@@ -32,7 +32,7 @@ const Hero = () => {
             className={`text-5xl md:text-7xl font-bold mb-6 tracking-tight transform transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             Ensemble, construisons
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-getigne-accent to-blue-400 block">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-getigne-accent to-teal-400 block">
               l'avenir de Gétigné
             </span>
           </h1>
