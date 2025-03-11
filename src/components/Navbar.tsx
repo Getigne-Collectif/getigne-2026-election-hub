@@ -55,8 +55,10 @@ const Navbar = () => {
             <Link to="/equipe" className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
               Notre équipe
             </Link>
-            <Button className="bg-getigne-accent text-white hover:bg-getigne-accent/80">
-              Nous contacter
+            <Button asChild className="bg-getigne-accent text-white hover:bg-getigne-accent/80">
+              <Link to="/contact">
+                Nous contacter
+              </Link>
             </Button>
           </nav>
 
@@ -93,8 +95,10 @@ const Navbar = () => {
           <Link to="/equipe" className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
             Notre équipe
           </Link>
-          <Button className="bg-getigne-accent text-white hover:bg-getigne-accent/80 mt-4 w-64">
-            Nous contacter
+          <Button asChild className="bg-getigne-accent text-white hover:bg-getigne-accent/80 mt-4 w-64">
+            <Link to="/contact">
+              Nous contacter
+            </Link>
           </Button>
         </nav>
       </div>
