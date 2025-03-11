@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,26 +12,6 @@ const Hero = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6, ease: [0.215, 0.61, 0.355, 1] }
-    }
-  };
-
   return (
     <section className="relative min-h-screen flex items-center px-4 py-20 overflow-hidden">
       {/* Background circle */}
@@ -40,39 +19,33 @@ const Hero = () => {
       <div className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-getigne-accent/10 blur-3xl opacity-70" />
       
       <div className="container mx-auto relative z-10">
-        <motion.div 
-          className="max-w-4xl mx-auto text-center"
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
-          variants={containerVariants}
+        <div 
+          className={`max-w-4xl mx-auto text-center transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
-          <motion.div variants={itemVariants} className="mb-4 inline-block">
+          <div className={`mb-4 inline-block transform transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
             <span className="text-getigne-accent bg-getigne-accent/10 px-4 py-1 rounded-full text-sm font-medium">
               Élections municipales 2026
             </span>
-          </motion.div>
+          </div>
 
-          <motion.h1 
-            variants={itemVariants}
-            className="text-5xl md:text-7xl font-bold mb-6 tracking-tight"
+          <h1 
+            className={`text-5xl md:text-7xl font-bold mb-6 tracking-tight transform transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             Ensemble, construisons
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-getigne-accent to-blue-400 block">
               l'avenir de Gétigné
             </span>
-          </motion.h1>
+          </h1>
 
-          <motion.p 
-            variants={itemVariants}
-            className="text-lg md:text-xl text-getigne-700 mb-10 max-w-3xl mx-auto"
+          <p 
+            className={`text-lg md:text-xl text-getigne-700 mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             Un collectif citoyen engagé pour une commune plus solidaire, 
             écologique et participative au service de toutes et tous.
-          </motion.p>
+          </p>
 
-          <motion.div 
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+          <div 
+            className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             <Button className="bg-getigne-accent hover:bg-getigne-accent/90 text-white py-6 px-8 rounded-md text-lg">
               Découvrir notre programme
@@ -80,8 +53,8 @@ const Hero = () => {
             <Button variant="outline" className="border-getigne-200 hover:bg-getigne-100 py-6 px-8 rounded-md text-lg">
               Nous rejoindre
             </Button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* Decorative pattern */}
