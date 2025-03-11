@@ -17,8 +17,8 @@ const Hero = () => {
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1559628129-67cf63b72248?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80" 
-          alt="Vue aérienne de Gétigné" 
+          src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80" 
+          alt="Groupe de personnes souriantes par une journée ensoleillée" 
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-getigne-800/80 to-getigne-800/30 backdrop-blur-sm"></div>
