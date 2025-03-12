@@ -3,28 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Calendar, Clock, MapPin, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-
-// Dummy events data
-const eventsData = [
-  {
-    id: 1,
-    title: "Réunion publique : Présentation du collectif",
-    description: "Venez nous rencontrer et échanger sur notre projet pour Gétigné.",
-    date: "15 mai 2024",
-    time: "19h00",
-    location: "Salle des Fêtes, Gétigné",
-    image: "https://images.unsplash.com/photo-1560439514-4e9645039924?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 2,
-    title: "Atelier participatif : Notre vision pour 2030",
-    description: "Un atelier collaboratif pour imaginer ensemble l'avenir de notre commune.",
-    date: "28 mai 2024",
-    time: "18h30",
-    location: "Espace culturel, Gétigné",
-    image: "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 const EventCard = ({ event, index }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -52,6 +31,21 @@ const EventCard = ({ event, index }) => {
     };
   }, []);
 
+  const formatDate = (dateStr) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  const formatTime = (dateStr) => {
+    return new Date(dateStr).toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <article 
       ref={ref}
@@ -73,11 +67,11 @@ const EventCard = ({ event, index }) => {
         <div className="flex flex-wrap gap-3 mb-3">
           <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
             <Calendar size={14} className="mr-1" />
-            <time>{event.date}</time>
+            <time>{formatDate(event.date)}</time>
           </div>
           <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
             <Clock size={14} className="mr-1" />
-            <span>{event.time}</span>
+            <span>{formatTime(event.date)}</span>
           </div>
           <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
             <MapPin size={14} className="mr-1" />
@@ -99,6 +93,53 @@ const EventCard = ({ event, index }) => {
 };
 
 const Events = () => {
+  const [eventsData, setEventsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .order('date', { ascending: true })
+          .limit(2);
+        
+        if (error) throw error;
+        
+        setEventsData(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des événements:', error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="evenements" className="py-24 px-4">
+        <div className="container mx-auto">
+          <div className="text-center">Chargement des événements...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="evenements" className="py-24 px-4">
+        <div className="container mx-auto">
+          <div className="text-center text-red-500">Une erreur est survenue: {error}</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="evenements" className="py-24 px-4">
       <div className="container mx-auto">

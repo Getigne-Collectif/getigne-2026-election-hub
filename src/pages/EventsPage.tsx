@@ -1,35 +1,11 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-
-// Dummy events data
-const events = [
-  {
-    id: 1,
-    title: "Réunion publique : Présentation du programme",
-    date: new Date("2024-03-15T19:00:00"),
-    location: "Salle des fêtes de Gétigné",
-    description: "Venez découvrir notre programme et échanger avec l'équipe du collectif sur notre vision pour Gétigné.",
-    image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 2,
-    title: "Café-débat : Transition écologique",
-    date: new Date("2024-03-22T10:00:00"),
-    location: "Café de la Place",
-    description: "Discussion ouverte autour des enjeux environnementaux et des solutions locales à mettre en place.",
-    image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 3,
-    title: "Atelier participatif : Mobilités douces",
-    date: new Date("2024-04-05T14:30:00"),
-    location: "Maison des associations",
-    description: "Atelier de réflexion collective sur l'amélioration des déplacements à vélo et à pied dans la commune.",
-    image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const EventCard = ({ event, index }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -57,19 +33,19 @@ const EventCard = ({ event, index }) => {
     };
   }, []);
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('fr-FR', {
+  const formatDate = (dateStr) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
-    }).format(date);
+    });
   };
 
-  const formatTime = (date: Date) => {
-    return new Intl.DateTimeFormat('fr-FR', {
-      hour: 'numeric',
-      minute: 'numeric'
-    }).format(date);
+  const formatTime = (dateStr) => {
+    return new Date(dateStr).toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -119,30 +95,64 @@ const EventCard = ({ event, index }) => {
 };
 
 const EventsPage = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .order('date', { ascending: true });
+        
+        if (error) throw error;
+        
+        setEvents(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des événements:', error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   return (
-    <div className="min-h-screen py-24 px-4">
-      <div className="container mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-            Agenda
-          </span>
-          <h1 className="text-4xl font-bold mt-4 mb-6">Nos prochains événements</h1>
-          <p className="text-getigne-700 text-lg">
-            Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échange 
-            pour construire ensemble l'avenir de Gétigné.
-          </p>
-        </div>
+    <div className="min-h-screen">
+      <Navbar />
+      <div className="py-24 px-4">
+        <div className="container mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+              Agenda
+            </span>
+            <h1 className="text-4xl font-bold mt-4 mb-6">Nos prochains événements</h1>
+            <p className="text-getigne-700 text-lg">
+              Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échange 
+              pour construire ensemble l'avenir de Gétigné.
+            </p>
+          </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event, index) => (
-            <EventCard key={event.id} event={event} index={index} />
-          ))}
+          {loading ? (
+            <div className="text-center py-8">Chargement des événements...</div>
+          ) : error ? (
+            <div className="text-center py-8 text-red-500">Une erreur est survenue: {error}</div>
+          ) : (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {events.map((event, index) => (
+                <EventCard key={event.id} event={event} index={index} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

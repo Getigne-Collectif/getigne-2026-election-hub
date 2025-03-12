@@ -1,10 +1,25 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Leaf, Users, Building, Book, Lightbulb, Heart, Shield, BarChart3 } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
-const ProgramSection = ({ icon: Icon, title, description, points }) => {
+// Map pour les icônes
+const iconMap = {
+  Leaf,
+  Home: Building,
+  Users,
+  BarChart3,
+  Lightbulb,
+  Book,
+  Heart,
+  Shield
+};
+
+const ProgramSection = ({ icon, title, description, points }) => {
+  const Icon = iconMap[icon] || Leaf;
+  
   return (
     <div className="mb-16">
       <div className="flex items-center gap-3 mb-4">
@@ -20,7 +35,7 @@ const ProgramSection = ({ icon: Icon, title, description, points }) => {
             <div className="w-6 h-6 rounded-full bg-getigne-accent/10 flex items-center justify-center text-getigne-accent mr-3 mt-0.5 flex-shrink-0">
               {index + 1}
             </div>
-            <p className="text-getigne-800">{point}</p>
+            <p className="text-getigne-800">{point.content}</p>
           </li>
         ))}
       </ul>
@@ -29,109 +44,53 @@ const ProgramSection = ({ icon: Icon, title, description, points }) => {
 };
 
 const ProgramPage = () => {
+  const [programSections, setProgramSections] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    
+    const fetchProgramData = async () => {
+      try {
+        // Récupérer tous les éléments du programme
+        const { data: programItems, error: programError } = await supabase
+          .from('program_items')
+          .select('*')
+          .order('title');
+        
+        if (programError) throw programError;
+        
+        // Pour chaque élément du programme, récupérer ses points
+        const programWithPoints = await Promise.all(
+          programItems.map(async (item) => {
+            const { data: points, error: pointsError } = await supabase
+              .from('program_points')
+              .select('*')
+              .eq('program_item_id', item.id)
+              .order('position');
+            
+            if (pointsError) throw pointsError;
+            
+            return {
+              ...item,
+              points: points
+            };
+          })
+        );
+        
+        setProgramSections(programWithPoints);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors de la récupération du programme:', error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
 
-  const programSections = [
-    {
-      icon: Leaf,
-      title: "Transition écologique",
-      description: "Faire de Gétigné une commune exemplaire en matière de transition écologique, résiliente face aux défis climatiques.",
-      points: [
-        "Développer un plan ambitieux de rénovation énergétique des bâtiments communaux.",
-        "Créer des îlots de fraîcheur et développer les espaces verts dans toute la commune.",
-        "Favoriser la mobilité douce avec un réseau de pistes cyclables sécurisées.",
-        "Mettre en place une alimentation biologique et locale dans la restauration scolaire.",
-        "Encourager l'installation d'un maraîchage bio et local pour approvisionner la commune."
-      ]
-    },
-    {
-      icon: Building,
-      title: "Cadre de vie",
-      description: "Aménager notre commune pour améliorer la qualité de vie de tous les habitants, quel que soit leur âge ou leur quartier.",
-      points: [
-        "Élaborer un plan d'urbanisme respectueux de l'identité de notre commune.",
-        "Créer des espaces publics conviviaux et inclusifs dans tous les quartiers.",
-        "Mettre en place une politique de logement accessible et diversifié.",
-        "Sécuriser les abords des écoles et les zones piétonnes.",
-        "Valoriser le patrimoine local et les espaces naturels remarquables."
-      ]
-    },
-    {
-      icon: Users,
-      title: "Solidarité & Inclusion",
-      description: "Renforcer le lien social et veiller à ce que personne ne soit laissé de côté dans notre commune.",
-      points: [
-        "Développer les services de proximité pour les personnes âgées ou en situation de handicap.",
-        "Créer une maison des associations pour favoriser l'engagement citoyen.",
-        "Mettre en place un dispositif de soutien aux familles en difficulté.",
-        "Soutenir les initiatives intergénérationnelles et de partage de compétences.",
-        "Œuvrer pour l'accessibilité de tous les équipements publics."
-      ]
-    },
-    {
-      icon: BarChart3,
-      title: "Économie locale",
-      description: "Dynamiser l'économie locale en favorisant les circuits courts et en soutenant nos commerces de proximité.",
-      points: [
-        "Créer un marché hebdomadaire de producteurs locaux en centre-ville.",
-        "Mettre en place un incubateur pour accompagner les projets d'entreprises locales.",
-        "Favoriser l'implantation de commerces diversifiés dans le centre-ville.",
-        "Créer une monnaie locale pour dynamiser les échanges dans la commune.",
-        "Mettre en valeur l'artisanat local et favoriser les achats responsables."
-      ]
-    },
-    {
-      icon: Book,
-      title: "Éducation & Jeunesse",
-      description: "Investir dans l'avenir de notre commune en soutenant notre jeunesse et en développant des projets éducatifs ambitieux.",
-      points: [
-        "Rénover et moderniser les écoles de la commune.",
-        "Développer les activités périscolaires autour de la citoyenneté et de l'écologie.",
-        "Créer un conseil municipal des jeunes pour impliquer la jeunesse dans la vie locale.",
-        "Mettre en place un soutien scolaire gratuit pour les élèves en difficulté.",
-        "Développer les infrastructures sportives et culturelles pour les jeunes."
-      ]
-    },
-    {
-      icon: Heart,
-      title: "Santé & Bien-être",
-      description: "Veiller à la santé et au bien-être de tous les habitants en améliorant l'accès aux soins et en favorisant un environnement sain.",
-      points: [
-        "Lutter contre les déserts médicaux en favorisant l'installation de professionnels de santé.",
-        "Créer une maison de santé pluridisciplinaire accessible à tous.",
-        "Développer des initiatives de prévention et d'éducation à la santé.",
-        "Aménager des parcours de santé dans les espaces verts de la commune.",
-        "Veiller à la qualité de l'air et de l'eau dans notre commune."
-      ]
-    },
-    {
-      icon: Shield,
-      title: "Sécurité & Tranquillité",
-      description: "Assurer la sécurité et la tranquillité de tous les habitants en privilégiant la prévention et la médiation.",
-      points: [
-        "Renforcer la présence des médiateurs de rue dans les quartiers.",
-        "Améliorer l'éclairage public tout en respectant les enjeux énergétiques.",
-        "Mettre en place des actions de prévention routière, notamment aux abords des écoles.",
-        "Lutter contre les incivilités par la sensibilisation et l'éducation.",
-        "Développer les systèmes d'entraide entre voisins."
-      ]
-    },
-    {
-      icon: Lightbulb,
-      title: "Démocratie participative",
-      description: "Impliquer les citoyens dans les décisions qui les concernent et faire vivre la démocratie locale au quotidien.",
-      points: [
-        "Mettre en place un budget participatif pour des projets proposés par les habitants.",
-        "Créer des conseils de quartier avec un pouvoir de proposition réel.",
-        "Organiser régulièrement des consultations citoyennes sur les grands projets.",
-        "Rendre transparentes les décisions municipales avec une communication claire et accessible.",
-        "Former les habitants qui le souhaitent aux enjeux de la gestion municipale."
-      ]
-    }
-  ];
+    fetchProgramData();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -173,15 +132,21 @@ const ProgramPage = () => {
 
           {/* Program sections */}
           <div className="max-w-4xl mx-auto">
-            {programSections.map((section, index) => (
-              <ProgramSection
-                key={index}
-                icon={section.icon}
-                title={section.title}
-                description={section.description}
-                points={section.points}
-              />
-            ))}
+            {loading ? (
+              <div className="text-center py-8">Chargement du programme...</div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-500">Une erreur est survenue: {error}</div>
+            ) : (
+              programSections.map((section, index) => (
+                <ProgramSection
+                  key={section.id}
+                  icon={section.icon}
+                  title={section.title}
+                  description={section.description}
+                  points={section.points}
+                />
+              ))
+            )}
           </div>
 
           {/* Conclusion */}

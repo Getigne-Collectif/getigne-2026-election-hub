@@ -1,12 +1,27 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronRight, Leaf, Home, Users, BarChart3, Lightbulb } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
+import { Leaf, Home, Users, BarChart3, Lightbulb, Book, Heart, Shield } from 'lucide-react';
 
-const ProgramItem = ({ icon: Icon, title, description, delay }) => {
+// Map pour les icônes
+const iconMap = {
+  Leaf,
+  Home,
+  Users,
+  BarChart3,
+  Lightbulb,
+  Book,
+  Heart,
+  Shield
+};
+
+const ProgramItem = ({ icon, title, description, delay }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
+  const Icon = iconMap[icon] || Leaf;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -54,33 +69,52 @@ const ProgramItem = ({ icon: Icon, title, description, delay }) => {
 };
 
 const Program = () => {
-  const programItems = [
-    {
-      icon: Leaf,
-      title: "Transition écologique",
-      description: "Des mesures concrètes pour une commune plus verte et responsable face aux défis climatiques.",
-    },
-    {
-      icon: Home,
-      title: "Cadre de vie",
-      description: "Aménagements urbains et développement de services pour améliorer la qualité de vie à Gétigné.",
-    },
-    {
-      icon: Users,
-      title: "Solidarité & Inclusion",
-      description: "Des initiatives pour ne laisser personne de côté et renforcer le lien social entre tous les habitants.",
-    },
-    {
-      icon: BarChart3,
-      title: "Économie locale",
-      description: "Soutien aux commerces de proximité et développement des ressources économiques locales.",
-    },
-    {
-      icon: Lightbulb,
-      title: "Démocratie participative",
-      description: "Impliquer les citoyens dans les décisions avec des outils de consultation et de co-construction.",
-    }
-  ];
+  const [programItems, setProgramItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProgramItems = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('program_items')
+          .select('*')
+          .order('title');
+        
+        if (error) throw error;
+        
+        // Limiter à 5 items pour la page d'accueil
+        setProgramItems(data.slice(0, 5));
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des éléments du programme:', error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProgramItems();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-24 px-4 relative overflow-hidden">
+        <div className="container mx-auto">
+          <div className="text-center">Chargement des données du programme...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-24 px-4 relative overflow-hidden">
+        <div className="container mx-auto">
+          <div className="text-center text-red-500">Une erreur est survenue: {error}</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="programme" className="py-24 px-4 relative overflow-hidden">
@@ -99,7 +133,7 @@ const Program = () => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {programItems.map((item, index) => (
             <ProgramItem 
-              key={index} 
+              key={item.id} 
               icon={item.icon} 
               title={item.title} 
               description={item.description} 

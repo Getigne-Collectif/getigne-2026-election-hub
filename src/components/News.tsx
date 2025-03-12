@@ -3,31 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-
-// Dummy news data
-const newsArticles = [
-  {
-    id: 1,
-    title: "Lancement officiel de notre collectif",
-    excerpt: "Nous sommes fiers d'annoncer le lancement officiel de Gétigné Collectif, une initiative citoyenne pour les élections municipales de 2026.",
-    date: "24 avril 2024",
-    image: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 2,
-    title: "Consultation citoyenne sur les transports",
-    excerpt: "Rejoignez-nous pour notre première consultation citoyenne autour des enjeux de mobilité dans notre commune.",
-    date: "15 avril 2024",
-    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 3,
-    title: "Rencontre avec les associations locales",
-    excerpt: "Notre collectif a rencontré plusieurs associations locales pour échanger sur les besoins en matière d'équipements et de soutien.",
-    date: "2 avril 2024",
-    image: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 const NewsCard = ({ article, index }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -75,7 +51,7 @@ const NewsCard = ({ article, index }) => {
       <div className="p-6">
         <div className="flex items-center text-getigne-500 text-sm mb-3">
           <Calendar size={14} className="mr-1" />
-          <time>{article.date}</time>
+          <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
         </div>
         <h3 className="font-medium text-xl mb-2">{article.title}</h3>
         <p className="text-getigne-700 mb-4">{article.excerpt}</p>
@@ -92,6 +68,53 @@ const NewsCard = ({ article, index }) => {
 };
 
 const News = () => {
+  const [newsArticles, setNewsArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('news')
+          .select('*')
+          .order('date', { ascending: false })
+          .limit(3);
+        
+        if (error) throw error;
+        
+        setNewsArticles(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des actualités:', error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="actualites" className="py-24 px-4 bg-getigne-50">
+        <div className="container mx-auto">
+          <div className="text-center">Chargement des actualités...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="actualites" className="py-24 px-4 bg-getigne-50">
+        <div className="container mx-auto">
+          <div className="text-center text-red-500">Une erreur est survenue: {error}</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="actualites" className="py-24 px-4 bg-getigne-50">
       <div className="container mx-auto">
