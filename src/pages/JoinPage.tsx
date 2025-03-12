@@ -1,5 +1,4 @@
-
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import Breadcrumb from "@/components/Breadcrumb";
 import Footer from "@/components/Footer";
@@ -8,7 +7,7 @@ import { Users, Heart, Zap, Landmark, LayoutList, PiggyBank } from 'lucide-react
 
 const JoinPage = () => {
   return (
-    <>
+    <HelmetProvider>
       <Helmet>
         <title>Adhérer | Collectif Gétigné</title>
         <meta
@@ -135,7 +134,7 @@ const JoinPage = () => {
 
         <Footer />
       </div>
-    </>
+    </HelmetProvider>
   );
 };
 

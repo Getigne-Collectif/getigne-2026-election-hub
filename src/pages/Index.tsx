@@ -1,5 +1,5 @@
 
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
@@ -11,7 +11,7 @@ import Team from "@/components/Team";
 import Values from "@/components/Values";
 
 const Index = () => (
-  <>
+  <HelmetProvider>
     <Helmet>
       <title>Collectif Gétigné | Ensemble pour une commune écologique, solidaire et démocratique</title>
       <meta
@@ -31,7 +31,7 @@ const Index = () => (
       <Team />
       <Footer />
     </div>
-  </>
+  </HelmetProvider>
 );
 
 export default Index;
