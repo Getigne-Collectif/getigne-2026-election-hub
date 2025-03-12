@@ -128,7 +128,7 @@ const EventsPage = () => {
         });
         
         // Sort past events in descending order (most recent first)
-        past.sort((a, b) => new Date(b.date) - new Date(a.date));
+        past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         
         setUpcomingEvents(upcoming);
         setPastEvents(past);

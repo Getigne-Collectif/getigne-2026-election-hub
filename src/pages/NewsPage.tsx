@@ -8,9 +8,22 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 
-const NewsCard = ({ article }) => {
+interface NewsArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  date: string;
+  image: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+const NewsCard = ({ article }: { article: NewsArticle }) => {
   // Parse tags from the article if they exist
-  const tags = article.tags ? Array.isArray(article.tags) ? article.tags : JSON.parse(article.tags) : [];
+  const tags = article.tags || [];
   
   return (
     <article className="bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift">
@@ -60,14 +73,14 @@ const NewsCard = ({ article }) => {
 };
 
 const NewsPage = () => {
-  const [allNewsArticles, setAllNewsArticles] = useState([]);
+  const [allNewsArticles, setAllNewsArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('Tous');
-  const [activeTags, setActiveTags] = useState([]);
+  const [activeTags, setActiveTags] = useState<string[]>([]);
   const [categories, setCategories] = useState(['Tous']);
-  const [availableTags, setAvailableTags] = useState([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
@@ -95,19 +108,13 @@ const NewsPage = () => {
         
         if (error) throw error;
         
-        // Parse tags for each article
+        // Ensure all articles have a valid tags array
         const processedData = data.map(article => {
-          if (article.tags && typeof article.tags === 'string') {
-            try {
-              article.tags = JSON.parse(article.tags);
-            } catch (e) {
-              console.error('Error parsing tags for article:', article.id);
-              article.tags = [];
-            }
-          } else if (!article.tags) {
+          // Make sure tags is always an array
+          if (!article.tags) {
             article.tags = [];
           }
-          return article;
+          return article as NewsArticle;
         });
         
         setAllNewsArticles(processedData);
@@ -117,7 +124,7 @@ const NewsPage = () => {
         setCategories(uniqueCategories);
         
         // Extract unique tags
-        const allTags = new Set();
+        const allTags = new Set<string>();
         processedData.forEach(article => {
           if (Array.isArray(article.tags)) {
             article.tags.forEach(tag => allTags.add(tag));
@@ -128,7 +135,7 @@ const NewsPage = () => {
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des actualités:', error);
-        setError(error.message);
+        setError((error as Error).message);
         setLoading(false);
       }
     };
@@ -152,19 +159,19 @@ const NewsPage = () => {
   }, [activeCategory, activeTags, setSearchParams]);
   
   // Handle category change
-  const handleCategoryChange = (category) => {
+  const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
   };
   
   // Handle tag selection
-  const handleTagSelect = (tag) => {
+  const handleTagSelect = (tag: string) => {
     if (!activeTags.includes(tag)) {
       setActiveTags([...activeTags, tag]);
     }
   };
   
   // Handle tag removal
-  const handleTagRemove = (tag) => {
+  const handleTagRemove = (tag: string) => {
     setActiveTags(activeTags.filter(t => t !== tag));
   };
   

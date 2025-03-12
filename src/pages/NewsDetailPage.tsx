@@ -8,12 +8,25 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import NotFound from './NotFound';
 
+interface NewsArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  date: string;
+  image: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 const NewsDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [article, setArticle] = useState(null);
+  const [article, setArticle] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,11 +41,16 @@ const NewsDetailPage = () => {
         
         if (error) throw error;
         
-        setArticle(data);
+        // Ensure tags is an array
+        if (!data.tags) {
+          data.tags = [];
+        }
+        
+        setArticle(data as NewsArticle);
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération de l\'article:', error);
-        setError(error.message);
+        setError((error as Error).message);
         setLoading(false);
       }
     };
@@ -56,8 +74,8 @@ const NewsDetailPage = () => {
     return <NotFound />;
   }
 
-  // Parse tags from the article if they exist
-  const tags = article.tags ? Array.isArray(article.tags) ? article.tags : JSON.parse(article.tags) : [];
+  // Get tags from the article
+  const tags = article.tags || [];
 
   return (
     <div className="min-h-screen flex flex-col">

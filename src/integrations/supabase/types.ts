@@ -160,6 +160,7 @@ export type Database = {
           excerpt: string
           id: string
           image: string
+          tags: Json | null
           title: string
           updated_at: string
         }
@@ -171,6 +172,7 @@ export type Database = {
           excerpt: string
           id?: string
           image: string
+          tags?: Json | null
           title: string
           updated_at?: string
         }
@@ -182,6 +184,7 @@ export type Database = {
           excerpt?: string
           id?: string
           image?: string
+          tags?: Json | null
           title?: string
           updated_at?: string
         }
