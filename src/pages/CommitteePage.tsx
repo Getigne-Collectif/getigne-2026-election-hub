@@ -6,10 +6,29 @@ import Footer from '@/components/Footer';
 import { supabase } from "@/integrations/supabase/client";
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Lightbulb, Bike, Utensils, Music, Leaf, Calendar, Users } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf, Calendar, Users, FileDown, ExternalLink } from 'lucide-react';
 import CommitteeMembers, { getMemberCount } from '@/components/CommitteeMembers';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+
+// Types
+type Work = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  images?: { url: string; caption: string }[];
+  files?: { url: string; name: string; type: string }[];
+};
 
 // Map pour les icônes
 const iconMap = {
@@ -20,11 +39,24 @@ const iconMap = {
   Leaf
 };
 
+// Map pour les icônes de type de fichier
+const fileTypeIconMap: Record<string, React.ReactNode> = {
+  pdf: <FileDown className="mr-2" size={16} />,
+  doc: <FileDown className="mr-2" size={16} />,
+  docx: <FileDown className="mr-2" size={16} />,
+  xls: <FileDown className="mr-2" size={16} />,
+  xlsx: <FileDown className="mr-2" size={16} />,
+  ppt: <FileDown className="mr-2" size={16} />,
+  pptx: <FileDown className="mr-2" size={16} />,
+  default: <ExternalLink className="mr-2" size={16} />
+};
+
 const CommitteePage = () => {
   const { id } = useParams();
   const [committee, setCommittee] = useState(null);
   const [pilots, setPilots] = useState([]);
-  const [works, setWorks] = useState([]);
+  const [works, setWorks] = useState<Work[]>([]);
+  const [selectedWork, setSelectedWork] = useState<Work | null>(null);
   const [memberCount, setMemberCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -188,9 +220,20 @@ const CommitteePage = () => {
                       </div>
                       <h3 className="text-xl font-medium mb-4">{work.title}</h3>
                       <div className="text-getigne-700 space-y-4">
-                        {work.content.split('\n').map((paragraph, i) => (
+                        {work.content.split('\n').slice(0, 2).map((paragraph, i) => (
                           <p key={i}>{paragraph}</p>
                         ))}
+                        {work.content.split('\n').length > 2 && (
+                          <div className="text-center mt-4">
+                            <Button 
+                              onClick={() => setSelectedWork(work)}
+                              variant="outline"
+                              className="mt-2"
+                            >
+                              Voir plus de détails
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -216,6 +259,78 @@ const CommitteePage = () => {
           </div>
         </div>
       </main>
+
+      {/* Modal pour afficher les détails d'une synthèse */}
+      <Dialog open={!!selectedWork} onOpenChange={(open) => !open && setSelectedWork(null)}>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+          {selectedWork && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl md:text-2xl">{selectedWork.title}</DialogTitle>
+                <DialogDescription>
+                  <time className="text-getigne-500">
+                    {format(new Date(selectedWork.date), 'd MMMM yyyy', { locale: fr })}
+                  </time>
+                </DialogDescription>
+              </DialogHeader>
+              
+              {/* Images */}
+              {selectedWork.images && selectedWork.images.length > 0 && (
+                <div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {selectedWork.images.map((image, index) => (
+                    <figure key={index} className="rounded-lg overflow-hidden">
+                      <img 
+                        src={image.url} 
+                        alt={image.caption || `Image ${index + 1}`} 
+                        className="w-full h-64 object-cover"
+                      />
+                      {image.caption && (
+                        <figcaption className="text-sm text-getigne-500 p-2 bg-getigne-50">
+                          {image.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  ))}
+                </div>
+              )}
+
+              {/* Contenu */}
+              <div className="text-getigne-700 space-y-4 my-6">
+                {selectedWork.content.split('\n').map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+
+              {/* Fichiers à télécharger */}
+              {selectedWork.files && selectedWork.files.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="mt-6">
+                    <h4 className="font-medium mb-3">Documents à télécharger</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {selectedWork.files.map((file, index) => {
+                        const fileIcon = file.type ? fileTypeIconMap[file.type] : fileTypeIconMap.default;
+                        return (
+                          <a 
+                            key={index}
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center p-3 border border-getigne-100 rounded-lg hover:bg-getigne-50 transition-colors"
+                          >
+                            {fileIcon}
+                            <span>{file.name}</span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
