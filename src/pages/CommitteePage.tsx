@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -73,7 +74,6 @@ const CommitteePage = () => {
     },
   });
 
-  const members = membersQuery.data || [];
   const works = worksQuery.data || [];
   const committee = committeeQuery.data?.[0];
 
@@ -91,7 +91,7 @@ const CommitteePage = () => {
         <p className="mt-2 text-muted-foreground">{committee.description}</p>
       </div>
 
-      <CommitteeMembers members={members} />
+      {id && <CommitteeMembers committeeId={id} />}
 
       <div className="space-y-6">
         <h2 className="text-2xl font-bold">Travaux de la commission</h2>
