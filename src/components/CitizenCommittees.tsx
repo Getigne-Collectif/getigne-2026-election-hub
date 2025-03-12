@@ -4,12 +4,12 @@ import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Bicycle, Utensils, Music, Leaf } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
 
 // Map pour les icônes
 const iconMap = {
   Lightbulb,
-  Bicycle,
+  Bicycle: Bike, // Replace Bicycle with Bike
   Utensils,
   Music,
   Leaf

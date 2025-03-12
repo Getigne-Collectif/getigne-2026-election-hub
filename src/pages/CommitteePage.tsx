@@ -6,12 +6,12 @@ import Footer from '@/components/Footer';
 import { supabase } from "@/integrations/supabase/client";
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Lightbulb, Bicycle, Utensils, Music, Leaf, Calendar } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf, Calendar } from 'lucide-react';
 
 // Map pour les icônes
 const iconMap = {
   Lightbulb,
-  Bicycle,
+  Bicycle: Bike, // Replace Bicycle with Bike
   Utensils,
   Music,
   Leaf

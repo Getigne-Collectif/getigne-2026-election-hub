@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Bicycle, Utensils, Music, Leaf, ChevronRight } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf, ChevronRight } from 'lucide-react';
 
 // Map pour les icônes
 const iconMap = {
   Lightbulb,
-  Bicycle,
+  Bicycle: Bike, // Replace Bicycle with Bike
   Utensils,
   Music,
   Leaf
