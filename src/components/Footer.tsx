@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Discord, Facebook, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -27,7 +27,7 @@ const Footer = () => {
                 <Facebook size={20} />
               </a>
               <a href="https://discord.gg/ePHjxJssex" className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
-                <Discord size={20} />
+                <MessageSquare size={20} />
               </a>
             </div>
           </div>
