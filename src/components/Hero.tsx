@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -17,11 +18,11 @@ const Hero = () => {
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80" 
-          alt="Groupe de personnes souriantes par une journée ensoleillée" 
+          src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80" 
+          alt="Champ de fleurs oranges dans la campagne par une journée ensoleillée" 
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-getigne-800/80 to-getigne-800/30 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-getigne-800/60 to-getigne-800/20 backdrop-blur-sm"></div>
       </div>
       
       {/* Semi-transparent shapes */}
@@ -57,11 +58,15 @@ const Hero = () => {
           <div 
             className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
-            <Button className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              Découvrir notre programme
+            <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <Link to="/programme">
+                Découvrir notre programme
+              </Link>
             </Button>
-            <Button variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 py-6 px-8 rounded-md text-lg backdrop-blur-sm">
-              Nous rejoindre
+            <Button asChild variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 py-6 px-8 rounded-md text-lg backdrop-blur-sm">
+              <Link to="/contact">
+                Nous rejoindre
+              </Link>
             </Button>
           </div>
         </div>
