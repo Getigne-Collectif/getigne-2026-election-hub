@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -74,10 +75,10 @@ export default {
 					'700': '#4a4a5d',
 					'800': '#40404f',
 					'900': '#1d1d1f',
-					'accent': '#10B981',
+					'accent': '#34b190', // Changed from #10B981 to #34b190
 					'green': {
 						'100': '#DCFCE7',
-						'500': '#10B981',
+						'500': '#34b190', // Changed from #10B981 to #34b190
 						'600': '#059669',
 						'700': '#047857'
 					}
