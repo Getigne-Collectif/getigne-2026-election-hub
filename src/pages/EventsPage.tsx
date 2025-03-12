@@ -95,7 +95,8 @@ const EventCard = ({ event, index }) => {
 };
 
 const EventsPage = () => {
-  const [events, setEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -111,7 +112,26 @@ const EventsPage = () => {
         
         if (error) throw error;
         
-        setEvents(data);
+        const now = new Date();
+        
+        // Split events into upcoming and past
+        const upcoming = [];
+        const past = [];
+        
+        data.forEach(event => {
+          const eventDate = new Date(event.date);
+          if (eventDate >= now) {
+            upcoming.push(event);
+          } else {
+            past.push(event);
+          }
+        });
+        
+        // Sort past events in descending order (most recent first)
+        past.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        setUpcomingEvents(upcoming);
+        setPastEvents(past);
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
@@ -128,6 +148,7 @@ const EventsPage = () => {
       <Navbar />
       <div className="py-24 px-4">
         <div className="container mx-auto">
+          {/* Upcoming Events */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
               Agenda
@@ -144,10 +165,40 @@ const EventsPage = () => {
           ) : error ? (
             <div className="text-center py-8 text-red-500">Une erreur est survenue: {error}</div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {events.map((event, index) => (
-                <EventCard key={event.id} event={event} index={index} />
-              ))}
+            <>
+              {upcomingEvents.length > 0 ? (
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                  {upcomingEvents.map((event, index) => (
+                    <EventCard key={event.id} event={event} index={index} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 bg-getigne-50 rounded-lg">
+                  <h3 className="text-xl font-medium mb-2">Aucun événement à venir</h3>
+                  <p className="text-getigne-700">Revenez bientôt pour découvrir nos futurs événements</p>
+                </div>
+              )}
+            </>
+          )}
+          
+          {/* Past Events Section */}
+          {!loading && !error && pastEvents.length > 0 && (
+            <div className="mt-24">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <span className="bg-getigne-700/10 text-getigne-700 font-medium px-4 py-1 rounded-full text-sm">
+                  Historique
+                </span>
+                <h2 className="text-3xl font-bold mt-4 mb-6">Événements passés</h2>
+                <p className="text-getigne-700 text-lg">
+                  Découvrez les événements que nous avons organisés récemment.
+                </p>
+              </div>
+              
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {pastEvents.map((event, index) => (
+                  <EventCard key={event.id} event={event} index={index} />
+                ))}
+              </div>
             </div>
           )}
         </div>

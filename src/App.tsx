@@ -8,7 +8,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProgramPage from "./pages/ProgramPage";
 import NewsPage from "./pages/NewsPage";
+import NewsDetailPage from "./pages/NewsDetailPage";
 import EventsPage from "./pages/EventsPage";
+import EventDetailPage from "./pages/EventDetailPage";
 import TeamPage from "./pages/TeamPage";
 import ContactPage from "./pages/ContactPage";
 import CommitteesPage from "./pages/CommitteesPage";
@@ -27,7 +29,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/programme" element={<ProgramPage />} />
           <Route path="/actualites" element={<NewsPage />} />
+          <Route path="/actualites/:id" element={<NewsDetailPage />} />
           <Route path="/evenements" element={<EventsPage />} />
+          <Route path="/evenements/:id" element={<EventDetailPage />} />
           <Route path="/equipe" element={<TeamPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/commissions" element={<CommitteesPage />} />
