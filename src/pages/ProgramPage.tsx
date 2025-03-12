@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Leaf, Users, Building, Book, Lightbulb, Heart, Shield, BarChart3 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import CitizenCommittees from '@/components/CitizenCommittees';
 
 // Map pour les icônes
 const iconMap = {
@@ -113,8 +114,8 @@ const ProgramPage = () => {
       </div>
 
       {/* Program content */}
-      <main className="flex-grow py-16">
-        <div className="container mx-auto px-4">
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 py-16">
           {/* Introduction */}
           <div className="max-w-3xl mx-auto mb-16 pb-10 border-b border-getigne-100">
             <h2 className="text-3xl font-bold mb-6">Notre vision pour Gétigné</h2>
@@ -148,9 +149,14 @@ const ProgramPage = () => {
               ))
             )}
           </div>
+        </div>
 
+        {/* Citizen committees section */}
+        <CitizenCommittees />
+
+        <div className="container mx-auto px-4 py-16">
           {/* Conclusion */}
-          <div className="max-w-3xl mx-auto mt-16 pt-10 border-t border-getigne-100">
+          <div className="max-w-3xl mx-auto mt-8 pt-10 border-t border-getigne-100">
             <h2 className="text-3xl font-bold mb-6">Notre engagement</h2>
             <p className="text-getigne-700 text-lg mb-4">
               Ce programme a été élaboré à partir de nombreuses rencontres avec les habitants de Gétigné, des associations 

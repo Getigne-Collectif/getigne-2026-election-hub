@@ -3,38 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { User, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-
-// Dummy team data
-const teamMembers = [
-  {
-    id: 1,
-    name: "Marie Dubois",
-    role: "Porte-parole",
-    bio: "Engagée dans la vie associative depuis 15 ans, Marie souhaite mettre son expérience au service de la commune.",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 2,
-    name: "Thomas Martin",
-    role: "Coordinateur",
-    bio: "Ingénieur en environnement, Thomas est spécialisé dans les questions de transition écologique et de développement durable.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 3,
-    name: "Sophie Bernard",
-    role: "Trésorière",
-    bio: "Comptable de profession, Sophie veille à la transparence et à la bonne gestion des ressources du collectif.",
-    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 4,
-    name: "Lucas Petit",
-    role: "Chargé de communication",
-    bio: "Graphiste et communicant, Lucas met ses compétences au service de la visibilité de notre collectif.",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 const TeamMember = ({ member, index }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -89,6 +58,51 @@ const TeamMember = ({ member, index }) => {
 };
 
 const Team = () => {
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('team_members')
+          .select('*');
+        
+        if (error) throw error;
+        
+        setTeamMembers(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des membres de l\'équipe:', error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchTeamMembers();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="equipe" className="py-24 px-4 bg-getigne-50">
+        <div className="container mx-auto">
+          <div className="text-center">Chargement des membres de l'équipe...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="equipe" className="py-24 px-4 bg-getigne-50">
+        <div className="container mx-auto">
+          <div className="text-center text-red-500">Une erreur est survenue: {error}</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="equipe" className="py-24 px-4 bg-getigne-50">
       <div className="container mx-auto">

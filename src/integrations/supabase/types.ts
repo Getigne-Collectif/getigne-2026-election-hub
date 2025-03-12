@@ -9,6 +9,71 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      citizen_committees: {
+        Row: {
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          icon: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      committee_works: {
+        Row: {
+          committee_id: string
+          content: string
+          created_at: string
+          date: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          committee_id: string
+          content: string
+          created_at?: string
+          date: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          committee_id?: string
+          content?: string
+          created_at?: string
+          date?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "committee_works_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_committees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string
@@ -139,6 +204,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      team_members: {
+        Row: {
+          bio: string
+          created_at: string
+          id: string
+          image: string
+          name: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          bio: string
+          created_at?: string
+          id?: string
+          image: string
+          name: string
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string
+          created_at?: string
+          id?: string
+          image?: string
+          name?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

@@ -11,6 +11,8 @@ import NewsPage from "./pages/NewsPage";
 import EventsPage from "./pages/EventsPage";
 import TeamPage from "./pages/TeamPage";
 import ContactPage from "./pages/ContactPage";
+import CommitteesPage from "./pages/CommitteesPage";
+import CommitteePage from "./pages/CommitteePage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/evenements" element={<EventsPage />} />
           <Route path="/equipe" element={<TeamPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/commissions" element={<CommitteesPage />} />
+          <Route path="/commissions/:id" element={<CommitteePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
