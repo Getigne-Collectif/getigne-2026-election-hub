@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { Discord, Facebook, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,7 +11,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* About */}
           <div>
-            <h3 className="text-xl font-medium mb-4">Gétigné Collectif</h3>
+            <div className="mb-4">
+              <img 
+                src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png" 
+                alt="Gétigné Collectif" 
+                className="h-14 mb-4"
+              />
+            </div>
             <p className="text-getigne-100 mb-6">
               Collectif citoyen engagé pour les élections municipales de 2026 à Gétigné.
               Ensemble, construisons une commune plus solidaire, écologique et participative.
@@ -20,11 +26,8 @@ const Footer = () => {
               <a href="#" className="text-getigne-100 hover:text-white transition-colors" aria-label="Facebook">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-getigne-100 hover:text-white transition-colors" aria-label="Twitter">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="text-getigne-100 hover:text-white transition-colors" aria-label="Instagram">
-                <Instagram size={20} />
+              <a href="https://discord.gg/ePHjxJssex" className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+                <Discord size={20} />
               </a>
             </div>
           </div>
@@ -56,6 +59,16 @@ const Footer = () => {
               <li>
                 <Link to="/equipe" className="text-getigne-100 hover:text-white transition-colors">
                   Notre équipe
+                </Link>
+              </li>
+              <li>
+                <Link to="/commissions" className="text-getigne-100 hover:text-white transition-colors">
+                  Commissions
+                </Link>
+              </li>
+              <li>
+                <Link to="/plan-du-site" className="text-getigne-100 hover:text-white transition-colors">
+                  Plan du site
                 </Link>
               </li>
             </ul>

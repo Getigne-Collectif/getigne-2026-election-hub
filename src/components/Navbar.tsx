@@ -36,7 +36,11 @@ const Navbar = () => {
             to="/" 
             className="text-getigne-900 font-medium text-xl flex items-center gap-2"
           >
-            <span className="text-getigne-accent">Gétigné</span> Collectif
+            <img 
+              src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png" 
+              alt="Gétigné Collectif" 
+              className="h-10"
+            />
           </Link>
 
           {/* Desktop Navigation */}

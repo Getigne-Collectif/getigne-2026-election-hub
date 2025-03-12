@@ -8,6 +8,7 @@ import CommitteeWorkModal from '@/components/CommitteeWorkModal';
 import { type Tables } from '@/integrations/supabase/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface Member {
   id: string;
@@ -87,6 +88,7 @@ const CommitteePage = () => {
     <>
       <Navbar />
       <div className="container py-8 space-y-8 mt-20">
+        <Breadcrumb />
         <div>
           <div className="flex items-center gap-4">
             <img src={committee.icon} alt={committee.title} className="w-12 h-12" />
