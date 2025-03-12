@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { User } from 'lucide-react';
 
@@ -68,30 +68,11 @@ const CommitteeMembers = ({ committeeId }: CommitteeMembersProps) => {
             {pilots.map(pilot => (
               <div key={pilot.id} className="flex flex-col items-center text-center">
                 <Avatar className="w-24 h-24 mb-3 border-2 border-getigne-accent">
-                  <img src={pilot.photo} alt={pilot.name} className="object-cover" />
+                  <AvatarImage src={pilot.photo} alt={pilot.name} className="object-cover" />
                 </Avatar>
                 <div className="space-y-1">
                   <h4 className="font-medium">{pilot.name}</h4>
                   <Badge className="bg-getigne-accent">Pilote</Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Section des membres réguliers */}
-      {regularMembers.length > 0 && (
-        <div>
-          <h3 className="text-xl font-medium mb-4">Membres de la commission</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {regularMembers.map(member => (
-              <div key={member.id} className="flex flex-col items-center text-center">
-                <Avatar className="w-20 h-20 mb-2">
-                  <img src={member.photo} alt={member.name} className="object-cover" />
-                </Avatar>
-                <div>
-                  <h4 className="font-medium">{member.name}</h4>
                 </div>
               </div>
             ))}

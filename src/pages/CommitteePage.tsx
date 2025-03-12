@@ -7,8 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Lightbulb, Bike, Utensils, Music, Leaf, Calendar, Users } from 'lucide-react';
-import CommitteeMembers from '@/components/CommitteeMembers';
-import { Avatar } from '@/components/ui/avatar';
+import CommitteeMembers, { getMemberCount } from '@/components/CommitteeMembers';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
 // Map pour les icônes
@@ -25,6 +25,7 @@ const CommitteePage = () => {
   const [committee, setCommittee] = useState(null);
   const [pilots, setPilots] = useState([]);
   const [works, setWorks] = useState([]);
+  const [memberCount, setMemberCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -60,9 +61,13 @@ const CommitteePage = () => {
         
         if (worksError) throw worksError;
         
+        // Récupérer le nombre de membres
+        const count = await getMemberCount(id);
+
         setCommittee(committeeData);
         setPilots(pilotsData);
         setWorks(worksData);
+        setMemberCount(count);
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des données de la commission:', error);
@@ -127,44 +132,47 @@ const CommitteePage = () => {
               {committee.description}
             </p>
 
-            {/* Affichage des pilotes */}
-            {pilots.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-4 items-center">
-                <span className="text-getigne-700 font-medium">
-                  {pilots.length > 1 ? 'Pilotes :' : 'Pilote :'}
-                </span>
-                <div className="flex flex-wrap gap-3">
-                  {pilots.map(pilot => (
-                    <div key={pilot.id} className="flex items-center bg-white rounded-full pl-1 pr-3 py-1 shadow-sm border border-getigne-100">
-                      <Avatar className="w-8 h-8 mr-2 border-2 border-getigne-accent">
-                        <img src={pilot.photo} alt={pilot.name} className="object-cover" />
-                      </Avatar>
-                      <span className="font-medium text-sm">{pilot.name}</span>
-                    </div>
-                  ))}
-                </div>
+            {/* Informations sur les membres et pilotes */}
+            <div className="mt-6 flex flex-wrap gap-6 items-start">
+              {/* Nombre total de membres */}
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-getigne-100">
+                <Users className="text-getigne-accent" size={20} />
+                <span className="font-medium">{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
               </div>
-            )}
+              
+              {/* Pilotes */}
+              {pilots.length > 0 && (
+                <div className="flex flex-wrap gap-3 items-center">
+                  <span className="text-getigne-700 font-medium">
+                    {pilots.length > 1 ? 'Pilotes :' : 'Pilote :'}
+                  </span>
+                  <div className="flex flex-wrap gap-3">
+                    {pilots.map(pilot => (
+                      <div key={pilot.id} className="flex items-center bg-white rounded-full pl-1 pr-3 py-1 shadow-sm border border-getigne-100">
+                        <Avatar className="w-8 h-8 mr-2 border-2 border-getigne-accent">
+                          <AvatarImage src={pilot.photo} alt={pilot.name} />
+                        </Avatar>
+                        <span className="font-medium text-sm">{pilot.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Committee works and members */}
+      {/* Committee works */}
       <main className="flex-grow py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            {/* Membres de la commission */}
-            <section className="mb-16">
-              <h2 className="text-2xl font-bold mb-8 flex items-center">
-                <Users size={24} className="mr-2 text-getigne-accent" />
-                Les membres de la commission
-              </h2>
-              <CommitteeMembers committeeId={id} />
-            </section>
-
             {/* Synthèses des travaux */}
             <section>
-              <h2 className="text-2xl font-bold mb-8">Synthèses des travaux</h2>
+              <h2 className="text-2xl font-bold mb-8 flex items-center">
+                <Calendar size={24} className="mr-2 text-getigne-accent" />
+                Synthèses des travaux
+              </h2>
               
               {works.length === 0 ? (
                 <p className="text-getigne-700">
