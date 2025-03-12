@@ -128,6 +128,7 @@ export type Database = {
           description: string
           id: string
           image: string
+          is_members_only: boolean | null
           location: string
           title: string
           updated_at: string
@@ -141,6 +142,7 @@ export type Database = {
           description: string
           id?: string
           image: string
+          is_members_only?: boolean | null
           location: string
           title: string
           updated_at?: string
@@ -154,11 +156,20 @@ export type Database = {
           description?: string
           id?: string
           image?: string
+          is_members_only?: boolean | null
           location?: string
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_committees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       news: {
         Row: {

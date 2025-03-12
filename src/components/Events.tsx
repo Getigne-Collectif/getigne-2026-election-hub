@@ -1,12 +1,23 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, MapPin, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, MapPin, ChevronRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 
+// Map committee names to colors
+const committeeColors = {
+  "Environnement": "border-getigne-green-500",
+  "Mobilité": "border-getigne-accent",
+  "Solidarité": "border-getigne-700",
+  "Culture": "border-[#9b87f5]",
+  "Économie": "border-[#0EA5E9]",
+  "Éducation": "border-[#F97316]",
+};
+
 const EventCard = ({ event, index }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [committeeColor, setCommitteeColor] = useState("");
   const ref = useRef(null);
 
   useEffect(() => {
@@ -31,6 +42,30 @@ const EventCard = ({ event, index }) => {
     };
   }, []);
 
+  useEffect(() => {
+    // Set committee color if applicable
+    const fetchCommitteeInfo = async () => {
+      if (event.committee_id) {
+        try {
+          const { data, error } = await supabase
+            .from('citizen_committees')
+            .select('title')
+            .eq('id', event.committee_id)
+            .single();
+            
+          if (!error && data) {
+            const color = committeeColors[data.title] || "border-getigne-100";
+            setCommitteeColor(color);
+          }
+        } catch (error) {
+          console.error('Error fetching committee:', error);
+        }
+      }
+    };
+    
+    fetchCommitteeInfo();
+  }, [event.committee_id]);
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -46,10 +81,12 @@ const EventCard = ({ event, index }) => {
     });
   };
 
+  const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
+
   return (
     <article 
       ref={ref}
-      className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift ${
+      className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
         isVisible 
           ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
           : 'opacity-0 translate-y-10'
@@ -77,6 +114,18 @@ const EventCard = ({ event, index }) => {
             <MapPin size={14} className="mr-1" />
             <span>{event.location}</span>
           </div>
+          {event.committee && (
+            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+              <Users size={14} className="mr-1" />
+              <span>Commission {event.committee}</span>
+            </div>
+          )}
+          {event.is_members_only && (
+            <div className="flex items-center text-white text-sm bg-getigne-700 px-3 py-1 rounded-full">
+              <Users size={14} className="mr-1" />
+              <span>Adhérents</span>
+            </div>
+          )}
         </div>
         <h3 className="font-medium text-xl mb-2">{event.title}</h3>
         <p className="text-getigne-700 mb-4">{event.description}</p>

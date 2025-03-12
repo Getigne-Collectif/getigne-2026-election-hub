@@ -1,14 +1,25 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, MapPin, Clock } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
+// Map committee names to colors
+const committeeColors = {
+  "Environnement": "border-getigne-green-500",
+  "Mobilité": "border-getigne-accent",
+  "Solidarité": "border-getigne-700",
+  "Culture": "border-[#9b87f5]",
+  "Économie": "border-[#0EA5E9]",
+  "Éducation": "border-[#F97316]",
+};
+
 const EventCard = ({ event, index }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [committeeColor, setCommitteeColor] = useState("");
   const ref = useRef(null);
 
   useEffect(() => {
@@ -33,6 +44,30 @@ const EventCard = ({ event, index }) => {
     };
   }, []);
 
+  useEffect(() => {
+    // Set committee color if applicable
+    const fetchCommitteeInfo = async () => {
+      if (event.committee_id) {
+        try {
+          const { data, error } = await supabase
+            .from('citizen_committees')
+            .select('title')
+            .eq('id', event.committee_id)
+            .single();
+            
+          if (!error && data) {
+            const color = committeeColors[data.title] || "border-getigne-100";
+            setCommitteeColor(color);
+          }
+        } catch (error) {
+          console.error('Error fetching committee:', error);
+        }
+      }
+    };
+    
+    fetchCommitteeInfo();
+  }, [event.committee_id]);
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -48,10 +83,12 @@ const EventCard = ({ event, index }) => {
     });
   };
 
+  const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
+
   return (
     <div 
       ref={ref}
-      className={`bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift ${
+      className={`bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
         isVisible 
           ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
           : 'opacity-0 translate-y-10'
@@ -79,6 +116,21 @@ const EventCard = ({ event, index }) => {
           <MapPin size={16} className="text-getigne-accent" />
           <span>{event.location}</span>
         </div>
+        
+        {event.committee && (
+          <div className="flex items-center gap-2 text-getigne-700 mb-4">
+            <Users size={16} className="text-getigne-accent" />
+            <span>Commission {event.committee}</span>
+          </div>
+        )}
+        
+        {event.is_members_only && (
+          <div className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-xs inline-flex items-center mb-4">
+            <Users size={12} className="mr-1" />
+            Réservé aux adhérents
+          </div>
+        )}
+        
         <p className="text-getigne-700 mb-6">{event.description}</p>
         <Button 
           asChild

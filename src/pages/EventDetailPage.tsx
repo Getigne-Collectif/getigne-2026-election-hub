@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag } from 'lucide-react';
@@ -17,6 +18,14 @@ interface Event {
   image: string;
   committee?: string;
   committee_id?: string;
+  is_members_only?: boolean;
+}
+
+interface Committee {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
 }
 
 // Map committee names to colors
@@ -33,6 +42,7 @@ const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
+  const [committee, setCommittee] = useState<Committee | null>(null);
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +62,19 @@ const EventDetailPage = () => {
         
         const eventData = data as Event;
         setEvent(eventData);
+        
+        // Fetch committee information if event is associated with one
+        if (eventData.committee_id) {
+          const { data: committeeData, error: committeeError } = await supabase
+            .from('citizen_committees')
+            .select('*')
+            .eq('id', eventData.committee_id)
+            .single();
+            
+          if (!committeeError && committeeData) {
+            setCommittee(committeeData as Committee);
+          }
+        }
         
         // Fetch related events (same committee or recent events)
         if (eventData.committee_id) {
@@ -140,7 +163,8 @@ const EventDetailPage = () => {
   const isPastEvent = new Date(event.date).getTime() < new Date().getTime();
 
   // Get committee color
-  const committeeColor = getCommitteeColor(event.committee);
+  const committeeColor = committee ? getCommitteeColor(committee.title) : "";
+  const committeeTextColor = committeeColor.replace('bg-', 'text-');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -167,10 +191,17 @@ const EventDetailPage = () => {
                   </span>
                 )}
                 
-                {event.committee && (
+                {event.is_members_only && (
+                  <span className="bg-getigne-700 text-white px-3 py-1 rounded-full text-sm flex items-center">
+                    <Users size={14} className="mr-1" />
+                    Réservé aux adhérents
+                  </span>
+                )}
+                
+                {committee && (
                   <span className={`${committeeColor} text-white px-3 py-1 rounded-full text-sm flex items-center`}>
                     <Users size={14} className="mr-1" />
-                    Commission {event.committee}
+                    Commission {committee.title}
                   </span>
                 )}
               </div>
@@ -202,6 +233,16 @@ const EventDetailPage = () => {
                     <div>{event.location}</div>
                   </div>
                 </div>
+                
+                {committee && (
+                  <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
+                    <Users size={20} className={committeeTextColor + " mr-3"} />
+                    <div>
+                      <div className="text-xs uppercase font-medium text-getigne-500">Commission</div>
+                      <div>{committee.title}</div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -218,19 +259,21 @@ const EventDetailPage = () => {
                   )}
                 </div>
                 
-                {/* Call to action */}
-                <div className="bg-getigne-50 p-6 rounded-lg mt-8">
-                  <h3 className="text-xl font-medium mb-2">Participez à nos actions</h3>
-                  <p className="mb-4">Rejoignez notre collectif pour soutenir nos initiatives et participer aux événements.</p>
-                  <Button 
-                    asChild
-                    className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
-                  >
-                    <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noreferrer">
-                      Adhérer au collectif
-                    </a>
-                  </Button>
-                </div>
+                {/* Call to action - only show for members-only events */}
+                {event.is_members_only && (
+                  <div className="bg-getigne-50 p-6 rounded-lg mt-8">
+                    <h3 className="text-xl font-medium mb-2">Événement réservé aux adhérents</h3>
+                    <p className="mb-4">Cet événement est exclusivement réservé aux adhérents de notre collectif. Rejoignez-nous pour y participer et soutenir nos actions.</p>
+                    <Button 
+                      asChild
+                      className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
+                    >
+                      <Link to="/adherer">
+                        En savoir plus sur l'adhésion
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </div>
               
               {/* Sidebar */}
