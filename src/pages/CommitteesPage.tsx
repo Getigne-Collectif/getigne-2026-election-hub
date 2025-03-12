@@ -6,14 +6,59 @@ import Footer from '@/components/Footer';
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Bike, Utensils, Music, Leaf, ChevronRight, Users } from 'lucide-react';
 import { getMemberCount } from '@/components/CommitteeMembers';
+import Breadcrumb from '@/components/Breadcrumb';
 
 // Map pour les icônes
 const iconMap = {
   Lightbulb,
-  Bicycle: Bike, // Replace Bicycle with Bike
+  Bicycle: Bike,
   Utensils,
   Music,
   Leaf
+};
+
+// Map pour les couleurs des thèmes
+const colorMap = {
+  'Lightbulb': {
+    bg: 'bg-yellow-50',
+    text: 'text-yellow-600',
+    border: 'border-yellow-200',
+    hover: 'hover:bg-yellow-100/50',
+    accent: 'bg-yellow-400/10',
+    theme: 'Énergie'
+  },
+  'Bicycle': {
+    bg: 'bg-purple-50',
+    text: 'text-purple-600',
+    border: 'border-purple-200',
+    hover: 'hover:bg-purple-100/50',
+    accent: 'bg-purple-400/10',
+    theme: 'Mobilité'
+  },
+  'Utensils': {
+    bg: 'bg-orange-50',
+    text: 'text-orange-600',
+    border: 'border-orange-200',
+    hover: 'hover:bg-orange-100/50',
+    accent: 'bg-orange-400/10',
+    theme: 'Alimentation'
+  },
+  'Music': {
+    bg: 'bg-blue-50',
+    text: 'text-blue-600',
+    border: 'border-blue-200',
+    hover: 'hover:bg-blue-100/50',
+    accent: 'bg-blue-400/10',
+    theme: 'Culture'
+  },
+  'Leaf': {
+    bg: 'bg-green-50',
+    text: 'text-green-600',
+    border: 'border-green-200',
+    hover: 'hover:bg-green-100/50',
+    accent: 'bg-green-400/10',
+    theme: 'Biodiversité'
+  }
 };
 
 const CommitteesPage = () => {
@@ -61,7 +106,8 @@ const CommitteesPage = () => {
       {/* Header */}
       <div className="pt-24 pb-12 bg-getigne-50">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
+          <Breadcrumb />
+          <div className="max-w-3xl mx-auto text-center mt-8">
             <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
               Démocratie participative
             </span>
@@ -70,6 +116,20 @@ const CommitteesPage = () => {
               Depuis mai 2024, des commissions citoyennes travaillent en lien avec nos élus sur des thématiques 
               essentielles pour l'avenir de notre commune. Découvrez leurs travaux et rejoignez-les !
             </p>
+          </div>
+          
+          {/* Image illustrant la démocratie participative */}
+          <div className="mt-8 max-w-4xl mx-auto rounded-xl overflow-hidden shadow-md">
+            <img 
+              src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80"
+              alt="Démocratie participative à Gétigné"
+              className="w-full h-80 object-cover"
+            />
+            <div className="bg-white p-4 text-center">
+              <p className="text-sm text-getigne-700 italic">
+                Des citoyens engagés pour construire ensemble l'avenir de Gétigné
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -86,27 +146,41 @@ const CommitteesPage = () => {
               {committees.map(committee => {
                 const Icon = iconMap[committee.icon] || Leaf;
                 const memberCount = memberCounts[committee.id] || 0;
+                const themeColor = colorMap[committee.icon] || {
+                  bg: 'bg-getigne-50',
+                  text: 'text-getigne-accent',
+                  border: 'border-getigne-100',
+                  hover: 'hover:bg-getigne-100/50',
+                  accent: 'bg-getigne-accent/10',
+                  theme: 'Thématique'
+                };
                 
                 return (
                   <Link 
                     key={committee.id} 
                     to={`/commissions/${committee.id}`}
-                    className="bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover:shadow-md transition-shadow p-6"
+                    className={`bg-white rounded-xl overflow-hidden shadow-sm border ${themeColor.border} ${themeColor.hover} transition-all hover:shadow-md`}
                   >
-                    <div className="w-16 h-16 bg-getigne-accent/10 rounded-lg flex items-center justify-center mb-4">
-                      <Icon className="text-getigne-accent" size={32} />
-                    </div>
-                    <h2 className="text-xl font-medium mb-3">{committee.title}</h2>
-                    <p className="text-getigne-700 mb-4">{committee.description}</p>
-                    
-                    <div className="flex items-center text-getigne-500 text-sm mb-3">
-                      <Users size={16} className="mr-1" />
-                      <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
-                    </div>
-                    
-                    <div className="text-getigne-accent flex items-center text-sm font-medium group">
-                      Découvrir les travaux
-                      <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
+                    <div className={`h-3 ${themeColor.bg.replace('50', '200')}`}></div>
+                    <div className="p-6">
+                      <div className={`w-16 h-16 ${themeColor.accent} rounded-lg flex items-center justify-center mb-4`}>
+                        <Icon className={themeColor.text} size={32} />
+                      </div>
+                      <span className={`text-xs font-medium ${themeColor.text} mb-2 inline-block px-2 py-1 rounded-full ${themeColor.bg}`}>
+                        {themeColor.theme}
+                      </span>
+                      <h2 className="text-xl font-medium mb-3 mt-2">{committee.title}</h2>
+                      <p className="text-getigne-700 mb-4">{committee.description}</p>
+                      
+                      <div className="flex items-center text-getigne-500 text-sm mb-3">
+                        <Users size={16} className="mr-1" />
+                        <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
+                      </div>
+                      
+                      <div className={`${themeColor.text} flex items-center text-sm font-medium group`}>
+                        Découvrir les travaux
+                        <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
+                      </div>
                     </div>
                   </Link>
                 );
