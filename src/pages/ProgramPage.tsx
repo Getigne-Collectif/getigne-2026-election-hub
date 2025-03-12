@@ -154,6 +154,110 @@ const ProgramPage = () => {
         {/* Citizen committees section */}
         <CitizenCommittees />
 
+        {/* Section sur l'aggloh! */}
+        <div className="bg-getigne-50 py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex flex-col md:flex-row items-center justify-between mb-10">
+                <div className="mb-6 md:mb-0 md:mr-8">
+                  <h2 className="text-3xl font-bold mb-4">Gétigné au sein de l'aggloh!</h2>
+                  <p className="text-getigne-700 text-lg">
+                    Notre commune fait partie de la communauté de communes Clisson Sèvre et Maine Agglo. 
+                    Nous souhaitons renforcer notre rôle et notre influence au sein de cette intercommunalité.
+                  </p>
+                </div>
+                <div className="flex-shrink-0 w-48">
+                  <img 
+                    src="/lovable-uploads/07e7372b-7c2e-4584-9a92-9becd5096172.png" 
+                    alt="Logo de l'aggloh!" 
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8">
+                <h3 className="text-xl font-bold mb-4">Nos engagements pour une meilleure coopération intercommunale</h3>
+                
+                <ul className="space-y-6 mt-6">
+                  <li className="flex">
+                    <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center text-getigne-accent mr-4 flex-shrink-0">
+                      1
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Représentation active et transparente</h4>
+                      <p className="text-getigne-700">
+                        Nous nous engageons à représenter activement les intérêts de Gétigné au sein de l'aggloh!, 
+                        avec un compte-rendu régulier aux habitants des décisions et des projets intercommunaux.
+                      </p>
+                    </div>
+                  </li>
+                  
+                  <li className="flex">
+                    <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center text-getigne-accent mr-4 flex-shrink-0">
+                      2
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Mutualisation des services</h4>
+                      <p className="text-getigne-700">
+                        Nous favoriserons une mutualisation intelligente des services avec les autres communes 
+                        pour optimiser les coûts tout en maintenant une qualité de service élevée pour les habitants.
+                      </p>
+                    </div>
+                  </li>
+                  
+                  <li className="flex">
+                    <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center text-getigne-accent mr-4 flex-shrink-0">
+                      3
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Projets de développement durable</h4>
+                      <p className="text-getigne-700">
+                        Nous porterons des projets de développement durable à l'échelle intercommunale : 
+                        mobilités douces, énergies renouvelables, protection des ressources en eau et préservation 
+                        de la biodiversité.
+                      </p>
+                    </div>
+                  </li>
+                  
+                  <li className="flex">
+                    <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center text-getigne-accent mr-4 flex-shrink-0">
+                      4
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Développement économique et emploi local</h4>
+                      <p className="text-getigne-700">
+                        Nous soutiendrons le développement économique du territoire en favorisant l'implantation 
+                        d'entreprises respectueuses de l'environnement et créatrices d'emplois durables et de qualité.
+                      </p>
+                    </div>
+                  </li>
+                  
+                  <li className="flex">
+                    <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center text-getigne-accent mr-4 flex-shrink-0">
+                      5
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Culture et tourisme</h4>
+                      <p className="text-getigne-700">
+                        Nous travaillerons à la valorisation du patrimoine culturel et naturel de notre territoire, 
+                        en coordination avec les autres communes, pour développer un tourisme durable et respectueux.
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="mt-10 text-getigne-700 text-lg">
+                <p>
+                  L'avenir de Gétigné s'inscrit pleinement dans celui de l'aggloh!. Notre ambition est de faire 
+                  entendre la voix de notre commune tout en contribuant au développement harmonieux du territoire, 
+                  dans un esprit de coopération et de solidarité intercommunale.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="container mx-auto px-4 py-16">
           {/* Conclusion */}
           <div className="max-w-3xl mx-auto mt-8 pt-10 border-t border-getigne-100">

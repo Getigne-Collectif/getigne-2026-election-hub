@@ -142,7 +142,25 @@ const Program = () => {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="flex flex-col md:flex-row gap-6 mt-10 items-center justify-center">
+          <div className="bg-getigne-50 p-6 rounded-xl flex items-center gap-4 max-w-lg w-full">
+            <img 
+              src="/lovable-uploads/07e7372b-7c2e-4584-9a92-9becd5096172.png" 
+              alt="Logo de l'aggloh!" 
+              className="w-24 h-auto"
+            />
+            <div>
+              <h3 className="text-lg font-medium mb-1">Gétigné au sein de l'aggloh!</h3>
+              <p className="text-getigne-700 text-sm mb-2">
+                Découvrez nos propositions pour une meilleure coopération intercommunale.
+              </p>
+              <Link to="/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
+                En savoir plus
+                <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+
           <Button 
             asChild
             className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
