@@ -1,9 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useState } from 'react';
 
 interface BreadcrumbNames {
   [key: string]: string;
@@ -24,6 +23,26 @@ const Breadcrumb = () => {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter(x => x);
   const [committeeNames, setCommitteeNames] = useState<BreadcrumbNames>({});
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    // Function to handle scroll events
+    const handleScroll = () => {
+      const breadcrumbElement = document.getElementById('breadcrumb');
+      if (breadcrumbElement) {
+        const breadcrumbPosition = breadcrumbElement.getBoundingClientRect().top;
+        setIsSticky(breadcrumbPosition <= 64); // 64px is approximately the navbar height
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // Initial check
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     // Fetch committee names if we have commissions in the path
@@ -57,7 +76,12 @@ const Breadcrumb = () => {
   }
 
   return (
-    <div className="sticky top-16 z-40 glass py-3 border-b border-white/20 shadow-sm">
+    <div 
+      id="breadcrumb"
+      className={`${
+        isSticky ? 'fixed top-16 z-40' : 'relative'
+      } w-full glass py-3 border-b border-white/20 shadow-sm transition-all duration-300`}
+    >
       <nav className="container mx-auto px-4">
         <div className="flex items-center space-x-2 text-getigne-700">
           <Link to="/" className="flex items-center hover:text-getigne-accent transition-colors">

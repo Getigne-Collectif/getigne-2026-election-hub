@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import CommitteeMembers from '@/components/CommitteeMembers';
 import CommitteeWorkModal from '@/components/CommitteeWorkModal';
+import CommitteeContactForm from '@/components/CommitteeContactForm';
 import { type Tables } from '@/integrations/supabase/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -279,7 +280,7 @@ const CommitteePage = () => {
               
               {/* Membres simplifiés */}
               <div className="mt-4">
-                <h3 className="text-lg font-medium mb-3">Membres de la commission</h3>
+                <h3 className="text-lg font-medium mb-3">Pilote de la commission</h3>
                 {id && <CommitteeMembers committeeId={id} simplified={true} />}
               </div>
             </div>
@@ -347,6 +348,15 @@ const CommitteePage = () => {
             ))}
           </div>
         </div>
+
+        {/* Contact Form Section */}
+        {committee && (
+          <CommitteeContactForm 
+            committeeId={committee.id}
+            committeeName={committee.title}
+            themeColor={themeColor}
+          />
+        )}
 
         <CommitteeWorkModal
           work={selectedWork}
