@@ -36,6 +36,44 @@ export type Database = {
         }
         Relationships: []
       }
+      committee_members: {
+        Row: {
+          committee_id: string
+          created_at: string
+          id: string
+          name: string
+          photo: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          committee_id: string
+          created_at?: string
+          id?: string
+          name: string
+          photo: string
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          committee_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          photo?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "committee_members_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "citizen_committees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       committee_works: {
         Row: {
           committee_id: string

@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Bike, Utensils, Music, Leaf, ChevronRight } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf, ChevronRight, Users } from 'lucide-react';
+import { getMemberCount } from '@/components/CommitteeMembers';
 
 // Map pour les icônes
 const iconMap = {
@@ -17,6 +18,7 @@ const iconMap = {
 
 const CommitteesPage = () => {
   const [committees, setCommittees] = useState([]);
+  const [memberCounts, setMemberCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -33,6 +35,14 @@ const CommitteesPage = () => {
         if (error) throw error;
         
         setCommittees(data);
+
+        // Récupérer le nombre de membres pour chaque commission
+        const counts = {};
+        for (const committee of data) {
+          counts[committee.id] = await getMemberCount(committee.id);
+        }
+        setMemberCounts(counts);
+        
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des commissions:', error);
@@ -75,6 +85,8 @@ const CommitteesPage = () => {
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {committees.map(committee => {
                 const Icon = iconMap[committee.icon] || Leaf;
+                const memberCount = memberCounts[committee.id] || 0;
+                
                 return (
                   <Link 
                     key={committee.id} 
@@ -86,6 +98,12 @@ const CommitteesPage = () => {
                     </div>
                     <h2 className="text-xl font-medium mb-3">{committee.title}</h2>
                     <p className="text-getigne-700 mb-4">{committee.description}</p>
+                    
+                    <div className="flex items-center text-getigne-500 text-sm mb-3">
+                      <Users size={16} className="mr-1" />
+                      <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
+                    </div>
+                    
                     <div className="text-getigne-accent flex items-center text-sm font-medium group">
                       Découvrir les travaux
                       <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />

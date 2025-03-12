@@ -6,7 +6,10 @@ import Footer from '@/components/Footer';
 import { supabase } from "@/integrations/supabase/client";
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Lightbulb, Bike, Utensils, Music, Leaf, Calendar } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf, Calendar, Users } from 'lucide-react';
+import CommitteeMembers from '@/components/CommitteeMembers';
+import { Avatar } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 // Map pour les icônes
 const iconMap = {
@@ -20,6 +23,7 @@ const iconMap = {
 const CommitteePage = () => {
   const { id } = useParams();
   const [committee, setCommittee] = useState(null);
+  const [pilots, setPilots] = useState([]);
   const [works, setWorks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,6 +41,15 @@ const CommitteePage = () => {
           .single();
         
         if (committeeError) throw committeeError;
+
+        // Récupérer les pilotes de la commission
+        const { data: pilotsData, error: pilotsError } = await supabase
+          .from('committee_members')
+          .select('*')
+          .eq('committee_id', id)
+          .eq('role', 'pilote');
+
+        if (pilotsError) throw pilotsError;
         
         // Récupérer les travaux de la commission
         const { data: worksData, error: worksError } = await supabase
@@ -48,6 +61,7 @@ const CommitteePage = () => {
         if (worksError) throw worksError;
         
         setCommittee(committeeData);
+        setPilots(pilotsData);
         setWorks(worksData);
         setLoading(false);
       } catch (error) {
@@ -109,41 +123,72 @@ const CommitteePage = () => {
                 <h1 className="text-3xl md:text-4xl font-bold mt-2">{committee.title}</h1>
               </div>
             </div>
-            <p className="text-getigne-700 text-lg">
+            <p className="text-getigne-700 text-lg mb-6">
               {committee.description}
             </p>
+
+            {/* Affichage des pilotes */}
+            {pilots.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-4 items-center">
+                <span className="text-getigne-700 font-medium">
+                  {pilots.length > 1 ? 'Pilotes :' : 'Pilote :'}
+                </span>
+                <div className="flex flex-wrap gap-3">
+                  {pilots.map(pilot => (
+                    <div key={pilot.id} className="flex items-center bg-white rounded-full pl-1 pr-3 py-1 shadow-sm border border-getigne-100">
+                      <Avatar className="w-8 h-8 mr-2 border-2 border-getigne-accent">
+                        <img src={pilot.photo} alt={pilot.name} className="object-cover" />
+                      </Avatar>
+                      <span className="font-medium text-sm">{pilot.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Committee works */}
+      {/* Committee works and members */}
       <main className="flex-grow py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-8">Synthèses des travaux</h2>
-            
-            {works.length === 0 ? (
-              <p className="text-getigne-700">
-                Aucune synthèse disponible pour le moment. Les travaux de cette commission sont en cours.
-              </p>
-            ) : (
-              <div className="space-y-10">
-                {works.map(work => (
-                  <div key={work.id} className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100">
-                    <div className="flex items-center text-getigne-500 text-sm mb-3">
-                      <Calendar size={14} className="mr-1" />
-                      <time>{format(new Date(work.date), 'd MMMM yyyy', { locale: fr })}</time>
+            {/* Membres de la commission */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold mb-8 flex items-center">
+                <Users size={24} className="mr-2 text-getigne-accent" />
+                Les membres de la commission
+              </h2>
+              <CommitteeMembers committeeId={id} />
+            </section>
+
+            {/* Synthèses des travaux */}
+            <section>
+              <h2 className="text-2xl font-bold mb-8">Synthèses des travaux</h2>
+              
+              {works.length === 0 ? (
+                <p className="text-getigne-700">
+                  Aucune synthèse disponible pour le moment. Les travaux de cette commission sont en cours.
+                </p>
+              ) : (
+                <div className="space-y-10">
+                  {works.map(work => (
+                    <div key={work.id} className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100">
+                      <div className="flex items-center text-getigne-500 text-sm mb-3">
+                        <Calendar size={14} className="mr-1" />
+                        <time>{format(new Date(work.date), 'd MMMM yyyy', { locale: fr })}</time>
+                      </div>
+                      <h3 className="text-xl font-medium mb-4">{work.title}</h3>
+                      <div className="text-getigne-700 space-y-4">
+                        {work.content.split('\n').map((paragraph, i) => (
+                          <p key={i}>{paragraph}</p>
+                        ))}
+                      </div>
                     </div>
-                    <h3 className="text-xl font-medium mb-4">{work.title}</h3>
-                    <div className="text-getigne-700 space-y-4">
-                      {work.content.split('\n').map((paragraph, i) => (
-                        <p key={i}>{paragraph}</p>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
 
           {/* Participation */}

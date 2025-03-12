@@ -1,10 +1,11 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
+import { getMemberCount } from './CommitteeMembers';
 
 // Map pour les icônes
 const iconMap = {
@@ -17,6 +18,7 @@ const iconMap = {
 
 const CommitteeItem = ({ committee, index }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [memberCount, setMemberCount] = useState(0);
   const ref = useRef(null);
   const Icon = iconMap[committee.icon] || Leaf;
 
@@ -42,6 +44,15 @@ const CommitteeItem = ({ committee, index }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchMemberCount = async () => {
+      const count = await getMemberCount(committee.id);
+      setMemberCount(count);
+    };
+
+    fetchMemberCount();
+  }, [committee.id]);
+
   return (
     <div 
       ref={ref}
@@ -56,7 +67,13 @@ const CommitteeItem = ({ committee, index }) => {
         <Icon className="text-getigne-accent" size={24} />
       </div>
       <h3 className="text-lg font-medium mb-2">{committee.title}</h3>
-      <p className="text-getigne-700 mb-4">{committee.description}</p>
+      <p className="text-getigne-700 mb-2">{committee.description}</p>
+      
+      <div className="flex items-center text-getigne-500 text-sm mb-3">
+        <Users size={16} className="mr-1" />
+        <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
+      </div>
+      
       <Link to={`/commissions/${committee.id}`} className="text-getigne-accent flex items-center text-sm font-medium group">
         En savoir plus
         <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
