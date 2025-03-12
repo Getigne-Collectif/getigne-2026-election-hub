@@ -6,6 +6,8 @@ import { supabase } from '@/integrations/supabase/client';
 import CommitteeMembers from '@/components/CommitteeMembers';
 import CommitteeWorkModal from '@/components/CommitteeWorkModal';
 import { type Tables } from '@/integrations/supabase/types';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 interface Member {
   id: string;
@@ -82,64 +84,68 @@ const CommitteePage = () => {
   }
 
   return (
-    <div className="container py-8 space-y-8">
-      <div>
-        <div className="flex items-center gap-4">
-          <img src={committee.icon} alt={committee.title} className="w-12 h-12" />
-          <h1 className="text-3xl font-bold">{committee.title}</h1>
+    <>
+      <Navbar />
+      <div className="container py-8 space-y-8 mt-20">
+        <div>
+          <div className="flex items-center gap-4">
+            <img src={committee.icon} alt={committee.title} className="w-12 h-12" />
+            <h1 className="text-3xl font-bold">{committee.title}</h1>
+          </div>
+          <p className="mt-2 text-muted-foreground">{committee.description}</p>
         </div>
-        <p className="mt-2 text-muted-foreground">{committee.description}</p>
-      </div>
 
-      {id && <CommitteeMembers committeeId={id} />}
+        {id && <CommitteeMembers committeeId={id} />}
 
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Travaux de la commission</h2>
-        <div className="grid gap-6">
-          {works.map((work) => (
-            <div
-              key={work.id}
-              className="p-6 bg-card rounded-lg border cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setSelectedWork(work)}
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">{work.title}</h3>
-                <span className="text-sm text-muted-foreground">
-                  {new Date(work.date).toLocaleDateString('fr-FR', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
-              </div>
-              <p className="mt-2 text-muted-foreground line-clamp-2">
-                {work.content}
-              </p>
-              
-              {/* Preview of attachments */}
-              <div className="mt-4 flex gap-4">
-                {(work.images as any[])?.length > 0 && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">Travaux de la commission</h2>
+          <div className="grid gap-6">
+            {works.map((work) => (
+              <div
+                key={work.id}
+                className="p-6 bg-card rounded-lg border cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() => setSelectedWork(work)}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{work.title}</h3>
                   <span className="text-sm text-muted-foreground">
-                    {(work.images as any[]).length} image(s)
+                    {new Date(work.date).toLocaleDateString('fr-FR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
                   </span>
-                )}
-                {(work.files as any[])?.length > 0 && (
-                  <span className="text-sm text-muted-foreground">
-                    {(work.files as any[]).length} document(s)
-                  </span>
-                )}
+                </div>
+                <p className="mt-2 text-muted-foreground line-clamp-2">
+                  {work.content}
+                </p>
+                
+                {/* Preview of attachments */}
+                <div className="mt-4 flex gap-4">
+                  {(work.images as any[])?.length > 0 && (
+                    <span className="text-sm text-muted-foreground">
+                      {(work.images as any[]).length} image(s)
+                    </span>
+                  )}
+                  {(work.files as any[])?.length > 0 && (
+                    <span className="text-sm text-muted-foreground">
+                      {(work.files as any[]).length} document(s)
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      <CommitteeWorkModal
-        work={selectedWork}
-        open={!!selectedWork}
-        onOpenChange={(open) => !open && setSelectedWork(null)}
-      />
-    </div>
+        <CommitteeWorkModal
+          work={selectedWork}
+          open={!!selectedWork}
+          onOpenChange={(open) => !open && setSelectedWork(null)}
+        />
+      </div>
+      <Footer />
+    </>
   );
 };
 
