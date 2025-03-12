@@ -1,19 +1,42 @@
 
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Clock, MapPin, ArrowLeft } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import NotFound from './NotFound';
 
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  date: string;
+  location: string;
+  image: string;
+  committee?: string;
+  committee_id?: string;
+}
+
+// Map committee names to colors
+const committeeColors = {
+  "Environnement": "bg-getigne-green-500",
+  "Mobilité": "bg-getigne-accent",
+  "Solidarité": "bg-getigne-700",
+  "Culture": "bg-[#9b87f5]",
+  "Économie": "bg-[#0EA5E9]",
+  "Éducation": "bg-[#F97316]",
+};
+
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [event, setEvent] = useState(null);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,11 +51,47 @@ const EventDetailPage = () => {
         
         if (error) throw error;
         
-        setEvent(data);
+        setEvent(data as Event);
+        
+        // Fetch related events (same committee or recent events)
+        if (data.committee_id) {
+          const { data: committeeEvents } = await supabase
+            .from('events')
+            .select('*')
+            .eq('committee_id', data.committee_id)
+            .neq('id', id)
+            .order('date', { ascending: false })
+            .limit(3);
+            
+          if (committeeEvents && committeeEvents.length > 0) {
+            setRelatedEvents(committeeEvents as Event[]);
+          } else {
+            // If no committee events, fetch recent events
+            const { data: recentEvents } = await supabase
+              .from('events')
+              .select('*')
+              .neq('id', id)
+              .order('date', { ascending: false })
+              .limit(3);
+              
+            setRelatedEvents(recentEvents as Event[] || []);
+          }
+        } else {
+          // If no committee, fetch recent events
+          const { data: recentEvents } = await supabase
+            .from('events')
+            .select('*')
+            .neq('id', id)
+            .order('date', { ascending: false })
+            .limit(3);
+            
+          setRelatedEvents(recentEvents as Event[] || []);
+        }
+        
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération de l\'événement:', error);
-        setError(error.message);
+        setError((error as Error).message);
         setLoading(false);
       }
     };
@@ -40,7 +99,7 @@ const EventDetailPage = () => {
     fetchEvent();
   }, [id]);
 
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
@@ -48,11 +107,17 @@ const EventDetailPage = () => {
     });
   };
 
-  const formatTime = (dateStr) => {
+  const formatTime = (dateStr: string) => {
     return new Date(dateStr).toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // Function to get committee color based on name
+  const getCommitteeColor = (committeeName?: string) => {
+    if (!committeeName) return "bg-getigne-accent";
+    return committeeColors[committeeName as keyof typeof committeeColors] || "bg-getigne-accent";
   };
 
   if (loading) {
@@ -71,62 +136,146 @@ const EventDetailPage = () => {
     return <NotFound />;
   }
 
+  // Determine if the event has passed
+  const isPastEvent = new Date(event.date).getTime() < new Date().getTime();
+
+  // Get committee color
+  const committeeColor = getCommitteeColor(event.committee);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-grow">
-        {/* Hero section with image */}
-        <div className="w-full h-[40vh] relative">
-          <div className="absolute inset-0 bg-black/40 z-10"></div>
-          <img 
-            src={event.image} 
-            alt={event.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 z-20 flex items-center justify-center">
-            <div className="container px-4 text-center text-white">
+      <main className="flex-grow pt-24 pb-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            {/* Header with event title and committee tag if available */}
+            <div className="mb-8">
+              <div className="flex flex-wrap gap-2 items-center mb-4">
+                <Button
+                  variant="outline"
+                  className="border-getigne-200"
+                  onClick={() => navigate('/evenements')}
+                >
+                  <ArrowLeft size={16} className="mr-2" />
+                  Retour aux événements
+                </Button>
+                
+                {isPastEvent && (
+                  <span className="bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
+                    Événement passé
+                  </span>
+                )}
+                
+                {event.committee && (
+                  <span className={`${committeeColor} text-white px-3 py-1 rounded-full text-sm flex items-center`}>
+                    <Users size={14} className="mr-1" />
+                    Commission {event.committee}
+                  </span>
+                )}
+              </div>
+              
               <h1 className="text-3xl md:text-5xl font-bold mb-4">{event.title}</h1>
-              <div className="flex flex-wrap gap-4 justify-center">
-                <div className="flex items-center bg-white/20 px-4 py-2 rounded-full text-white text-sm">
-                  <Calendar size={16} className="mr-2" />
-                  {formatDate(event.date)}
+              
+              {/* Event details cards */}
+              <div className="flex flex-wrap gap-4 my-6">
+                <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
+                  <Calendar size={20} className="text-getigne-accent mr-3" />
+                  <div>
+                    <div className="text-xs uppercase font-medium text-getigne-500">Date</div>
+                    <div>{formatDate(event.date)}</div>
+                  </div>
                 </div>
-                <div className="flex items-center bg-white/20 px-4 py-2 rounded-full text-white text-sm">
-                  <Clock size={16} className="mr-2" />
-                  {formatTime(event.date)}
+                
+                <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
+                  <Clock size={20} className="text-getigne-accent mr-3" />
+                  <div>
+                    <div className="text-xs uppercase font-medium text-getigne-500">Heure</div>
+                    <div>{formatTime(event.date)}</div>
+                  </div>
                 </div>
-                <div className="flex items-center bg-white/20 px-4 py-2 rounded-full text-white text-sm">
-                  <MapPin size={16} className="mr-2" />
-                  {event.location}
+                
+                <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
+                  <MapPin size={20} className="text-getigne-accent mr-3" />
+                  <div>
+                    <div className="text-xs uppercase font-medium text-getigne-500">Lieu</div>
+                    <div>{event.location}</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Content */}
-        <div className="container mx-auto px-4 py-16 max-w-4xl">
-          <div className="prose prose-lg mx-auto">
-            {/* Render event content */}
-            <h2>À propos de cet événement</h2>
-            <p className="text-xl text-getigne-700">{event.description}</p>
             
-            {/* Additional content if available */}
-            {event.content && (
-              <div dangerouslySetInnerHTML={{ __html: event.content }}></div>
-            )}
-            
-            {/* Back button */}
-            <div className="mt-16">
-              <Button
-                variant="outline"
-                className="border-getigne-200"
-                onClick={() => navigate('/evenements')}
-              >
-                <ArrowLeft size={16} className="mr-2" />
-                Retour aux événements
-              </Button>
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Main content */}
+              <div className="md:col-span-2">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-medium mb-4">À propos de cet événement</h2>
+                  <p className="text-lg text-getigne-700 mb-6">{event.description}</p>
+                  
+                  {/* Render event content if available */}
+                  {event.content && (
+                    <div dangerouslySetInnerHTML={{ __html: event.content }} className="mt-8"></div>
+                  )}
+                </div>
+                
+                {/* Call to action */}
+                <div className="bg-getigne-50 p-6 rounded-lg mt-8">
+                  <h3 className="text-xl font-medium mb-2">Participez à nos actions</h3>
+                  <p className="mb-4">Rejoignez notre collectif pour soutenir nos initiatives et participer aux événements.</p>
+                  <Button 
+                    asChild
+                    className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
+                  >
+                    <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noreferrer">
+                      Adhérer au collectif
+                    </a>
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Sidebar */}
+              <div className="space-y-6">
+                {/* Event image */}
+                <div className="rounded-lg overflow-hidden">
+                  <img 
+                    src={event.image} 
+                    alt={event.title}
+                    className="w-full h-auto"
+                  />
+                </div>
+                
+                {/* Related events or other sidebar content */}
+                {relatedEvents.length > 0 && (
+                  <div className="border border-getigne-100 rounded-lg p-4">
+                    <h3 className="text-lg font-medium mb-4">Autres événements</h3>
+                    <div className="space-y-4">
+                      {relatedEvents.map((relEvent) => (
+                        <Link 
+                          key={relEvent.id} 
+                          to={`/evenements/${relEvent.id}`}
+                          className="flex gap-3 group"
+                        >
+                          <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+                            <img 
+                              src={relEvent.image} 
+                              alt={relEvent.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm group-hover:text-getigne-accent transition-colors line-clamp-2">
+                              {relEvent.title}
+                            </h4>
+                            <p className="text-xs text-getigne-500">
+                              {formatDate(relEvent.date)}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
