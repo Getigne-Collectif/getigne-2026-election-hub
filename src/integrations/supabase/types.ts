@@ -80,7 +80,9 @@ export type Database = {
           content: string
           created_at: string
           date: string
+          files: Json | null
           id: string
+          images: Json | null
           title: string
           updated_at: string
         }
@@ -89,7 +91,9 @@ export type Database = {
           content: string
           created_at?: string
           date: string
+          files?: Json | null
           id?: string
+          images?: Json | null
           title: string
           updated_at?: string
         }
@@ -98,7 +102,9 @@ export type Database = {
           content?: string
           created_at?: string
           date?: string
+          files?: Json | null
           id?: string
+          images?: Json | null
           title?: string
           updated_at?: string
         }
