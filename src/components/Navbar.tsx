@@ -1,8 +1,17 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const routes = [
+  { name: 'Accueil', path: '/', exact: true },
+  { name: 'Programme', path: '/programme' },
+  { name: 'Actualités', path: '/actualites' },
+  { name: 'Événements', path: '/evenements' },
+  { name: 'Commissions', path: '/commissions' },
+  { name: 'Adhérer', path: '/adherer' },
+  { name: 'Contact', path: '/contact' }
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,26 +52,11 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
-              Accueil
-            </Link>
-            <Link to="/programme" className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
-              Programme
-            </Link>
-            <Link to="/actualites" className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
-              Actualités
-            </Link>
-            <Link to="/evenements" className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
-              Événements
-            </Link>
-            <Link to="/equipe" className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
-              Notre équipe
-            </Link>
-            <Button asChild className="bg-getigne-accent text-white hover:bg-getigne-accent/80">
-              <Link to="/contact">
-                Nous contacter
+            {routes.map(route => (
+              <Link key={route.path} to={route.path} className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
+                {route.name}
               </Link>
-            </Button>
+            ))}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -83,26 +77,11 @@ const Navbar = () => {
         } md:hidden`}
       >
         <nav className="container flex flex-col items-center justify-center h-full gap-8 text-lg">
-          <Link to="/" className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
-            Accueil
-          </Link>
-          <Link to="/programme" className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
-            Programme
-          </Link>
-          <Link to="/actualites" className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
-            Actualités
-          </Link>
-          <Link to="/evenements" className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
-            Événements
-          </Link>
-          <Link to="/equipe" className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
-            Notre équipe
-          </Link>
-          <Button asChild className="bg-getigne-accent text-white hover:bg-getigne-accent/80 mt-4 w-64">
-            <Link to="/contact">
-              Nous contacter
+          {routes.map(route => (
+            <Link key={route.path} to={route.path} className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
+              {route.name}
             </Link>
-          </Button>
+          ))}
         </nav>
       </div>
     </header>

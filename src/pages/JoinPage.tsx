@@ -1,225 +1,141 @@
 
-import { useState, useEffect } from 'react';
-import { Heart, Users, CalendarRange, MousePointer, Wallet, CheckSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { supabase } from '@/integrations/supabase/client';
-
-interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  image: string;
-  bio: string;
-}
+import { Helmet } from "react-helmet";
+import { Button } from "@/components/ui/button";
+import Breadcrumb from "@/components/Breadcrumb";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import { Users, Heart, Zap, Landmark, LayoutList, PiggyBank } from 'lucide-react';
 
 const JoinPage = () => {
-  const [boardMembers, setBoardMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    
-    const fetchBoardMembers = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('team_members')
-          .select('*')
-          .order('name');
-          
-        if (error) throw error;
-        setBoardMembers(data as TeamMember[]);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des membres du bureau:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchBoardMembers();
-  }, []);
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <main className="flex-grow pt-24 pb-16">
-        <div className="container mx-auto px-4">
-          {/* Hero section */}
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-              Rejoignez-nous
-            </span>
-            <h1 className="text-4xl font-bold mt-4 mb-6">Adhérer au collectif</h1>
-            <p className="text-getigne-700 text-lg">
-              Soutenez notre collectif et participez activement à la vie démocratique de Gétigné. 
-              Votre adhésion permet de financer nos actions et renforce notre légitimité.
-            </p>
-          </div>
-          
-          {/* Benefits section */}
-          <div className="bg-getigne-50 rounded-xl p-8 mb-16">
-            <h2 className="text-2xl font-medium mb-6 text-center">Pourquoi adhérer ?</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-lg">
-                <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center mb-4">
-                  <Heart className="text-getigne-accent" size={24} />
-                </div>
-                <h3 className="text-lg font-medium mb-2">Soutenir nos actions</h3>
-                <p className="text-getigne-700">
-                  Votre adhésion nous permet de financer nos initiatives locales 
-                  et de mener des projets d'intérêt général.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg">
-                <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center mb-4">
-                  <Users className="text-getigne-accent" size={24} />
-                </div>
-                <h3 className="text-lg font-medium mb-2">Intégrer une communauté</h3>
-                <p className="text-getigne-700">
-                  Rejoignez un groupe de citoyens engagés et participez 
-                  aux réflexions collectives sur l'avenir de notre commune.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg">
-                <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center mb-4">
-                  <CalendarRange className="text-getigne-accent" size={24} />
-                </div>
-                <h3 className="text-lg font-medium mb-2">Événements exclusifs</h3>
-                <p className="text-getigne-700">
-                  Participez à des événements réservés aux adhérents et 
-                  bénéficiez d'informations privilégiées sur nos actions.
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          {/* How to join section */}
-          <div className="max-w-4xl mx-auto mb-16">
-            <h2 className="text-2xl font-medium mb-8 text-center">Comment adhérer ?</h2>
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-getigne-200 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="font-medium">1</span>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Rendez-vous sur HelloAsso</h3>
-                  <p className="text-getigne-700 mb-2">
-                    Notre plateforme de paiement sécurisée HelloAsso vous permet d'adhérer en quelques clics.
+    <>
+      <Helmet>
+        <title>Adhérer | Collectif Gétigné</title>
+        <meta
+          name="description"
+          content="Rejoignez notre collectif citoyen et participez activement à la vie démocratique de Gétigné."
+        />
+      </Helmet>
+
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <Breadcrumb />
+
+        <main className="flex-grow">
+          <section className="py-16 md:py-24 px-4 bg-getigne-50">
+            <div className="container mx-auto">
+              <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8 md:p-12">
+                <div className="text-center mb-12">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-6">
+                    Rejoignez le Collectif Gétigné
+                  </h1>
+                  <p className="text-lg text-getigne-700 max-w-2xl mx-auto">
+                    Ensemble, agissons pour notre commune et construisons une démocratie plus participative.
                   </p>
-                  <div className="flex items-center text-getigne-500 text-sm">
-                    <MousePointer size={16} className="mr-2" />
-                    <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" 
-                      target="_blank" 
-                      rel="noreferrer"
-                      className="text-getigne-accent hover:underline"
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-10 mb-12">
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-4">Pourquoi adhérer ?</h2>
+                    <ul className="space-y-6">
+                      <li className="flex gap-4">
+                        <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-full flex-shrink-0 flex items-center justify-center">
+                          <Users className="text-getigne-accent h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Faire partie d'un collectif</h3>
+                          <p className="text-getigne-700">Rejoignez un groupe de citoyens engagés pour le bien commun et l'avenir de notre territoire.</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-full flex-shrink-0 flex items-center justify-center">
+                          <Zap className="text-getigne-accent h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Participer aux décisions</h3>
+                          <p className="text-getigne-700">Votez lors des assemblées générales et contribuez aux orientations du collectif.</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-full flex-shrink-0 flex items-center justify-center">
+                          <LayoutList className="text-getigne-accent h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Accéder à nos événements</h3>
+                          <p className="text-getigne-700">Participez à nos rencontres, formations et ateliers, dont certains sont réservés à nos adhérents.</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-4">Notre organisation</h2>
+                    <ul className="space-y-6">
+                      <li className="flex gap-4">
+                        <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-full flex-shrink-0 flex items-center justify-center">
+                          <Landmark className="text-getigne-accent h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Association loi 1901</h3>
+                          <p className="text-getigne-700">Notre collectif est constitué en association à but non lucratif, dirigée par un bureau élu.</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-full flex-shrink-0 flex items-center justify-center">
+                          <PiggyBank className="text-getigne-accent h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Financement transparent</h3>
+                          <p className="text-getigne-700">Nos ressources proviennent uniquement des cotisations et dons de nos membres et sympathisants.</p>
+                        </div>
+                      </li>
+                      <li className="flex gap-4">
+                        <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-full flex-shrink-0 flex items-center justify-center">
+                          <Heart className="text-getigne-accent h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Engagement bénévole</h3>
+                          <p className="text-getigne-700">Tous nos membres agissent bénévolement, par conviction et attachement à notre commune.</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="border-t border-getigne-100 pt-10 mt-10">
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-semibold mb-4">Comment nous rejoindre ?</h2>
+                    <p className="text-getigne-700 max-w-2xl mx-auto">
+                      L'adhésion annuelle est de 10€. Vous pouvez également faire un don libre pour soutenir nos actions.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
+                    <Button 
+                      size="lg"
+                      className="bg-getigne-accent hover:bg-getigne-accent/90 text-white"
+                      onClick={() => window.open('https://www.helloasso.com/associations/collectif-getigne', '_blank')}
                     >
-                      www.helloasso.com/associations/getigne-collectif
-                    </a>
+                      Adhérer en ligne
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="lg"
+                      className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5"
+                      onClick={() => window.open('https://www.helloasso.com/associations/collectif-getigne/formulaires/2', '_blank')}
+                    >
+                      Faire un don
+                    </Button>
                   </div>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="bg-getigne-200 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="font-medium">2</span>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Choisissez votre cotisation</h3>
-                  <p className="text-getigne-700 mb-3">
-                    Nous proposons plusieurs montants de cotisation pour s'adapter à toutes les situations :
-                  </p>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="border border-getigne-200 p-4 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium">Cotisation de base</span>
-                        <span className="text-getigne-accent font-bold">10€</span>
-                      </div>
-                      <p className="text-sm text-getigne-700">Adhésion annuelle standard</p>
-                    </div>
-                    <div className="border border-getigne-200 p-4 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium">Cotisation soutien</span>
-                        <span className="text-getigne-accent font-bold">20€</span>
-                      </div>
-                      <p className="text-sm text-getigne-700">Pour soutenir davantage nos actions</p>
-                    </div>
-                    <div className="border border-getigne-200 p-4 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium">Cotisation réduite</span>
-                        <span className="text-getigne-accent font-bold">5€</span>
-                      </div>
-                      <p className="text-sm text-getigne-700">Étudiants, demandeurs d'emploi, etc.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="bg-getigne-200 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="font-medium">3</span>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Confirmez votre adhésion</h3>
-                  <p className="text-getigne-700">
-                    Après paiement, vous recevrez un email de confirmation avec votre reçu. 
-                    Nous vous contacterons ensuite pour vous présenter les activités du collectif.
-                  </p>
                 </div>
               </div>
             </div>
-          </div>
-          
-          {/* Team section */}
-          {!loading && boardMembers.length > 0 && (
-            <div className="max-w-4xl mx-auto mb-16">
-              <h2 className="text-2xl font-medium mb-8 text-center">Le bureau de l'association</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {boardMembers.map((member) => (
-                  <div key={member.id} className="bg-white border border-getigne-100 rounded-lg overflow-hidden">
-                    <div className="h-48 overflow-hidden">
-                      <img 
-                        src={member.image} 
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-medium mb-1">{member.name}</h3>
-                      <p className="text-getigne-500 text-sm mb-2">{member.role}</p>
-                      <p className="text-getigne-700 text-sm line-clamp-3">{member.bio}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* CTA section */}
-          <div className="bg-getigne-700 text-white rounded-xl p-8 text-center max-w-3xl mx-auto">
-            <h2 className="text-2xl font-medium mb-4">Rejoignez-nous aujourd'hui</h2>
-            <p className="mb-6">
-              En adhérant à notre collectif, vous contribuez directement à faire avancer 
-              les projets qui façonnent l'avenir de Gétigné.
-            </p>
-            <Button 
-              asChild
-              className="bg-white text-getigne-700 hover:bg-getigne-100"
-            >
-              <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noreferrer">
-                <Wallet size={16} className="mr-2" />
-                Adhérer maintenant
-              </a>
-            </Button>
-          </div>
-        </div>
-      </main>
-      
-      <Footer />
-    </div>
+          </section>
+        </main>
+
+        <Footer />
+      </div>
+    </>
   );
 };
 

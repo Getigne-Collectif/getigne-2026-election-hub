@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, MapPin, ChevronRight, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, ChevronRight, Users, Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -15,9 +15,20 @@ const committeeColors = {
   "Éducation": "border-[#F97316]",
 };
 
+// Map for the committee icons
+const iconMap = {
+  'Lightbulb': Lightbulb,
+  'Bicycle': Bike,
+  'Utensils': Utensils,
+  'Music': Music,
+  'Leaf': Leaf,
+};
+
 const EventCard = ({ event, index }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [committeeColor, setCommitteeColor] = useState("");
+  const [committeeIcon, setCommitteeIcon] = useState(null);
+  const [committeeData, setCommitteeData] = useState(null);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -49,13 +60,18 @@ const EventCard = ({ event, index }) => {
         try {
           const { data, error } = await supabase
             .from('citizen_committees')
-            .select('title')
+            .select('*')
             .eq('id', event.committee_id)
             .single();
             
           if (!error && data) {
             const color = committeeColors[data.title] || "border-getigne-100";
             setCommitteeColor(color);
+            setCommitteeData(data);
+            
+            // Set the icon component
+            const IconComponent = iconMap[data.icon] || Users;
+            setCommitteeIcon(IconComponent);
           }
         } catch (error) {
           console.error('Error fetching committee:', error);
@@ -114,10 +130,10 @@ const EventCard = ({ event, index }) => {
             <MapPin size={14} className="mr-1" />
             <span>{event.location}</span>
           </div>
-          {event.committee && (
+          {committeeData && committeeIcon && (
             <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
-              <Users size={14} className="mr-1" />
-              <span>Commission {event.committee}</span>
+              {React.createElement(committeeIcon, { size: 14, className: "mr-1" })}
+              <span>Commission {committeeData.title}</span>
             </div>
           )}
           {event.is_members_only && (

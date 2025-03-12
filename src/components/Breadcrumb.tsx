@@ -16,17 +16,23 @@ const routes: BreadcrumbNames = {
   'equipe': 'Notre équipe',
   'contact': 'Contact',
   'commissions': 'Commissions',
-  'plan-du-site': 'Plan du site'
+  'plan-du-site': 'Plan du site',
+  'adherer': 'Adhérer'
 };
 
 const Breadcrumb = () => {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter(x => x);
   const [committeeNames, setCommitteeNames] = useState<BreadcrumbNames>({});
+  const [newsTitle, setNewsTitle] = useState<string>("");
+  const [eventTitle, setEventTitle] = useState<string>("");
 
   useEffect(() => {
-    // Fetch committee names if we have commissions in the path
-    const fetchCommitteeNames = async () => {
+    // Don't fetch data on home page
+    if (pathnames.length === 0) return;
+
+    const fetchData = async () => {
+      // Fetch committee names if we have commissions in the path
       if (pathnames.includes('commissions') && pathnames.length > 1) {
         try {
           const { data, error } = await supabase
@@ -45,9 +51,45 @@ const Breadcrumb = () => {
           console.error('Erreur lors de la récupération des noms de commissions:', error);
         }
       }
+
+      // Fetch news title if on a news detail page
+      if (pathnames.includes('actualites') && pathnames.length > 1) {
+        try {
+          const newsId = pathnames[pathnames.length - 1];
+          const { data, error } = await supabase
+            .from('news')
+            .select('title')
+            .eq('id', newsId)
+            .single();
+          
+          if (!error && data) {
+            setNewsTitle(data.title);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération du titre de l\'actualité:', error);
+        }
+      }
+
+      // Fetch event title if on an event detail page
+      if (pathnames.includes('evenements') && pathnames.length > 1) {
+        try {
+          const eventId = pathnames[pathnames.length - 1];
+          const { data, error } = await supabase
+            .from('events')
+            .select('title')
+            .eq('id', eventId)
+            .single();
+          
+          if (!error && data) {
+            setEventTitle(data.title);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération du titre de l\'événement:', error);
+        }
+      }
     };
 
-    fetchCommitteeNames();
+    fetchData();
   }, [pathnames]);
 
   // Don't show breadcrumb on home page
@@ -58,7 +100,7 @@ const Breadcrumb = () => {
   return (
     <div 
       id="breadcrumb"
-      className="w-full glass py-3 border-b border-white/20 shadow-sm"
+      className="w-full bg-white py-3 border-b border-getigne-100 shadow-sm"
     >
       <nav className="container mx-auto px-4">
         <div className="flex items-center space-x-2 text-getigne-700">
@@ -71,10 +113,19 @@ const Breadcrumb = () => {
             const routePath = pathnames.slice(0, index + 1).join('/');
             const isLast = index === pathnames.length - 1;
             
-            // Use committee name if available, otherwise use from routes or path itself
+            // Use custom title for detail pages
             let displayName = path;
-            if (committeeNames[path]) {
-              displayName = committeeNames[path];
+            
+            if (isLast && path === pathnames[pathnames.length - 1]) {
+              if (pathnames.includes('actualites') && newsTitle) {
+                displayName = newsTitle;
+              } else if (pathnames.includes('evenements') && eventTitle) {
+                displayName = eventTitle;
+              } else if (committeeNames[path]) {
+                displayName = committeeNames[path];
+              } else if (routes[path]) {
+                displayName = routes[path];
+              }
             } else if (routes[path]) {
               displayName = routes[path];
             }
