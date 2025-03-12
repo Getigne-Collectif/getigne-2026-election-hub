@@ -120,6 +120,9 @@ export type Database = {
       }
       events: {
         Row: {
+          committee: string | null
+          committee_id: string | null
+          content: string | null
           created_at: string
           date: string
           description: string
@@ -130,6 +133,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          committee?: string | null
+          committee_id?: string | null
+          content?: string | null
           created_at?: string
           date: string
           description: string
@@ -140,6 +146,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          committee?: string | null
+          committee_id?: string | null
+          content?: string | null
           created_at?: string
           date?: string
           description?: string

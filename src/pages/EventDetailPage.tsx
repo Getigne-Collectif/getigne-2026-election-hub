@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, Users, ArrowLeft, Tag } from 'lucide-react';
@@ -51,14 +50,15 @@ const EventDetailPage = () => {
         
         if (error) throw error;
         
-        setEvent(data as Event);
+        const eventData = data as Event;
+        setEvent(eventData);
         
         // Fetch related events (same committee or recent events)
-        if (data.committee_id) {
+        if (eventData.committee_id) {
           const { data: committeeEvents } = await supabase
             .from('events')
             .select('*')
-            .eq('committee_id', data.committee_id)
+            .eq('committee_id', eventData.committee_id)
             .neq('id', id)
             .order('date', { ascending: false })
             .limit(3);
