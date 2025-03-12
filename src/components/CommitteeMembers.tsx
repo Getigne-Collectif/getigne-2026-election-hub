@@ -14,9 +14,10 @@ type CommitteeMember = {
 
 interface CommitteeMembersProps {
   committeeId: string;
+  simplified?: boolean;
 }
 
-const CommitteeMembers = ({ committeeId }: CommitteeMembersProps) => {
+const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersProps) => {
   const [members, setMembers] = useState<CommitteeMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,14 +46,52 @@ const CommitteeMembers = ({ committeeId }: CommitteeMembersProps) => {
   }, [committeeId]);
 
   if (loading) {
-    return <div className="py-4">Chargement des membres...</div>;
+    return <div className="py-2">Chargement des membres...</div>;
   }
 
   if (error) {
-    return <div className="py-4 text-red-500">{error}</div>;
+    return <div className="py-2 text-red-500">{error}</div>;
   }
 
-  // Séparer les pilotes des autres membres
+  if (simplified) {
+    // Version simplifiée pour le résumé
+    const pilots = members.filter(member => member.role === 'pilote');
+    const memberCount = members.length - pilots.length;
+    
+    return (
+      <div className="flex flex-col space-y-2">
+        {pilots.length > 0 && (
+          <div>
+            <div className="text-sm text-getigne-500 mb-1">
+              {pilots.length > 1 ? 'Pilotes' : 'Pilote'}:
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {pilots.map(pilot => (
+                <div key={pilot.id} className="flex items-center">
+                  <Avatar className="w-6 h-6 mr-2">
+                    {pilot.photo ? (
+                      <AvatarImage src={pilot.photo} alt={pilot.name} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-getigne-100">
+                        <User className="text-getigne-500 w-4 h-4" />
+                      </div>
+                    )}
+                  </Avatar>
+                  <span className="text-sm font-medium">{pilot.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        <div className="text-sm text-getigne-500">
+          {memberCount} {memberCount > 1 ? 'membres' : 'membre'} au total
+        </div>
+      </div>
+    );
+  }
+
+  // Version complète - affichée uniquement lorsque nécessaire
   const pilots = members.filter(member => member.role === 'pilote');
   const regularMembers = members.filter(member => member.role !== 'pilote');
 

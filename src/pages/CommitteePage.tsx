@@ -211,8 +211,8 @@ const CommitteePage = () => {
     return (
       <>
         <Navbar />
+        <Breadcrumb />
         <div className="container py-8 mt-20">
-          <Breadcrumb />
           <div className="flex items-center justify-center h-64">
             <p className="text-xl text-getigne-700">Commission non trouvée</p>
           </div>
@@ -242,6 +242,7 @@ const CommitteePage = () => {
   return (
     <>
       <Navbar />
+      <Breadcrumb />
       
       {/* Cover image */}
       <div 
@@ -260,8 +261,6 @@ const CommitteePage = () => {
       </div>
       
       <div className="container py-8 space-y-8">
-        <Breadcrumb />
-        
         {/* Theme badge */}
         <div className="flex flex-wrap gap-2">
           <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
@@ -272,29 +271,32 @@ const CommitteePage = () => {
         {/* Description */}
         <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
           <h2 className="text-2xl font-bold mb-4">À propos de cette commission</h2>
-          <p className="text-getigne-700 whitespace-pre-line">
-            {extendedDescription}
-          </p>
-        </div>
-
-        {/* Members */}
-        <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
-          <h2 className="text-2xl font-bold mb-4">Membres de la commission</h2>
-          
-          {id && <CommitteeMembers committeeId={id} />}
-          
-          {/* Team photo */}
-          <div className="mt-8">
-            <div className="rounded-xl overflow-hidden shadow-md">
-              <img 
-                src={teamImage}
-                alt="Équipe de la commission"
-                className="w-full h-64 object-cover"
-              />
+          <div className="flex flex-col md:flex-row md:gap-8">
+            <div className="md:flex-1">
+              <p className="text-getigne-700 whitespace-pre-line mb-6">
+                {extendedDescription}
+              </p>
+              
+              {/* Membres simplifiés */}
+              <div className="mt-4">
+                <h3 className="text-lg font-medium mb-3">Membres de la commission</h3>
+                {id && <CommitteeMembers committeeId={id} simplified={true} />}
+              </div>
             </div>
-            <p className="text-center text-sm text-getigne-700 mt-2 italic">
-              Les membres de la commission {committee.title} lors d'une réunion de travail
-            </p>
+            
+            {/* Team photo */}
+            <div className="mt-6 md:mt-0 md:w-1/3">
+              <div className="rounded-xl overflow-hidden shadow-md">
+                <img 
+                  src={teamImage}
+                  alt="Équipe de la commission"
+                  className="w-full h-48 md:h-64 object-cover"
+                />
+              </div>
+              <p className="text-center text-sm text-getigne-700 mt-2 italic">
+                Les membres de la commission {committee.title} lors d'une réunion de travail
+              </p>
+            </div>
           </div>
         </div>
 

@@ -16,11 +16,59 @@ const iconMap = {
   Leaf
 };
 
+// Map pour les couleurs des thèmes
+const colorMap = {
+  'Lightbulb': {
+    bg: 'bg-yellow-50',
+    text: 'text-yellow-600',
+    border: 'border-yellow-200',
+    accent: 'bg-yellow-400/10',
+    theme: 'Énergie'
+  },
+  'Bicycle': {
+    bg: 'bg-purple-50',
+    text: 'text-purple-600',
+    border: 'border-purple-200',
+    accent: 'bg-purple-400/10',
+    theme: 'Mobilité'
+  },
+  'Utensils': {
+    bg: 'bg-orange-50',
+    text: 'text-orange-600',
+    border: 'border-orange-200',
+    accent: 'bg-orange-400/10',
+    theme: 'Alimentation'
+  },
+  'Music': {
+    bg: 'bg-blue-50',
+    text: 'text-blue-600',
+    border: 'border-blue-200',
+    accent: 'bg-blue-400/10',
+    theme: 'Culture'
+  },
+  'Leaf': {
+    bg: 'bg-green-50',
+    text: 'text-green-600',
+    border: 'border-green-200',
+    accent: 'bg-green-400/10',
+    theme: 'Biodiversité'
+  }
+};
+
 const CommitteeItem = ({ committee, index }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [memberCount, setMemberCount] = useState(0);
   const ref = useRef(null);
   const Icon = iconMap[committee.icon] || Leaf;
+  
+  // Récupérer les couleurs spécifiques à cette commission
+  const themeColor = colorMap[committee.icon] || {
+    bg: 'bg-getigne-50',
+    text: 'text-getigne-accent',
+    border: 'border-getigne-100',
+    accent: 'bg-getigne-accent/10',
+    theme: 'Thématique'
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,16 +104,19 @@ const CommitteeItem = ({ committee, index }) => {
   return (
     <div 
       ref={ref}
-      className={`bg-white shadow-sm border border-getigne-100 rounded-xl p-6 hover-lift ${
+      className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift ${
         isVisible 
           ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
           : 'opacity-0 translate-y-10'
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center mb-4">
-        <Icon className="text-getigne-accent" size={24} />
+      <div className={`w-12 h-12 ${themeColor.accent} rounded-lg flex items-center justify-center mb-4`}>
+        <Icon className={themeColor.text} size={24} />
       </div>
+      <span className={`text-xs ${themeColor.text} ${themeColor.bg} px-2 py-0.5 rounded-full inline-block mb-2`}>
+        {themeColor.theme}
+      </span>
       <h3 className="text-lg font-medium mb-2">{committee.title}</h3>
       <p className="text-getigne-700 mb-2">{committee.description}</p>
       
@@ -74,7 +125,7 @@ const CommitteeItem = ({ committee, index }) => {
         <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
       </div>
       
-      <Link to={`/commissions/${committee.id}`} className="text-getigne-accent flex items-center text-sm font-medium group">
+      <Link to={`/commissions/${committee.id}`} className={`${themeColor.text} flex items-center text-sm font-medium group`}>
         En savoir plus
         <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
       </Link>
