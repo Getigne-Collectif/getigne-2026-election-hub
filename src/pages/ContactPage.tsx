@@ -14,17 +14,17 @@ const ContactPage = () => {
   return (
     <div className="page-content">
       <Navbar />
-      
+
       <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto">
-          <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-8">
+        <div className="container mx-auto"><h1 className="text-3xl font-bold mb-4 text-center">Contactez-nous</h1>
+          <p className="text-getigne-700 text-center">
+            Vous avez des questions ou des suggestions ? N'hésitez pas à nous contacter.
+          </p>
+          <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-8 mt-5">
             <div className="text-center mb-10">
-              <h1 className="text-3xl font-bold mb-4">Contactez-nous</h1>
-              <p className="text-getigne-700">
-                Vous avez des questions ou des suggestions ? N'hésitez pas à nous contacter.
-              </p>
+
             </div>
-            
+
             <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -37,7 +37,7 @@ const ContactPage = () => {
                     className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
                   />
                 </div>
-                
+
                 <div>
                   <label htmlFor="lastName" className="block text-sm font-medium text-getigne-800 mb-1">
                     Nom
@@ -49,7 +49,7 @@ const ContactPage = () => {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-getigne-800 mb-1">
                   Email
@@ -60,7 +60,7 @@ const ContactPage = () => {
                   className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-getigne-800 mb-1">
                   Sujet
@@ -71,7 +71,7 @@ const ContactPage = () => {
                   className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-getigne-800 mb-1">
                   Message
@@ -82,15 +82,15 @@ const ContactPage = () => {
                   className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
                 ></textarea>
               </div>
-              
-              <Button className="w-full bg-getigne-green-600 hover:bg-getigne-green-700 text-white">
+
+              <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">
                 <Send className="mr-2 h-4 w-4" /> Envoyer
               </Button>
             </form>
           </div>
         </div>
       </section>
-      
+
       <Footer />
     </div>
   );

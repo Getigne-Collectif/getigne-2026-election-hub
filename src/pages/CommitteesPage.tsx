@@ -1,12 +1,19 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Bike, Utensils, Music, Leaf, ChevronRight, Users } from 'lucide-react';
+import {Lightbulb, Bike, Utensils, Music, Leaf, ChevronRight, Users, Home} from 'lucide-react';
 import { getMemberCount } from '@/components/CommitteeMembers';
-import Breadcrumb from '@/components/Breadcrumb';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
 
 // Map pour les icônes
 const iconMap = {
@@ -69,16 +76,16 @@ const CommitteesPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    
+
     const fetchCommittees = async () => {
       try {
         const { data, error } = await supabase
           .from('citizen_committees')
           .select('*')
           .order('title');
-        
+
         if (error) throw error;
-        
+
         setCommittees(data);
 
         // Récupérer le nombre de membres pour chaque commission
@@ -87,7 +94,7 @@ const CommitteesPage = () => {
           counts[committee.id] = await getMemberCount(committee.id);
         }
         setMemberCounts(counts);
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des commissions:', error);
@@ -102,25 +109,41 @@ const CommitteesPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       {/* Header */}
       <div className="pt-24 pb-12 bg-getigne-50">
         <div className="container mx-auto px-4">
-          <Breadcrumb />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">
+                  <Home className="h-4 w-4 mr-1" />
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/programme">Programme</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Commissions</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <div className="max-w-3xl mx-auto text-center mt-8">
             <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
               Démocratie participative
             </span>
             <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos commissions citoyennes</h1>
             <p className="text-getigne-700 text-lg mb-8">
-              Depuis mai 2024, des commissions citoyennes travaillent en lien avec nos élus sur des thématiques 
+              Depuis mai 2024, des commissions citoyennes travaillent en lien avec nos élus sur des thématiques
               essentielles pour l'avenir de notre commune. Découvrez leurs travaux et rejoignez-les !
             </p>
           </div>
-          
+
           {/* Image illustrant la démocratie participative */}
           <div className="mt-8 max-w-4xl mx-auto rounded-xl overflow-hidden shadow-md">
-            <img 
+            <img
               src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80"
               alt="Démocratie participative à Gétigné"
               className="w-full h-80 object-cover"
@@ -154,10 +177,10 @@ const CommitteesPage = () => {
                   accent: 'bg-getigne-accent/10',
                   theme: 'Thématique'
                 };
-                
+
                 return (
-                  <Link 
-                    key={committee.id} 
+                  <Link
+                    key={committee.id}
                     to={`/commissions/${committee.id}`}
                     className={`bg-white rounded-xl overflow-hidden shadow-sm border ${themeColor.border} ${themeColor.hover} transition-all hover:shadow-md`}
                   >
@@ -171,12 +194,12 @@ const CommitteesPage = () => {
                       </span>
                       <h2 className="text-xl font-medium mb-3 mt-2">{committee.title}</h2>
                       <p className="text-getigne-700 mb-4">{committee.description}</p>
-                      
+
                       <div className="flex items-center text-getigne-500 text-sm mb-3">
                         <Users size={16} className="mr-1" />
                         <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
                       </div>
-                      
+
                       <div className={`${themeColor.text} flex items-center text-sm font-medium group`}>
                         Découvrir les travaux
                         <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
@@ -192,13 +215,13 @@ const CommitteesPage = () => {
           <div className="max-w-3xl mx-auto mt-16 pt-10 border-t border-getigne-100">
             <h2 className="text-2xl font-bold mb-4">Participez aux commissions</h2>
             <p className="text-getigne-700 mb-6">
-              Les commissions citoyennes sont ouvertes à tous les habitants de Gétigné qui souhaitent s'impliquer 
-              dans la vie de notre commune. Aucune compétence particulière n'est requise, juste l'envie de contribuer 
+              Les commissions citoyennes sont ouvertes à tous les habitants de Gétigné qui souhaitent s'impliquer
+              dans la vie de notre commune. Aucune compétence particulière n'est requise, juste l'envie de contribuer
               à l'amélioration de notre cadre de vie.
             </p>
             <p className="text-getigne-700 mb-6">
-              Chaque commission se réunit régulièrement pour travailler sur des projets concrets, élaborer des 
-              propositions et suivre leur mise en œuvre. Les travaux des commissions alimentent directement le 
+              Chaque commission se réunit régulièrement pour travailler sur des projets concrets, élaborer des
+              propositions et suivre leur mise en œuvre. Les travaux des commissions alimentent directement le
               programme municipal de notre collectif.
             </p>
             <div className="bg-getigne-accent/10 p-6 rounded-xl">

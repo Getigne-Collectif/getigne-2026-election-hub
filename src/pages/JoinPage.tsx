@@ -1,10 +1,18 @@
 
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
-import Breadcrumb from "@/components/Breadcrumb";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { Users, Heart, Zap, Landmark, LayoutList, PiggyBank } from 'lucide-react';
+import {Users, Heart, Zap, Landmark, LayoutList, PiggyBank, Home} from 'lucide-react';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
+import React from "react";
 
 const JoinPage = () => {
   return (
@@ -19,20 +27,37 @@ const JoinPage = () => {
 
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <Breadcrumb />
+
+        <div className="pt-24 pb-12 bg-getigne-50">
+          <div className="container mx-auto px-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">
+                    <Home className="h-4 w-4 mr-1" />
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Adhérer</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <div className="max-w-3xl mx-auto text-center">
+            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+              Actualités
+            </span>
+              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Rejoignez le mouvement</h1>
+              <p className="text-getigne-700 text-lg mb-8">
+                Ensemble, agissons pour notre commune et construisons une démocratie plus participative.
+              </p>
+            </div>
+          </div>
+        </div>
 
         <main className="flex-grow">
           <section className="relative py-16 md:py-24 px-4 bg-getigne-50">
             <div className="container mx-auto">
-              <div className="text-center mb-12 max-w-3xl mx-auto">
-                <h1 className="text-3xl md:text-4xl font-bold mb-6">
-                  Rejoignez Gétigné Collectif
-                </h1>
-                <p className="text-lg text-getigne-700">
-                  Ensemble, agissons pour notre commune et construisons une démocratie plus participative.
-                </p>
-              </div>
-              
               <div className="grid md:grid-cols-3 gap-8 mb-12">
                 <div className="md:col-span-2">
                   <div className="bg-white rounded-xl shadow-sm p-8 md:p-10 h-full">
@@ -108,7 +133,7 @@ const JoinPage = () => {
                       <div className="text-center mb-8">
                         <h2 className="text-2xl font-semibold mb-4">Comment nous rejoindre ?</h2>
                         <p className="text-getigne-700 max-w-2xl mx-auto">
-                          L'adhésion annuelle est de 10€. Vous pouvez également faire un don libre pour soutenir nos actions.
+                          L'adhésion annuelle est à <strong>prix libre</strong> pour que chaque personne puisse donner selon ses moyens et définir elle-même le bon montant. Vous pouvez également faire un don libre pour soutenir nos actions.
                         </p>
                       </div>
 
@@ -132,19 +157,19 @@ const JoinPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div className="rounded-xl overflow-hidden shadow-sm h-[300px]">
-                    <img 
-                      src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-                      alt="Groupe de discussion" 
+                    <img
+                      src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+                      alt="Groupe de discussion"
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="rounded-xl overflow-hidden shadow-sm h-[300px]">
-                    <img 
-                      src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-                      alt="Réunion de collectif" 
+                    <img
+                      src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+                      alt="Réunion de collectif"
                       className="w-full h-full object-cover"
                     />
                   </div>

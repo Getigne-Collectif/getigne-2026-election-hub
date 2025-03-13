@@ -1,12 +1,19 @@
 
-import { useState, useEffect, useRef } from 'react';
-import { Calendar, MapPin, Clock, Users, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import {Calendar, MapPin, Clock, Users, ChevronRight, Home} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
-import Breadcrumb from '@/components/Breadcrumb';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
 
 // Map committee names to colors
 const committeeColors = {
@@ -66,12 +73,12 @@ const EventCard = ({ event, index }) => {
             .select('*')
             .eq('id', event.committee_id)
             .single();
-            
+
           if (!error && data) {
             const color = committeeColors[data.title] || "border-getigne-100";
             setCommitteeColor(color);
             setCommitteeData(data);
-            
+
             // Set the icon component
             const IconComponent = iconMap[data.icon];
             setCommitteeIcon(IconComponent || Users);
@@ -81,7 +88,7 @@ const EventCard = ({ event, index }) => {
         }
       }
     };
-    
+
     fetchCommitteeInfo();
   }, [event.committee_id]);
 
@@ -105,7 +112,7 @@ const EventCard = ({ event, index }) => {
 
   return (
     <Link to={`/evenements/${event.id}`} className="block hover:no-underline">
-      <div 
+      <div
         ref={ref}
         className={`bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
           isVisible 
@@ -115,8 +122,8 @@ const EventCard = ({ event, index }) => {
         style={{ transitionDelay: `${index * 100}ms` }}
       >
         <div className="h-48 overflow-hidden">
-          <img 
-            src={event.image} 
+          <img
+            src={event.image}
             alt={event.title}
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
@@ -130,9 +137,9 @@ const EventCard = ({ event, index }) => {
               </div>
             )}
           </div>
-          
+
           <h3 className="font-medium text-xl mb-4">{event.title}</h3>
-          
+
           <div className="flex items-center gap-2 text-getigne-700 mb-2">
             <Calendar size={16} className="text-getigne-accent" />
             <span>{formatDate(event.date)}</span>
@@ -145,14 +152,14 @@ const EventCard = ({ event, index }) => {
             <MapPin size={16} className="text-getigne-accent" />
             <span>{event.location}</span>
           </div>
-          
+
           {event.is_members_only && (
             <div className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-xs inline-flex items-center mb-4">
               <Users size={12} className="mr-1" />
               Réservé aux adhérents
             </div>
           )}
-          
+
           <div className="text-getigne-accent flex items-center text-sm font-medium group mt-4">
             En savoir plus
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
@@ -171,22 +178,22 @@ const EventsPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    
+
     const fetchEvents = async () => {
       try {
         const { data, error } = await supabase
           .from('events')
           .select('*')
           .order('date', { ascending: true });
-        
+
         if (error) throw error;
-        
+
         const now = new Date();
-        
+
         // Split events into upcoming and past
         const upcoming = [];
         const past = [];
-        
+
         data.forEach(event => {
           const eventDate = new Date(event.date);
           if (eventDate >= now) {
@@ -195,10 +202,10 @@ const EventsPage = () => {
             past.push(event);
           }
         });
-        
+
         // Sort past events in descending order (most recent first)
         past.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        
+
         setUpcomingEvents(upcoming);
         setPastEvents(past);
         setLoading(false);
@@ -215,21 +222,42 @@ const EventsPage = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <Breadcrumb />
-      <div className="py-24 px-4">
-        <div className="container mx-auto">
-          {/* Upcoming Events */}
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-              Agenda
-            </span>
-            <h1 className="text-4xl font-bold mt-4 mb-6">Nos prochains événements</h1>
-            <p className="text-getigne-700 text-lg">
-              Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échange 
-              pour construire ensemble l'avenir de Gétigné.
-            </p>
-          </div>
 
+      <div>
+        {/* Header */}
+        <div className="pt-24 pb-12 bg-getigne-50">
+          <div className="container mx-auto px-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">
+                    <Home className="h-4 w-4 mr-1" />
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Événements</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <div className="max-w-3xl mx-auto text-center">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+                  Agenda
+                </span>
+                <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos prochains événements</h1>
+                <p className="text-getigne-700 text-lg">
+                  Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échange
+                  pour construire ensemble l'avenir de Gétigné.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Events content */}
+        <main className="flex-grow py-16">
+          <div className="container mx-auto px-4">
           {loading ? (
             <div className="text-center py-8">Chargement des événements...</div>
           ) : error ? (
@@ -250,7 +278,7 @@ const EventsPage = () => {
               )}
             </>
           )}
-          
+
           {/* Past Events Section */}
           {!loading && !error && pastEvents.length > 0 && (
             <div className="mt-24">
@@ -263,7 +291,7 @@ const EventsPage = () => {
                   Découvrez les événements que nous avons organisés récemment.
                 </p>
               </div>
-              
+
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {pastEvents.map((event, index) => (
                   <EventCard key={event.id} event={event} index={index} />
@@ -272,6 +300,7 @@ const EventsPage = () => {
             </div>
           )}
         </div>
+        </main>
       </div>
       <Footer />
     </div>

@@ -2,24 +2,30 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import Breadcrumb from '@/components/Breadcrumb';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  ArrowRight, 
-  Newspaper, 
-  Calendar, 
-  Users, 
-  MessageSquare, 
-  LayoutGrid, 
-  Leaf, 
+import {
+  ArrowRight,
+  Newspaper,
+  Calendar,
+  Users,
+  MessageSquare,
+  LayoutGrid,
+  Leaf,
   Lightbulb,
   Utensils,
   Bike,
   Music,
   Home
 } from 'lucide-react';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
 
 // Map for committee icons
 const committeeIconMap = {
@@ -38,7 +44,7 @@ const getIconColor = (icon: string) => {
     'Music': 'bg-blue-50 text-blue-600 border-blue-200',
     'Leaf': 'bg-green-50 text-green-600 border-green-200'
   };
-  
+
   return colorMap[icon] || 'bg-getigne-100 text-getigne-700 border-getigne-200';
 };
 
@@ -56,7 +62,7 @@ const SiteMapPage = () => {
         .from('citizen_committees')
         .select('*')
         .order('title');
-      
+
       if (error) throw error;
       return data;
     },
@@ -71,7 +77,7 @@ const SiteMapPage = () => {
         .select('*')
         .order('date', { ascending: false })
         .limit(5);
-      
+
       if (error) throw error;
       return data;
     },
@@ -86,7 +92,7 @@ const SiteMapPage = () => {
         .select('*')
         .order('date', { ascending: true })
         .limit(5);
-      
+
       if (error) throw error;
       return data;
     },
@@ -147,10 +153,22 @@ const SiteMapPage = () => {
     <div className="page-content">
       <Navbar />
       <div className="pt-20">
-        <Breadcrumb />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">
+                <Home className="h-4 w-4 mr-1" />
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Plan du site</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold mb-8">Plan du site</h1>
-          
+
           <div className="space-y-12">
             {/* Main Pages */}
             <section>
@@ -159,9 +177,9 @@ const SiteMapPage = () => {
               </h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {mainPages.map((item) => (
-                  <Link 
-                    key={item.path} 
-                    to={item.path} 
+                  <Link
+                    key={item.path}
+                    to={item.path}
                     className="p-6 bg-white rounded-lg border border-getigne-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4"
                   >
                     <div className="mt-1 bg-getigne-50 p-2 rounded-full">
@@ -192,11 +210,11 @@ const SiteMapPage = () => {
                   committeesQuery.data?.map((committee) => {
                     const IconComponent = committeeIconMap[committee.icon] || Leaf;
                     const colorClass = getIconColor(committee.icon);
-                    
+
                     return (
-                      <Link 
-                        key={committee.id} 
-                        to={`/commissions/${committee.id}`} 
+                      <Link
+                        key={committee.id}
+                        to={`/commissions/${committee.id}`}
                         className="p-6 bg-white rounded-lg border border-getigne-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4"
                       >
                         <div className={`mt-1 p-2 rounded-full ${colorClass}`}>
@@ -231,15 +249,15 @@ const SiteMapPage = () => {
                   </div>
                 ) : (
                   newsQuery.data?.map((news) => (
-                    <Link 
-                      key={news.id} 
-                      to={`/actualites/${news.id}`} 
+                    <Link
+                      key={news.id}
+                      to={`/actualites/${news.id}`}
                       className="p-6 bg-white rounded-lg border border-getigne-100 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="mb-4 h-40 rounded-md overflow-hidden">
-                        <img 
-                          src={news.image} 
-                          alt={news.title} 
+                        <img
+                          src={news.image}
+                          alt={news.title}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -257,9 +275,9 @@ const SiteMapPage = () => {
                     </Link>
                   ))
                 )}
-                
-                <Link 
-                  to="/actualites" 
+
+                <Link
+                  to="/actualites"
                   className="col-span-full flex items-center justify-center text-getigne-accent hover:text-getigne-accent/80 font-medium mt-2"
                 >
                   Voir toutes les actualités
@@ -286,15 +304,15 @@ const SiteMapPage = () => {
                   </div>
                 ) : (
                   eventsQuery.data?.map((event) => (
-                    <Link 
-                      key={event.id} 
-                      to={`/evenements/${event.id}`} 
+                    <Link
+                      key={event.id}
+                      to={`/evenements/${event.id}`}
                       className="p-6 bg-white rounded-lg border border-getigne-100 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="mb-4 h-40 rounded-md overflow-hidden">
-                        <img 
-                          src={event.image} 
-                          alt={event.title} 
+                        <img
+                          src={event.image}
+                          alt={event.title}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -312,9 +330,9 @@ const SiteMapPage = () => {
                     </Link>
                   ))
                 )}
-                
-                <Link 
-                  to="/evenements" 
+
+                <Link
+                  to="/evenements"
                   className="col-span-full flex items-center justify-center text-getigne-accent hover:text-getigne-accent/80 font-medium mt-2"
                 >
                   Voir tous les événements

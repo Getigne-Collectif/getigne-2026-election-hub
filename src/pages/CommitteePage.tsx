@@ -10,7 +10,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Lightbulb, Bike, Utensils, Music, Leaf, Users, FileText, Calendar, Clock, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { 
+import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -19,7 +19,7 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
 import { Home } from 'lucide-react';
-import { 
+import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -42,8 +42,6 @@ interface Committee {
   icon: string;
   team_photo_url?: string;
 }
-
-const [loading, setLoading] = useState(true);
 
 const iconMap = {
   'Lightbulb': Lightbulb,
@@ -225,7 +223,7 @@ const CommitteePage = () => {
             .select('team_photo_url')
             .eq('id', id)
             .single();
-            
+
           if (error) {
             console.error("Error fetching team photo:", error);
             const committee = committeeQuery.data?.[0];
@@ -235,7 +233,7 @@ const CommitteePage = () => {
             }
             return;
           }
-            
+
           if (committeeData?.team_photo_url) {
             setTeamPhotoUrl(committeeData.team_photo_url);
           } else {
@@ -251,7 +249,7 @@ const CommitteePage = () => {
         setTeamPhotoUrl(null);
       }
     };
-    
+
     if (!isLoading && committeeQuery.data) {
       fetchTeamPhoto();
       setLoading(false);
@@ -262,7 +260,7 @@ const CommitteePage = () => {
     if (allCommitteesQuery.data && id) {
       const committees = allCommitteesQuery.data;
       setOtherCommittees(committees);
-      
+
       const currentIndex = committees.findIndex((c) => c.id === id);
       setCurrentCommitteeIndex(currentIndex);
     }
@@ -275,7 +273,7 @@ const CommitteePage = () => {
     if (currentCommitteeIndex <= 0 || otherCommittees.length === 0) return null;
     return otherCommittees[currentCommitteeIndex - 1];
   };
-  
+
   const getNextCommittee = () => {
     if (currentCommitteeIndex === -1 || currentCommitteeIndex >= otherCommittees.length - 1) return null;
     return otherCommittees[currentCommitteeIndex + 1];
@@ -331,9 +329,9 @@ const CommitteePage = () => {
   return (
     <>
       <Navbar />
-      
-      <div 
-        className="h-64 md:h-80 w-full bg-cover bg-center relative" 
+
+      <div
+        className="h-64 md:h-80 w-full bg-cover bg-center relative"
         style={{ backgroundImage: `url(${themeColor.coverImage})` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
@@ -348,7 +346,7 @@ const CommitteePage = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="container py-8 space-y-8">
         <div className="pt-4">
           <Breadcrumb>
@@ -356,7 +354,6 @@ const CommitteePage = () => {
               <BreadcrumbItem>
                 <BreadcrumbLink href="/">
                   <Home className="h-4 w-4 mr-1" />
-                  Accueil
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
@@ -374,7 +371,7 @@ const CommitteePage = () => {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        
+
         <div className="flex flex-wrap gap-2">
           <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
             {themeColor.theme}
@@ -388,16 +385,16 @@ const CommitteePage = () => {
               <p className="text-getigne-700 whitespace-pre-line mb-6">
                 {extendedDescription}
               </p>
-              
+
               <div className="mt-4">
                 <h3 className="text-lg font-medium mb-3">Pilote de la commission</h3>
                 {id && <CommitteeMembers committeeId={id} simplified={true} />}
               </div>
             </div>
-            
+
             <div className="mt-6 md:mt-0 md:w-1/3">
               <div className="rounded-xl overflow-hidden shadow-md">
-                <img 
+                <img
                   src={teamImage}
                   alt="Équipe de la commission"
                   className="w-full h-48 md:h-64 object-cover"
@@ -414,11 +411,11 @@ const CommitteePage = () => {
           <div className="mb-6">
             <h2 className="text-2xl font-bold mb-2">Travaux de la commission</h2>
             <p className="text-getigne-700">
-              Retrouvez ci-dessous les comptes-rendus, études et propositions réalisés par la commission {committee.title}. 
+              Retrouvez ci-dessous les comptes-rendus, études et propositions réalisés par la commission {committee.title}.
               Ces travaux constituent la base de notre réflexion pour élaborer des propositions concrètes pour Gétigné.
             </p>
           </div>
-          
+
           {works.length === 0 ? (
             <div className={`p-6 rounded-lg ${themeColor.bg} border ${themeColor.border}`}>
               <div className="flex items-center">
@@ -440,7 +437,7 @@ const CommitteePage = () => {
                     <FileText className={`${themeColor.text}`} size={20} />
                     <h3 className="text-lg font-semibold">{work.title}</h3>
                   </div>
-                  
+
                   <div className="flex items-center gap-4 mb-3 text-sm text-getigne-500">
                     <div className="flex items-center">
                       <Calendar size={14} className="mr-1" />
@@ -462,11 +459,11 @@ const CommitteePage = () => {
                       </span>
                     </div>
                   </div>
-                  
+
                   <p className="mt-2 text-getigne-700 mb-4">
                     {work.content.length > 160 ? `${work.content.substring(0, 160)}...` : work.content}
                   </p>
-                  
+
                   <div className="flex flex-wrap gap-4">
                     {Array.isArray(work.images) && work.images.length > 0 && (
                       <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
@@ -478,8 +475,8 @@ const CommitteePage = () => {
                         {work.files.length} document{work.files.length > 1 ? 's' : ''}
                       </span>
                     )}
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       className={`ml-auto border-${themeColor.border}`}
                       onClick={(e) => {
@@ -497,21 +494,22 @@ const CommitteePage = () => {
         </div>
 
         {committee && (
-          <CommitteeContactForm 
+          <CommitteeContactForm
             committeeId={committee.id}
             committeeName={committee.title}
             themeColor={themeColor}
           />
         )}
 
-        <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
-          <h2 className="text-xl font-bold mb-4">Découvrir les autres commissions</h2>
-          
+        <div className="">
+          <h2 className="text-xl font-bold mb-4">Découvrir les autres commissions
+          </h2>
+
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="w-full md:w-auto">
               {prevCommittee ? (
-                <Link 
-                  to={`/commissions/${prevCommittee.id}`} 
+                <Link
+                  to={`/commissions/${prevCommittee.id}`}
                   className="flex items-center hover:underline"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -524,18 +522,13 @@ const CommitteePage = () => {
                 </span>
               )}
             </div>
-            
-            <Link 
-              to="/commissions"
-              className="px-4 py-1 border border-getigne-200 rounded-full text-sm hover:bg-getigne-50 transition-colors"
-            >
-              Voir toutes les commissions
-            </Link>
-            
+
+
+
             <div className="w-full md:w-auto text-right">
               {nextCommittee ? (
-                <Link 
-                  to={`/commissions/${nextCommittee.id}`} 
+                <Link
+                  to={`/commissions/${nextCommittee.id}`}
                   className="flex items-center justify-end hover:underline"
                 >
                   <span>Commission {nextCommittee.title}</span>
@@ -548,23 +541,6 @@ const CommitteePage = () => {
                 </span>
               )}
             </div>
-          </div>
-          
-          <div className="mt-6">
-            <Pagination>
-              <PaginationContent>
-                {otherCommittees.map((comm, index) => (
-                  <PaginationItem key={comm.id}>
-                    <PaginationLink 
-                      href={`/commissions/${comm.id}`}
-                      isActive={comm.id === id}
-                    >
-                      {index + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-              </PaginationContent>
-            </Pagination>
           </div>
         </div>
 
