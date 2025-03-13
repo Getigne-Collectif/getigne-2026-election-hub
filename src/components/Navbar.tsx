@@ -70,11 +70,11 @@ const Navbar = () => {
 
                 {/* Programme dropdown with Commissions */}
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-getigne-800 hover:text-getigne-accent py-1 text-sm font-medium transition-colors bg-transparent">
+                  <NavigationMenuTrigger className="text-getigne-800 hover:text-getigne-accent py-1 text-sm font-medium transition-colors bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
                     Programme
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[200px] gap-3 p-4">
+                    <ul className="grid w-[200px] gap-3 p-4 bg-white">
                       <li>
                         <NavigationMenuLink asChild>
                           <Link 
@@ -105,59 +105,36 @@ const Navbar = () => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
-                {/* Actualités dropdown */}
+                {/* Actualités link */}
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-getigne-800 hover:text-getigne-accent py-1 text-sm font-medium transition-colors bg-transparent">
+                  <Link to="/actualites" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
                     Actualités
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[200px] gap-3 p-4">
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link 
-                            to="/actualites" 
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-getigne-accent/10 hover:text-getigne-accent focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium">Toutes les actualités</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Dernières nouvelles du collectif
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <NavigationMenuLink asChild>
-                          <Link 
-                            to="/evenements" 
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-getigne-accent/10 hover:text-getigne-accent focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium">Événements</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Nos prochains rendez-vous
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
+                  </Link>
                 </NavigationMenuItem>
 
+                {/* Agenda link */}
                 <NavigationMenuItem>
-                  <Link to="/equipe" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
-                    Équipe
+                  <Link to="/agenda" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
+                    Agenda
                   </Link>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <Link to="/adherer" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
-                    Rejoignez le mouvement
+                  <Link to="/qui-sommes-nous" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
+                    Qui sommes-nous ?
                   </Link>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <Link to="/adherer#contact" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
-                    Contact
-                  </Link>
+                  <Button 
+                    asChild
+                    className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90"
+                    size="sm"
+                  >
+                    <Link to="/adherer">
+                      Rejoignez le mouvement
+                    </Link>
+                  </Button>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
@@ -227,52 +204,25 @@ const Navbar = () => {
               </div>
             </div>
             
-            <div>
-              <button 
-                className="text-getigne-800 text-lg font-medium hover:text-getigne-accent flex items-center"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const el = document.getElementById('mobile-actualites-submenu');
-                  if (el) el.classList.toggle('hidden');
-                }}
-              >
-                Actualités <ChevronDown size={16} className="ml-1" />
-              </button>
-              <div id="mobile-actualites-submenu" className="hidden pl-4 mt-2 space-y-2">
-                <Link 
-                  to="/actualites" 
-                  className="block py-1 text-getigne-700 hover:text-getigne-accent"
-                >
-                  Toutes les actualités
-                </Link>
-                <Link 
-                  to="/evenements" 
-                  className="block py-1 text-getigne-700 hover:text-getigne-accent"
-                >
-                  Événements
-                </Link>
-              </div>
-            </div>
+            <Link 
+              to="/actualites" 
+              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
+            >
+              Actualités
+            </Link>
+            
+            <Link 
+              to="/agenda" 
+              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
+            >
+              Agenda
+            </Link>
 
             <Link 
-              to="/equipe" 
+              to="/qui-sommes-nous" 
               className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
             >
-              Équipe
-            </Link>
-            
-            <Link 
-              to="/adherer" 
-              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
-            >
-              Rejoignez le mouvement
-            </Link>
-            
-            <Link 
-              to="/adherer#contact" 
-              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
-            >
-              Contact
+              Qui sommes-nous ?
             </Link>
             
             <Button 
@@ -283,6 +233,13 @@ const Navbar = () => {
                 Rejoignez le mouvement
               </Link>
             </Button>
+
+            <Link 
+              to="/adherer#contact" 
+              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
+            >
+              Contact
+            </Link>
           </nav>
         </div>
       </div>

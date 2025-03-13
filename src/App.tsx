@@ -9,13 +9,14 @@ import NotFound from "./pages/NotFound";
 import ProgramPage from "./pages/ProgramPage";
 import NewsPage from "./pages/NewsPage";
 import NewsDetailPage from "./pages/NewsDetailPage";
-import EventsPage from "./pages/EventsPage";
+import AgendaPage from "./pages/AgendaPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import TeamPage from "./pages/TeamPage";
 import CommitteesPage from "./pages/CommitteesPage";
 import CommitteePage from "./pages/CommitteePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import JoinPage from "./pages/JoinPage";
+import AboutUsPage from "./pages/AboutUsPage";
 
 const queryClient = new QueryClient();
 
@@ -30,13 +31,14 @@ const App = () => (
           <Route path="/programme" element={<ProgramPage />} />
           <Route path="/actualites" element={<NewsPage />} />
           <Route path="/actualites/:id" element={<NewsDetailPage />} />
-          <Route path="/evenements" element={<EventsPage />} />
+          <Route path="/agenda" element={<AgendaPage />} />
           <Route path="/evenements/:id" element={<EventDetailPage />} />
           <Route path="/equipe" element={<TeamPage />} />
           <Route path="/commissions" element={<CommitteesPage />} />
           <Route path="/commissions/:id" element={<CommitteePage />} />
           <Route path="/plan-du-site" element={<SiteMapPage />} />
           <Route path="/adherer" element={<JoinPage />} />
+          <Route path="/qui-sommes-nous" element={<AboutUsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
