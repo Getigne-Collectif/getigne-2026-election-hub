@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,9 @@ const Navbar = () => {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass py-2"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white shadow-md py-2' : 'bg-white/80 backdrop-blur-md py-3'
+      }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
@@ -51,38 +54,80 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {routes.map(route => (
-              <Link key={route.path} to={route.path} className="text-getigne-800 hover:text-getigne-accent animated-underline py-1">
+              <Link 
+                key={route.path} 
+                to={route.path} 
+                className={`text-getigne-800 hover:text-getigne-accent py-1 px-2 text-sm font-medium transition-colors ${
+                  location.pathname === route.path ? 'text-getigne-accent' : ''
+                }`}
+              >
                 {route.name}
               </Link>
             ))}
+            <Button 
+              asChild
+              className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90 ml-2"
+            >
+              <Link to="/contact">
+                Nous rejoindre
+              </Link>
+            </Button>
           </nav>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-getigne-900"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden flex items-center">
+            <Button 
+              asChild
+              className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90 mr-4"
+              size="sm"
+            >
+              <Link to="/contact">
+                Rejoindre
+              </Link>
+            </Button>
+            <button
+              className="text-getigne-900"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       <div
-        className={`fixed inset-0 z-40 glass pt-16 transform transition-transform duration-300 ${
+        className={`fixed inset-0 z-40 bg-white transform transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         } md:hidden`}
       >
-        <nav className="container flex flex-col items-center justify-center h-full gap-8 text-lg">
-          {routes.map(route => (
-            <Link key={route.path} to={route.path} className="text-getigne-800 hover:text-getigne-accent py-2 w-full text-center" onClick={() => setIsOpen(false)}>
-              {route.name}
-            </Link>
-          ))}
-        </nav>
+        <div className="container pt-20 px-4">
+          <nav className="flex flex-col space-y-6">
+            {routes.map(route => (
+              <Link 
+                key={route.path} 
+                to={route.path} 
+                className={`text-getigne-800 text-lg font-medium hover:text-getigne-accent ${
+                  location.pathname === route.path ? 'text-getigne-accent' : ''
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                {route.name}
+              </Link>
+            ))}
+            <Button 
+              asChild
+              className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90 w-full"
+            >
+              <Link to="/contact" onClick={() => setIsOpen(false)}>
+                Nous rejoindre
+              </Link>
+            </Button>
+          </nav>
+        </div>
       </div>
     </header>
   );

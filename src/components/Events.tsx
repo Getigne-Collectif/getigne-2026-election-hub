@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, MapPin, ChevronRight, Users, Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
+import { Calendar, Clock, MapPin, ChevronRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
+import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
 
 // Map committee names to colors
 const committeeColors = {
@@ -70,8 +71,8 @@ const EventCard = ({ event, index }) => {
             setCommitteeData(data);
             
             // Set the icon component
-            const IconComponent = iconMap[data.icon] || Users;
-            setCommitteeIcon(IconComponent);
+            const IconComponent = iconMap[data.icon];
+            setCommitteeIcon(IconComponent || Users);
           }
         } catch (error) {
           console.error('Error fetching committee:', error);
@@ -99,61 +100,64 @@ const EventCard = ({ event, index }) => {
 
   const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
 
+  const IconComponent = committeeIcon || Users;
+
   return (
-    <article 
-      ref={ref}
-      className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
-        isVisible 
-          ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
-          : 'opacity-0 translate-y-10'
-      }`}
-      style={{ transitionDelay: `${index * 100}ms` }}
-    >
-      <div className="md:w-1/3 h-48 md:h-auto relative overflow-hidden">
-        <img 
-          src={event.image} 
-          alt={event.title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-        />
-      </div>
-      <div className="md:w-2/3 p-6">
-        <div className="flex flex-wrap gap-3 mb-3">
-          <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
-            <Calendar size={14} className="mr-1" />
-            <time>{formatDate(event.date)}</time>
-          </div>
-          <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
-            <Clock size={14} className="mr-1" />
-            <span>{formatTime(event.date)}</span>
-          </div>
-          <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
-            <MapPin size={14} className="mr-1" />
-            <span>{event.location}</span>
-          </div>
-          {committeeData && committeeIcon && (
-            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
-              {React.createElement(committeeIcon, { size: 14, className: "mr-1" })}
-              <span>Commission {committeeData.title}</span>
-            </div>
-          )}
-          {event.is_members_only && (
-            <div className="flex items-center text-white text-sm bg-getigne-700 px-3 py-1 rounded-full">
-              <Users size={14} className="mr-1" />
-              <span>Adhérents</span>
-            </div>
-          )}
+    <Link to={`/evenements/${event.id}`} className="block">
+      <article 
+        ref={ref}
+        className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
+          isVisible 
+            ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
+            : 'opacity-0 translate-y-10'
+        }`}
+        style={{ transitionDelay: `${index * 100}ms` }}
+      >
+        <div className="md:w-1/3 h-48 md:h-auto relative overflow-hidden">
+          <img 
+            src={event.image} 
+            alt={event.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          />
         </div>
-        <h3 className="font-medium text-xl mb-2">{event.title}</h3>
-        <p className="text-getigne-700 mb-4">{event.description}</p>
-        <Link 
-          to={`/evenements/${event.id}`} 
-          className="text-getigne-accent flex items-center text-sm font-medium group"
-        >
-          Plus d'informations
-          <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-        </Link>
-      </div>
-    </article>
+        <div className="md:w-2/3 p-6">
+          <div className="flex flex-wrap gap-3 mb-3">
+            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+              <Calendar size={14} className="mr-1" />
+              <time>{formatDate(event.date)}</time>
+            </div>
+            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+              <Clock size={14} className="mr-1" />
+              <span>{formatTime(event.date)}</span>
+            </div>
+            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+              <MapPin size={14} className="mr-1" />
+              <span>{event.location}</span>
+            </div>
+            {committeeData && (
+              <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+                <IconComponent size={14} className="mr-1" />
+                <span>Commission {committeeData.title}</span>
+              </div>
+            )}
+            {event.is_members_only && (
+              <div className="flex items-center text-white text-sm bg-getigne-700 px-3 py-1 rounded-full">
+                <Users size={14} className="mr-1" />
+                <span>Adhérents</span>
+              </div>
+            )}
+          </div>
+          <h3 className="font-medium text-xl mb-2">{event.title}</h3>
+          <p className="text-getigne-700 mb-4">{event.description}</p>
+          <div 
+            className="text-getigne-accent flex items-center text-sm font-medium group"
+          >
+            Plus d'informations
+            <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
+          </div>
+        </div>
+      </article>
+    </Link>
   );
 };
 

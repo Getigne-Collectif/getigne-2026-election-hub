@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +9,8 @@ import { type Tables } from '@/integrations/supabase/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
-import { Lightbulb, Bike, Utensils, Music, Leaf, Users } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf, Users, FileText, Calendar, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Member {
   id: string;
@@ -179,34 +179,55 @@ const CommitteePage = () => {
     },
   });
 
-  // Vérifier si des photos d'équipe sont disponibles
   useEffect(() => {
-    // Simuler une vérification d'image d'équipe
-    // Dans une vraie implémentation, récupérer depuis Supabase
-    const checkTeamPhoto = async () => {
+    const fetchTeamPhoto = async () => {
       try {
-        // Ici on pourrait vérifier si une photo d'équipe existe dans Supabase Storage
-        // Pour l'exemple, utilisons une condition aléatoire
-        const hasCustomPhoto = Math.random() > 0.5;
-        
-        if (!hasCustomPhoto) {
-          // Pas de photo personnalisée, on garde celle par défaut
-          setTeamPhotoUrl(null);
-        } else {
-          // Photo personnalisée trouvée (factice pour cet exemple)
-          setTeamPhotoUrl("https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80");
+        if (id) {
+          const { data: committeeData } = await supabase
+            .from('citizen_committees')
+            .select('team_photo_url')
+            .eq('id', id)
+            .single();
+            
+          if (committeeData?.team_photo_url) {
+            setTeamPhotoUrl(committeeData.team_photo_url);
+          } else {
+            const committee = committeeQuery.data?.[0];
+            if (committee) {
+              const themeColor = colorMap[committee.icon];
+              setTeamPhotoUrl(themeColor?.teamImage || null);
+            }
+          }
         }
       } catch (error) {
-        console.error("Erreur lors de la vérification de la photo d'équipe:", error);
+        console.error("Erreur lors de la récupération de la photo d'équipe:", error);
         setTeamPhotoUrl(null);
       }
     };
     
-    checkTeamPhoto();
-  }, [id]);
+    if (!loading && committeeQuery.data) {
+      fetchTeamPhoto();
+    }
+  }, [id, committeeQuery.data, loading]);
 
   const works = worksQuery.data || [];
   const committee = committeeQuery.data?.[0];
+  const loading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading;
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <Breadcrumb />
+        <div className="container py-8 mt-20">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-xl text-getigne-700">Chargement des informations de la commission...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   if (!committee) {
     return (
@@ -231,13 +252,12 @@ const CommitteePage = () => {
     accent: 'bg-getigne-accent/10',
     theme: 'Thématique',
     coverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?ixlib=rb-4.0.3&auto=format&fit=crop&w=2971&q=80',
-    teamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&auto=format&fit=crop&w=2970&q=80'
+    teamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80'
   };
 
   const IconComponent = iconMap[committee.icon] || Leaf;
   const extendedDescription = extendedDescriptions[committee.icon] || committee.description;
 
-  // On utilise la photo d'équipe personnalisée si elle existe, sinon celle du thème
   const teamImage = teamPhotoUrl || themeColor.teamImage;
 
   return (
@@ -245,31 +265,30 @@ const CommitteePage = () => {
       <Navbar />
       <Breadcrumb />
       
-      {/* Cover image */}
       <div 
         className="h-64 md:h-80 w-full bg-cover bg-center relative" 
         style={{ backgroundImage: `url(${themeColor.coverImage})` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-        <div className="container mx-auto h-full flex items-end pb-8 relative z-10">
-          <div className={`${themeColor.bg} p-3 rounded-full inline-flex items-center justify-center`}>
-            <IconComponent className={themeColor.text} size={32} />
+        <div className="container mx-auto h-full flex items-center relative z-10">
+          <div className="text-white">
+            <div className={`${themeColor.bg} p-3 rounded-full inline-flex items-center justify-center mb-4`}>
+              <IconComponent className={themeColor.text} size={32} />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold">
+              Commission {committee.title}
+            </h1>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white ml-4">
-            {committee.title}
-          </h1>
         </div>
       </div>
       
       <div className="container py-8 space-y-8">
-        {/* Theme badge */}
         <div className="flex flex-wrap gap-2">
           <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
             {themeColor.theme}
           </span>
         </div>
 
-        {/* Description */}
         <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
           <h2 className="text-2xl font-bold mb-4">À propos de cette commission</h2>
           <div className="flex flex-col md:flex-row md:gap-8">
@@ -278,14 +297,12 @@ const CommitteePage = () => {
                 {extendedDescription}
               </p>
               
-              {/* Membres simplifiés */}
               <div className="mt-4">
                 <h3 className="text-lg font-medium mb-3">Pilote de la commission</h3>
                 {id && <CommitteeMembers committeeId={id} simplified={true} />}
               </div>
             </div>
             
-            {/* Team photo */}
             <div className="mt-6 md:mt-0 md:w-1/3">
               <div className="rounded-xl overflow-hidden shadow-md">
                 <img 
@@ -301,55 +318,83 @@ const CommitteePage = () => {
           </div>
         </div>
 
-        {/* Works */}
         <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
-          <h2 className="text-2xl font-bold mb-6">Travaux de la commission</h2>
-          <div className="grid gap-6">
-            {works.length === 0 && (
-              <p className="text-getigne-700">
-                Aucun travail n'a encore été publié par cette commission.
-              </p>
-            )}
-            
-            {works.map((work) => (
-              <div
-                key={work.id}
-                className={`p-6 rounded-lg border ${themeColor.border} cursor-pointer ${themeColor.hover} transition-colors`}
-                onClick={() => setSelectedWork(work)}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{work.title}</h3>
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(work.date).toLocaleDateString('fr-FR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </span>
-                </div>
-                <p className="mt-2 text-muted-foreground line-clamp-2">
-                  {work.content}
-                </p>
-                
-                {/* Preview of attachments */}
-                <div className="mt-4 flex gap-4">
-                  {(work.images as any[])?.length > 0 && (
-                    <span className="text-sm text-muted-foreground">
-                      {(work.images as any[]).length} image(s)
-                    </span>
-                  )}
-                  {(work.files as any[])?.length > 0 && (
-                    <span className="text-sm text-muted-foreground">
-                      {(work.files as any[]).length} document(s)
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-2">Travaux de la commission</h2>
+            <p className="text-getigne-700">
+              Retrouvez ci-dessous les comptes-rendus, études et propositions réalisés par la commission {committee.title}. 
+              Ces travaux constituent la base de notre réflexion pour élaborer des propositions concrètes pour Gétigné.
+            </p>
           </div>
+          
+          {works.length === 0 ? (
+            <div className={`p-6 rounded-lg ${themeColor.bg} border ${themeColor.border}`}>
+              <div className="flex items-center">
+                <FileText className={`${themeColor.text} mr-3`} size={24} />
+                <p className="text-getigne-700">
+                  Aucun travail n'a encore été publié par cette commission. Les premières publications arriveront prochainement !
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {works.map((work) => (
+                <div
+                  key={work.id}
+                  className={`p-6 rounded-lg border ${themeColor.border} cursor-pointer ${themeColor.hover} transition-colors`}
+                  onClick={() => setSelectedWork(work)}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <FileText className={`${themeColor.text}`} size={20} />
+                    <h3 className="text-lg font-semibold">{work.title}</h3>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 mb-3 text-sm text-getigne-500">
+                    <div className="flex items-center">
+                      <Calendar size={14} className="mr-1" />
+                      <span>
+                        {new Date(work.date).toLocaleDateString('fr-FR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <p className="mt-2 text-getigne-700 mb-4">
+                    {work.content.length > 160 ? `${work.content.substring(0, 160)}...` : work.content}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-4">
+                    {(work.images as any[])?.length > 0 && (
+                      <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
+                        {(work.images as any[]).length} image{(work.images as any[]).length > 1 ? 's' : ''}
+                      </span>
+                    )}
+                    {(work.files as any[])?.length > 0 && (
+                      <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
+                        {(work.files as any[]).length} document{(work.files as any[]).length > 1 ? 's' : ''}
+                      </span>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className={`ml-auto border-${themeColor.border}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedWork(work);
+                      }}
+                    >
+                      Voir les détails
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Contact Form Section */}
         {committee && (
           <CommitteeContactForm 
             committeeId={committee.id}

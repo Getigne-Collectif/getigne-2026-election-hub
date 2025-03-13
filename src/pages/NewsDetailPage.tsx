@@ -1,12 +1,13 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, Tag, ArrowLeft } from 'lucide-react';
+import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import NotFound from './NotFound';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface NewsArticle {
   id: string;
@@ -19,12 +20,41 @@ interface NewsArticle {
   tags: string[];
   created_at: string;
   updated_at: string;
+  author?: string;
 }
+
+const RelatedArticleCard = ({ article }) => {
+  return (
+    <Link to={`/actualites/${article.id}`} className="block">
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-getigne-100 hover:shadow-md transition-shadow">
+        <div className="h-40 overflow-hidden">
+          <img 
+            src={article.image} 
+            alt={article.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="p-4">
+          <h3 className="font-medium text-lg mb-2 line-clamp-2">{article.title}</h3>
+          <div className="flex items-center text-getigne-500 text-sm">
+            <Calendar size={14} className="mr-1" />
+            <time>{new Date(article.date).toLocaleDateString('fr-FR', { 
+              day: 'numeric', 
+              month: 'long', 
+              year: 'numeric' 
+            })}</time>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 const NewsDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [article, setArticle] = useState<NewsArticle | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,6 +77,37 @@ const NewsDetailPage = () => {
         }
         
         setArticle(data as NewsArticle);
+        
+        // Fetch related articles based on tags or category
+        if (data.tags.length > 0 || data.category) {
+          let query = supabase.from('news').select('*').neq('id', id).limit(3);
+          
+          if (data.tags.length > 0) {
+            // Filter for articles that share at least one tag
+            const tagsFilter = data.tags.map(tag => `tags.cs.{${tag}}`).join(',');
+            query = query.or(tagsFilter);
+          } else if (data.category) {
+            // If no tags, filter by the same category
+            query = query.eq('category', data.category);
+          }
+          
+          const { data: relatedData, error: relatedError } = await query;
+          
+          if (!relatedError && relatedData.length > 0) {
+            setRelatedArticles(relatedData as NewsArticle[]);
+          } else {
+            // If no related articles found, just get the most recent ones
+            const { data: recentData } = await supabase
+              .from('news')
+              .select('*')
+              .neq('id', id)
+              .order('date', { ascending: false })
+              .limit(3);
+              
+            setRelatedArticles(recentData as NewsArticle[]);
+          }
+        }
+        
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération de l\'article:', error);
@@ -62,6 +123,7 @@ const NewsDetailPage = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
+        <Breadcrumb />
         <div className="container mx-auto px-4 py-24 flex-grow flex items-center justify-center">
           <div className="text-center">Chargement de l'article...</div>
         </div>
@@ -80,32 +142,44 @@ const NewsDetailPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <Breadcrumb />
       
-      <main className="flex-grow">
-        {/* Hero section with image */}
-        <div className="w-full h-[40vh] relative">
-          <div className="absolute inset-0 bg-black/40 z-10"></div>
-          <img 
-            src={article.image} 
-            alt={article.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 z-20 flex items-center justify-center">
-            <div className="container px-4 text-center text-white">
-              <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium inline-block mb-4">
-                {article.category}
-              </span>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">{article.title}</h1>
-              <div className="flex items-center justify-center text-getigne-50 text-sm">
-                <Calendar size={16} className="mr-1" />
-                <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
-              </div>
+      <main className="flex-grow pt-24">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          {/* Category & metadata */}
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium">
+              {article.category}
+            </span>
+            <div className="flex items-center text-getigne-500 text-sm">
+              <Calendar size={16} className="mr-1" />
+              <time>{new Date(article.date).toLocaleDateString('fr-FR', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+              })}</time>
             </div>
+            {article.author && (
+              <div className="flex items-center text-getigne-500 text-sm">
+                <User size={16} className="mr-1" />
+                <span>{article.author}</span>
+              </div>
+            )}
           </div>
-        </div>
-        
-        {/* Content */}
-        <div className="container mx-auto px-4 py-16 max-w-4xl">
+          
+          {/* Title */}
+          <h1 className="text-3xl md:text-5xl font-bold mb-6">{article.title}</h1>
+          
+          {/* Featured image */}
+          <div className="w-full h-[300px] md:h-[400px] mb-8 rounded-xl overflow-hidden">
+            <img 
+              src={article.image} 
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          
+          {/* Content */}
           <div className="prose prose-lg mx-auto">
             <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
             
@@ -127,18 +201,33 @@ const NewsDetailPage = () => {
                 ))}
               </div>
             )}
-            
-            {/* Back button */}
-            <div className="mt-16">
-              <Button
-                variant="outline"
-                className="border-getigne-200"
-                onClick={() => navigate('/actualites')}
-              >
-                <ArrowLeft size={16} className="mr-2" />
-                Retour aux actualités
-              </Button>
+          </div>
+          
+          {/* Related articles */}
+          {relatedArticles.length > 0 && (
+            <div className="mt-16 border-t border-getigne-100 pt-8">
+              <h2 className="text-2xl font-bold mb-6">Articles similaires</h2>
+              <div className="grid md:grid-cols-3 gap-6">
+                {relatedArticles.map(relatedArticle => (
+                  <RelatedArticleCard 
+                    key={relatedArticle.id} 
+                    article={relatedArticle} 
+                  />
+                ))}
+              </div>
             </div>
+          )}
+          
+          {/* Back button */}
+          <div className="mt-16">
+            <Button
+              variant="outline"
+              className="border-getigne-200"
+              onClick={() => navigate('/actualites')}
+            >
+              <ArrowLeft size={16} className="mr-2" />
+              Retour aux actualités
+            </Button>
           </div>
         </div>
       </main>

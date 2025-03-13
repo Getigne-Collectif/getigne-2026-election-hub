@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { ChevronRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -102,34 +101,36 @@ const CommitteeItem = ({ committee, index }) => {
   }, [committee.id]);
 
   return (
-    <div 
-      ref={ref}
-      className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift ${
-        isVisible 
-          ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
-          : 'opacity-0 translate-y-10'
-      }`}
-      style={{ transitionDelay: `${index * 100}ms` }}
-    >
-      <div className={`w-12 h-12 ${themeColor.accent} rounded-lg flex items-center justify-center mb-4`}>
-        <Icon className={themeColor.text} size={24} />
+    <Link to={`/commissions/${committee.id}`} className="block">
+      <div 
+        ref={ref}
+        className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift ${
+          isVisible 
+            ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
+            : 'opacity-0 translate-y-10'
+        }`}
+        style={{ transitionDelay: `${index * 100}ms` }}
+      >
+        <div className={`w-12 h-12 ${themeColor.accent} rounded-lg flex items-center justify-center mb-4`}>
+          <Icon className={themeColor.text} size={24} />
+        </div>
+        <span className={`text-xs ${themeColor.text} ${themeColor.bg} px-2 py-0.5 rounded-full inline-block mb-2`}>
+          {themeColor.theme}
+        </span>
+        <h3 className="text-lg font-medium mb-2">{committee.title}</h3>
+        <p className="text-getigne-700 mb-2">{committee.description}</p>
+        
+        <div className="flex items-center text-getigne-500 text-sm mb-3">
+          <Users size={16} className="mr-1" />
+          <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
+        </div>
+        
+        <div className={`${themeColor.text} flex items-center text-sm font-medium group`}>
+          En savoir plus
+          <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
+        </div>
       </div>
-      <span className={`text-xs ${themeColor.text} ${themeColor.bg} px-2 py-0.5 rounded-full inline-block mb-2`}>
-        {themeColor.theme}
-      </span>
-      <h3 className="text-lg font-medium mb-2">{committee.title}</h3>
-      <p className="text-getigne-700 mb-2">{committee.description}</p>
-      
-      <div className="flex items-center text-getigne-500 text-sm mb-3">
-        <Users size={16} className="mr-1" />
-        <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
-      </div>
-      
-      <Link to={`/commissions/${committee.id}`} className={`${themeColor.text} flex items-center text-sm font-medium group`}>
-        En savoir plus
-        <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-      </Link>
-    </div>
+    </Link>
   );
 };
 
