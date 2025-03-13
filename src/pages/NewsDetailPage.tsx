@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -6,7 +7,15 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import NotFound from './NotFound';
-import Breadcrumb from '@/components/Breadcrumb';
+import { 
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
+import { Home } from 'lucide-react';
 
 interface NewsArticle {
   id: string;
@@ -70,21 +79,22 @@ const NewsDetailPage = () => {
         
         if (error) throw error;
         
+        // Ensure tags is an array
+        const tags = Array.isArray(data.tags) ? data.tags : [];
+        
         const processedData = {
           ...data,
-          tags: Array.isArray(data.tags) ? data.tags : []
+          tags
         };
         
         setArticle(processedData as NewsArticle);
         
-        const tagsArray = Array.isArray(processedData.tags) ? processedData.tags : [];
-        
-        if (tagsArray.length > 0 || processedData.category) {
+        if (tags.length > 0 || processedData.category) {
           let query = supabase.from('news').select('*').neq('id', id).limit(3);
           
-          if (tagsArray.length > 0) {
-            const tagsFilter = tagsArray.map(tag => `tags.cs.{${tag}}`).join(',');
-            query = query.or(tagsFilter);
+          if (tags.length > 0) {
+            // Use overlap for array comparison
+            query = query.overlaps('tags', tags);
           } else if (processedData.category) {
             query = query.eq('category', processedData.category);
           }
@@ -128,7 +138,6 @@ const NewsDetailPage = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <Breadcrumb />
         <div className="container mx-auto px-4 py-24 flex-grow flex items-center justify-center">
           <div className="text-center">Chargement de l'article...</div>
         </div>
@@ -141,89 +150,109 @@ const NewsDetailPage = () => {
     return <NotFound />;
   }
 
-  const tags = Array.isArray(article?.tags) ? article.tags : [];
+  const tags = Array.isArray(article.tags) ? article.tags : [];
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <Breadcrumb />
       
-      <main className="flex-grow pt-24">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium">
-              {article.category}
-            </span>
-            <div className="flex items-center text-getigne-500 text-sm">
-              <Calendar size={16} className="mr-1" />
-              <time>{new Date(article.date).toLocaleDateString('fr-FR', { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-              })}</time>
-            </div>
-            {article.author && (
+      <main className="flex-grow pt-16">
+        <div className="container mx-auto px-4 py-8">
+          <Breadcrumb className="mb-8">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">
+                  <Home className="h-4 w-4 mr-1" />
+                  Accueil
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/actualites">Actualités</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{article.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium">
+                {article.category}
+              </span>
               <div className="flex items-center text-getigne-500 text-sm">
-                <User size={16} className="mr-1" />
-                <span>{article.author}</span>
+                <Calendar size={16} className="mr-1" />
+                <time>{new Date(article.date).toLocaleDateString('fr-FR', { 
+                  day: 'numeric', 
+                  month: 'long', 
+                  year: 'numeric' 
+                })}</time>
               </div>
-            )}
-          </div>
-          
-          <h1 className="text-3xl md:text-5xl font-bold mb-6">{article.title}</h1>
-          
-          <div className="w-full h-[300px] md:h-[400px] mb-8 rounded-xl overflow-hidden">
-            <img 
-              src={article.image} 
-              alt={article.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          <div className="prose prose-lg mx-auto">
-            <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
-            
-            <div dangerouslySetInnerHTML={{ __html: article.content }}></div>
-            
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-8">
-                <Tag size={16} className="text-getigne-500 mr-2" />
-                {tags.map((tag, index) => (
-                  <Link 
-                    key={index} 
-                    to={`/actualites?tags=${tag}`}
-                    className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-sm hover:bg-getigne-100 transition-colors"
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          {relatedArticles.length > 0 && (
-            <div className="mt-16 border-t border-getigne-100 pt-8">
-              <h2 className="text-2xl font-bold mb-6">Articles similaires</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                {relatedArticles.map(relatedArticle => (
-                  <RelatedArticleCard 
-                    key={relatedArticle.id} 
-                    article={relatedArticle} 
-                  />
-                ))}
-              </div>
+              {article.author && (
+                <div className="flex items-center text-getigne-500 text-sm">
+                  <User size={16} className="mr-1" />
+                  <span>{article.author}</span>
+                </div>
+              )}
             </div>
-          )}
-          
-          <div className="mt-16">
-            <Button
-              variant="outline"
-              className="border-getigne-200"
-              onClick={() => navigate('/actualites')}
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              Retour aux actualités
-            </Button>
+            
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">{article.title}</h1>
+            
+            <div className="w-full h-[300px] md:h-[400px] mb-8 rounded-xl overflow-hidden">
+              <img 
+                src={article.image} 
+                alt={article.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            <div className="prose prose-lg mx-auto">
+              <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
+              
+              <div dangerouslySetInnerHTML={{ __html: article.content }}></div>
+              
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-8">
+                  <Tag size={16} className="text-getigne-500 mr-2" />
+                  {tags.map((tag, index) => (
+                    <Link 
+                      key={index} 
+                      to={`/actualites?tags=${tag}`}
+                      className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-sm hover:bg-getigne-100 transition-colors"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {relatedArticles.length > 0 && (
+              <div className="mt-16 border-t border-getigne-100 pt-8">
+                <h2 className="text-2xl font-bold mb-6">Articles similaires</h2>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {relatedArticles.map(relatedArticle => (
+                    <RelatedArticleCard 
+                      key={relatedArticle.id} 
+                      article={relatedArticle} 
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-16">
+              <Button
+                variant="outline"
+                className="border-getigne-200"
+                onClick={() => navigate('/actualites')}
+              >
+                <ArrowLeft size={16} className="mr-2" />
+                Retour aux actualités
+              </Button>
+            </div>
           </div>
         </div>
       </main>

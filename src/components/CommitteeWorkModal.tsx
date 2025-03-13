@@ -1,19 +1,11 @@
 
 import React from 'react';
-import { X } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { type Tables } from '@/integrations/supabase/types';
-
-type CommitteeWork = Tables<'committee_works'>;
+import { Calendar } from 'lucide-react';
 
 interface CommitteeWorkModalProps {
-  work: CommitteeWork | null;
+  work: Tables<'committee_works'> | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -21,79 +13,68 @@ interface CommitteeWorkModalProps {
 const CommitteeWorkModal = ({ work, open, onOpenChange }: CommitteeWorkModalProps) => {
   if (!work) return null;
 
-  const images = (work.images as { url: string; caption: string }[]) || [];
-  const files = (work.files as { url: string; name: string; type: string }[]) || [];
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{work.title}</DialogTitle>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <DialogTitle className="text-2xl">{work.title}</DialogTitle>
+          <DialogDescription className="flex items-center mt-2 text-getigne-500">
+            <Calendar size={16} className="mr-1" />
+            <time>{formatDate(work.date)}</time>
+          </DialogDescription>
         </DialogHeader>
-
-        <div className="mt-6 space-y-6">
-          {/* Date */}
-          <div className="text-sm text-muted-foreground">
-            {new Date(work.date).toLocaleDateString('fr-FR', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
+        
+        <div className="mt-6">
+          <div className="prose max-w-none">
+            <div dangerouslySetInnerHTML={{ __html: work.content }} />
           </div>
 
-          {/* Content */}
-          <div className="text-base leading-relaxed whitespace-pre-wrap">
-            {work.content}
-          </div>
-
-          {/* Images */}
-          {images.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Images</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {images.map((image, index) => (
-                  <figure key={index} className="relative">
-                    <img
-                      src={image.url}
-                      alt={image.caption}
-                      className="w-full h-48 object-cover rounded-lg"
+          {(work.images as any[])?.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg font-medium mb-4">Images</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {(work.images as any[]).map((image, index) => (
+                  <div key={index} className="aspect-square rounded-lg overflow-hidden">
+                    <img 
+                      src={image.url} 
+                      alt={image.alt || `Image ${index + 1}`}
+                      className="w-full h-full object-cover"
                     />
-                    {image.caption && (
-                      <figcaption className="mt-2 text-sm text-muted-foreground">
-                        {image.caption}
-                      </figcaption>
-                    )}
-                  </figure>
+                  </div>
                 ))}
               </div>
             </div>
           )}
-
-          {/* Files */}
-          {files.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Documents</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {files.map((file, index) => (
-                  <Button
+          
+          {(work.files as any[])?.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg font-medium mb-4">Documents</h3>
+              <div className="space-y-2">
+                {(work.files as any[]).map((file, index) => (
+                  <a 
                     key={index}
-                    variant="outline"
-                    className="w-full justify-start gap-2"
-                    asChild
+                    href={file.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center p-3 border border-getigne-100 rounded-lg hover:bg-getigne-50 transition-colors"
                   >
-                    <a href={file.url} target="_blank" rel="noopener noreferrer">
-                      <span>{file.name}</span>
-                      <span className="text-xs uppercase text-muted-foreground">
-                        {file.type}
-                      </span>
-                    </a>
-                  </Button>
+                    <div className="text-getigne-700">
+                      <div className="font-medium">{file.name}</div>
+                      {file.size && (
+                        <div className="text-sm text-getigne-500">
+                          {Math.round(file.size / 1024)} Ko
+                        </div>
+                      )}
+                    </div>
+                  </a>
                 ))}
               </div>
             </div>

@@ -8,9 +8,17 @@ import CommitteeContactForm from '@/components/CommitteeContactForm';
 import { type Tables } from '@/integrations/supabase/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import Breadcrumb from '@/components/Breadcrumb';
 import { Lightbulb, Bike, Utensils, Music, Leaf, Users, FileText, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { 
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
+import { Home } from 'lucide-react';
 
 interface Member {
   id: string;
@@ -24,9 +32,11 @@ interface Committee {
   title: string;
   description: string;
   icon: string;
+  team_photo_url?: string;
 }
 
-// Map pour les icônes - corrigé pour utiliser les bons noms
+const [loading, setLoading] = useState(true);
+
 const iconMap = {
   'Lightbulb': Lightbulb,
   'Bicycle': Bike,
@@ -35,7 +45,6 @@ const iconMap = {
   'Leaf': Leaf
 };
 
-// Map pour les couleurs des thèmes
 const colorMap = {
   'Lightbulb': {
     bg: 'bg-yellow-50',
@@ -89,7 +98,6 @@ const colorMap = {
   }
 };
 
-// Textes enrichis pour les descriptions des commissions
 const extendedDescriptions = {
   'Lightbulb': `
     La commission Énergie travaille sur les questions de transition énergétique et d'efficacité énergétique 
@@ -129,8 +137,8 @@ const CommitteePage = () => {
   const { id } = useParams();
   const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'> | null>(null);
   const [teamPhotoUrl, setTeamPhotoUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Queries for committee data, members, and works
   const membersQuery = useQuery({
     queryKey: ['committee', id, 'members'],
     queryFn: async () => {
@@ -180,7 +188,7 @@ const CommitteePage = () => {
     },
   });
   
-  const loading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading;
+  const isLoading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading;
 
   useEffect(() => {
     const fetchTeamPhoto = async () => {
@@ -194,7 +202,6 @@ const CommitteePage = () => {
             
           if (error) {
             console.error("Error fetching team photo:", error);
-            // Fallback to default theme image if there's an error
             const committee = committeeQuery.data?.[0];
             if (committee) {
               const themeColor = colorMap[committee.icon];
@@ -206,7 +213,6 @@ const CommitteePage = () => {
           if (committeeData?.team_photo_url) {
             setTeamPhotoUrl(committeeData.team_photo_url);
           } else {
-            // Use fallback image from theme if no custom photo is set
             const committee = committeeQuery.data?.[0];
             if (committee) {
               const themeColor = colorMap[committee.icon];
@@ -220,19 +226,19 @@ const CommitteePage = () => {
       }
     };
     
-    if (!loading && committeeQuery.data) {
+    if (!isLoading && committeeQuery.data) {
       fetchTeamPhoto();
+      setLoading(false);
     }
-  }, [id, committeeQuery.data, loading]);
+  }, [id, committeeQuery.data, isLoading]);
 
   const works = worksQuery.data || [];
   const committee = committeeQuery.data?.[0];
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <>
         <Navbar />
-        <Breadcrumb />
         <div className="container py-8 mt-20">
           <div className="flex items-center justify-center h-64">
             <p className="text-xl text-getigne-700">Chargement des informations de la commission...</p>
@@ -247,7 +253,6 @@ const CommitteePage = () => {
     return (
       <>
         <Navbar />
-        <Breadcrumb />
         <div className="container py-8 mt-20">
           <div className="flex items-center justify-center h-64">
             <p className="text-xl text-getigne-700">Commission non trouvée</p>
@@ -277,19 +282,18 @@ const CommitteePage = () => {
   return (
     <>
       <Navbar />
-      <Breadcrumb />
       
       <div 
         className="h-64 md:h-80 w-full bg-cover bg-center relative" 
         style={{ backgroundImage: `url(${themeColor.coverImage})` }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+        <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         <div className="container mx-auto h-full flex items-center relative z-10">
           <div className="text-white">
             <div className={`${themeColor.bg} p-3 rounded-full inline-flex items-center justify-center mb-4`}>
               <IconComponent className={themeColor.text} size={32} />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold">
+            <h1 className="text-3xl md:text-4xl font-bold text-white">
               Commission {committee.title}
             </h1>
           </div>
@@ -297,6 +301,31 @@ const CommitteePage = () => {
       </div>
       
       <div className="container py-8 space-y-8">
+        <div className="pt-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">
+                  <Home className="h-4 w-4 mr-1" />
+                  Accueil
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/programme">Programme</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/commissions">Commissions</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{committee.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+        
         <div className="flex flex-wrap gap-2">
           <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
             {themeColor.theme}
@@ -374,6 +403,15 @@ const CommitteePage = () => {
                         })}
                       </span>
                     </div>
+                    <div className="flex items-center">
+                      <Clock size={14} className="mr-1" />
+                      <span>
+                        {new Date(work.date).toLocaleTimeString('fr-FR', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
                   </div>
                   
                   <p className="mt-2 text-getigne-700 mb-4">
@@ -381,14 +419,14 @@ const CommitteePage = () => {
                   </p>
                   
                   <div className="flex flex-wrap gap-4">
-                    {(work.images as any[])?.length > 0 && (
+                    {Array.isArray(work.images) && work.images.length > 0 && (
                       <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
-                        {(work.images as any[]).length} image{(work.images as any[]).length > 1 ? 's' : ''}
+                        {work.images.length} image{work.images.length > 1 ? 's' : ''}
                       </span>
                     )}
-                    {(work.files as any[])?.length > 0 && (
+                    {Array.isArray(work.files) && work.files.length > 0 && (
                       <span className={`text-sm ${themeColor.text} ${themeColor.bg} px-3 py-1 rounded-full`}>
-                        {(work.files as any[]).length} document{(work.files as any[]).length > 1 ? 's' : ''}
+                        {work.files.length} document{work.files.length > 1 ? 's' : ''}
                       </span>
                     )}
                     <Button 
@@ -429,3 +467,4 @@ const CommitteePage = () => {
 };
 
 export default CommitteePage;
+

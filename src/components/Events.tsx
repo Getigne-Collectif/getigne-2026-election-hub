@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Clock, MapPin, ChevronRight, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
@@ -103,7 +102,7 @@ const EventCard = ({ event, index }) => {
   const IconComponent = committeeIcon || Users;
 
   return (
-    <Link to={`/evenements/${event.id}`} className="block">
+    <Link to={`/evenements/${event.id}`} className="block hover:no-underline">
       <article 
         ref={ref}
         className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
@@ -122,6 +121,12 @@ const EventCard = ({ event, index }) => {
         </div>
         <div className="md:w-2/3 p-6">
           <div className="flex flex-wrap gap-3 mb-3">
+            {committeeData && (
+              <div className={`flex items-center text-sm px-3 py-1 rounded-full ${committeeColor ? committeeColor.replace('border', 'bg').replace('getigne', 'getigne') : 'bg-getigne-50'} text-getigne-700`}>
+                <IconComponent size={14} className="mr-1" />
+                <span>Commission {committeeData.title}</span>
+              </div>
+            )}
             <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
               <Calendar size={14} className="mr-1" />
               <time>{formatDate(event.date)}</time>
@@ -134,12 +139,6 @@ const EventCard = ({ event, index }) => {
               <MapPin size={14} className="mr-1" />
               <span>{event.location}</span>
             </div>
-            {committeeData && (
-              <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
-                <IconComponent size={14} className="mr-1" />
-                <span>Commission {committeeData.title}</span>
-              </div>
-            )}
             {event.is_members_only && (
               <div className="flex items-center text-white text-sm bg-getigne-700 px-3 py-1 rounded-full">
                 <Users size={14} className="mr-1" />
@@ -152,7 +151,7 @@ const EventCard = ({ event, index }) => {
           <div 
             className="text-getigne-accent flex items-center text-sm font-medium group"
           >
-            Plus d'informations
+            En savoir plus
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
           </div>
         </div>
@@ -229,14 +228,12 @@ const Events = () => {
         </div>
 
         <div className="mt-12 text-center">
-          <Button 
-            asChild
-            className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+          <Link 
+            to="/evenements"
+            className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90 px-4 py-2 inline-flex items-center"
           >
-            <Link to="/evenements">
-              Voir tous les événements
-            </Link>
-          </Button>
+            Voir tous les événements
+          </Link>
         </div>
       </div>
     </section>

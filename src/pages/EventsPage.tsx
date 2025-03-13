@@ -1,11 +1,12 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, MapPin, Clock, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Calendar, MapPin, Clock, Users, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
+import Breadcrumb from '@/components/Breadcrumb';
 
 // Map committee names to colors
 const committeeColors = {
@@ -17,9 +18,20 @@ const committeeColors = {
   "Éducation": "border-[#F97316]",
 };
 
+// Map for the committee icons
+const iconMap = {
+  'Lightbulb': Lightbulb,
+  'Bicycle': Bike,
+  'Utensils': Utensils,
+  'Music': Music,
+  'Leaf': Leaf,
+};
+
 const EventCard = ({ event, index }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [committeeColor, setCommitteeColor] = useState("");
+  const [committeeIcon, setCommitteeIcon] = useState(null);
+  const [committeeData, setCommitteeData] = useState(null);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -51,13 +63,18 @@ const EventCard = ({ event, index }) => {
         try {
           const { data, error } = await supabase
             .from('citizen_committees')
-            .select('title')
+            .select('*')
             .eq('id', event.committee_id)
             .single();
             
           if (!error && data) {
             const color = committeeColors[data.title] || "border-getigne-100";
             setCommitteeColor(color);
+            setCommitteeData(data);
+            
+            // Set the icon component
+            const IconComponent = iconMap[data.icon];
+            setCommitteeIcon(IconComponent || Users);
           }
         } catch (error) {
           console.error('Error fetching committee:', error);
@@ -84,65 +101,65 @@ const EventCard = ({ event, index }) => {
   };
 
   const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
+  const IconComponent = committeeIcon || Users;
 
   return (
-    <div 
-      ref={ref}
-      className={`bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
-        isVisible 
-          ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
-          : 'opacity-0 translate-y-10'
-      }`}
-      style={{ transitionDelay: `${index * 100}ms` }}
-    >
-      <div className="h-48 overflow-hidden">
-        <img 
-          src={event.image} 
-          alt={event.title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-        />
-      </div>
-      <div className="p-6">
-        <h3 className="font-medium text-xl mb-4">{event.title}</h3>
-        <div className="flex items-center gap-2 text-getigne-700 mb-2">
-          <Calendar size={16} className="text-getigne-accent" />
-          <span>{formatDate(event.date)}</span>
+    <Link to={`/evenements/${event.id}`} className="block hover:no-underline">
+      <div 
+        ref={ref}
+        className={`bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
+          isVisible 
+            ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
+            : 'opacity-0 translate-y-10'
+        }`}
+        style={{ transitionDelay: `${index * 100}ms` }}
+      >
+        <div className="h-48 overflow-hidden">
+          <img 
+            src={event.image} 
+            alt={event.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          />
         </div>
-        <div className="flex items-center gap-2 text-getigne-700 mb-2">
-          <Clock size={16} className="text-getigne-accent" />
-          <span>{formatTime(event.date)}</span>
-        </div>
-        <div className="flex items-center gap-2 text-getigne-700 mb-4">
-          <MapPin size={16} className="text-getigne-accent" />
-          <span>{event.location}</span>
-        </div>
-        
-        {event.committee && (
+        <div className="p-6">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {committeeData && (
+              <div className={`flex items-center text-sm px-3 py-1 rounded-full ${committeeColor ? committeeColor.replace('border', 'bg').replace('getigne', 'getigne') : 'bg-getigne-50'} text-getigne-700`}>
+                <IconComponent size={14} className="mr-1" />
+                <span>Commission {committeeData.title}</span>
+              </div>
+            )}
+          </div>
+          
+          <h3 className="font-medium text-xl mb-4">{event.title}</h3>
+          
+          <div className="flex items-center gap-2 text-getigne-700 mb-2">
+            <Calendar size={16} className="text-getigne-accent" />
+            <span>{formatDate(event.date)}</span>
+          </div>
+          <div className="flex items-center gap-2 text-getigne-700 mb-2">
+            <Clock size={16} className="text-getigne-accent" />
+            <span>{formatTime(event.date)}</span>
+          </div>
           <div className="flex items-center gap-2 text-getigne-700 mb-4">
-            <Users size={16} className="text-getigne-accent" />
-            <span>Commission {event.committee}</span>
+            <MapPin size={16} className="text-getigne-accent" />
+            <span>{event.location}</span>
           </div>
-        )}
-        
-        {event.is_members_only && (
-          <div className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-xs inline-flex items-center mb-4">
-            <Users size={12} className="mr-1" />
-            Réservé aux adhérents
+          
+          {event.is_members_only && (
+            <div className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-xs inline-flex items-center mb-4">
+              <Users size={12} className="mr-1" />
+              Réservé aux adhérents
+            </div>
+          )}
+          
+          <div className="text-getigne-accent flex items-center text-sm font-medium group mt-4">
+            En savoir plus
+            <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
           </div>
-        )}
-        
-        <p className="text-getigne-700 mb-6">{event.description}</p>
-        <Button 
-          asChild
-          variant="outline" 
-          className="w-full border-getigne-200 hover:bg-getigne-100"
-        >
-          <Link to={`/evenements/${event.id}`}>
-            Plus d'informations
-          </Link>
-        </Button>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -198,6 +215,7 @@ const EventsPage = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
+      <Breadcrumb />
       <div className="py-24 px-4">
         <div className="container mx-auto">
           {/* Upcoming Events */}
