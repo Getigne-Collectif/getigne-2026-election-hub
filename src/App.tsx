@@ -12,7 +12,6 @@ import NewsDetailPage from "./pages/NewsDetailPage";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import TeamPage from "./pages/TeamPage";
-import ContactPage from "./pages/ContactPage";
 import CommitteesPage from "./pages/CommitteesPage";
 import CommitteePage from "./pages/CommitteePage";
 import SiteMapPage from "./pages/SiteMapPage";
@@ -34,7 +33,6 @@ const App = () => (
           <Route path="/evenements" element={<EventsPage />} />
           <Route path="/evenements/:id" element={<EventDetailPage />} />
           <Route path="/equipe" element={<TeamPage />} />
-          <Route path="/contact" element={<ContactPage />} />
           <Route path="/commissions" element={<CommitteesPage />} />
           <Route path="/commissions/:id" element={<CommitteePage />} />
           <Route path="/plan-du-site" element={<SiteMapPage />} />

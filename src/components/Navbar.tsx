@@ -1,18 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-const routes = [
-  { name: 'Accueil', path: '/', exact: true },
-  { name: 'Programme', path: '/programme' },
-  { name: 'Actualités', path: '/actualites' },
-  { name: 'Événements', path: '/evenements' },
-  { name: 'Commissions', path: '/commissions' },
-  { name: 'Adhérer', path: '/adherer' },
-  { name: 'Contact', path: '/contact' }
-];
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,28 +58,110 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {routes.map(route => (
-              <Link 
-                key={route.path} 
-                to={route.path} 
-                className={`text-getigne-800 hover:text-getigne-accent py-1 px-2 text-sm font-medium transition-colors ${
-                  location.pathname === route.path ? 'text-getigne-accent' : ''
-                }`}
-              >
-                {route.name}
-              </Link>
-            ))}
-            <Button 
-              asChild
-              className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90 ml-2"
-            >
-              <Link to="/contact">
-                Nous rejoindre
-              </Link>
-            </Button>
-          </nav>
+          {/* Desktop Navigation with Dropdowns */}
+          <div className="hidden md:block">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link to="/" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
+                    Accueil
+                  </Link>
+                </NavigationMenuItem>
+
+                {/* Programme dropdown with Commissions */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-getigne-800 hover:text-getigne-accent py-1 text-sm font-medium transition-colors bg-transparent">
+                    Programme
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[200px] gap-3 p-4">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link 
+                            to="/programme" 
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-getigne-accent/10 hover:text-getigne-accent focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium">Notre programme</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Nos valeurs et nos engagements
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link 
+                            to="/commissions" 
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-getigne-accent/10 hover:text-getigne-accent focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium">Commissions citoyennes</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Travaux et membres des commissions
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                {/* Actualités dropdown */}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-getigne-800 hover:text-getigne-accent py-1 text-sm font-medium transition-colors bg-transparent">
+                    Actualités
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[200px] gap-3 p-4">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link 
+                            to="/actualites" 
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-getigne-accent/10 hover:text-getigne-accent focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium">Toutes les actualités</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Dernières nouvelles du collectif
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link 
+                            to="/evenements" 
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-getigne-accent/10 hover:text-getigne-accent focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium">Événements</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Nos prochains rendez-vous
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link to="/equipe" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
+                    Équipe
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link to="/adherer" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
+                    Rejoignez le mouvement
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link to="/adherer#contact" className="text-getigne-800 hover:text-getigne-accent py-1 px-4 text-sm font-medium transition-colors">
+                    Contact
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
@@ -89,7 +170,7 @@ const Navbar = () => {
               className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90 mr-4"
               size="sm"
             >
-              <Link to="/contact">
+              <Link to="/adherer">
                 Rejoindre
               </Link>
             </Button>
@@ -112,24 +193,94 @@ const Navbar = () => {
       >
         <div className="container pt-20 px-4">
           <nav className="flex flex-col space-y-6">
-            {routes.map(route => (
-              <Link 
-                key={route.path} 
-                to={route.path} 
-                className={`text-getigne-800 text-lg font-medium hover:text-getigne-accent ${
-                  location.pathname === route.path ? 'text-getigne-accent' : ''
-                }`}
-                onClick={() => setIsOpen(false)}
+            <Link 
+              to="/" 
+              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
+            >
+              Accueil
+            </Link>
+            
+            <div>
+              <button 
+                className="text-getigne-800 text-lg font-medium hover:text-getigne-accent flex items-center"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const el = document.getElementById('mobile-programme-submenu');
+                  if (el) el.classList.toggle('hidden');
+                }}
               >
-                {route.name}
-              </Link>
-            ))}
+                Programme <ChevronDown size={16} className="ml-1" />
+              </button>
+              <div id="mobile-programme-submenu" className="hidden pl-4 mt-2 space-y-2">
+                <Link 
+                  to="/programme" 
+                  className="block py-1 text-getigne-700 hover:text-getigne-accent"
+                >
+                  Notre programme
+                </Link>
+                <Link 
+                  to="/commissions" 
+                  className="block py-1 text-getigne-700 hover:text-getigne-accent"
+                >
+                  Commissions citoyennes
+                </Link>
+              </div>
+            </div>
+            
+            <div>
+              <button 
+                className="text-getigne-800 text-lg font-medium hover:text-getigne-accent flex items-center"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const el = document.getElementById('mobile-actualites-submenu');
+                  if (el) el.classList.toggle('hidden');
+                }}
+              >
+                Actualités <ChevronDown size={16} className="ml-1" />
+              </button>
+              <div id="mobile-actualites-submenu" className="hidden pl-4 mt-2 space-y-2">
+                <Link 
+                  to="/actualites" 
+                  className="block py-1 text-getigne-700 hover:text-getigne-accent"
+                >
+                  Toutes les actualités
+                </Link>
+                <Link 
+                  to="/evenements" 
+                  className="block py-1 text-getigne-700 hover:text-getigne-accent"
+                >
+                  Événements
+                </Link>
+              </div>
+            </div>
+
+            <Link 
+              to="/equipe" 
+              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
+            >
+              Équipe
+            </Link>
+            
+            <Link 
+              to="/adherer" 
+              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
+            >
+              Rejoignez le mouvement
+            </Link>
+            
+            <Link 
+              to="/adherer#contact" 
+              className="text-getigne-800 text-lg font-medium hover:text-getigne-accent"
+            >
+              Contact
+            </Link>
+            
             <Button 
               asChild
-              className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90 w-full"
+              className="bg-getigne-accent text-white rounded-full hover:bg-getigne-accent/90 w-full mt-4"
             >
-              <Link to="/contact" onClick={() => setIsOpen(false)}>
-                Nous rejoindre
+              <Link to="/adherer">
+                Rejoignez le mouvement
               </Link>
             </Button>
           </nav>
