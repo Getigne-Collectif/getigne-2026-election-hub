@@ -33,6 +33,11 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location]);
 
+  const handleLogoClick = () => {
+    // Scroll to top when logo is clicked
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -45,6 +50,7 @@ const Navbar = () => {
           <Link 
             to="/" 
             className="text-getigne-900 font-medium text-xl flex items-center gap-2"
+            onClick={handleLogoClick}
           >
             <img 
               src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png" 

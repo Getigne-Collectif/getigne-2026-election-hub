@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import CommitteeMembers from '@/components/CommitteeMembers';
@@ -8,7 +8,7 @@ import CommitteeContactForm from '@/components/CommitteeContactForm';
 import { type Tables } from '@/integrations/supabase/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Lightbulb, Bike, Utensils, Music, Leaf, Users, FileText, Calendar, Clock } from 'lucide-react';
+import { Lightbulb, Bike, Utensils, Music, Leaf, Users, FileText, Calendar, Clock, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Breadcrumb,
@@ -19,6 +19,14 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
 import { Home } from 'lucide-react';
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Member {
   id: string;
@@ -138,6 +146,8 @@ const CommitteePage = () => {
   const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'> | null>(null);
   const [teamPhotoUrl, setTeamPhotoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [otherCommittees, setOtherCommittees] = useState<any[]>([]);
+  const [currentCommitteeIndex, setCurrentCommitteeIndex] = useState<number>(-1);
 
   const membersQuery = useQuery({
     queryKey: ['committee', id, 'members'],
@@ -187,8 +197,24 @@ const CommitteePage = () => {
       return data as Committee[];
     },
   });
-  
-  const isLoading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading;
+
+  const allCommitteesQuery = useQuery({
+    queryKey: ['all_committees'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('citizen_committees')
+        .select('*')
+        .order('title');
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+  });
+
+  const isLoading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading || allCommitteesQuery.isLoading;
 
   useEffect(() => {
     const fetchTeamPhoto = async () => {
@@ -232,8 +258,31 @@ const CommitteePage = () => {
     }
   }, [id, committeeQuery.data, isLoading]);
 
+  useEffect(() => {
+    if (allCommitteesQuery.data && id) {
+      const committees = allCommitteesQuery.data;
+      setOtherCommittees(committees);
+      
+      const currentIndex = committees.findIndex((c) => c.id === id);
+      setCurrentCommitteeIndex(currentIndex);
+    }
+  }, [allCommitteesQuery.data, id]);
+
   const works = worksQuery.data || [];
   const committee = committeeQuery.data?.[0];
+
+  const getPrevCommittee = () => {
+    if (currentCommitteeIndex <= 0 || otherCommittees.length === 0) return null;
+    return otherCommittees[currentCommitteeIndex - 1];
+  };
+  
+  const getNextCommittee = () => {
+    if (currentCommitteeIndex === -1 || currentCommitteeIndex >= otherCommittees.length - 1) return null;
+    return otherCommittees[currentCommitteeIndex + 1];
+  };
+
+  const prevCommittee = getPrevCommittee();
+  const nextCommittee = getNextCommittee();
 
   if (loading || isLoading) {
     return (
@@ -455,6 +504,70 @@ const CommitteePage = () => {
           />
         )}
 
+        <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
+          <h2 className="text-xl font-bold mb-4">Découvrir les autres commissions</h2>
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="w-full md:w-auto">
+              {prevCommittee ? (
+                <Link 
+                  to={`/commissions/${prevCommittee.id}`} 
+                  className="flex items-center hover:underline"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  <span>Commission {prevCommittee.title}</span>
+                </Link>
+              ) : (
+                <span className="text-getigne-500 flex items-center">
+                  <ArrowLeft className="h-4 w-4 mr-2 opacity-50" />
+                  <span>Première commission</span>
+                </span>
+              )}
+            </div>
+            
+            <Link 
+              to="/commissions"
+              className="px-4 py-1 border border-getigne-200 rounded-full text-sm hover:bg-getigne-50 transition-colors"
+            >
+              Voir toutes les commissions
+            </Link>
+            
+            <div className="w-full md:w-auto text-right">
+              {nextCommittee ? (
+                <Link 
+                  to={`/commissions/${nextCommittee.id}`} 
+                  className="flex items-center justify-end hover:underline"
+                >
+                  <span>Commission {nextCommittee.title}</span>
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              ) : (
+                <span className="text-getigne-500 flex items-center justify-end">
+                  <span>Dernière commission</span>
+                  <ArrowRight className="h-4 w-4 ml-2 opacity-50" />
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <Pagination>
+              <PaginationContent>
+                {otherCommittees.map((comm, index) => (
+                  <PaginationItem key={comm.id}>
+                    <PaginationLink 
+                      href={`/commissions/${comm.id}`}
+                      isActive={comm.id === id}
+                    >
+                      {index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </div>
+
         <CommitteeWorkModal
           work={selectedWork}
           open={!!selectedWork}
@@ -467,4 +580,3 @@ const CommitteePage = () => {
 };
 
 export default CommitteePage;
-
