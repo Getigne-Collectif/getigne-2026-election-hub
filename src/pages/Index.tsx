@@ -13,10 +13,10 @@ import Values from "@/components/Values";
 const Index = () => (
   <HelmetProvider>
     <Helmet>
-      <title>Collectif Gétigné | Ensemble pour une commune écologique, solidaire et démocratique</title>
+      <title>Gétigné Collectif | Ensemble pour une commune écologique, solidaire et démocratique</title>
       <meta
         name="description"
-        content="Le Collectif Gétigné rassemble des citoyens et citoyennes engagés pour une commune plus écologique, solidaire et démocratique."
+        content="Gétigné Collectif rassemble des citoyens et citoyennes engagés pour une commune plus écologique, solidaire et démocratique."
       />
     </Helmet>
 

@@ -9,7 +9,7 @@ const JoinPage = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>Adhérer | Collectif Gétigné</title>
+        <title>Adhérer | Gétigné Collectif</title>
         <meta
           name="description"
           content="Rejoignez notre collectif citoyen et participez activement à la vie démocratique de Gétigné."
@@ -26,7 +26,7 @@ const JoinPage = () => {
               <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8 md:p-12">
                 <div className="text-center mb-12">
                   <h1 className="text-3xl md:text-4xl font-bold mb-6">
-                    Rejoignez le Collectif Gétigné
+                    Rejoignez Gétigné Collectif
                   </h1>
                   <p className="text-lg text-getigne-700 max-w-2xl mx-auto">
                     Ensemble, agissons pour notre commune et construisons une démocratie plus participative.
@@ -42,7 +42,7 @@ const JoinPage = () => {
                           <Users className="text-getigne-accent h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Faire partie d'un collectif</h3>
+                          <h3 className="text-xl font-medium">Faire partie d'un collectif</h3>
                           <p className="text-getigne-700">Rejoignez un groupe de citoyens engagés pour le bien commun et l'avenir de notre territoire.</p>
                         </div>
                       </li>
@@ -51,7 +51,7 @@ const JoinPage = () => {
                           <Zap className="text-getigne-accent h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Participer aux décisions</h3>
+                          <h3 className="text-xl font-medium">Participer aux décisions</h3>
                           <p className="text-getigne-700">Votez lors des assemblées générales et contribuez aux orientations du collectif.</p>
                         </div>
                       </li>
@@ -60,7 +60,7 @@ const JoinPage = () => {
                           <LayoutList className="text-getigne-accent h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Accéder à nos événements</h3>
+                          <h3 className="text-xl font-medium">Accéder à nos événements</h3>
                           <p className="text-getigne-700">Participez à nos rencontres, formations et ateliers, dont certains sont réservés à nos adhérents.</p>
                         </div>
                       </li>
@@ -75,7 +75,7 @@ const JoinPage = () => {
                           <Landmark className="text-getigne-accent h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Association loi 1901</h3>
+                          <h3 className="text-xl font-medium">Association loi 1901</h3>
                           <p className="text-getigne-700">Notre collectif est constitué en association à but non lucratif, dirigée par un bureau élu.</p>
                         </div>
                       </li>
@@ -84,7 +84,7 @@ const JoinPage = () => {
                           <PiggyBank className="text-getigne-accent h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Financement transparent</h3>
+                          <h3 className="text-xl font-medium">Financement transparent</h3>
                           <p className="text-getigne-700">Nos ressources proviennent uniquement des cotisations et dons de nos membres et sympathisants.</p>
                         </div>
                       </li>
@@ -93,7 +93,7 @@ const JoinPage = () => {
                           <Heart className="text-getigne-accent h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="font-medium">Engagement bénévole</h3>
+                          <h3 className="text-xl font-medium">Engagement bénévole</h3>
                           <p className="text-getigne-700">Tous nos membres agissent bénévolement, par conviction et attachement à notre commune.</p>
                         </div>
                       </li>
@@ -110,18 +110,18 @@ const JoinPage = () => {
                   </div>
 
                   <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
-                    <Button 
+                    <Button
                       size="lg"
                       className="bg-getigne-accent hover:bg-getigne-accent/90 text-white"
-                      onClick={() => window.open('https://www.helloasso.com/associations/collectif-getigne', '_blank')}
+                      onClick={() => window.open('https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025', '_blank')}
                     >
                       Adhérer en ligne
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="lg"
                       className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5"
-                      onClick={() => window.open('https://www.helloasso.com/associations/collectif-getigne/formulaires/2', '_blank')}
+                      onClick={() => window.open('https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025', '_blank')}
                     >
                       Faire un don
                     </Button>
