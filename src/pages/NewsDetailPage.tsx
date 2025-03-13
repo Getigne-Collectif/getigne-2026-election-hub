@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -71,32 +70,34 @@ const NewsDetailPage = () => {
         
         if (error) throw error;
         
-        // Ensure tags is an array
-        if (!data.tags) {
-          data.tags = [];
-        }
+        const processedData = {
+          ...data,
+          tags: Array.isArray(data.tags) ? data.tags : []
+        };
         
-        setArticle(data as NewsArticle);
+        setArticle(processedData as NewsArticle);
         
-        // Fetch related articles based on tags or category
-        if (data.tags.length > 0 || data.category) {
+        const tagsArray = Array.isArray(processedData.tags) ? processedData.tags : [];
+        
+        if (tagsArray.length > 0 || processedData.category) {
           let query = supabase.from('news').select('*').neq('id', id).limit(3);
           
-          if (data.tags.length > 0) {
-            // Filter for articles that share at least one tag
-            const tagsFilter = data.tags.map(tag => `tags.cs.{${tag}}`).join(',');
+          if (tagsArray.length > 0) {
+            const tagsFilter = tagsArray.map(tag => `tags.cs.{${tag}}`).join(',');
             query = query.or(tagsFilter);
-          } else if (data.category) {
-            // If no tags, filter by the same category
-            query = query.eq('category', data.category);
+          } else if (processedData.category) {
+            query = query.eq('category', processedData.category);
           }
           
           const { data: relatedData, error: relatedError } = await query;
           
           if (!relatedError && relatedData.length > 0) {
-            setRelatedArticles(relatedData as NewsArticle[]);
+            const processedRelatedData = relatedData.map(item => ({
+              ...item,
+              tags: Array.isArray(item.tags) ? item.tags : []
+            }));
+            setRelatedArticles(processedRelatedData as NewsArticle[]);
           } else {
-            // If no related articles found, just get the most recent ones
             const { data: recentData } = await supabase
               .from('news')
               .select('*')
@@ -104,7 +105,11 @@ const NewsDetailPage = () => {
               .order('date', { ascending: false })
               .limit(3);
               
-            setRelatedArticles(recentData as NewsArticle[]);
+            const processedRecentData = recentData.map(item => ({
+              ...item,
+              tags: Array.isArray(item.tags) ? item.tags : []
+            }));
+            setRelatedArticles(processedRecentData as NewsArticle[]);
           }
         }
         
@@ -136,8 +141,7 @@ const NewsDetailPage = () => {
     return <NotFound />;
   }
 
-  // Get tags from the article
-  const tags = article.tags || [];
+  const tags = Array.isArray(article?.tags) ? article.tags : [];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -146,7 +150,6 @@ const NewsDetailPage = () => {
       
       <main className="flex-grow pt-24">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          {/* Category & metadata */}
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium">
               {article.category}
@@ -167,10 +170,8 @@ const NewsDetailPage = () => {
             )}
           </div>
           
-          {/* Title */}
           <h1 className="text-3xl md:text-5xl font-bold mb-6">{article.title}</h1>
           
-          {/* Featured image */}
           <div className="w-full h-[300px] md:h-[400px] mb-8 rounded-xl overflow-hidden">
             <img 
               src={article.image} 
@@ -179,14 +180,11 @@ const NewsDetailPage = () => {
             />
           </div>
           
-          {/* Content */}
           <div className="prose prose-lg mx-auto">
             <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
             
-            {/* Render article content as HTML */}
             <div dangerouslySetInnerHTML={{ __html: article.content }}></div>
             
-            {/* Tags */}
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-8">
                 <Tag size={16} className="text-getigne-500 mr-2" />
@@ -203,7 +201,6 @@ const NewsDetailPage = () => {
             )}
           </div>
           
-          {/* Related articles */}
           {relatedArticles.length > 0 && (
             <div className="mt-16 border-t border-getigne-100 pt-8">
               <h2 className="text-2xl font-bold mb-6">Articles similaires</h2>
@@ -218,7 +215,6 @@ const NewsDetailPage = () => {
             </div>
           )}
           
-          {/* Back button */}
           <div className="mt-16">
             <Button
               variant="outline"

@@ -15,6 +15,7 @@ export type Database = {
           description: string
           icon: string
           id: string
+          team_photo_url: string | null
           title: string
           updated_at: string
         }
@@ -23,6 +24,7 @@ export type Database = {
           description: string
           icon: string
           id?: string
+          team_photo_url?: string | null
           title: string
           updated_at?: string
         }
@@ -31,6 +33,7 @@ export type Database = {
           description?: string
           icon?: string
           id?: string
+          team_photo_url?: string | null
           title?: string
           updated_at?: string
         }

@@ -130,6 +130,7 @@ const CommitteePage = () => {
   const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'> | null>(null);
   const [teamPhotoUrl, setTeamPhotoUrl] = useState<string | null>(null);
 
+  // Queries for committee data, members, and works
   const membersQuery = useQuery({
     queryKey: ['committee', id, 'members'],
     queryFn: async () => {
@@ -178,20 +179,34 @@ const CommitteePage = () => {
       return data as Committee[];
     },
   });
+  
+  const loading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading;
 
   useEffect(() => {
     const fetchTeamPhoto = async () => {
       try {
         if (id) {
-          const { data: committeeData } = await supabase
+          const { data: committeeData, error } = await supabase
             .from('citizen_committees')
             .select('team_photo_url')
             .eq('id', id)
             .single();
             
+          if (error) {
+            console.error("Error fetching team photo:", error);
+            // Fallback to default theme image if there's an error
+            const committee = committeeQuery.data?.[0];
+            if (committee) {
+              const themeColor = colorMap[committee.icon];
+              setTeamPhotoUrl(themeColor?.teamImage || null);
+            }
+            return;
+          }
+            
           if (committeeData?.team_photo_url) {
             setTeamPhotoUrl(committeeData.team_photo_url);
           } else {
+            // Use fallback image from theme if no custom photo is set
             const committee = committeeQuery.data?.[0];
             if (committee) {
               const themeColor = colorMap[committee.icon];
@@ -212,7 +227,6 @@ const CommitteePage = () => {
 
   const works = worksQuery.data || [];
   const committee = committeeQuery.data?.[0];
-  const loading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading;
 
   if (loading) {
     return (
