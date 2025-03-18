@@ -39,6 +39,41 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          news_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          news_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          news_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "news"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       committee_members: {
         Row: {
           committee_id: string
@@ -213,6 +248,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          first_name: string
+          id: string
+          last_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name: string
+          id: string
+          last_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       program_items: {
         Row: {
           created_at: string
@@ -281,6 +340,8 @@ export type Database = {
           created_at: string
           id: string
           image: string
+          is_board_member: boolean | null
+          is_elected: boolean | null
           name: string
           role: string
           updated_at: string
@@ -290,6 +351,8 @@ export type Database = {
           created_at?: string
           id?: string
           image: string
+          is_board_member?: boolean | null
+          is_elected?: boolean | null
           name: string
           role: string
           updated_at?: string
@@ -299,6 +362,8 @@ export type Database = {
           created_at?: string
           id?: string
           image?: string
+          is_board_member?: boolean | null
+          is_elected?: boolean | null
           name?: string
           role?: string
           updated_at?: string
