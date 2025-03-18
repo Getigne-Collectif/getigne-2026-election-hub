@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         if (session?.user) {
           setUser(session.user);
           const { data } = await supabase
@@ -75,9 +76,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
+    try {
+      console.log('Signing out...');
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+        throw error;
+      }
+      
+      console.log('Sign out successful');
+      // Explicitly clear the state
+      setUser(null);
+      setProfile(null);
+      
+      // Force a page reload to clear any cached data
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
   };
 
   const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google'): Promise<void> => {
@@ -90,7 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (error) throw error;
-      // Not returning data, as the function type expects void
+      // Not returning data to match the Promise<void> return type
     } catch (error) {
       console.error(`Erreur de connexion avec ${provider}:`, error);
       throw error;

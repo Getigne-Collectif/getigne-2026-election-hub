@@ -37,6 +37,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('Fetching comments for news ID:', newsId);
     fetchComments();
   }, [newsId]);
 
@@ -54,7 +55,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         .eq('news_id', newsId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching comments:', error);
+        throw error;
+      }
+      
+      console.log('Fetched comments:', data);
       
       // Transform the data to match our Comment interface
       const transformedData = data?.map(item => ({
@@ -94,6 +100,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
 
     setSubmitting(true);
     try {
+      console.log('Submitting comment:', {
+        user_id: user.id,
+        news_id: newsId,
+        content: newComment.trim()
+      });
+      
       // Insert the new comment
       const { data: commentData, error: commentError } = await supabase
         .from('comments')
@@ -102,7 +114,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         ])
         .select();
 
-      if (commentError) throw commentError;
+      if (commentError) {
+        console.error('Error inserting comment:', commentError);
+        throw commentError;
+      }
+      
+      console.log('Comment inserted:', commentData);
       
       // Fetch the profile data
       const { data: profileData, error: profileError } = await supabase
@@ -111,7 +128,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         .eq('id', user.id)
         .single();
         
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
+      }
+      
+      console.log('Profile fetched:', profileData);
       
       // Combine the comment and profile data
       const newCommentWithProfile = {
@@ -125,6 +147,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         title: 'Commentaire publié',
         description: 'Votre commentaire a été publié avec succès'
       });
+      
+      // Force reload comments to ensure we have the latest data
+      fetchComments();
     } catch (error: any) {
       toast({
         title: 'Erreur',

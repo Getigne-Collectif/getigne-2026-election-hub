@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -73,19 +74,24 @@ const News = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
+        console.log('Fetching news articles...');
         const { data, error } = await supabase
           .from('news')
           .select('*')
           .order('date', { ascending: false })
           .limit(3);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching news:', error);
+          throw error;
+        }
         
+        console.log('Fetched news articles:', data);
         setNewsArticles(data);
-        setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des actualités:', error);
         setError(error.message);
+      } finally {
         setLoading(false);
       }
     };

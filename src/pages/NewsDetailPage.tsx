@@ -72,13 +72,19 @@ const NewsDetailPage = () => {
 
     const fetchArticle = async () => {
       try {
+        console.log('Fetching article with ID:', id);
         const { data, error } = await supabase
           .from('news')
           .select('*')
           .eq('id', id)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching article:', error);
+          throw error;
+        }
+
+        console.log('Fetched article:', data);
 
         // Ensure tags is an array
         const tags = Array.isArray(data.tags) ? data.tags : [];

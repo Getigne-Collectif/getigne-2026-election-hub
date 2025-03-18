@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogIn, LogOut, User } from 'lucide-react';
@@ -12,9 +12,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from '@/components/ui/use-toast';
 
 const AuthButton = () => {
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès"
+      });
+    } catch (error) {
+      console.error('Error during sign out:', error);
+      toast({
+        title: "Erreur lors de la déconnexion",
+        description: "Une erreur est survenue lors de la déconnexion",
+        variant: "destructive"
+      });
+    }
+  };
 
   if (!user) {
     return (
@@ -47,7 +66,7 @@ const AuthButton = () => {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
+        <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
           <LogOut className="h-4 w-4 mr-2" />
           Se déconnecter
         </DropdownMenuItem>
