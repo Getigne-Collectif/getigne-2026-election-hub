@@ -9,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   setUser: (user: User | null) => void;
   signOut: () => Promise<void>;
+  signInWithProvider: (provider: 'discord' | 'facebook' | 'google') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,7 +17,8 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   setUser: () => {},
-  signOut: async () => {}
+  signOut: async () => {},
+  signInWithProvider: async () => {}
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -78,8 +80,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setProfile(null);
   };
 
+  const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google') => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth`
+        }
+      });
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error(`Erreur de connexion avec ${provider}:`, error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, setUser, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, setUser, signOut, signInWithProvider }}>
       {children}
     </AuthContext.Provider>
   );

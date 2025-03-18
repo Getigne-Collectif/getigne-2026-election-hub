@@ -103,8 +103,12 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-getigne-700">
-            Gétigné Collectif
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/lovable-uploads/07e7372b-7c2e-4584-9a92-9becd5096172.png" 
+              alt="Gétigné Collectif" 
+              className="h-10"
+            />
           </Link>
 
           {/* Desktop Navigation */}

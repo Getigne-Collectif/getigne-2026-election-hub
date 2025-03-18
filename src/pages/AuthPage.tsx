@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
@@ -14,6 +13,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { Separator } from '@/components/ui/separator';
+import { DiscordLogoIcon } from '@radix-ui/react-icons';
+import { Facebook, Mail } from 'lucide-react';
 
 // Schéma de validation pour l'inscription
 const signUpSchema = z.object({
@@ -35,8 +37,9 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 const AuthPage = () => {
   const [activeTab, setActiveTab] = useState<string>('signin');
   const [loading, setLoading] = useState(false);
+  const [ssoLoading, setSsoLoading] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser, signInWithProvider } = useAuth();
 
   // Formulaire d'inscription
   const signUpForm = useForm<SignUpFormValues>({
@@ -128,6 +131,22 @@ const AuthPage = () => {
     }
   };
 
+  // Gérer la connexion avec un fournisseur tiers
+  const handleSsoSignIn = async (provider: 'discord' | 'facebook' | 'google') => {
+    try {
+      setSsoLoading(provider);
+      await signInWithProvider(provider);
+    } catch (error: any) {
+      toast({
+        title: `Erreur lors de la connexion avec ${provider}`,
+        description: error.message || 'Une erreur est survenue',
+        variant: 'destructive'
+      });
+    } finally {
+      setSsoLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -179,6 +198,44 @@ const AuthPage = () => {
                   </Button>
                 </form>
               </Form>
+
+              <div className="mt-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <Separator className="w-full" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">Ou se connecter avec</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid grid-cols-3 gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSsoSignIn('discord')}
+                    disabled={!!ssoLoading}
+                    className="w-full"
+                  >
+                    {ssoLoading === 'discord' ? 'Chargement...' : <DiscordLogoIcon className="h-5 w-5" />}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSsoSignIn('facebook')}
+                    disabled={!!ssoLoading}
+                    className="w-full"
+                  >
+                    {ssoLoading === 'facebook' ? 'Chargement...' : <Facebook className="h-5 w-5" />}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSsoSignIn('google')}
+                    disabled={!!ssoLoading}
+                    className="w-full"
+                  >
+                    {ssoLoading === 'google' ? 'Chargement...' : <Mail className="h-5 w-5" />}
+                  </Button>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="signup">
@@ -247,6 +304,44 @@ const AuthPage = () => {
                   </Button>
                 </form>
               </Form>
+              
+              <div className="mt-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <Separator className="w-full" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">Ou s'inscrire avec</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid grid-cols-3 gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSsoSignIn('discord')}
+                    disabled={!!ssoLoading}
+                    className="w-full"
+                  >
+                    {ssoLoading === 'discord' ? 'Chargement...' : <DiscordLogoIcon className="h-5 w-5" />}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSsoSignIn('facebook')}
+                    disabled={!!ssoLoading}
+                    className="w-full"
+                  >
+                    {ssoLoading === 'facebook' ? 'Chargement...' : <Facebook className="h-5 w-5" />}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSsoSignIn('google')}
+                    disabled={!!ssoLoading}
+                    className="w-full"
+                  >
+                    {ssoLoading === 'google' ? 'Chargement...' : <Mail className="h-5 w-5" />}
+                  </Button>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
