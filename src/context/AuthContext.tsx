@@ -29,8 +29,9 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   // Fonction pour récupérer le profil utilisateur
   const fetchUserProfile = async (userId: string) => {
@@ -55,25 +56,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Initialise l'état d'authentification au chargement
   useEffect(() => {
-    const initAuth = async () => {
+    const initializeAuth = async () => {
       setLoading(true);
       try {
-        // Récupérer la session actuelle
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session?.user) {
           console.log('Session found, user is authenticated:', session.user.id);
           setUser(session.user);
           
-          // Récupérer le profil utilisateur
           const profileData = await fetchUserProfile(session.user.id);
           if (profileData) {
             console.log('Setting profile data:', profileData);
             setProfile(profileData);
-          } else {
-            console.log('No profile data found, setting profile to null');
-            setProfile(null);
           }
         } else {
           console.log('No session found, user is not authenticated');
@@ -86,33 +83,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setProfile(null);
       } finally {
         setLoading(false);
+        setAuthInitialized(true);
       }
     };
 
-    initAuth();
+    initializeAuth();
+  }, []);
 
-    // Écouter les changements d'état d'authentification
+  // Écoute les changements d'état d'authentification après l'initialisation
+  useEffect(() => {
+    if (!authInitialized) return;
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
         
         if (session?.user) {
           setUser(session.user);
+          
+          // Important: await pour s'assurer que le profil est chargé avant de continuer
           const profileData = await fetchUserProfile(session.user.id);
           console.log('Profile data after auth state change:', profileData);
-          setProfile(profileData);
+          
+          if (profileData) {
+            setProfile(profileData);
+          }
         } else {
           setUser(null);
           setProfile(null);
         }
-        setLoading(false);
       }
     );
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [authInitialized]);
 
   const signOut = async () => {
     try {
@@ -124,7 +130,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       console.log('Sign out successful');
-      // Explicitement effacer l'état
       setUser(null);
       setProfile(null);
       
@@ -146,7 +151,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (error) throw error;
-      // Ne retourne rien pour correspondre au type Promise<void>
     } catch (error) {
       console.error(`Erreur de connexion avec ${provider}:`, error);
       throw error;
@@ -154,7 +158,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, setUser, signOut, signInWithProvider }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        profile, 
+        loading, 
+        setUser, 
+        signOut, 
+        signInWithProvider 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -47,21 +47,21 @@ const AuthButton = () => {
   }
 
   // Déterminer le nom à afficher
-  let displayName = user.email;
+  let displayName = user.email || '';
   let firstName = '';
   let lastName = '';
   
-  // Vérifiez si le profil existe et contient les informations de nom
   if (profile) {
-    displayName = profile.first_name;
-    firstName = profile.first_name;
-    lastName = profile.last_name;
+    // Utiliser les données du profil si disponibles
+    displayName = profile.first_name || displayName;
+    firstName = profile.first_name || '';
+    lastName = profile.last_name || '';
   } else if (user.user_metadata) {
-    // Fallback sur les métadonnées utilisateur si le profil n'est pas disponible
-    if (user.user_metadata.first_name) {
-      displayName = user.user_metadata.first_name;
-      firstName = user.user_metadata.first_name;
-      lastName = user.user_metadata.last_name || '';
+    // Fallback sur les métadonnées utilisateur
+    firstName = user.user_metadata.first_name || '';
+    lastName = user.user_metadata.last_name || '';
+    if (firstName) {
+      displayName = firstName;
     }
   }
 
