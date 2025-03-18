@@ -7,6 +7,12 @@ import { User, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
+interface Profile {
+  first_name: string;
+  last_name: string;
+}
 
 interface Comment {
   id: string;
@@ -14,10 +20,7 @@ interface Comment {
   news_id: string;
   content: string;
   created_at: string;
-  profiles: {
-    first_name: string;
-    last_name: string;
-  };
+  profiles?: Profile;
 }
 
 interface CommentsProps {
@@ -52,7 +55,14 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setComments(data || []);
+      
+      // Transform the data to match our Comment interface
+      const transformedData = data?.map(item => ({
+        ...item,
+        profiles: item.profiles as unknown as Profile
+      })) || [];
+      
+      setComments(transformedData);
     } catch (error) {
       console.error('Erreur lors de la récupération des commentaires:', error);
     } finally {
@@ -84,22 +94,32 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
 
     setSubmitting(true);
     try {
-      const { data, error } = await supabase
+      // Insert the new comment
+      const { data: commentData, error: commentError } = await supabase
         .from('comments')
         .insert([
           { user_id: user.id, news_id: newsId, content: newComment.trim() }
         ])
-        .select(`
-          *,
-          profiles:user_id (
-            first_name,
-            last_name
-          )
-        `);
+        .select();
 
-      if (error) throw error;
+      if (commentError) throw commentError;
       
-      setComments([data[0], ...comments]);
+      // Fetch the profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', user.id)
+        .single();
+        
+      if (profileError) throw profileError;
+      
+      // Combine the comment and profile data
+      const newCommentWithProfile = {
+        ...commentData[0],
+        profiles: profileData
+      };
+      
+      setComments([newCommentWithProfile, ...comments]);
       setNewComment('');
       toast({
         title: 'Commentaire publié',
@@ -111,9 +131,15 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         description: error.message || 'Une erreur est survenue',
         variant: 'destructive'
       });
+      console.error('Error submitting comment:', error);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Helper function to get initials from name
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
   return (
@@ -161,12 +187,14 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
               className="bg-white p-5 rounded-lg shadow-sm border border-getigne-100"
             >
               <div className="flex items-center gap-2 mb-3">
-                <div className="bg-getigne-100 rounded-full p-2">
-                  <User size={18} className="text-getigne-700" />
-                </div>
+                <Avatar className="h-10 w-10 bg-getigne-100">
+                  <AvatarFallback className="text-getigne-700">
+                    {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <h4 className="font-medium">
-                    {comment.profiles?.first_name} {comment.profiles?.last_name}
+                    {comment.profiles ? `${comment.profiles.first_name} ${comment.profiles.last_name}` : 'Utilisateur'}
                   </h4>
                   <time className="text-getigne-500 text-sm">
                     {new Date(comment.created_at).toLocaleDateString('fr-FR', {
