@@ -121,6 +121,11 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-getigne-800 mt-12 pt-8 text-center text-getigne-400 text-sm">
+          <div className="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 mb-2">
+            <Link to="/mentions-legales" className="hover:text-white transition-colors">
+              Mentions légales
+            </Link>
+          </div>
           <p>© {currentYear} Gétigné Collectif. Tous droits réservés.</p>
         </div>
       </div>

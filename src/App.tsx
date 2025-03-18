@@ -19,6 +19,7 @@ import SiteMapPage from "./pages/SiteMapPage";
 import JoinPage from "./pages/JoinPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import AuthPage from "./pages/AuthPage";
+import LegalPage from "./pages/LegalPage";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/adherer" element={<JoinPage />} />
             <Route path="/qui-sommes-nous" element={<AboutUsPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/mentions-legales" element={<LegalPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
