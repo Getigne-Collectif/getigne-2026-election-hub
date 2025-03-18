@@ -3,11 +3,13 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 
+type Role = 'admin' | 'moderator' | 'user';
+
 interface AuthContextType {
   user: User | null;
   profile: any;
   loading: boolean;
-  userRoles: string[];
+  userRoles: Role[];
   isAdmin: boolean;
   isModerator: boolean;
   setUser: (user: User | null) => void;
@@ -36,7 +38,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [userRoles, setUserRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -64,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Fonction pour récupérer les rôles de l'utilisateur
-  const fetchUserRoles = async (userId: string) => {
+  const fetchUserRoles = async (userId: string): Promise<Role[]> => {
     try {
       console.log('Fetching roles for user:', userId);
       const { data, error } = await supabase
@@ -73,12 +75,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .eq('user_id', userId);
       
       if (error) {
+        // Si la table n'existe pas encore ou autre erreur
         console.error('Error fetching user roles:', error);
         return [];
       }
       
       // Extraire la liste des rôles
-      const roles = data.map(item => item.role);
+      const roles = data.map(item => item.role as Role);
       console.log('User roles retrieved:', roles);
       return roles;
     } catch (error) {

@@ -24,6 +24,7 @@ interface Comment {
   content: string;
   created_at: string;
   status: 'pending' | 'approved' | 'rejected';
+  updated_at: string;
   profiles?: Profile;
 }
 
@@ -82,7 +83,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         profiles: item.profiles as unknown as Profile
       })) || [];
       
-      setComments(transformedData);
+      setComments(transformedData as Comment[]);
     } catch (error) {
       console.error('Erreur lors de la récupération des commentaires:', error);
     } finally {
@@ -159,7 +160,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       const newCommentWithProfile = {
         ...commentData[0],
         profiles: profileData
-      };
+      } as Comment;
       
       if (isModerator || showAllComments) {
         // Si modérateur ou affichage de tous les commentaires, ajouter au début de la liste
