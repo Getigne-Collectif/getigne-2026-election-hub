@@ -70,29 +70,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('Fetching roles for user:', userId);
       
-      // Utiliser une requête directe qui évite la récursion RLS
+      // Utiliser la fonction RPC qui évite la récursion RLS
       const { data, error } = await supabase.rpc('get_user_roles', { uid: userId });
       
       if (error) {
-        // Essayer une méthode alternative si l'RPC n'existe pas encore
+        console.error('Error fetching user roles via RPC:', error);
+        
+        // Essayer une méthode alternative si l'RPC échoue
         const { data: rolesData, error: rolesError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userId);
           
         if (rolesError) {
-          console.error('Error fetching user roles:', rolesError);
+          console.error('Error fetching user roles from table:', rolesError);
           return [];
         }
         
         // Extraire la liste des rôles
         const roles = rolesData.map(item => item.role as Role);
-        console.log('User roles retrieved:', roles);
+        console.log('User roles retrieved from table:', roles);
         return roles;
       }
       
       console.log('User roles retrieved via RPC:', data);
-      return data || [];
+      return data as Role[] || [];
     } catch (error) {
       console.error('Exception when fetching user roles:', error);
       return [];

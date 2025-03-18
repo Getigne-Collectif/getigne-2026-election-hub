@@ -8,10 +8,26 @@ import Footer from '@/components/Footer';
 import UserManagement from '@/components/UserManagement';
 import { toast } from '@/components/ui/use-toast';
 
+interface Profile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  [key: string]: any;
+}
+
+interface UserWithRoles {
+  id: string;
+  email: string;
+  created_at: string;
+  first_name: string;
+  last_name: string;
+  roles: string[];
+}
+
 const AdminUsersPage = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
@@ -44,7 +60,12 @@ const AdminUsersPage = () => {
       
       // Combiner les données
       const combinedUsers = authUsers.users.map(authUser => {
-        const profile = profiles?.find(p => p.id === authUser.id) || {};
+        const profile = profiles?.find(p => p.id === authUser.id) as Profile || { 
+          id: authUser.id, 
+          first_name: '', 
+          last_name: '' 
+        };
+        
         const roles = userRoles
           ?.filter(ur => ur.user_id === authUser.id)
           .map(ur => ur.role) || [];
@@ -53,8 +74,8 @@ const AdminUsersPage = () => {
           id: authUser.id,
           email: authUser.email,
           created_at: authUser.created_at,
-          first_name: profile.first_name || '',
-          last_name: profile.last_name || '',
+          first_name: profile.first_name,
+          last_name: profile.last_name,
           roles: roles
         };
       });
