@@ -48,13 +48,21 @@ const AuthButton = () => {
 
   // Déterminer le nom à afficher
   let displayName = user.email;
+  let firstName = '';
+  let lastName = '';
   
   // Vérifiez si le profil existe et contient les informations de nom
-  if (profile?.first_name) {
+  if (profile) {
     displayName = profile.first_name;
-  } else if (user.user_metadata?.first_name) {
+    firstName = profile.first_name;
+    lastName = profile.last_name;
+  } else if (user.user_metadata) {
     // Fallback sur les métadonnées utilisateur si le profil n'est pas disponible
-    displayName = user.user_metadata.first_name;
+    if (user.user_metadata.first_name) {
+      displayName = user.user_metadata.first_name;
+      firstName = user.user_metadata.first_name;
+      lastName = user.user_metadata.last_name || '';
+    }
   }
 
   console.log('AuthButton rendering with profile:', profile);
@@ -74,16 +82,9 @@ const AuthButton = () => {
         <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex flex-col items-start">
-          {profile ? (
+          {firstName && (
             <>
-              <span className="font-medium">{`${profile.first_name} ${profile.last_name}`}</span>
-              <span className="text-xs text-muted-foreground">{user.email}</span>
-            </>
-          ) : user.user_metadata?.first_name ? (
-            <>
-              <span className="font-medium">
-                {`${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`}
-              </span>
+              <span className="font-medium">{`${firstName} ${lastName}`}</span>
               <span className="text-xs text-muted-foreground">{user.email}</span>
             </>
           ) : (

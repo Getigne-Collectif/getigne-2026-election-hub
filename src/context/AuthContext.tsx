@@ -68,7 +68,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           // Récupérer le profil utilisateur
           const profileData = await fetchUserProfile(session.user.id);
-          setProfile(profileData);
+          if (profileData) {
+            console.log('Setting profile data:', profileData);
+            setProfile(profileData);
+          } else {
+            console.log('No profile data found, setting profile to null');
+            setProfile(null);
+          }
         } else {
           console.log('No session found, user is not authenticated');
           setUser(null);
@@ -93,6 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (session?.user) {
           setUser(session.user);
           const profileData = await fetchUserProfile(session.user.id);
+          console.log('Profile data after auth state change:', profileData);
           setProfile(profileData);
         } else {
           setUser(null);
