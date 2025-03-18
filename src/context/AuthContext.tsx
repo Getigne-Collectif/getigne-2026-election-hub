@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setProfile(null);
   };
 
-  const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google') => {
+  const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google'): Promise<void> => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (error) throw error;
-      return data;
+      // Not returning data, as the function type expects void
     } catch (error) {
       console.error(`Erreur de connexion avec ${provider}:`, error);
       throw error;
