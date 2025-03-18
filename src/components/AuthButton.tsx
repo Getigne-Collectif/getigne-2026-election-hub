@@ -82,7 +82,7 @@ const AuthButton = () => {
         <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex flex-col items-start">
-          {firstName && (
+          {firstName ? (
             <>
               <span className="font-medium">{`${firstName} ${lastName}`}</span>
               <span className="text-xs text-muted-foreground">{user.email}</span>
