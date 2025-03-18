@@ -7,12 +7,20 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import UserManagement from '@/components/UserManagement';
 import { toast } from '@/components/ui/use-toast';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
+import {Home} from "lucide-react";
 
 interface Profile {
   id: string;
   first_name: string;
   last_name: string;
-  [key: string]: any;
+  [key: string]: string | number | object | boolean;
 }
 
 interface UserWithRoles {
@@ -31,15 +39,6 @@ const AdminUsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
 
-  useEffect(() => {
-    // Ajouter des logs pour déboguer l'état de l'authentification
-    console.log("AdminUsersPage - Auth state:", { 
-      user: user?.id, 
-      isAdmin, 
-      userRoles 
-    });
-  }, [user, isAdmin, userRoles]);
-
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -48,24 +47,24 @@ const AdminUsersPage = () => {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
-        
+
       if (profilesError) throw profilesError;
-      
+
       if (!profiles) {
         setUsers([]);
         return;
       }
-      
+
       // Get user roles for each profile
       const usersData: UserWithRoles[] = await Promise.all(
         profiles.map(async (profile) => {
           // Get user roles
-          const { data: roles } = await supabase
-            .rpc('get_user_roles', { uid: profile.id });
-            
+          // @ts-expect-error - don't know why
+          const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
+
           // Get user email from auth metadata if available
           // Note: we won't have access to this directly, so we'll use what's available
-          
+
           return {
             id: profile.id,
             email: '', // We don't have direct access to emails
@@ -76,7 +75,7 @@ const AdminUsersPage = () => {
           };
         })
       );
-      
+
       setUsers(usersData);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
@@ -117,7 +116,7 @@ const AdminUsersPage = () => {
           description: `Le rôle ${role} a été retiré.`
         });
       }
-      
+
       // Rafraîchir la liste des utilisateurs
       await fetchUsers();
     } catch (error: any) {
@@ -137,13 +136,13 @@ const AdminUsersPage = () => {
         setAuthChecked(true);
       }
     };
-    
+
     checkAuth();
   }, [user, userRoles]);
 
   useEffect(() => {
     if (!authChecked) return;
-    
+
     // Rediriger si l'utilisateur n'est pas admin
     if (!user) {
       console.log("AdminUsersPage - Redirection: User not authenticated");
@@ -155,7 +154,7 @@ const AdminUsersPage = () => {
       navigate('/auth');
       return;
     }
-    
+
     if (user && !isAdmin) {
       console.log("AdminUsersPage - Redirection: User not admin", { userRoles });
       toast({
@@ -174,31 +173,68 @@ const AdminUsersPage = () => {
   }, [user, isAdmin, authChecked, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-grow container mx-auto px-4 py-10">
-        <h1 className="text-3xl font-bold mb-8">Administration des utilisateurs</h1>
-        
-        {!authChecked ? (
-          <div className="text-center py-10">
-            <p>Vérification des droits d'accès...</p>
+      <div>
+        <div className="min-h-screen">
+          <Navbar />
+
+          {/* Header */}
+          <div className="pt-24 pb-12 bg-getigne-50">
+            <div className="container mx-auto px-4">
+              <Breadcrumb className="mb-6">
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                      <Home className="h-4 w-4 mr-1" />
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Administration</BreadcrumbPage>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Utilisateurs</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              <div className="max-w-3xl mx-auto text-center">
+                <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+                  Administration
+                </span>
+                <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Utilisateurs</h1>
+                <p className="text-getigne-700 text-lg mb-6">
+                  Gérez les utilisateurs et leurs rôles.
+                </p>
+              </div>
+            </div>
           </div>
-        ) : !user ? (
-          <div className="text-center py-10">
-            <p>Veuillez vous connecter pour accéder à l'administration.</p>
-          </div>
-        ) : !isAdmin ? (
-          <div className="text-center py-10">
-            <p>Vous n'avez pas les droits pour accéder à cette page.</p>
-          </div>
-        ) : (
-          <UserManagement 
-            users={users} 
-            loading={loading} 
-            onRoleChange={handleRoleChange}
-          />
-        )}
-      </main>
+
+          <section className="py-16">
+            <div className="container mx-auto px-4">
+
+              {!authChecked ? (
+                <div className="text-center py-10">
+                  <p>Vérification des droits d'accès...</p>
+                </div>
+              ) : !user ? (
+                <div className="text-center py-10">
+                  <p>Veuillez vous connecter pour accéder à l'administration.</p>
+                </div>
+              ) : !isAdmin ? (
+                <div className="text-center py-10">
+                  <p>Vous n'avez pas les droits pour accéder à cette page.</p>
+                </div>
+              ) : (
+                <UserManagement
+                  users={users}
+                  loading={loading}
+                  onRoleChange={handleRoleChange}
+                />
+              )}
+            </div>
+          </section>
+        </div>
       <Footer />
     </div>
   );
