@@ -17,18 +17,54 @@ const AdminUsersPage = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Récupérer la liste des utilisateurs depuis la vue
-      const { data, error } = await supabase
-        .from('users_with_roles')
+      // Obtenir tous les utilisateurs depuis la table auth.users
+      // Note: Ceci ne fonctionne que pour les administrateurs grâce aux RLS
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) throw authError;
+      
+      if (!authUsers || !authUsers.users) {
+        setUsers([]);
+        return;
+      }
+      
+      // Récupérer les profils pour tous les utilisateurs
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
         .select('*');
-
-      if (error) throw error;
-      setUsers(data || []);
+        
+      if (profilesError) throw profilesError;
+      
+      // Récupérer tous les rôles d'utilisateurs
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+        
+      if (rolesError) throw rolesError;
+      
+      // Combiner les données
+      const combinedUsers = authUsers.users.map(authUser => {
+        const profile = profiles?.find(p => p.id === authUser.id) || {};
+        const roles = userRoles
+          ?.filter(ur => ur.user_id === authUser.id)
+          .map(ur => ur.role) || [];
+          
+        return {
+          id: authUser.id,
+          email: authUser.email,
+          created_at: authUser.created_at,
+          first_name: profile.first_name || '',
+          last_name: profile.last_name || '',
+          roles: roles
+        };
+      });
+      
+      setUsers(combinedUsers);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
       toast({
         title: 'Erreur',
-        description: "Impossible de récupérer la liste des utilisateurs.",
+        description: error.message || "Impossible de récupérer la liste des utilisateurs.",
         variant: 'destructive'
       });
     } finally {

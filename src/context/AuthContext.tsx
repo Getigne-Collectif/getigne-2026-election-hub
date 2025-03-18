@@ -69,21 +69,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchUserRoles = async (userId: string): Promise<Role[]> => {
     try {
       console.log('Fetching roles for user:', userId);
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
+      
+      // Utiliser une requête directe qui évite la récursion RLS
+      const { data, error } = await supabase.rpc('get_user_roles', { uid: userId });
       
       if (error) {
-        // Si la table n'existe pas encore ou autre erreur
-        console.error('Error fetching user roles:', error);
-        return [];
+        // Essayer une méthode alternative si l'RPC n'existe pas encore
+        const { data: rolesData, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId);
+          
+        if (rolesError) {
+          console.error('Error fetching user roles:', rolesError);
+          return [];
+        }
+        
+        // Extraire la liste des rôles
+        const roles = rolesData.map(item => item.role as Role);
+        console.log('User roles retrieved:', roles);
+        return roles;
       }
       
-      // Extraire la liste des rôles
-      const roles = data.map(item => item.role as Role);
-      console.log('User roles retrieved:', roles);
-      return roles;
+      console.log('User roles retrieved via RPC:', data);
+      return data || [];
     } catch (error) {
       console.error('Exception when fetching user roles:', error);
       return [];
