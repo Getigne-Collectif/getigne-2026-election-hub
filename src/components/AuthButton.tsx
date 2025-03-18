@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogIn, LogOut, User } from 'lucide-react';
+import { LogIn, LogOut, User, Shield } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
 import { toast } from '@/components/ui/use-toast';
 
 const AuthButton = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -92,6 +92,19 @@ const AuthButton = () => {
           )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        
+        {isAdmin && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/users" className="flex items-center w-full">
+                <Shield className="h-4 w-4 mr-2" />
+                Administration
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
           <LogOut className="h-4 w-4 mr-2" />
           Se déconnecter

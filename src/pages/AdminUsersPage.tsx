@@ -43,54 +43,41 @@ const AdminUsersPage = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Obtenir tous les utilisateurs depuis la table auth.users
-      // Note: Ceci ne fonctionne que pour les administrateurs grâce aux RLS
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-      
-      if (authError) throw authError;
-      
-      if (!authUsers || !authUsers.users) {
-        setUsers([]);
-        return;
-      }
-      
-      // Récupérer les profils pour tous les utilisateurs
+      // Instead of using the admin API, we'll query the auth.users indirectly
+      // First, get all profiles from the profiles table
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
         
       if (profilesError) throw profilesError;
       
-      // Récupérer tous les rôles d'utilisateurs
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('*');
-        
-      if (rolesError) throw rolesError;
+      if (!profiles) {
+        setUsers([]);
+        return;
+      }
       
-      // Combiner les données
-      const combinedUsers = authUsers.users.map(authUser => {
-        const profile = profiles?.find(p => p.id === authUser.id) as Profile || { 
-          id: authUser.id, 
-          first_name: '', 
-          last_name: '' 
-        };
-        
-        const roles = userRoles
-          ?.filter(ur => ur.user_id === authUser.id)
-          .map(ur => ur.role) || [];
+      // Get user roles for each profile
+      const usersData: UserWithRoles[] = await Promise.all(
+        profiles.map(async (profile) => {
+          // Get user roles
+          const { data: roles } = await supabase
+            .rpc('get_user_roles', { uid: profile.id });
+            
+          // Get user email from auth metadata if available
+          // Note: we won't have access to this directly, so we'll use what's available
           
-        return {
-          id: authUser.id,
-          email: authUser.email,
-          created_at: authUser.created_at,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          roles: roles
-        };
-      });
+          return {
+            id: profile.id,
+            email: '', // We don't have direct access to emails
+            created_at: profile.created_at,
+            first_name: profile.first_name || '',
+            last_name: profile.last_name || '',
+            roles: roles || []
+          };
+        })
+      );
       
-      setUsers(combinedUsers);
+      setUsers(usersData);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
       toast({
