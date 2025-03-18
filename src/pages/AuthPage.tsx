@@ -5,7 +5,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,8 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Separator } from '@/components/ui/separator';
+import FacebookIcon from '@/components/icons/facebook.svg?react';
+import GoogleIcon from '@/components/icons/google.svg?react';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
-import { Facebook, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 // Schéma de validation pour l'inscription
 const signUpSchema = z.object({
@@ -210,29 +211,29 @@ const AuthPage = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-3 gap-2">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => handleSsoSignIn('discord')}
                     disabled={!!ssoLoading}
                     className="w-full"
                   >
                     {ssoLoading === 'discord' ? 'Chargement...' : <DiscordLogoIcon className="h-5 w-5" />}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => handleSsoSignIn('facebook')}
                     disabled={!!ssoLoading}
                     className="w-full"
                   >
-                    {ssoLoading === 'facebook' ? 'Chargement...' : <Facebook className="h-5 w-5" />}
+                    {ssoLoading === 'facebook' ? 'Chargement...' : <span className="h-5 w-5 hover:text-white"><FacebookIcon /></span>}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => handleSsoSignIn('google')}
                     disabled={!!ssoLoading}
                     className="w-full"
                   >
-                    {ssoLoading === 'google' ? 'Chargement...' : <Mail className="h-5 w-5" />}
+                    {ssoLoading === 'google' ? 'Chargement...' : <span className="h-5 w-5 hover:text-white"><GoogleIcon /></span>}
                   </Button>
                 </div>
               </div>
@@ -304,7 +305,7 @@ const AuthPage = () => {
                   </Button>
                 </form>
               </Form>
-              
+
               <div className="mt-6">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
@@ -316,24 +317,24 @@ const AuthPage = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-3 gap-2">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => handleSsoSignIn('discord')}
                     disabled={!!ssoLoading}
                     className="w-full"
                   >
                     {ssoLoading === 'discord' ? 'Chargement...' : <DiscordLogoIcon className="h-5 w-5" />}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => handleSsoSignIn('facebook')}
                     disabled={!!ssoLoading}
                     className="w-full"
                   >
-                    {ssoLoading === 'facebook' ? 'Chargement...' : <Facebook className="h-5 w-5" />}
+                    {ssoLoading === 'facebook' ? 'Chargement...' : <FacebookIcon className="h-5 w-5" />}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => handleSsoSignIn('google')}
                     disabled={!!ssoLoading}
                     className="w-full"

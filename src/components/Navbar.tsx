@@ -104,9 +104,9 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center">
-            <img 
-              src="/lovable-uploads/07e7372b-7c2e-4584-9a92-9becd5096172.png" 
-              alt="Gétigné Collectif" 
+            <img
+              src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png"
+              alt="Gétigné Collectif"
               className="h-10"
             />
           </Link>
