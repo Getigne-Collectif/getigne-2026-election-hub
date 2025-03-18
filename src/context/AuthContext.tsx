@@ -32,36 +32,68 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const getUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        setProfile(data);
+  // Fonction pour récupérer le profil utilisateur
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      console.log('Fetching profile for user:', userId);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
       }
-      setLoading(false);
+      
+      console.log('Profile data retrieved:', data);
+      return data;
+    } catch (error) {
+      console.error('Exception when fetching profile:', error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const initAuth = async () => {
+      setLoading(true);
+      try {
+        // Récupérer la session actuelle
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          console.log('Session found, user is authenticated:', session.user.id);
+          setUser(session.user);
+          
+          // Récupérer le profil utilisateur
+          const profileData = await fetchUserProfile(session.user.id);
+          setProfile(profileData);
+        } else {
+          console.log('No session found, user is not authenticated');
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setUser(null);
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    getUserProfile();
+    initAuth();
 
+    // Écouter les changements d'état d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
+        
         if (session?.user) {
           setUser(session.user);
-          const { data } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-          
-          setProfile(data);
+          const profileData = await fetchUserProfile(session.user.id);
+          setProfile(profileData);
         } else {
           setUser(null);
           setProfile(null);
@@ -85,20 +117,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       
       console.log('Sign out successful');
-      // Explicitly clear the state
+      // Explicitement effacer l'état
       setUser(null);
       setProfile(null);
       
-      // Force a page reload to clear any cached data
+      // Forcer un rechargement de la page pour effacer toutes les données en cache
       window.location.href = '/';
     } catch (error) {
       console.error('Error during sign out:', error);
+      throw error;
     }
   };
 
   const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google'): Promise<void> => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth`
@@ -106,7 +139,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (error) throw error;
-      // Not returning data to match the Promise<void> return type
+      // Ne retourne rien pour correspondre au type Promise<void>
     } catch (error) {
       console.error(`Erreur de connexion avec ${provider}:`, error);
       throw error;

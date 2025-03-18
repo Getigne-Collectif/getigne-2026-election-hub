@@ -46,25 +46,50 @@ const AuthButton = () => {
     );
   }
 
+  // Déterminer le nom à afficher
+  let displayName = user.email;
+  
+  // Vérifiez si le profil existe et contient les informations de nom
+  if (profile?.first_name) {
+    displayName = profile.first_name;
+  } else if (user.user_metadata?.first_name) {
+    // Fallback sur les métadonnées utilisateur si le profil n'est pas disponible
+    displayName = user.user_metadata.first_name;
+  }
+
+  console.log('AuthButton rendering with profile:', profile);
+  console.log('User metadata:', user.user_metadata);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-2">
           <User className="h-4 w-4" />
           <span className="hidden sm:inline">
-            {profile?.first_name ? `${profile.first_name}` : user.email}
+            {displayName}
           </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {profile && (
-          <DropdownMenuItem className="flex flex-col items-start">
-            <span className="font-medium">{`${profile.first_name} ${profile.last_name}`}</span>
+        <DropdownMenuItem className="flex flex-col items-start">
+          {profile ? (
+            <>
+              <span className="font-medium">{`${profile.first_name} ${profile.last_name}`}</span>
+              <span className="text-xs text-muted-foreground">{user.email}</span>
+            </>
+          ) : user.user_metadata?.first_name ? (
+            <>
+              <span className="font-medium">
+                {`${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`}
+              </span>
+              <span className="text-xs text-muted-foreground">{user.email}</span>
+            </>
+          ) : (
             <span className="text-xs text-muted-foreground">{user.email}</span>
-          </DropdownMenuItem>
-        )}
+          )}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
           <LogOut className="h-4 w-4 mr-2" />
