@@ -20,6 +20,7 @@ import JoinPage from "./pages/JoinPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import AuthPage from "./pages/AuthPage";
 import LegalPage from "./pages/LegalPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/qui-sommes-nous" element={<AboutUsPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/mentions-legales" element={<LegalPage />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

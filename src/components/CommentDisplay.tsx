@@ -1,6 +1,9 @@
 
 import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Pencil, Trash } from 'lucide-react';
 
 interface Profile {
   first_name: string;
@@ -18,15 +21,28 @@ interface Comment {
 
 interface CommentDisplayProps {
   comments: Comment[];
+  onEditComment?: (comment: Comment) => void;
+  onDeleteComment?: (commentId: string) => void;
 }
 
-const CommentDisplay: React.FC<CommentDisplayProps> = ({ comments }) => {
+const CommentDisplay: React.FC<CommentDisplayProps> = ({ 
+  comments, 
+  onEditComment, 
+  onDeleteComment 
+}) => {
+  const { user } = useAuth();
+  
   // Helper function to get initials from name
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase() || 'UN';
   };
 
-  if (comments.length === 0) {
+  // Filtre pour afficher uniquement les commentaires approuvés ou ceux de l'utilisateur connecté
+  const visibleComments = comments.filter(comment => 
+    comment.status === 'approved' || comment.user_id === user?.id
+  );
+
+  if (visibleComments.length === 0) {
     return (
       <div className="text-center py-8 text-getigne-500">
         Aucun commentaire pour cet article
@@ -36,10 +52,14 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({ comments }) => {
 
   return (
     <div className="space-y-6">
-      {comments.map((comment) => (
+      {visibleComments.map((comment) => (
         <div 
           key={comment.id} 
-          className="bg-white p-5 rounded-lg shadow-sm border border-getigne-100"
+          className={`bg-white p-5 rounded-lg shadow-sm border ${
+            comment.status === 'pending' ? 'border-amber-200 bg-amber-50' : 
+            comment.status === 'rejected' ? 'border-red-200 bg-red-50' : 
+            'border-getigne-100'
+          }`}
         >
           <div className="flex items-center gap-2 mb-3">
             <Avatar className="h-10 w-10 bg-getigne-100">
@@ -47,9 +67,10 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({ comments }) => {
                 {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="flex-1">
               <h4 className="font-medium">
                 {comment.profiles ? `${comment.profiles.first_name} ${comment.profiles.last_name}` : 'Utilisateur'}
+                {comment.user_id === user?.id && <span className="ml-2 text-sm text-getigne-500">(Vous)</span>}
               </h4>
               <time className="text-getigne-500 text-sm">
                 {new Date(comment.created_at).toLocaleDateString('fr-FR', {
@@ -61,8 +82,45 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({ comments }) => {
                 })}
               </time>
             </div>
+            
+            {/* Actions de modification/suppression si c'est le commentaire de l'utilisateur */}
+            {comment.user_id === user?.id && onEditComment && onDeleteComment && (
+              <div className="flex gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => onEditComment(comment)}
+                  className="h-8 w-8 p-0"
+                >
+                  <Pencil className="h-4 w-4" />
+                  <span className="sr-only">Modifier</span>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => onDeleteComment(comment.id)}
+                  className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
+                >
+                  <Trash className="h-4 w-4" />
+                  <span className="sr-only">Supprimer</span>
+                </Button>
+              </div>
+            )}
           </div>
+          
           <p className="text-getigne-700">{comment.content}</p>
+          
+          {/* Indicateur de statut pour les commentaires de l'utilisateur */}
+          {comment.user_id === user?.id && comment.status !== 'approved' && (
+            <div className="mt-2 text-sm">
+              {comment.status === 'pending' && (
+                <span className="text-amber-600">En attente d'approbation</span>
+              )}
+              {comment.status === 'rejected' && (
+                <span className="text-red-600">Rejeté par un modérateur</span>
+              )}
+            </div>
+          )}
         </div>
       ))}
     </div>
