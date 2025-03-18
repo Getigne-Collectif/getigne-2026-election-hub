@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown } from 'lucide-react';
+import { Menu, ChevronDown, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from './AuthButton';
+import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,6 +94,14 @@ const Navbar = () => {
           Adhérer
         </Link>
       </li>
+      {isAdmin && (
+        <li>
+          <Link to="/admin/users" className={`${isActive('/admin/users')} flex items-center`}>
+            <Shield className="h-4 w-4 mr-1" />
+            Administration
+          </Link>
+        </li>
+      )}
     </>
   );
 

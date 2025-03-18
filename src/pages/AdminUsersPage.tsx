@@ -25,10 +25,20 @@ interface UserWithRoles {
 }
 
 const AdminUsersPage = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, userRoles } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    // Ajouter des logs pour déboguer l'état de l'authentification
+    console.log("AdminUsersPage - Auth state:", { 
+      user: user?.id, 
+      isAdmin, 
+      userRoles 
+    });
+  }, [user, isAdmin, userRoles]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -134,8 +144,33 @@ const AdminUsersPage = () => {
   };
 
   useEffect(() => {
+    const checkAuth = async () => {
+      // Attendre que le statut d'authentification soit chargé
+      if (user === null || (user && userRoles.length > 0)) {
+        setAuthChecked(true);
+      }
+    };
+    
+    checkAuth();
+  }, [user, userRoles]);
+
+  useEffect(() => {
+    if (!authChecked) return;
+    
     // Rediriger si l'utilisateur n'est pas admin
+    if (!user) {
+      console.log("AdminUsersPage - Redirection: User not authenticated");
+      toast({
+        title: 'Accès refusé',
+        description: "Veuillez vous connecter pour accéder à cette page.",
+        variant: 'destructive'
+      });
+      navigate('/auth');
+      return;
+    }
+    
     if (user && !isAdmin) {
+      console.log("AdminUsersPage - Redirection: User not admin", { userRoles });
       toast({
         title: 'Accès refusé',
         description: "Vous n'avez pas les droits d'accès à cette page.",
@@ -146,9 +181,10 @@ const AdminUsersPage = () => {
     }
 
     if (user && isAdmin) {
+      console.log("AdminUsersPage - Fetching users as admin");
       fetchUsers();
     }
-  }, [user, isAdmin, navigate]);
+  }, [user, isAdmin, authChecked, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -156,7 +192,11 @@ const AdminUsersPage = () => {
       <main className="flex-grow container mx-auto px-4 py-10">
         <h1 className="text-3xl font-bold mb-8">Administration des utilisateurs</h1>
         
-        {!user ? (
+        {!authChecked ? (
+          <div className="text-center py-10">
+            <p>Vérification des droits d'accès...</p>
+          </div>
+        ) : !user ? (
           <div className="text-center py-10">
             <p>Veuillez vous connecter pour accéder à l'administration.</p>
           </div>
