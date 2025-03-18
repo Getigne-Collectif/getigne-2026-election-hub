@@ -20,8 +20,18 @@ interface Profile {
   id: string;
   first_name: string;
   last_name: string;
+  email?: string;
   status?: string;
   [key: string]: string | number | object | boolean | undefined;
+}
+
+interface InvitedUser {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
+  status: string;
 }
 
 interface UserWithRoles {
@@ -62,7 +72,7 @@ const AdminUsersPage = () => {
         return;
       }
 
-      // Récupérer les utilisateurs invités également
+      // Récupérer les utilisateurs invités
       const { data: invitedUsers, error: invitedError } = await supabase
         .from('invited_users')
         .select('*');
@@ -88,9 +98,9 @@ const AdminUsersPage = () => {
       );
 
       // Ajouter les utilisateurs invités
-      const allUsers = [...profilesData];
+      const allUsers: UserWithRoles[] = [...profilesData];
       if (invitedUsers && invitedUsers.length > 0) {
-        invitedUsers.forEach((invited: any) => {
+        invitedUsers.forEach((invited: InvitedUser) => {
           allUsers.push({
             id: invited.id,
             email: invited.email,

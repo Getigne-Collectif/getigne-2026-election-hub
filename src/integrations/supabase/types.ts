@@ -212,6 +212,33 @@ export type Database = {
           },
         ]
       }
+      invited_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       news: {
         Row: {
           category: string
@@ -254,23 +281,29 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email: string | null
           first_name: string
           id: string
           last_name: string
+          status: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          email?: string | null
           first_name: string
           id: string
           last_name: string
+          status?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          email?: string | null
           first_name?: string
           id?: string
           last_name?: string
+          status?: string | null
           updated_at?: string
         }
         Relationships: []
