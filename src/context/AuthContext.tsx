@@ -7,6 +7,9 @@ interface AuthContextType {
   user: User | null;
   profile: any;
   loading: boolean;
+  userRoles: string[];
+  isAdmin: boolean;
+  isModerator: boolean;
   setUser: (user: User | null) => void;
   signOut: () => Promise<void>;
   signInWithProvider: (provider: 'discord' | 'facebook' | 'google') => Promise<void>;
@@ -16,6 +19,9 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
   loading: true,
+  userRoles: [],
+  isAdmin: false,
+  isModerator: false,
   setUser: () => {},
   signOut: async () => {},
   signInWithProvider: async () => {}
@@ -30,6 +36,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -56,6 +63,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Fonction pour récupérer les rôles de l'utilisateur
+  const fetchUserRoles = async (userId: string) => {
+    try {
+      console.log('Fetching roles for user:', userId);
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error('Error fetching user roles:', error);
+        return [];
+      }
+      
+      // Extraire la liste des rôles
+      const roles = data.map(item => item.role);
+      console.log('User roles retrieved:', roles);
+      return roles;
+    } catch (error) {
+      console.error('Exception when fetching user roles:', error);
+      return [];
+    }
+  };
+
   // Initialise l'état d'authentification au chargement
   useEffect(() => {
     const initializeAuth = async () => {
@@ -72,15 +103,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             console.log('Setting profile data:', profileData);
             setProfile(profileData);
           }
+          
+          const roles = await fetchUserRoles(session.user.id);
+          setUserRoles(roles);
         } else {
           console.log('No session found, user is not authenticated');
           setUser(null);
           setProfile(null);
+          setUserRoles([]);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
         setUser(null);
         setProfile(null);
+        setUserRoles([]);
       } finally {
         setLoading(false);
         setAuthInitialized(true);
@@ -108,9 +144,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (profileData) {
             setProfile(profileData);
           }
+          
+          // Récupérer les rôles de l'utilisateur
+          const roles = await fetchUserRoles(session.user.id);
+          setUserRoles(roles);
         } else {
           setUser(null);
           setProfile(null);
+          setUserRoles([]);
         }
       }
     );
@@ -132,6 +173,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('Sign out successful');
       setUser(null);
       setProfile(null);
+      setUserRoles([]);
       
       // Forcer un rechargement de la page pour effacer toutes les données en cache
       window.location.href = '/';
@@ -157,12 +199,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Vérifier si l'utilisateur a un rôle spécifique
+  const isAdmin = userRoles.includes('admin');
+  const isModerator = userRoles.includes('moderator') || isAdmin; // Un admin est aussi modérateur
+
   return (
     <AuthContext.Provider 
       value={{ 
         user, 
         profile, 
         loading, 
+        userRoles,
+        isAdmin,
+        isModerator,
         setUser, 
         signOut, 
         signInWithProvider 
