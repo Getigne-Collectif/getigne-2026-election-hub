@@ -88,7 +88,7 @@ const AdminUsersPage = () => {
           return {
             id: profile.id,
             email: profile.email || '',
-            created_at: profile.created_at,
+            created_at: String(profile.created_at), // Ensure it's a string
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
             status: profile.status || 'active',
@@ -104,7 +104,7 @@ const AdminUsersPage = () => {
           allUsers.push({
             id: invited.id,
             email: invited.email,
-            created_at: invited.created_at,
+            created_at: String(invited.created_at), // Ensure it's a string
             first_name: invited.first_name || '',
             last_name: invited.last_name || '',
             status: 'invited',
