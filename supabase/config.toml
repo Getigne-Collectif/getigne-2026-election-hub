@@ -1,1 +1,9 @@
+
 project_id = "jqpivqdwblrccjzicnxn"
+
+[api]
+enabled = true
+url = "https://jqpivqdwblrccjzicnxn.supabase.co"
+
+[functions.invite-user]
+verify_jwt = true

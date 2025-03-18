@@ -20,7 +20,8 @@ interface Profile {
   id: string;
   first_name: string;
   last_name: string;
-  [key: string]: string | number | object | boolean;
+  status?: string;
+  [key: string]: string | number | object | boolean | undefined;
 }
 
 interface UserWithRoles {
@@ -29,7 +30,14 @@ interface UserWithRoles {
   created_at: string;
   first_name: string;
   last_name: string;
+  status?: string;
   roles: string[];
+}
+
+interface InviteUserData {
+  first_name: string;
+  last_name: string;
+  email: string;
 }
 
 const AdminUsersPage = () => {
@@ -42,8 +50,7 @@ const AdminUsersPage = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Instead of using the admin API, we'll query the auth.users indirectly
-      // First, get all profiles from the profiles table
+      // Récupérer tous les profils de la table profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
@@ -55,28 +62,48 @@ const AdminUsersPage = () => {
         return;
       }
 
-      // Get user roles for each profile
-      const usersData: UserWithRoles[] = await Promise.all(
-        profiles.map(async (profile) => {
-          // Get user roles
-          // @ts-expect-error - don't know why
-          const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
+      // Récupérer les utilisateurs invités également
+      const { data: invitedUsers, error: invitedError } = await supabase
+        .from('invited_users')
+        .select('*');
 
-          // Get user email from auth metadata if available
-          // Note: we won't have access to this directly, so we'll use what's available
+      if (invitedError) console.error("Erreur lors de la récupération des invitations:", invitedError);
+
+      // Convertir les profils en utilisateurs avec rôles
+      const profilesData = await Promise.all(
+        profiles.map(async (profile: Profile) => {
+          // Récupérer les rôles de l'utilisateur
+          const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
 
           return {
             id: profile.id,
-            email: '', // We don't have direct access to emails
+            email: profile.email || '',
             created_at: profile.created_at,
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
+            status: profile.status || 'active',
             roles: roles || []
           };
         })
       );
 
-      setUsers(usersData);
+      // Ajouter les utilisateurs invités
+      const allUsers = [...profilesData];
+      if (invitedUsers && invitedUsers.length > 0) {
+        invitedUsers.forEach((invited: any) => {
+          allUsers.push({
+            id: invited.id,
+            email: invited.email,
+            created_at: invited.created_at,
+            first_name: invited.first_name || '',
+            last_name: invited.last_name || '',
+            status: 'invited',
+            roles: []
+          });
+        });
+      }
+
+      setUsers(allUsers);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
       toast({
@@ -126,6 +153,60 @@ const AdminUsersPage = () => {
         description: error.message || "Une erreur est survenue lors de la modification du rôle.",
         variant: 'destructive'
       });
+    }
+  };
+
+  const handleInviteUser = async (userData: InviteUserData) => {
+    try {
+      console.log("Inviting user:", userData);
+
+      // Stocker l'invitation dans la table invited_users
+      const { error: insertError } = await supabase
+        .from('invited_users')
+        .insert({
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name
+        });
+
+      if (insertError) throw insertError;
+
+      // Envoyer l'invitation via la fonction edge
+      const { error: inviteError } = await supabase.functions.invoke('invite-user', {
+        body: {
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name
+        }
+      });
+
+      if (inviteError) throw inviteError;
+
+      // Rafraîchir la liste des utilisateurs
+      await fetchUsers();
+    } catch (error: any) {
+      console.error('Erreur lors de l\'invitation:', error);
+      throw error;
+    }
+  };
+
+  const handleToggleUserStatus = async (userId: string, isActive: boolean) => {
+    try {
+      const newStatus = isActive ? 'active' : 'disabled';
+      
+      // Mettre à jour le statut dans la table profiles
+      const { error } = await supabase
+        .from('profiles')
+        .update({ status: newStatus })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      // Rafraîchir la liste des utilisateurs
+      await fetchUsers();
+    } catch (error: any) {
+      console.error('Erreur lors de la modification du statut:', error);
+      throw error;
     }
   };
 
@@ -230,6 +311,8 @@ const AdminUsersPage = () => {
                   users={users}
                   loading={loading}
                   onRoleChange={handleRoleChange}
+                  onInviteUser={handleInviteUser}
+                  onToggleUserStatus={handleToggleUserStatus}
                 />
               )}
             </div>
