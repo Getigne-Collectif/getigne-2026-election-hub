@@ -21,8 +21,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isMember, setIsMember] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [sessionExpiryTimer, setSessionExpiryTimer] = useState<NodeJS.Timeout | null>(null);
-  const [visibilityState, setVisibilityState] = useState<string>(document.visibilityState);
-  const [lastVisibilityChange, setLastVisibilityChange] = useState<number>(Date.now());
   const { toast } = useToast();
 
   // Function to refresh user roles
@@ -207,35 +205,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAuthChecked(true);
     }
   };
-
-  // Handle tab visibility change
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      const now = Date.now();
-      const newVisibilityState = document.visibilityState;
-      console.log('[AUTH] Visibility changed:', newVisibilityState);
-      setVisibilityState(newVisibilityState);
-      
-      // If the tab becomes visible and more than 2 seconds have passed since the last change
-      // This prevents double refreshes when switching tabs rapidly
-      if (newVisibilityState === 'visible' && (now - lastVisibilityChange) > 2000) {
-        console.log('[AUTH] Tab became visible, refreshing session');
-        setLastVisibilityChange(now);
-        // Use a slight delay to ensure browser has fully restored state
-        setTimeout(() => {
-          refreshSession();
-        }, 100);
-      } else if (newVisibilityState === 'hidden') {
-        setLastVisibilityChange(now);
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [lastVisibilityChange]);
 
   // Initial authentication setup
   useEffect(() => {

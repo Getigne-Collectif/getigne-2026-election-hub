@@ -14,34 +14,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: true,
     autoRefreshToken: true,
     storageKey: 'getigne-auth-token',
-    storage: {
-      getItem: (key) => {
-        try {
-          const value = localStorage.getItem(key);
-          console.log(`[AUTH] Retrieved storage for key ${key}: ${value ? 'found' : 'not found'}`);
-          return value;
-        } catch (error) {
-          console.error(`[AUTH] Error accessing localStorage for key ${key}:`, error);
-          return null;
-        }
-      },
-      setItem: (key, value) => {
-        try {
-          localStorage.setItem(key, value);
-          console.log(`[AUTH] Set storage for key ${key}`);
-        } catch (error) {
-          console.error(`[AUTH] Error setting localStorage for key ${key}:`, error);
-        }
-      },
-      removeItem: (key) => {
-        try {
-          localStorage.removeItem(key);
-          console.log(`[AUTH] Removed storage for key ${key}`);
-        } catch (error) {
-          console.error(`[AUTH] Error removing localStorage for key ${key}:`, error);
-        }
-      },
-    },
     detectSessionInUrl: true,
     flowType: 'pkce',
   }
