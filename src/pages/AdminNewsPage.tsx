@@ -119,10 +119,11 @@ const AdminNewsPage = () => {
 
   const handleUpdateNews = async (id: string, formData: Partial<NewsFormData>, status?: string) => {
     try {
-      const updateData = {
-        ...formData,
-        ...(status && { status })
-      };
+      let updateData: any = { ...formData };
+      
+      if (status !== undefined) {
+        updateData.status = status;
+      }
 
       const { error } = await supabase
         .from('news')
@@ -162,7 +163,7 @@ const AdminNewsPage = () => {
         description: `L'article a été supprimé avec succès.`
       });
 
-      await fetchNewsArticles();
+      setNewsArticles(prevArticles => prevArticles.filter(article => article.id !== id));
     } catch (error: any) {
       console.error('Erreur lors de la suppression de l\'article:', error);
       toast({
@@ -201,6 +202,20 @@ const AdminNewsPage = () => {
       fetchNewsArticles();
     }
   }, [user, isAdmin, authChecked, navigate]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user && isAdmin && authChecked) {
+        fetchNewsArticles();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user, isAdmin, authChecked]);
 
   return (
     <div>
