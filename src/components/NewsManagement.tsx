@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -45,6 +46,15 @@ interface NewsArticle {
   status: string;
 }
 
+interface NewsFormValues {
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  image: string;
+  tags: string[];
+}
+
 interface NewsManagementProps {
   news: NewsArticle[];
   loading: boolean;
@@ -53,17 +63,19 @@ interface NewsManagementProps {
   onDeleteNews: (id: string) => Promise<void>;
 }
 
-// Schéma de validation pour le formulaire d'article
+// Schema with custom transform for tags
 const newsFormSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères"),
   excerpt: z.string().min(10, "Le résumé doit contenir au moins 10 caractères"),
   content: z.string().min(50, "Le contenu doit contenir au moins 50 caractères"),
   category: z.string().min(2, "La catégorie est requise"),
   image: z.string().url("L'URL de l'image doit être valide"),
+  // We represent tags as string in the form but transform it to string[] for the API
   tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()) : []),
 });
 
-type NewsFormValues = z.infer<typeof newsFormSchema>;
+// Define the form values type from the schema
+type FormValues = z.infer<typeof newsFormSchema>;
 
 const NewsManagement: React.FC<NewsManagementProps> = ({ 
   news, 
@@ -80,7 +92,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Formulaire de création/édition
-  const form = useForm<NewsFormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(newsFormSchema),
     defaultValues: {
       title: "",
@@ -127,10 +139,15 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   };
 
   // Gérer la création d'un article
-  const handleCreateNews = async (values: NewsFormValues, status: 'draft' | 'published') => {
+  const handleCreateNews = async (values: FormValues, status: 'draft' | 'published') => {
     setIsSubmitting(true);
     try {
-      await onCreateNews(values, status);
+      // The schema has already transformed tags string to array
+      await onCreateNews({
+        ...values,
+        tags: Array.isArray(values.tags) ? values.tags : []
+      }, status);
+      
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error("Error creating news article:", error);
@@ -140,12 +157,17 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   };
 
   // Gérer la mise à jour d'un article
-  const handleUpdateNews = async (values: NewsFormValues) => {
+  const handleUpdateNews = async (values: FormValues) => {
     if (!selectedArticle) return;
     
     setIsSubmitting(true);
     try {
-      await onUpdateNews(selectedArticle.id, values);
+      // The schema has already transformed tags string to array
+      await onUpdateNews(selectedArticle.id, {
+        ...values,
+        tags: Array.isArray(values.tags) ? values.tags : []
+      });
+      
       setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating news article:", error);
