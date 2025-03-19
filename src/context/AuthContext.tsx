@@ -70,28 +70,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('Fetching roles for user:', userId);
       
-      const { data, error } = await supabase.rpc('get_user_roles', { uid: userId });
-      
-      if (error) {
-        console.error('Error fetching user roles via RPC:', error);
-        
-        const { data: rolesData, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId);
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
           
-        if (rolesError) {
-          console.error('Error fetching user roles from table:', rolesError);
-          return [];
-        }
-        
-        const roles = rolesData.map(item => item.role as Role);
-        console.log('User roles retrieved from table:', roles);
-        return roles;
+      if (rolesError) {
+        console.error('Error fetching user roles from table:', rolesError);
+        return [];
       }
       
-      console.log('User roles retrieved via RPC:', data);
-      return data as Role[] || [];
+      const roles = rolesData.map(item => item.role as Role);
+      console.log('User roles retrieved from direct query:', roles);
+      return roles;
     } catch (error) {
       console.error('Exception when fetching user roles:', error);
       return [];

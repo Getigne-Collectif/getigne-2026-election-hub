@@ -16,7 +16,6 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import { Home } from "lucide-react";
-import { Json } from '@/integrations/supabase/types';
 
 interface NewsArticle {
   id: string;
@@ -50,6 +49,7 @@ const AdminNewsPage = () => {
   const fetchNewsArticles = async () => {
     setPageLoading(true);
     try {
+      // Use a more direct approach with the service role if possible, but here we'll try a simpler query
       const { data, error } = await supabase
         .from('news')
         .select('*')
@@ -221,6 +221,7 @@ const AdminNewsPage = () => {
       return;
     }
 
+    // Add manual admin check if needed for testing
     if (user && !isAdmin) {
       toast({
         title: 'Accès refusé',
@@ -232,6 +233,7 @@ const AdminNewsPage = () => {
     }
 
     if (user && isAdmin) {
+      console.log("User is admin, fetching news articles");
       fetchNewsArticles();
     }
   }, [user, isAdmin, authChecked, navigate]);
