@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -64,7 +63,7 @@ const newsFormSchema = z.object({
   tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()) : []),
 });
 
-type NewsFormValues = z.infer<typeof newsFormSchema> & { tags: string[] };
+type NewsFormValues = z.infer<typeof newsFormSchema>;
 
 const NewsManagement: React.FC<NewsManagementProps> = ({ 
   news, 
@@ -89,7 +88,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
       content: "",
       category: "",
       image: "",
-      tags: [],
+      tags: "",
     },
   });
 
@@ -102,7 +101,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: selectedArticle.content,
         category: selectedArticle.category,
         image: selectedArticle.image,
-        tags: selectedArticle.tags,
+        tags: prepareTagsForForm(selectedArticle.tags),
       });
     }
   }, [selectedArticle, isEditDialogOpen, form]);
@@ -116,7 +115,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: "",
         category: "",
         image: "",
-        tags: [],
+        tags: "",
       });
     }
   }, [isCreateDialogOpen, form]);
@@ -127,23 +126,11 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     return tags.join(', ');
   };
 
-  // Get form values for tags as comma-separated string for display
-  const getTagsDisplayValue = () => {
-    const tags = form.getValues('tags');
-    return Array.isArray(tags) ? tags.join(', ') : tags || '';
-  };
-
   // Gérer la création d'un article
-  const handleCreateNews = async (values: z.infer<typeof newsFormSchema>, status: 'draft' | 'published') => {
+  const handleCreateNews = async (values: NewsFormValues, status: 'draft' | 'published') => {
     setIsSubmitting(true);
     try {
-      // Ensure tags is an array
-      const formData = {
-        ...values,
-        tags: Array.isArray(values.tags) ? values.tags : []
-      };
-      
-      await onCreateNews(formData as NewsFormValues, status);
+      await onCreateNews(values, status);
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error("Error creating news article:", error);
@@ -153,18 +140,12 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   };
 
   // Gérer la mise à jour d'un article
-  const handleUpdateNews = async (values: z.infer<typeof newsFormSchema>) => {
+  const handleUpdateNews = async (values: NewsFormValues) => {
     if (!selectedArticle) return;
     
     setIsSubmitting(true);
     try {
-      // Ensure tags is an array
-      const formData = {
-        ...values,
-        tags: Array.isArray(values.tags) ? values.tags : []
-      };
-      
-      await onUpdateNews(selectedArticle.id, formData);
+      await onUpdateNews(selectedArticle.id, values);
       setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating news article:", error);

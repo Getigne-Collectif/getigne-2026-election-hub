@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -16,6 +15,7 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import { Home } from "lucide-react";
+import { Json } from '@/integrations/supabase/types';
 
 interface NewsArticle {
   id: string;

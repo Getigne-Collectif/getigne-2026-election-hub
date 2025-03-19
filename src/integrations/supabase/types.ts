@@ -248,6 +248,7 @@ export type Database = {
           excerpt: string
           id: string
           image: string
+          status: string
           tags: Json | null
           title: string
           updated_at: string
@@ -260,6 +261,7 @@ export type Database = {
           excerpt: string
           id?: string
           image: string
+          status?: string
           tags?: Json | null
           title: string
           updated_at?: string
@@ -272,6 +274,7 @@ export type Database = {
           excerpt?: string
           id?: string
           image?: string
+          status?: string
           tags?: Json | null
           title?: string
           updated_at?: string
