@@ -47,7 +47,7 @@ const AdminNewsPage = () => {
   const [pageLoading, setPageLoading] = useState(true);
 
   const fetchNewsArticles = async () => {
-    setLoading(true);
+    setPageLoading(true);
     try {
       const { data, error } = await supabase
         .from('news')
@@ -80,7 +80,7 @@ const AdminNewsPage = () => {
         variant: 'destructive'
       });
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
 

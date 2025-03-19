@@ -56,7 +56,7 @@ const AdminUsersPage = () => {
   const [pageLoading, setPageLoading] = useState(true);
 
   const fetchUsers = async () => {
-    setLoading(true);
+    setPageLoading(true);
     try {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
@@ -115,7 +115,7 @@ const AdminUsersPage = () => {
         variant: 'destructive'
       });
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
 
@@ -237,68 +237,68 @@ const AdminUsersPage = () => {
   }, [user, isAdmin, authChecked, navigate]);
 
   return (
-      <div>
-        <div className="min-h-screen">
-          <Navbar />
+    <div>
+      <div className="min-h-screen">
+        <Navbar />
 
-          <div className="pt-24 pb-12 bg-getigne-50">
-            <div className="container mx-auto px-4">
-              <Breadcrumb className="mb-6">
-                <BreadcrumbList>
-                  <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
-                      <Home className="h-4 w-4 mr-1" />
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Administration</BreadcrumbPage>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Utilisateurs</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
+        <div className="pt-24 pb-12 bg-getigne-50">
+          <div className="container mx-auto px-4">
+            <Breadcrumb className="mb-6">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">
+                    <Home className="h-4 w-4 mr-1" />
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Administration</BreadcrumbPage>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Utilisateurs</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
 
-              <div className="max-w-3xl mx-auto text-center">
-                <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-                  Administration
-                </span>
-                <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Utilisateurs</h1>
-                <p className="text-getigne-700 text-lg mb-6">
-                  Gérez les utilisateurs et leurs rôles.
-                </p>
-              </div>
+            <div className="max-w-3xl mx-auto text-center">
+              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+                Administration
+              </span>
+              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Utilisateurs</h1>
+              <p className="text-getigne-700 text-lg mb-6">
+                Gérez les utilisateurs et leurs rôles.
+              </p>
             </div>
           </div>
-
-          <section className="py-16">
-            <div className="container mx-auto px-4">
-              {!authChecked || loading ? (
-                <div className="text-center py-10">
-                  <p>Vérification des droits d'accès...</p>
-                </div>
-              ) : !user ? (
-                <div className="text-center py-10">
-                  <p>Veuillez vous connecter pour accéder à l'administration.</p>
-                </div>
-              ) : !isAdmin ? (
-                <div className="text-center py-10">
-                  <p>Vous n'avez pas les droits pour accéder à cette page.</p>
-                </div>
-              ) : (
-                <UserManagement
-                  users={users}
-                  loading={pageLoading}
-                  onRoleChange={handleRoleChange}
-                  onInviteUser={handleInviteUser}
-                  onToggleUserStatus={handleToggleUserStatus}
-                />
-              )}
-            </div>
-          </section>
         </div>
+
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            {!authChecked || loading ? (
+              <div className="text-center py-10">
+                <p>Vérification des droits d'accès...</p>
+              </div>
+            ) : !user ? (
+              <div className="text-center py-10">
+                <p>Veuillez vous connecter pour accéder à l'administration.</p>
+              </div>
+            ) : !isAdmin ? (
+              <div className="text-center py-10">
+                <p>Vous n'avez pas les droits pour accéder à cette page.</p>
+              </div>
+            ) : (
+              <UserManagement
+                users={users}
+                loading={pageLoading}
+                onRoleChange={handleRoleChange}
+                onInviteUser={handleInviteUser}
+                onToggleUserStatus={handleToggleUserStatus}
+              />
+            )}
+          </div>
+        </section>
+      </div>
       <Footer />
     </div>
   );
