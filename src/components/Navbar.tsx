@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, ChevronDown, Shield } from 'lucide-react';
@@ -10,6 +11,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { isAdmin, user, refreshUserRoles } = useAuth();
+  const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,14 +32,22 @@ const Navbar = () => {
       : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200';
   };
 
+  // Modified useEffect to prevent infinite loop
   useEffect(() => {
-    // Log admin status for debugging and refresh user roles on initial load
-    if (user) {
+    // Only refresh roles on initial load or when user changes
+    if (user && !hasRefreshedRoles) {
       console.log('Navbar admin status check:', { isAdmin, userId: user.id });
-      // S'assurer que les rôles sont à jour au chargement de la navbar
       refreshUserRoles();
+      setHasRefreshedRoles(true);
     }
-  }, [isAdmin, user, refreshUserRoles]);
+  }, [user, refreshUserRoles, isAdmin, hasRefreshedRoles]);
+
+  // Reset the refresh flag when user changes
+  useEffect(() => {
+    if (user === null) {
+      setHasRefreshedRoles(false);
+    }
+  }, [user]);
 
   const NavLinks = () => (
     <>
