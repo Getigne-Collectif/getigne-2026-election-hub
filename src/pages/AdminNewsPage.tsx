@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -92,12 +93,19 @@ const AdminNewsPage = () => {
         status
       };
 
+      console.log('Creating new article with data:', newArticle);
+
       const { data, error } = await supabase
         .from('news')
         .insert(newArticle)
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error during insert:', error);
+        throw error;
+      }
+
+      console.log('Successfully created article, response:', data);
 
       toast({
         title: 'Succès',
@@ -125,12 +133,21 @@ const AdminNewsPage = () => {
         updateData.status = status;
       }
 
-      const { error } = await supabase
+      console.log('Updating article with ID:', id);
+      console.log('Update data:', updateData);
+
+      const { error, data } = await supabase
         .from('news')
         .update(updateData)
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error during update:', error);
+        throw error;
+      }
+
+      console.log('Update response:', data);
 
       toast({
         title: 'Succès',
@@ -151,12 +168,19 @@ const AdminNewsPage = () => {
 
   const handleDeleteNews = async (id: string) => {
     try {
+      console.log('Deleting article with ID:', id);
+
       const { error } = await supabase
         .from('news')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error during delete:', error);
+        throw error;
+      }
+
+      console.log('Successfully deleted article');
 
       toast({
         title: 'Succès',
