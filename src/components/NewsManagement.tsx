@@ -104,7 +104,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: selectedArticle.content,
         category: selectedArticle.category,
         image: selectedArticle.image,
-        tags: selectedArticle.tags.join(', '),
+        tags: selectedArticle.tags.join(', '), // Convertir le tableau en chaîne pour le formulaire
       });
     }
   }, [selectedArticle, isEditDialogOpen, form]);

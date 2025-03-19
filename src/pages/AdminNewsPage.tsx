@@ -57,14 +57,14 @@ const AdminNewsPage = () => {
 
       if (error) throw error;
 
-      // Transform the data to include status (for now, all articles are considered "published")
+      // Transform the data to ensure consistent types
       const transformedData = data.map(article => ({
         ...article,
         status: article.status || 'published',
-        tags: article.tags || []
+        tags: Array.isArray(article.tags) ? article.tags : []
       }));
 
-      setNewsArticles(transformedData);
+      setNewsArticles(transformedData as NewsArticle[]);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des actualités:', error);
       toast({
