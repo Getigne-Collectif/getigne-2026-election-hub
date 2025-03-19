@@ -19,7 +19,6 @@ import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import { Mail } from 'lucide-react';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 
-// Schéma de validation pour l'inscription
 const signUpSchema = z.object({
   first_name: z.string().min(2, { message: 'Le prénom doit contenir au moins 2 caractères' }),
   last_name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
@@ -27,7 +26,6 @@ const signUpSchema = z.object({
   password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' })
 });
 
-// Schéma de validation pour la connexion
 const signInSchema = z.object({
   email: z.string().email({ message: 'Veuillez entrer une adresse email valide' }),
   password: z.string().min(1, { message: 'Veuillez entrer votre mot de passe' })
@@ -43,7 +41,6 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { setUser, signInWithProvider } = useAuth();
 
-  // Formulaire d'inscription
   const signUpForm = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -54,7 +51,6 @@ const AuthPage = () => {
     }
   });
 
-  // Formulaire de connexion
   const signInForm = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -63,7 +59,6 @@ const AuthPage = () => {
     }
   });
 
-  // Fonction d'inscription
   const handleSignUp = async (values: SignUpFormValues) => {
     setLoading(true);
     try {
@@ -85,7 +80,6 @@ const AuthPage = () => {
       if (data?.user) {
         setUser(data.user);
         
-        // Envoyer notification Discord
         await sendDiscordNotification({
           title: `👤 Nouvel utilisateur inscrit`,
           message: `
@@ -151,7 +145,6 @@ const AuthPage = () => {
     }
   };
 
-  // Gérer la connexion avec un fournisseur tiers
   const handleSsoSignIn = async (provider: 'discord' | 'facebook' | 'google') => {
     try {
       setSsoLoading(provider);
