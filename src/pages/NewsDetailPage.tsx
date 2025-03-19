@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -7,7 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import NotFound from './NotFound';
-import Comments from '@/components/Comments';
+import CommentsSection from '@/components/newsDetail/CommentsSection';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -242,7 +241,7 @@ const NewsDetailPage = () => {
             </div>
 
             {/* Système de commentaires */}
-            {id && <Comments newsId={id} />}
+            {id && <CommentsSection newsId={id} />}
 
             {relatedArticles.length > 0 && (
               <div className="mt-16 border-t border-getigne-100 pt-8">
