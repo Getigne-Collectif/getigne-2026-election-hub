@@ -159,8 +159,48 @@ export type Database = {
           },
         ]
       }
+      event_registrations: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_registrations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
+          allow_registration: boolean | null
           committee: string | null
           committee_id: string | null
           content: string | null
@@ -175,6 +215,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allow_registration?: boolean | null
           committee?: string | null
           committee_id?: string | null
           content?: string | null
@@ -189,6 +230,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allow_registration?: boolean | null
           committee?: string | null
           committee_id?: string | null
           content?: string | null
@@ -287,6 +329,7 @@ export type Database = {
           email: string | null
           first_name: string
           id: string
+          is_member: boolean | null
           last_name: string
           status: string | null
           updated_at: string
@@ -296,6 +339,7 @@ export type Database = {
           email?: string | null
           first_name: string
           id: string
+          is_member?: boolean | null
           last_name: string
           status?: string | null
           updated_at?: string
@@ -305,6 +349,7 @@ export type Database = {
           email?: string | null
           first_name?: string
           id?: string
+          is_member?: boolean | null
           last_name?: string
           status?: string | null
           updated_at?: string

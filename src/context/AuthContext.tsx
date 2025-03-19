@@ -1,267 +1,201 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
-import { toast } from '@/components/ui/use-toast';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
-type Role = 'admin' | 'moderator' | 'user';
-
-interface AuthContextType {
-  user: User | null;
-  profile: any;
+interface IAuthContext {
+  user: any | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  signOut: () => Promise<void>;
   loading: boolean;
-  authChecked: boolean;
-  userRoles: Role[];
   isAdmin: boolean;
   isModerator: boolean;
-  setUser: (user: User | null) => void;
-  signOut: () => Promise<void>;
-  signInWithProvider: (provider: 'discord' | 'facebook' | 'google') => Promise<void>;
+  isMember: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<IAuthContext>({
   user: null,
-  profile: null,
+  signIn: async () => {},
+  signUp: async () => {},
+  signOut: async () => {},
   loading: true,
-  authChecked: false,
-  userRoles: [],
   isAdmin: false,
   isModerator: false,
-  setUser: () => {},
-  signOut: async () => {},
-  signInWithProvider: async () => {}
+  isMember: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [userRoles, setUserRoles] = useState<Role[]>([]);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [authInitialized, setAuthInitialized] = useState(false);
-
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      console.log('Fetching profile for user:', userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-      
-      console.log('Profile data retrieved:', data);
-      return data;
-    } catch (error) {
-      console.error('Exception when fetching profile:', error);
-      return null;
-    }
-  };
-
-  const fetchUserRoles = async (userId: string): Promise<Role[]> => {
-    try {
-      console.log('Fetching roles for user:', userId);
-      
-      // Utiliser la fonction RPC get_user_roles au lieu d'une requête directe
-      // Cette fonction est définie comme SECURITY DEFINER et évite les problèmes de récursion
-      const { data: rolesData, error: rolesError } = await supabase.rpc('get_user_roles', { uid: userId });
-          
-      if (rolesError) {
-        console.error('Error fetching user roles with RPC:', rolesError);
-        
-        // Fallback pour les tests seulement - à supprimer en production
-        const knownAdminEmails = ['leny.bernard@gmail.com']; 
-        const currentEmail = user?.email || '';
-        
-        if (knownAdminEmails.includes(currentEmail.toLowerCase())) {
-          console.log('User recognized as admin by email fallback');
-          return ['admin'];
-        }
-        
-        return [];
-      }
-      
-      // Convertir le résultat en tableau de rôles
-      const roles = Array.isArray(rolesData) ? rolesData : [rolesData];
-      console.log('User roles retrieved via RPC function:', roles);
-      
-      // Validation supplémentaire pour le débogage
-      if (roles.includes('admin')) {
-        console.log('User has admin role confirmed!');
-      }
-      
-      return roles as Role[];
-    } catch (error) {
-      console.error('Exception when fetching user roles:', error);
-      
-      // Fallback pour les tests seulement - à supprimer en production
-      const knownAdminEmails = ['leny.bernard@gmail.com'];
-      const currentEmail = user?.email || '';
-      
-      if (knownAdminEmails.includes(currentEmail.toLowerCase())) {
-        console.log('User recognized as admin by email in catch block');
-        return ['admin'];
-      }
-      
-      return [];
-    }
-  };
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [isMember, setIsMember] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      setLoading(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
+    const fetchUserData = async () => {
+      // Get the current user from Supabase
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // If there's a user, fetch their roles
+      if (user) {
+        setUser(user);
         
-        if (session?.user) {
-          console.log('Session found, user is authenticated:', session.user.id);
-          setUser(session.user);
-          
-          const profileData = await fetchUserProfile(session.user.id);
-          if (profileData) {
-            console.log('Setting profile data:', profileData);
-            setProfile(profileData);
-          }
-          
-          // Considérer l'email directement depuis la session
-          console.log('User email from session:', session.user.email);
-          
-          const roles = await fetchUserRoles(session.user.id);
-          console.log('Setting user roles:', roles);
-          setUserRoles(roles);
+        // Fetch user roles
+        const { data: rolesData, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        if (rolesError) {
+          console.error('Error fetching user roles:', rolesError);
         } else {
-          console.log('No session found, user is not authenticated');
-          setUser(null);
-          setProfile(null);
-          setUserRoles([]);
+          const roles = rolesData.map(r => r.role);
+          setUserRoles(roles);
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        setUser(null);
-        setProfile(null);
-        setUserRoles([]);
-      } finally {
-        setLoading(false);
-        setAuthInitialized(true);
-        setAuthChecked(true);
+
+        // Fetch user profile to check member status
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('is_member')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+        } else if (profileData) {
+          setIsMember(profileData.is_member === true);
+        }
       }
+
+      setLoading(false);
     };
 
-    initializeAuth();
+    // Initial fetch
+    fetchUserData();
+
+    // Set up auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user);
+        
+        // Fetch user roles
+        const { data: rolesData, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id);
+
+        if (rolesError) {
+          console.error('Error fetching user roles:', rolesError);
+        } else {
+          const roles = rolesData.map(r => r.role);
+          setUserRoles(roles);
+        }
+
+        // Fetch user profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('is_member')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+        } else if (profileData) {
+          setIsMember(profileData.is_member === true);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setUserRoles([]);
+        setIsMember(false);
+      }
+    });
+
+    // Cleanup
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
-  useEffect(() => {
-    if (!authInitialized) return;
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
-        
-        if (session?.user) {
-          setUser(session.user);
-          
-          const profileData = await fetchUserProfile(session.user.id);
-          console.log('Profile data after auth state change:', profileData);
-          
-          if (profileData) {
-            setProfile(profileData);
-          }
-          
-          const roles = await fetchUserRoles(session.user.id);
-          console.log('User roles after auth state change:', roles);
-          setUserRoles(roles);
-        } else {
-          setUser(null);
-          setProfile(null);
-          setUserRoles([]);
-        }
-      }
-    );
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [authInitialized]);
+      if (error) throw error;
+
+    } catch (error: any) {
+      toast({
+        title: 'Erreur de connexion',
+        description: error.message,
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Compte créé avec succès',
+        description: 'Vérifiez votre e-mail pour confirmer votre compte.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erreur d\'inscription',
+        description: error.message,
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
 
   const signOut = async () => {
     try {
-      console.log('Signing out...');
       const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error signing out:', error);
-        throw error;
-      }
-      
-      console.log('Sign out successful');
-      setUser(null);
-      setProfile(null);
-      setUserRoles([]);
-      
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error during sign out:', error);
-      throw error;
-    }
-  };
-
-  const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google'): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth`
-        }
-      });
-      
       if (error) throw error;
-    } catch (error) {
-      console.error(`Erreur de connexion avec ${provider}:`, error);
-      throw error;
+    } catch (error: any) {
+      toast({
+        title: 'Erreur de déconnexion',
+        description: error.message,
+        variant: 'destructive',
+      });
     }
   };
 
+  // Check if user has specific roles
   const isAdmin = userRoles.includes('admin');
   const isModerator = userRoles.includes('moderator') || isAdmin;
 
-  // Sortie de débogage pour aider au dépannage
-  useEffect(() => {
-    if (user) {
-      console.log('Auth status:', {
-        userId: user.id,
-        email: user.email,
-        userRoles,
-        isAdmin,
-        isModerator
-      });
-    }
-  }, [user, userRoles, isAdmin, isModerator]);
+  const value = {
+    user,
+    signIn,
+    signUp,
+    signOut,
+    loading,
+    isAdmin,
+    isModerator,
+    isMember,
+  };
 
-  return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        profile, 
-        loading, 
-        authChecked,
-        userRoles,
-        isAdmin,
-        isModerator,
-        setUser, 
-        signOut, 
-        signInWithProvider 
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthContext;

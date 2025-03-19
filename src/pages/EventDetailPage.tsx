@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import NotFound from './NotFound';
+import EventRegistration from '@/components/events/EventRegistration';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -26,6 +27,7 @@ interface Event {
   committee?: string;
   committee_id?: string;
   is_members_only?: boolean;
+  allow_registration?: boolean;
 }
 
 interface Committee {
@@ -56,58 +58,49 @@ const EventDetailPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchEvent();
+  }, [id]);
 
-    const fetchEvent = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('events')
+  const fetchEvent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      const eventData = data as Event;
+      setEvent(eventData);
+
+      // Fetch committee information if event is associated with one
+      if (eventData.committee_id) {
+        const { data: committeeData, error: committeeError } = await supabase
+          .from('citizen_committees')
           .select('*')
-          .eq('id', id)
+          .eq('id', eventData.committee_id)
           .single();
 
-        if (error) throw error;
-
-        const eventData = data as Event;
-        setEvent(eventData);
-
-        // Fetch committee information if event is associated with one
-        if (eventData.committee_id) {
-          const { data: committeeData, error: committeeError } = await supabase
-            .from('citizen_committees')
-            .select('*')
-            .eq('id', eventData.committee_id)
-            .single();
-
-          if (!committeeError && committeeData) {
-            setCommittee(committeeData as Committee);
-          }
+        if (!committeeError && committeeData) {
+          setCommittee(committeeData as Committee);
         }
+      }
 
-        // Fetch related events (same committee or recent events)
-        if (eventData.committee_id) {
-          const { data: committeeEvents } = await supabase
-            .from('events')
-            .select('*')
-            .eq('committee_id', eventData.committee_id)
-            .neq('id', id)
-            .order('date', { ascending: false })
-            .limit(3);
+      // Fetch related events (same committee or recent events)
+      if (eventData.committee_id) {
+        const { data: committeeEvents } = await supabase
+          .from('events')
+          .select('*')
+          .eq('committee_id', eventData.committee_id)
+          .neq('id', id)
+          .order('date', { ascending: false })
+          .limit(3);
 
-          if (committeeEvents && committeeEvents.length > 0) {
-            setRelatedEvents(committeeEvents as Event[]);
-          } else {
-            // If no committee events, fetch recent events
-            const { data: recentEvents } = await supabase
-              .from('events')
-              .select('*')
-              .neq('id', id)
-              .order('date', { ascending: false })
-              .limit(3);
-
-            setRelatedEvents(recentEvents as Event[] || []);
-          }
+        if (committeeEvents && committeeEvents.length > 0) {
+          setRelatedEvents(committeeEvents as Event[]);
         } else {
-          // If no committee, fetch recent events
+          // If no committee events, fetch recent events
           const { data: recentEvents } = await supabase
             .from('events')
             .select('*')
@@ -117,17 +110,25 @@ const EventDetailPage = () => {
 
           setRelatedEvents(recentEvents as Event[] || []);
         }
+      } else {
+        // If no committee, fetch recent events
+        const { data: recentEvents } = await supabase
+          .from('events')
+          .select('*')
+          .neq('id', id)
+          .order('date', { ascending: false })
+          .limit(3);
 
-        setLoading(false);
-      } catch (error) {
-        console.error('Erreur lors de la récupération de l\'événement:', error);
-        setError((error as Error).message);
-        setLoading(false);
+        setRelatedEvents(recentEvents as Event[] || []);
       }
-    };
 
-    fetchEvent();
-  }, [id]);
+      setLoading(false);
+    } catch (error) {
+      console.error('Erreur lors de la récupération de l\'événement:', error);
+      setError((error as Error).message);
+      setLoading(false);
+    }
+  };
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
@@ -172,6 +173,9 @@ const EventDetailPage = () => {
   // Get committee color
   const committeeColor = committee ? getCommitteeColor(committee.title) : "";
   const committeeTextColor = committeeColor.replace('bg-', 'text-');
+
+  // Default event.allow_registration to true if undefined (for backward compatibility)
+  const allowRegistration = event.allow_registration !== false;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -274,6 +278,19 @@ const EventDetailPage = () => {
                     <div dangerouslySetInnerHTML={{ __html: event.content }} className="mt-8"></div>
                   )}
                 </div>
+
+                {/* Registration component */}
+                {id && (
+                  <div className="mt-8">
+                    <EventRegistration 
+                      eventId={id}
+                      isMembersOnly={!!event.is_members_only}
+                      allowRegistration={allowRegistration}
+                      isPastEvent={isPastEvent}
+                      onRegistrationChange={fetchEvent}
+                    />
+                  </div>
+                )}
 
                 {/* Call to action - only show for members-only events */}
                 {event.is_members_only && (
