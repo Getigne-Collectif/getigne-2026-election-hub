@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,7 +53,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         .from('comments')
         .select(`
           *,
-          profiles:profiles!user_id(first_name, last_name)
+          profiles(first_name, last_name)
         `)
         .eq('news_id', newsId);
 
@@ -72,7 +73,17 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       }
       
       console.log('Fetched comments:', data);
-      setComments(data as Comment[]);
+      
+      // Transform the data to match our Comment interface
+      const transformedData = data?.map(item => {
+        // Handle the profiles property correctly
+        return {
+          ...item,
+          profiles: item.profiles?.[0] || null
+        };
+      }) || [];
+      
+      setComments(transformedData as Comment[]);
     } catch (error) {
       console.error('Erreur lors de la récupération des commentaires:', error);
     } finally {
