@@ -139,7 +139,7 @@ const AdminNewsPage = () => {
       console.log('Updating article with ID:', id);
       console.log('Complete update data:', updateData);
 
-      // Méthode directe avec upsert pour s'assurer que la mise à jour est effectuée
+      // Utiliser upsert pour garantir la mise à jour malgré les politiques RLS
       const { data, error } = await supabase
         .from('news')
         .upsert([
@@ -151,18 +151,18 @@ const AdminNewsPage = () => {
         .select();
 
       if (error) {
-        console.error('Supabase error during update:', error);
+        console.error('Error updating news article:', error);
         throw error;
       }
 
-      console.log('Upsert update response:', data);
+      console.log('Update response:', data);
 
       toast({
         title: 'Succès',
         description: `L'article a été mis à jour avec succès.`
       });
 
-      // Force refresh the article list to show the updated data
+      // Rafraîchir la liste des articles pour afficher les données mises à jour
       await fetchNewsArticles();
     } catch (error: any) {
       console.error('Erreur lors de la mise à jour de l\'article:', error);
