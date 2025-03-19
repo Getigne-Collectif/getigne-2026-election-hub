@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 
 interface CommitteeContactFormProps {
   committeeId: string;
@@ -37,9 +37,20 @@ export const CommitteeContactForm = ({ committeeId, committeeName, themeColor }:
     setIsSubmitting(true);
 
     try {
-      // Here we would normally call an edge function to send the email
-      // For now, we'll simulate a successful submission
-      console.log('Form submitted:', { committeeId, committeeName, ...formData });
+      // Envoi de la notification Discord
+      await sendDiscordNotification({
+        title: `🤝 Demande d'information commission: ${committeeName}`,
+        message: `
+**De**: ${formData.firstName} ${formData.lastName}
+**Email**: ${formData.email}
+**Téléphone**: ${formData.phone || 'Non fourni'}
+
+**Message**:
+${formData.message}
+        `,
+        color: DiscordColors.PURPLE,
+        username: "Formulaire Commission"
+      });
       
       // Clear form data
       setFormData({

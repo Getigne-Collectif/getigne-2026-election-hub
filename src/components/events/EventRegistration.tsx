@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import { Loader2, Check, X, Users } from 'lucide-react';
+import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 
 interface EventRegistrationProps {
   eventId: string;
@@ -114,11 +114,45 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           variant: 'destructive'
         });
       } else {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, email')
+          .eq('id', user.id)
+          .single();
+          
+        const { data: eventData } = await supabase
+          .from('events')
+          .select('title, date')
+          .eq('id', eventId)
+          .single();
+          
+        if (profileData && eventData) {
+          const userName = `${profileData.first_name} ${profileData.last_name}`;
+          const eventDate = new Date(eventData.date).toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+          
+          await sendDiscordNotification({
+            title: `🎟️ Nouvelle inscription à l'événement: ${eventData.title}`,
+            message: `
+**Participant**: ${userName} (${profileData.email})
+**Événement**: ${eventData.title}
+**Date**: ${eventDate}
+**Nombre total de participants**: ${participantCount + 1}
+            `,
+            color: DiscordColors.PURPLE,
+            username: "Système d'Événements"
+          });
+        }
+        
         toast({
           title: 'Inscription confirmée',
           description: 'Vous êtes inscrit à cet événement',
           variant: 'default'
         });
+        
         setIsRegistered(true);
         fetchParticipantCount();
         onRegistrationChange();
@@ -207,7 +241,6 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
     );
   }
 
-  // Conteneur unique pour les utilisateurs connectés mais non adhérents pour événements réservés
   if (isMembersOnly && !isMember) {
     return (
       <div className="border border-getigne-100 p-4 rounded-lg mb-6">

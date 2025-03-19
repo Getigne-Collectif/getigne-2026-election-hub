@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 
 interface CommentFormProps {
   newsId: string;
@@ -81,6 +81,33 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, onCommentSubmitted })
         // Continue without profile data
       } else {
         console.log('Profile fetched:', profileData);
+      }
+
+      // Get article details for the notification
+      const { data: newsData, error: newsError } = await supabase
+        .from('news')
+        .select('title')
+        .eq('id', newsId)
+        .single();
+
+      if (!newsError && newsData) {
+        // Send Discord notification
+        const userName = profileData ? 
+          `${profileData.first_name} ${profileData.last_name}` : 
+          user.email || 'Utilisateur';
+          
+        await sendDiscordNotification({
+          title: `💬 Nouveau commentaire sur l'article: ${newsData.title}`,
+          message: `
+**De**: ${userName}
+**Statut**: ${isModerator ? 'Publié' : 'En attente de modération'}
+
+**Commentaire**:
+${newComment.trim()}
+          `,
+          color: DiscordColors.GREEN,
+          username: "Système de Commentaires"
+        });
       }
       
       setNewComment('');

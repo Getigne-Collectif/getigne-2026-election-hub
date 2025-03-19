@@ -17,6 +17,7 @@ import FacebookIcon from '@/components/icons/facebook.svg?react';
 import GoogleIcon from '@/components/icons/google.svg?react';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import { Mail } from 'lucide-react';
+import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 
 // Schéma de validation pour l'inscription
 const signUpSchema = z.object({
@@ -83,6 +84,25 @@ const AuthPage = () => {
 
       if (data?.user) {
         setUser(data.user);
+        
+        // Envoyer notification Discord
+        await sendDiscordNotification({
+          title: `👤 Nouvel utilisateur inscrit`,
+          message: `
+**Nom**: ${values.first_name} ${values.last_name}
+**Email**: ${values.email}
+**Date**: ${new Date().toLocaleDateString('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+})}
+          `,
+          color: DiscordColors.ORANGE,
+          username: "Système d'Authentication"
+        });
+        
         toast({
           title: 'Compte créé avec succès',
           description: 'Votre compte a été créé avec succès.',
@@ -100,7 +120,6 @@ const AuthPage = () => {
     }
   };
 
-  // Fonction de connexion
   const handleSignIn = async (values: SignInFormValues) => {
     setLoading(true);
     try {
@@ -339,7 +358,7 @@ const AuthPage = () => {
                     disabled={!!ssoLoading}
                     className="w-full"
                   >
-                    {ssoLoading === 'google' ? 'Chargement...' : <Mail className="h-5 w-5" />}
+                    {ssoLoading === 'google' ? 'Chargement...' : <GoogleIcon className="h-5 w-5" />}
                   </Button>
                 </div>
               </div>
