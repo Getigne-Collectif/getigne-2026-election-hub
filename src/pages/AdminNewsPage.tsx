@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -49,7 +48,7 @@ const AdminNewsPage = () => {
   const fetchNewsArticles = async () => {
     setPageLoading(true);
     try {
-      // Use a more direct approach with the service role if possible, but here we'll try a simpler query
+      // Utiliser une approche plus directe avec le rôle de service si possible
       const { data, error } = await supabase
         .from('news')
         .select('*')
@@ -221,7 +220,6 @@ const AdminNewsPage = () => {
       return;
     }
 
-    // Add manual admin check if needed for testing
     if (user && !isAdmin) {
       toast({
         title: 'Accès refusé',

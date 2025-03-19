@@ -72,43 +72,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('Fetching roles for user:', userId);
       
-      // Try direct query with debug logging
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
+      // Utiliser la fonction RPC get_user_roles au lieu d'une requête directe
+      // Cette fonction est définie comme SECURITY DEFINER et évite les problèmes de récursion
+      const { data: rolesData, error: rolesError } = await supabase.rpc('get_user_roles', { uid: userId });
           
       if (rolesError) {
-        console.error('Error fetching user roles from table:', rolesError);
+        console.error('Error fetching user roles with RPC:', rolesError);
         
-        // If we're getting the infinite recursion error, try a workaround with service role
-        // This would require setting up a serverless function in production
-        console.log('Checking if user is admin manually for testing');
-        
-        // For testing purposes: Check if current user is in known admin list
-        // In production, you should use a more secure approach
-        const knownAdminEmails = ['leny.bernard@gmail.com']; // Add your admin emails here
+        // Fallback pour les tests seulement - à supprimer en production
+        const knownAdminEmails = ['leny.bernard@gmail.com']; 
         const currentEmail = user?.email || '';
         
         if (knownAdminEmails.includes(currentEmail.toLowerCase())) {
-          console.log('User recognized as admin by email');
+          console.log('User recognized as admin by email fallback');
           return ['admin'];
         }
         
         return [];
       }
       
-      const roles = rolesData.map(item => item.role as Role);
-      console.log('User roles retrieved from direct query:', roles);
+      // Convertir le résultat en tableau de rôles
+      const roles = Array.isArray(rolesData) ? rolesData : [rolesData];
+      console.log('User roles retrieved via RPC function:', roles);
       
-      // Extra validation for debugging
+      // Validation supplémentaire pour le débogage
       if (roles.includes('admin')) {
         console.log('User has admin role confirmed!');
       }
       
-      return roles;
+      return roles as Role[];
     } catch (error) {
       console.error('Exception when fetching user roles:', error);
+      
+      // Fallback pour les tests seulement - à supprimer en production
+      const knownAdminEmails = ['leny.bernard@gmail.com'];
+      const currentEmail = user?.email || '';
+      
+      if (knownAdminEmails.includes(currentEmail.toLowerCase())) {
+        console.log('User recognized as admin by email in catch block');
+        return ['admin'];
+      }
+      
       return [];
     }
   };
@@ -128,6 +132,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             console.log('Setting profile data:', profileData);
             setProfile(profileData);
           }
+          
+          // Considérer l'email directement depuis la session
+          console.log('User email from session:', session.user.email);
           
           const roles = await fetchUserRoles(session.user.id);
           console.log('Setting user roles:', roles);
@@ -226,7 +233,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isAdmin = userRoles.includes('admin');
   const isModerator = userRoles.includes('moderator') || isAdmin;
 
-  // Debug output to help in troubleshooting
+  // Sortie de débogage pour aider au dépannage
   useEffect(() => {
     if (user) {
       console.log('Auth status:', {
