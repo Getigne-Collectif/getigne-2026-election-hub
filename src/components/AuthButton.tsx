@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, User, Shield, Newspaper} from 'lucide-react';
+import {LogIn, LogOut, User, Shield, Newspaper, RefreshCw} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
 import { toast } from '@/components/ui/use-toast';
 
 const AuthButton = () => {
-  const { user, profile, signOut, isAdmin } = useAuth();
+  const { user, profile, signOut, isAdmin, refreshUserRoles } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -30,6 +30,23 @@ const AuthButton = () => {
       toast({
         title: "Erreur lors de la déconnexion",
         description: "Une erreur est survenue lors de la déconnexion",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRefreshRoles = async () => {
+    try {
+      await refreshUserRoles();
+      toast({
+        title: "Droits actualisés",
+        description: "Vos droits d'accès ont été actualisés"
+      });
+    } catch (error) {
+      console.error('Error refreshing roles:', error);
+      toast({
+        title: "Erreur d'actualisation",
+        description: "Impossible d'actualiser vos droits d'accès",
         variant: "destructive"
       });
     }
@@ -87,6 +104,12 @@ const AuthButton = () => {
           ) : (
             <span className="text-xs text-muted-foreground">{user.email}</span>
           )}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuItem onClick={handleRefreshRoles} className="flex items-center">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Actualiser mes droits
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 

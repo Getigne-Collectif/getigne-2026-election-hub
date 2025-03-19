@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -55,14 +56,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [isMember, setIsMember] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const [sessionExpiryTimer, setSessionExpiryTimer] = useState<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
+  // Fonction améliorée pour rafraîchir les rôles de l'utilisateur
   const refreshUserRoles = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('Tentative de rafraîchissement des rôles sans utilisateur connecté');
+      return;
+    }
     
     console.log('Refreshing user roles for:', user.id);
     
     try {
+      // Récupérer la session active pour s'assurer que les tokens sont valides
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Erreur lors de la récupération de la session:', sessionError);
+        return;
+      }
+      
+      if (!sessionData.session) {
+        console.log('Session expirée, reconnexion nécessaire');
+        setUser(null);
+        setUserRoles([]);
+        setProfile(null);
+        setAuthChecked(true);
+        return;
+      }
+      
+      // Récupérer les rôles avec la session active
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('role')
@@ -70,13 +94,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (rolesError) {
         console.error('Error fetching user roles:', rolesError);
-        return;
+        // Si l'erreur est liée à l'authentification, on réinitialise l'état
+        if (rolesError.code === '401' || rolesError.code === 'PGRST301') {
+          console.log('Erreur d\'authentification lors de la récupération des rôles');
+          return;
+        }
+      } else {
+        const roles = rolesData.map(r => r.role);
+        console.log('Updated user roles:', roles);
+        setUserRoles(roles);
       }
       
-      const roles = rolesData.map(r => r.role);
-      console.log('Updated user roles:', roles);
-      setUserRoles(roles);
-      
+      // Récupérer le profil utilisateur
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -85,20 +114,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (profileError) {
         console.error('Error fetching profile:', profileError);
-        return;
-      }
-      
-      if (profileData) {
+        // Si l'erreur est liée à l'authentification, on réinitialise l'état
+        if (profileError.code === '401' || profileError.code === 'PGRST301') {
+          console.log('Erreur d\'authentification lors de la récupération du profil');
+          return;
+        }
+      } else if (profileData) {
         console.log('Updated user profile:', profileData);
         setProfile(profileData);
         setIsMember(profileData.is_member === true);
       }
     } catch (error) {
-      console.error('Error during roles refresh:', error);
+      console.error('Erreur générale lors du rafraîchissement des rôles:', error);
     }
   };
 
-  const fetchUserData = async (currentUser: any) => {
+  // Fonction pour configurer un minuteur pour le rafraîchissement basé sur l'expiration du token
+  const setupSessionRefreshTimer = (expiresAt: number) => {
+    if (sessionExpiryTimer) {
+      clearTimeout(sessionExpiryTimer);
+    }
+    
+    // Calculer le temps restant avant expiration (en ms)
+    const expiresIn = expiresAt * 1000 - Date.now();
+    
+    // Si le token a déjà expiré ou est proche de l'expiration, rafraîchir immédiatement
+    if (expiresIn <= 60000) {
+      console.log('Token proche de l\'expiration, rafraîchissement immédiat');
+      refreshUserRoles();
+      return;
+    }
+    
+    // Rafraîchir les rôles 5 minutes avant l'expiration du token
+    const refreshTime = expiresIn - 300000; // 5 minutes avant l'expiration
+    console.log(`Programmation du rafraîchissement des rôles dans ${Math.floor(refreshTime/1000/60)} minutes`);
+    
+    const timer = setTimeout(() => {
+      console.log('Exécution du rafraîchissement programmé des rôles');
+      refreshUserRoles();
+    }, refreshTime);
+    
+    setSessionExpiryTimer(timer);
+  };
+
+  const fetchUserData = async (currentUser: any, session: any) => {
     if (!currentUser) {
       setLoading(false);
       setAuthChecked(true);
@@ -135,6 +194,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(profileData);
         setIsMember(profileData.is_member === true);
       }
+      
+      // Configurer le minuteur pour le rafraîchissement basé sur l'expiration du token
+      if (session?.expires_at) {
+        setupSessionRefreshTimer(session.expires_at);
+      }
     } catch (error) {
       console.error('Error during user data fetch:', error);
     } finally {
@@ -160,7 +224,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (session?.user) {
           console.log('Initial session found, fetching user data for:', session.user.id);
-          await fetchUserData(session.user);
+          await fetchUserData(session.user, session);
         } else {
           console.log('No initial session found');
           setLoading(false);
@@ -178,7 +242,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (event === 'SIGNED_IN' && session?.user) {
         console.log('User signed in, fetching data for:', session.user.id);
-        await fetchUserData(session.user);
+        await fetchUserData(session.user, session);
       } else if (event === 'SIGNED_OUT') {
         console.log('User signed out, clearing data');
         setUser(null);
@@ -187,9 +251,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(null);
         setAuthChecked(true);
         setLoading(false);
+        
+        // Nettoyer le minuteur lors de la déconnexion
+        if (sessionExpiryTimer) {
+          clearTimeout(sessionExpiryTimer);
+          setSessionExpiryTimer(null);
+        }
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         console.log('Token refreshed, updating user data for:', session.user.id);
-        await fetchUserData(session.user);
+        await fetchUserData(session.user, session);
       }
     });
 
@@ -197,17 +267,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       authListener.subscription.unsubscribe();
+      // Nettoyer le minuteur lors du démontage du composant
+      if (sessionExpiryTimer) {
+        clearTimeout(sessionExpiryTimer);
+      }
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+      
+      // Configurer le rafraîchissement basé sur l'expiration si la connexion réussit
+      if (data.session?.expires_at) {
+        setupSessionRefreshTimer(data.session.expires_at);
+      }
 
     } catch (error: any) {
       toast({
@@ -250,6 +329,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      // Nettoyer le minuteur lors de la déconnexion
+      if (sessionExpiryTimer) {
+        clearTimeout(sessionExpiryTimer);
+        setSessionExpiryTimer(null);
+      }
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     } catch (error: any) {
