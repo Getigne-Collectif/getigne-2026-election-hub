@@ -81,7 +81,7 @@ const News = () => {
         const { data, error } = await supabase
           .from('news')
           .select('*')
-          .eq('status', 'published')
+          .eq('status', 'published') // S'assurer de ne récupérer que les articles publiés
           .order('date', { ascending: false })
           .limit(3);
         

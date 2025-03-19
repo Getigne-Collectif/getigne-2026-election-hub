@@ -151,6 +151,7 @@ const AdminNewsPage = () => {
         
         console.log('Updating article with data:', updateData);
         
+        // Utiliser PATCH au lieu de POST (update)
         const { data, error } = await supabase
           .from('news')
           .update(updateData)
@@ -185,6 +186,7 @@ const AdminNewsPage = () => {
       console.log('Updating article with ID:', id);
       console.log('Complete update data:', updateData);
 
+      // Utiliser PATCH au lieu de POST (update)
       const { data, error } = await supabase
         .from('news')
         .update(updateData)

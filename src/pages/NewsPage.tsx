@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -111,6 +110,7 @@ const NewsPage = () => {
         const { data, error } = await supabase
           .from('news')
           .select('*')
+          .eq('status', 'published')
           .order('date', { ascending: false });
 
         if (error) throw error;

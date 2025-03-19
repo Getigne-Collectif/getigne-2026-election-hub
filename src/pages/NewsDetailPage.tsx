@@ -77,6 +77,7 @@ const NewsDetailPage = () => {
           .from('news')
           .select('*')
           .eq('id', id)
+          .eq('status', 'published') // Ne récupérer que les articles publiés
           .single();
 
         if (error) {
@@ -97,7 +98,11 @@ const NewsDetailPage = () => {
         setArticle(processedData as NewsArticle);
 
         if (tags.length > 0 || processedData.category) {
-          let query = supabase.from('news').select('*').neq('id', id).limit(3);
+          let query = supabase.from('news')
+            .select('*')
+            .eq('status', 'published') // Assurons-nous que les articles liés sont également publiés
+            .neq('id', id)
+            .limit(3);
 
           if (tags.length > 0) {
             // Use overlap for array comparison
@@ -118,6 +123,7 @@ const NewsDetailPage = () => {
             const { data: recentData } = await supabase
               .from('news')
               .select('*')
+              .eq('status', 'published') // Assurons-nous que les articles récents sont également publiés
               .neq('id', id)
               .order('date', { ascending: false })
               .limit(3);

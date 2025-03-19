@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -193,7 +192,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
     try {
       const { error } = await supabase
         .from('comments')
-        .update({ status: newStatus })
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', commentId);
 
       if (error) {
@@ -211,6 +213,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
           'Le commentaire est maintenant visible pour tous les utilisateurs' : 
           'Le commentaire a été rejeté et ne sera pas visible publiquement'
       });
+      
+      // Rafraîchir les commentaires pour s'assurer que tout est à jour
+      fetchComments();
     } catch (error: any) {
       toast({
         title: 'Erreur de modération',
@@ -221,12 +226,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
     }
   };
 
-  // Helper function to get initials from name
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase() || 'UN';
   };
 
-  // Fonction pour obtenir la couleur de badge selon le statut
   const getStatusBadgeProps = (status: string) => {
     switch (status) {
       case 'approved':
@@ -239,7 +242,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
     }
   };
 
-  // Rendu des commentaires pour les modérateurs
   const renderModeratorView = () => (
     <>
       <div className="flex items-center justify-between mb-4">
@@ -361,7 +363,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
     </>
   );
 
-  // Rendu standard des commentaires pour les utilisateurs non-modérateurs
   const renderUserView = () => (
     <div className="space-y-6">
       {comments.length > 0 ? (
