@@ -61,7 +61,16 @@ const AdminNewsPage = () => {
       const transformedData = data.map(article => ({
         ...article,
         status: article.status || 'published',
-        tags: Array.isArray(article.tags) ? article.tags : []
+        tags: Array.isArray(article.tags) ? article.tags : 
+              (article.tags ? 
+                (typeof article.tags === 'string' ? 
+                  [article.tags] : 
+                  Array.isArray(JSON.parse(JSON.stringify(article.tags))) ? 
+                    JSON.parse(JSON.stringify(article.tags)) : 
+                    []
+                ) : 
+                []
+              )
       }));
 
       setNewsArticles(transformedData as NewsArticle[]);

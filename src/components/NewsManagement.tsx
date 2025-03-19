@@ -18,13 +18,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, FileEdit, Trash2, Plus, Eye } from 'lucide-react';
+import { Search, FileEdit, Trash2, Plus } from 'lucide-react';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -66,7 +64,7 @@ const newsFormSchema = z.object({
   tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()) : []),
 });
 
-type NewsFormValues = z.infer<typeof newsFormSchema>;
+type NewsFormValues = z.infer<typeof newsFormSchema> & { tags: string[] };
 
 const NewsManagement: React.FC<NewsManagementProps> = ({ 
   news, 
@@ -91,7 +89,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
       content: "",
       category: "",
       image: "",
-      tags: "",
+      tags: [],
     },
   });
 
@@ -104,7 +102,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: selectedArticle.content,
         category: selectedArticle.category,
         image: selectedArticle.image,
-        tags: selectedArticle.tags.join(', '), // Convertir le tableau en chaîne pour le formulaire
+        tags: selectedArticle.tags,
       });
     }
   }, [selectedArticle, isEditDialogOpen, form]);
@@ -118,16 +116,34 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: "",
         category: "",
         image: "",
-        tags: "",
+        tags: [],
       });
     }
   }, [isCreateDialogOpen, form]);
 
+  // Préparer les champs tags pour l'affichage dans le formulaire
+  const prepareTagsForForm = (tags: string[] | undefined) => {
+    if (!tags || tags.length === 0) return "";
+    return tags.join(', ');
+  };
+
+  // Get form values for tags as comma-separated string for display
+  const getTagsDisplayValue = () => {
+    const tags = form.getValues('tags');
+    return Array.isArray(tags) ? tags.join(', ') : tags || '';
+  };
+
   // Gérer la création d'un article
-  const handleCreateNews = async (values: NewsFormValues, status: 'draft' | 'published') => {
+  const handleCreateNews = async (values: z.infer<typeof newsFormSchema>, status: 'draft' | 'published') => {
     setIsSubmitting(true);
     try {
-      await onCreateNews(values, status);
+      // Ensure tags is an array
+      const formData = {
+        ...values,
+        tags: Array.isArray(values.tags) ? values.tags : []
+      };
+      
+      await onCreateNews(formData as NewsFormValues, status);
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error("Error creating news article:", error);
@@ -137,12 +153,18 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   };
 
   // Gérer la mise à jour d'un article
-  const handleUpdateNews = async (values: NewsFormValues) => {
+  const handleUpdateNews = async (values: z.infer<typeof newsFormSchema>) => {
     if (!selectedArticle) return;
     
     setIsSubmitting(true);
     try {
-      await onUpdateNews(selectedArticle.id, values);
+      // Ensure tags is an array
+      const formData = {
+        ...values,
+        tags: Array.isArray(values.tags) ? values.tags : []
+      };
+      
+      await onUpdateNews(selectedArticle.id, formData);
       setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating news article:", error);
@@ -379,7 +401,11 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   <FormItem>
                     <FormLabel>Tags (séparés par des virgules)</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input 
+                        {...field} 
+                        value={typeof field.value === 'string' ? field.value : Array.isArray(field.value) ? field.value.join(', ') : ''}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -509,7 +535,11 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     <FormItem>
                       <FormLabel>Tags (séparés par des virgules)</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input 
+                          {...field} 
+                          value={typeof field.value === 'string' ? field.value : Array.isArray(field.value) ? field.value.join(', ') : ''}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
