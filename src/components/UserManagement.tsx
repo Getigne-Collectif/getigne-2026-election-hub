@@ -239,7 +239,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
                     <UserMembershipStatus 
                       userId={user.id}
                       isMember={user.is_member === true}
-                      onUpdate={() => fetchUsers()}
+                      onUpdate={() => onToggleUserStatus(user.id, user.status !== 'disabled')}
                     />
                   )}
                 </TableCell>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -21,6 +22,7 @@ interface Profile {
   last_name: string;
   email?: string;
   status?: string;
+  is_member?: boolean;
   [key: string]: string | number | object | boolean | undefined;
 }
 
@@ -87,7 +89,7 @@ const AdminUsersPage = () => {
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
             status: profile.status || 'active',
-            is_member: profile.is_member || false,
+            is_member: profile.is_member === true, // Ensure boolean type
             roles: roles || []
           };
         })
