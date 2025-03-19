@@ -22,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authChecked, setAuthChecked] = useState(false);
   const [sessionExpiryTimer, setSessionExpiryTimer] = useState<NodeJS.Timeout | null>(null);
   const [visibilityState, setVisibilityState] = useState<string>(document.visibilityState);
+  const [lastVisibilityChange, setLastVisibilityChange] = useState<number>(Date.now());
   const { toast } = useToast();
 
   // Function to refresh user roles
@@ -54,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Update the session state
       setSession(sessionData.session);
+      setUser(sessionData.session.user);
       
       // Fetch user roles with active session
       const roles = await fetchUserRoles(user.id);
@@ -106,9 +108,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshSession = async () => {
     console.log('[AUTH] Refreshing session');
     try {
+      // First try to get the current session
+      const { data: currentSession, error: currentSessionError } = await supabase.auth.getSession();
+      
+      if (currentSessionError) {
+        console.error('[AUTH] Error getting current session:', currentSessionError);
+        // If we can't get the current session, try to refresh it
+      } else if (currentSession?.session) {
+        console.log('[AUTH] Current session exists, using it');
+        setSession(currentSession.session);
+        setUser(currentSession.session.user);
+        
+        // After setting the session, also refresh roles
+        if (currentSession.session.user) {
+          await refreshUserRoles();
+        }
+        
+        // We found a valid session, no need to try refreshing
+        return;
+      }
+      
+      // If we're here, either there was an error or no session, try refreshing
       const { data, error } = await supabase.auth.refreshSession();
+      
       if (error) {
         console.error('[AUTH] Error refreshing session:', error);
+        
+        // If refresh failed, clear state and require login again
+        if (error.message.includes('expired') || error.message.includes('invalid')) {
+          console.log('[AUTH] Session expired or invalid, clearing auth state');
+          setUser(null);
+          setSession(null);
+          setUserRoles([]);
+          setProfile(null);
+          setAuthChecked(true);
+        }
         return;
       }
       
@@ -121,6 +155,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.session.user) {
           await refreshUserRoles();
         }
+      } else {
+        console.log('[AUTH] No session data after refresh attempt');
+        setUser(null);
+        setSession(null);
+        setUserRoles([]);
+        setProfile(null);
+        setAuthChecked(true);
       }
     } catch (error) {
       console.error('[AUTH] Unexpected error refreshing session:', error);
@@ -170,13 +211,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Handle tab visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
+      const now = Date.now();
       const newVisibilityState = document.visibilityState;
       console.log('[AUTH] Visibility changed:', newVisibilityState);
       setVisibilityState(newVisibilityState);
       
-      if (newVisibilityState === 'visible' && user) {
-        console.log('[AUTH] Tab became visible, refreshing user data');
-        refreshSession(); // Use refreshSession instead of just refreshUserRoles
+      // If the tab becomes visible and more than 2 seconds have passed since the last change
+      // This prevents double refreshes when switching tabs rapidly
+      if (newVisibilityState === 'visible' && (now - lastVisibilityChange) > 2000) {
+        console.log('[AUTH] Tab became visible, refreshing session');
+        setLastVisibilityChange(now);
+        // Use a slight delay to ensure browser has fully restored state
+        setTimeout(() => {
+          refreshSession();
+        }, 100);
+      } else if (newVisibilityState === 'hidden') {
+        setLastVisibilityChange(now);
       }
     };
     
@@ -185,7 +235,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [user]);
+  }, [lastVisibilityChange]);
 
   // Initial authentication setup
   useEffect(() => {
@@ -249,7 +299,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    getInitialSession();
+    // Start with a slight delay to ensure everything is loaded properly
+    setTimeout(() => {
+      getInitialSession();
+    }, 100);
 
     // Clean up listeners on component unmount
     return () => {
@@ -265,8 +318,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleOnline = () => {
       console.log('[AUTH] Network connection restored');
       if (user) {
-        console.log('[AUTH] Refreshing user data after reconnection');
-        refreshSession(); // Use refreshSession instead of just refreshUserRoles
+        console.log('[AUTH] Refreshing session after reconnection');
+        refreshSession();
       }
     };
     
