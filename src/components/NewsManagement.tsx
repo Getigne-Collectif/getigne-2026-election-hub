@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -34,6 +33,7 @@ import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
+// Define the news article structure
 interface NewsArticle {
   id: string;
   title: string;
@@ -46,6 +46,7 @@ interface NewsArticle {
   status: string;
 }
 
+// Interface for form values after transformation
 interface NewsFormValues {
   title: string;
   excerpt: string;
@@ -74,7 +75,7 @@ const newsFormSchema = z.object({
   tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()) : []),
 });
 
-// Define the form values type from the schema
+// Define the form values type directly from the schema
 type FormValues = z.infer<typeof newsFormSchema>;
 
 const NewsManagement: React.FC<NewsManagementProps> = ({ 
@@ -91,7 +92,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Formulaire de création/édition
+  // Create/edit form
   const form = useForm<FormValues>({
     resolver: zodResolver(newsFormSchema),
     defaultValues: {
@@ -104,7 +105,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     },
   });
 
-  // Mettre à jour le formulaire avec les données de l'article sélectionné
+  // Update form with selected article data
   React.useEffect(() => {
     if (selectedArticle && isEditDialogOpen) {
       form.reset({
@@ -118,7 +119,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   }, [selectedArticle, isEditDialogOpen, form]);
 
-  // Réinitialiser le formulaire lorsque le dialogue de création s'ouvre
+  // Reset form when create dialog opens
   React.useEffect(() => {
     if (isCreateDialogOpen) {
       form.reset({
@@ -132,22 +133,27 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   }, [isCreateDialogOpen, form]);
 
-  // Préparer les champs tags pour l'affichage dans le formulaire
+  // Prepare tags field for display in form
   const prepareTagsForForm = (tags: string[] | undefined) => {
     if (!tags || tags.length === 0) return "";
     return tags.join(', ');
   };
 
-  // Gérer la création d'un article
+  // Handle creating a new article
   const handleCreateNews = async (values: FormValues, status: 'draft' | 'published') => {
     setIsSubmitting(true);
     try {
-      // The schema has already transformed tags string to array
-      await onCreateNews({
-        ...values,
+      // Create the news article with proper types
+      const formData: NewsFormValues = {
+        title: values.title,
+        excerpt: values.excerpt,
+        content: values.content,
+        category: values.category,
+        image: values.image,
         tags: Array.isArray(values.tags) ? values.tags : []
-      }, status);
+      };
       
+      await onCreateNews(formData, status);
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error("Error creating news article:", error);
@@ -156,18 +162,23 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   };
 
-  // Gérer la mise à jour d'un article
+  // Handle updating an article
   const handleUpdateNews = async (values: FormValues) => {
     if (!selectedArticle) return;
     
     setIsSubmitting(true);
     try {
-      // The schema has already transformed tags string to array
-      await onUpdateNews(selectedArticle.id, {
-        ...values,
+      // Update the news article with proper types
+      const formData: Partial<NewsFormValues> = {
+        title: values.title,
+        excerpt: values.excerpt,
+        content: values.content,
+        category: values.category,
+        image: values.image,
         tags: Array.isArray(values.tags) ? values.tags : []
-      });
+      };
       
+      await onUpdateNews(selectedArticle.id, formData);
       setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating news article:", error);
@@ -176,7 +187,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   };
 
-  // Gérer la publication/dépublication d'un article
+  // Handle publishing/unpublishing an article
   const handleToggleStatus = async (article: NewsArticle) => {
     const newStatus = article.status === 'published' ? 'draft' : 'published';
     try {
@@ -190,7 +201,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   };
 
-  // Gérer la suppression d'un article
+  // Handle deleting an article
   const handleConfirmDelete = async () => {
     if (!selectedArticle) return;
     
@@ -203,19 +214,19 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   };
 
-  // Ouvrir le dialogue d'édition pour un article
+  // Open edit dialog for an article
   const openEditDialog = (article: NewsArticle) => {
     setSelectedArticle(article);
     setIsEditDialogOpen(true);
   };
 
-  // Ouvrir le dialogue de suppression pour un article
+  // Open delete dialog for an article
   const openDeleteDialog = (article: NewsArticle) => {
     setSelectedArticle(article);
     setIsDeleteDialogOpen(true);
   };
 
-  // Filtrer les articles en fonction du terme de recherche
+  // Filter articles based on search term
   const filteredNews = news.filter(article => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -312,7 +323,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         </Table>
       )}
 
-      {/* Dialogue de création d'article */}
+      {/* Creation dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -445,7 +456,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Dialogue d'édition d'article */}
+      {/* Edit dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -538,11 +549,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     <FormItem>
                       <FormLabel>Tags (séparés par des virgules)</FormLabel>
                       <FormControl>
-                        <Input 
-                          {...field} 
-                          value={typeof field.value === 'string' ? field.value : Array.isArray(field.value) ? field.value.join(', ') : ''}
-                          onChange={(e) => field.onChange(e.target.value)}
-                        />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -572,7 +579,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Dialogue de confirmation de suppression */}
+      {/* Delete confirmation dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
