@@ -36,6 +36,7 @@ const AuthButton = () => {
   };
 
   const handleRefreshRoles = async () => {
+    console.log('AuthButton: Manually refreshing user roles');
     try {
       await refreshUserRoles();
       toast({
@@ -52,6 +53,7 @@ const AuthButton = () => {
     }
   };
 
+  // Pas d'utilisateur - afficher bouton connexion
   if (!user) {
     return (
       <Button asChild variant="outline" size="sm" className="flex items-center gap-2">

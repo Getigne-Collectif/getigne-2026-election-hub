@@ -57,28 +57,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isMember, setIsMember] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [sessionExpiryTimer, setSessionExpiryTimer] = useState<NodeJS.Timeout | null>(null);
+  const [visibilityState, setVisibilityState] = useState<string>(document.visibilityState);
   const { toast } = useToast();
 
-  // Fonction améliorée pour rafraîchir les rôles de l'utilisateur
+  // Fonction pour rafraîchir les rôles de l'utilisateur
   const refreshUserRoles = async () => {
     if (!user) {
-      console.log('Tentative de rafraîchissement des rôles sans utilisateur connecté');
+      console.log('[AUTH] Tentative de rafraîchissement des rôles sans utilisateur connecté');
       return;
     }
     
-    console.log('Refreshing user roles for:', user.id);
+    console.log('[AUTH] Refreshing user roles for:', user.id);
     
     try {
       // Récupérer la session active pour s'assurer que les tokens sont valides
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        console.error('Erreur lors de la récupération de la session:', sessionError);
+        console.error('[AUTH] Erreur lors de la récupération de la session:', sessionError);
         return;
       }
       
       if (!sessionData.session) {
-        console.log('Session expirée, reconnexion nécessaire');
+        console.log('[AUTH] Session expirée, reconnexion nécessaire');
         setUser(null);
         setUserRoles([]);
         setProfile(null);
@@ -93,15 +94,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', user.id);
 
       if (rolesError) {
-        console.error('Error fetching user roles:', rolesError);
+        console.error('[AUTH] Error fetching user roles:', rolesError);
         // Si l'erreur est liée à l'authentification, on réinitialise l'état
         if (rolesError.code === '401' || rolesError.code === 'PGRST301') {
-          console.log('Erreur d\'authentification lors de la récupération des rôles');
+          console.log('[AUTH] Erreur d\'authentification lors de la récupération des rôles');
           return;
         }
       } else {
         const roles = rolesData.map(r => r.role);
-        console.log('Updated user roles:', roles);
+        console.log('[AUTH] Updated user roles:', roles);
         setUserRoles(roles);
       }
       
@@ -113,19 +114,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (profileError) {
-        console.error('Error fetching profile:', profileError);
+        console.error('[AUTH] Error fetching profile:', profileError);
         // Si l'erreur est liée à l'authentification, on réinitialise l'état
         if (profileError.code === '401' || profileError.code === 'PGRST301') {
-          console.log('Erreur d\'authentification lors de la récupération du profil');
+          console.log('[AUTH] Erreur d\'authentification lors de la récupération du profil');
           return;
         }
       } else if (profileData) {
-        console.log('Updated user profile:', profileData);
+        console.log('[AUTH] Updated user profile:', profileData);
         setProfile(profileData);
         setIsMember(profileData.is_member === true);
       }
+      
+      // Mettre à jour les timestamps de la session pour le rafraîchissement automatique
+      if (sessionData.session?.expires_at) {
+        setupSessionRefreshTimer(sessionData.session.expires_at);
+      }
     } catch (error) {
-      console.error('Erreur générale lors du rafraîchissement des rôles:', error);
+      console.error('[AUTH] Erreur générale lors du rafraîchissement des rôles:', error);
     }
   };
 
@@ -140,17 +146,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Si le token a déjà expiré ou est proche de l'expiration, rafraîchir immédiatement
     if (expiresIn <= 60000) {
-      console.log('Token proche de l\'expiration, rafraîchissement immédiat');
+      console.log('[AUTH] Token proche de l\'expiration, rafraîchissement immédiat');
       refreshUserRoles();
       return;
     }
     
     // Rafraîchir les rôles 5 minutes avant l'expiration du token
     const refreshTime = expiresIn - 300000; // 5 minutes avant l'expiration
-    console.log(`Programmation du rafraîchissement des rôles dans ${Math.floor(refreshTime/1000/60)} minutes`);
+    console.log(`[AUTH] Programmation du rafraîchissement des rôles dans ${Math.floor(refreshTime/1000/60)} minutes`);
     
     const timer = setTimeout(() => {
-      console.log('Exécution du rafraîchissement programmé des rôles');
+      console.log('[AUTH] Exécution du rafraîchissement programmé des rôles');
       refreshUserRoles();
     }, refreshTime);
     
@@ -164,7 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
     
-    console.log('Fetching complete user data for:', currentUser.id);
+    console.log('[AUTH] Fetching complete user data for:', currentUser.id);
     setUser(currentUser);
     
     try {
@@ -174,10 +180,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', currentUser.id);
 
       if (rolesError) {
-        console.error('Error fetching user roles:', rolesError);
+        console.error('[AUTH] Error fetching user roles:', rolesError);
       } else {
         const roles = rolesData.map(r => r.role);
-        console.log('Fetched user roles:', roles);
+        console.log('[AUTH] Fetched user roles:', roles);
         setUserRoles(roles);
       }
 
@@ -188,9 +194,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (profileError) {
-        console.error('Error fetching profile:', profileError);
+        console.error('[AUTH] Error fetching profile:', profileError);
       } else if (profileData) {
-        console.log('Fetched user profile:', profileData);
+        console.log('[AUTH] Fetched user profile:', profileData);
         setProfile(profileData);
         setIsMember(profileData.is_member === true);
       }
@@ -200,51 +206,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setupSessionRefreshTimer(session.expires_at);
       }
     } catch (error) {
-      console.error('Error during user data fetch:', error);
+      console.error('[AUTH] Error during user data fetch:', error);
     } finally {
       setLoading(false);
       setAuthChecked(true);
     }
   };
 
+  // Gestion du changement de visibilité de l'onglet
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      console.log('[AUTH] Visibility changed:', document.visibilityState);
+      setVisibilityState(document.visibilityState);
+      
+      if (document.visibilityState === 'visible' && user) {
+        console.log('[AUTH] Tab became visible, refreshing user data');
+        refreshUserRoles();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user]);
+
   useEffect(() => {
     setLoading(true);
     
     const getInitialSession = async () => {
       try {
-        console.log('Getting initial session...');
+        console.log('[AUTH] Getting initial session...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('[AUTH] Error getting session:', error);
           setLoading(false);
           setAuthChecked(true);
           return;
         }
 
         if (session?.user) {
-          console.log('Initial session found, fetching user data for:', session.user.id);
+          console.log('[AUTH] Initial session found, fetching user data for:', session.user.id);
           await fetchUserData(session.user, session);
         } else {
-          console.log('No initial session found');
+          console.log('[AUTH] No initial session found');
           setLoading(false);
           setAuthChecked(true);
         }
       } catch (error) {
-        console.error('Unexpected error during session initialization:', error);
+        console.error('[AUTH] Unexpected error during session initialization:', error);
         setLoading(false);
         setAuthChecked(true);
       }
     };
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.id);
+      console.log('[AUTH] Auth state changed:', event, session?.user?.id);
       
       if (event === 'SIGNED_IN' && session?.user) {
-        console.log('User signed in, fetching data for:', session.user.id);
+        console.log('[AUTH] User signed in, fetching data for:', session.user.id);
         await fetchUserData(session.user, session);
       } else if (event === 'SIGNED_OUT') {
-        console.log('User signed out, clearing data');
+        console.log('[AUTH] User signed out, clearing data');
         setUser(null);
         setUserRoles([]);
         setIsMember(false);
@@ -258,13 +283,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSessionExpiryTimer(null);
         }
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        console.log('Token refreshed, updating user data for:', session.user.id);
+        console.log('[AUTH] Token refreshed, updating user data for:', session.user.id);
         await fetchUserData(session.user, session);
       }
     });
 
     getInitialSession();
 
+    // Nettoyer les écouteurs lors du démontage du composant
     return () => {
       authListener.subscription.unsubscribe();
       // Nettoyer le minuteur lors du démontage du composant
@@ -273,6 +299,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
   }, []);
+
+  // Gérer la reconnexion au réseau
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('[AUTH] Network connection restored');
+      if (user) {
+        console.log('[AUTH] Refreshing user data after reconnection');
+        refreshUserRoles();
+      }
+    };
+    
+    window.addEventListener('online', handleOnline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [user]);
 
   const signIn = async (email: string, password: string) => {
     try {
