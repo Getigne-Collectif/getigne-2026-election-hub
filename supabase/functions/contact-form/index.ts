@@ -5,6 +5,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 // Environment variables
 const DISCORD_WEBHOOK_URL = Deno.env.get('DISCORD_WEBHOOK_URL');
 const CONTACT_EMAIL = Deno.env.get('CONTACT_EMAIL') || 'contact@getigne-collectif.fr';
+const PUBLIC_URL = Deno.env.get('PUBLIC_URL') || 'https://getigne-collectif.fr';
 
 // CORS headers for browser requests
 const corsHeaders = {
@@ -20,6 +21,7 @@ interface ContactFormRequest {
   source?: string; // "contact" or "committee"
   committeeId?: string;
   committeeTitle?: string;
+  url?: string; // URL de la page où le formulaire a été soumis
 }
 
 serve(async (req) => {
@@ -31,7 +33,16 @@ serve(async (req) => {
   try {
     // Parse the request body
     const requestData: ContactFormRequest = await req.json();
-    const { name, email, subject, message, source = "contact", committeeId, committeeTitle } = requestData;
+    const { 
+      name, 
+      email, 
+      subject, 
+      message, 
+      source = "contact", 
+      committeeId, 
+      committeeTitle,
+      url = null
+    } = requestData;
 
     console.log("Contact form submission:", requestData);
 
@@ -42,10 +53,21 @@ serve(async (req) => {
         ? `📬 Nouveau message pour la commission: ${committeeTitle}` 
         : `📬 Nouveau message de contact`;
 
+      // Déterminer l'URL de contexte
+      let contextUrl = '';
+      if (url) {
+        contextUrl = url;
+      } else if (isCommittee && committeeId) {
+        contextUrl = `${PUBLIC_URL}/commissions/${committeeId}`;
+      } else {
+        contextUrl = `${PUBLIC_URL}/contact`;
+      }
+
       const discordMessage = `
 **De**: ${name} (${email})
 **Sujet**: ${subject}
 ${isCommittee ? `**Commission**: ${committeeTitle}` : ''}
+**Page**: ${contextUrl}
 
 **Message**:
 ${message}
@@ -65,6 +87,7 @@ ${message}
               description: discordMessage,
               color: isCommittee ? 5793266 : 3447003, // Green for committee, blue for general contact
               timestamp: new Date().toISOString(),
+              url: contextUrl, // Ajouter l'URL comme lien cliquable dans le titre
             },
           ],
         }),

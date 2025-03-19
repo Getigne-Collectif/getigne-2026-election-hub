@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -106,7 +107,9 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, onCommentSubmitted })
 ${newComment.trim()}
           `,
           color: DiscordColors.GREEN,
-          username: "Système de Commentaires"
+          username: "Système de Commentaires",
+          resourceType: 'news',
+          resourceId: newsId
         });
       }
       

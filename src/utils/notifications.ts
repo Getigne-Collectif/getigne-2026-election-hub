@@ -7,22 +7,41 @@ import { supabase } from '../integrations/supabase/client';
  * @param message The message to send
  * @param color Optional color for the Discord embed (as a decimal number)
  * @param username Optional username override for the webhook
+ * @param url Optional URL to link to the notification (context)
+ * @param resourceType Optional type of resource (news, event, committee)
+ * @param resourceId Optional ID of the resource
  * @returns A promise that resolves when the notification is sent
  */
 export const sendDiscordNotification = async ({
   title,
   message,
   color,
-  username
+  username,
+  url,
+  resourceType,
+  resourceId
 }: {
   title?: string;
   message: string;
   color?: number;
   username?: string;
+  url?: string;
+  resourceType?: 'news' | 'event' | 'committee' | 'user';
+  resourceId?: string;
 }) => {
   try {
+    // Si l'URL n'est pas fournie mais que nous avons l'ID et le type de ressource,
+    // nous laissons la fonction Edge construire l'URL complète
     const { data, error } = await supabase.functions.invoke('discord-notify', {
-      body: { title, message, color, username }
+      body: { 
+        title, 
+        message, 
+        color, 
+        username, 
+        url, 
+        resourceType, 
+        resourceId 
+      }
     });
 
     if (error) {
