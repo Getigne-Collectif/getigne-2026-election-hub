@@ -10,3 +10,6 @@ max_rows = 1000
 [functions]
 [functions.invite-user]
 verify_jwt = true
+
+[functions.discord-notify]
+verify_jwt = true
