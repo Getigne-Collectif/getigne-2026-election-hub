@@ -133,24 +133,24 @@ const AdminNewsPage = () => {
           .select('*')
           .eq('id', id)
           .single();
-          
+
         if (fetchError) {
           console.error('Error fetching existing article:', fetchError);
           throw fetchError;
         }
-        
+
         // S'assurer que tous les champs obligatoires sont présents
         const updateData = {
           ...existingArticle,
           status,
           updated_at: new Date().toISOString()
         };
-        
+
         delete updateData.id;
         delete updateData.created_at;
-        
+
         console.log('Updating article with data:', updateData);
-        
+
         // Utiliser PATCH au lieu de POST (update)
         const { data, error } = await supabase
           .from('news')
@@ -173,10 +173,10 @@ const AdminNewsPage = () => {
         await fetchNewsArticles();
         return;
       }
-      
+
       // Pour les autres mises à jour (avec formData)
       let updateData: any = { ...formData };
-      
+
       if (status !== undefined) {
         updateData.status = status;
       }
@@ -324,7 +324,7 @@ const AdminNewsPage = () => {
               </span>
               <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Actualités</h1>
               <p className="text-getigne-700 text-lg mb-6">
-                Gérez les articles d'actualité du site.
+                Gérez l'actualité du collectif.
               </p>
             </div>
           </div>

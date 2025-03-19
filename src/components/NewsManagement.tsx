@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/ui/table';
-import { 
-  Dialog, 
+import {
+  Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -32,6 +32,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import {generatePath, Link} from "react-router-dom";
 
 interface NewsArticle {
   id: string;
@@ -73,9 +74,9 @@ const newsFormSchema = z.object({
 
 type FormValues = z.infer<typeof newsFormSchema>;
 
-const NewsManagement: React.FC<NewsManagementProps> = ({ 
-  news, 
-  loading, 
+const NewsManagement: React.FC<NewsManagementProps> = ({
+  news,
+  loading,
   onCreateNews,
   onUpdateNews,
   onDeleteNews
@@ -141,7 +142,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         image: values.image,
         tags: parseTags(values.tags || ""),
       };
-      
+
       await onCreateNews(formData, status);
       setIsCreateDialogOpen(false);
     } catch (error) {
@@ -153,7 +154,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
   const handleUpdateNews = async (values: FormValues) => {
     if (!selectedArticle) return;
-    
+
     setIsSubmitting(true);
     try {
       const formData: Partial<NewsFormValues> = {
@@ -164,7 +165,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         image: values.image,
         tags: parseTags(values.tags || ""),
       };
-      
+
       await onUpdateNews(selectedArticle.id, formData);
       setIsEditDialogOpen(false);
     } catch (error) {
@@ -178,7 +179,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     const newStatus = article.status === 'published' ? 'draft' : 'published';
     try {
       await onUpdateNews(article.id, {}, newStatus);
-      
+
       toast({
         title: "Statut modifié",
         description: newStatus === 'published' ? "L'article a été publié" : "L'article a été mis en brouillon",
@@ -195,7 +196,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
   const handleConfirmDelete = async () => {
     if (!selectedArticle) return;
-    
+
     try {
       await onDeleteNews(selectedArticle.id);
       setIsDeleteDialogOpen(false);
@@ -237,7 +238,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button 
+        <Button
           onClick={() => setIsCreateDialogOpen(true)}
           className="gap-2"
         >
@@ -268,7 +269,9 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
           <TableBody>
             {filteredNews.map((article) => (
               <TableRow key={article.id}>
-                <TableCell className="font-medium">{article.title}</TableCell>
+                <TableCell className="font-medium"><Link to={article.status === 'draft' ? '#' : generatePath('/actualites/:id', {
+                  id: article.id
+                })}>{article.title}</Link></TableCell>
                 <TableCell>{article.category}</TableCell>
                 <TableCell>
                   {new Date(article.date).toLocaleDateString('fr-FR')}
@@ -282,22 +285,22 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => openEditDialog(article)}
                     >
                       <FileEdit className="h-4 w-4" />
                     </Button>
-                    <Button 
+                    <Button
                       variant={article.status === 'draft' ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleToggleStatus(article)}
                     >
                       {article.status === 'draft' ? "Publier" : "Dépublier"}
                     </Button>
-                    <Button 
-                      variant="destructive" 
+                    <Button
+                      variant="destructive"
                       size="sm"
                       onClick={() => openDeleteDialog(article)}
                     >
@@ -332,7 +335,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="category"
@@ -346,7 +349,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="excerpt"
@@ -354,16 +357,16 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   <FormItem>
                     <FormLabel>Résumé</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        rows={3} 
-                        {...field} 
+                      <Textarea
+                        rows={3}
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="content"
@@ -371,16 +374,16 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   <FormItem>
                     <FormLabel>Contenu</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        rows={10} 
-                        {...field} 
+                      <Textarea
+                        rows={10}
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="image"
@@ -394,7 +397,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="tags"
@@ -461,7 +464,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="category"
@@ -475,7 +478,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="excerpt"
@@ -483,16 +486,16 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     <FormItem>
                       <FormLabel>Résumé</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          rows={3} 
-                          {...field} 
+                        <Textarea
+                          rows={3}
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="content"
@@ -500,16 +503,16 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     <FormItem>
                       <FormLabel>Contenu</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          rows={10} 
-                          {...field} 
+                        <Textarea
+                          rows={10}
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="image"
@@ -523,7 +526,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="tags"
