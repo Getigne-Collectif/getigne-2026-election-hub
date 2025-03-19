@@ -65,18 +65,18 @@ interface NewsManagementProps {
   onDeleteNews: (id: string) => Promise<void>;
 }
 
-// Schema with custom transform for tags
+// Define the schema with proper tags transformation
 const newsFormSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères"),
   excerpt: z.string().min(10, "Le résumé doit contenir au moins 10 caractères"),
   content: z.string().min(50, "Le contenu doit contenir au moins 50 caractères"),
   category: z.string().min(2, "La catégorie est requise"),
   image: z.string().url("L'URL de l'image doit être valide"),
-  // We represent tags as string in the form but transform it to string[] for the API
-  tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()) : []),
+  // We use string for form input but transform to string[] before submission
+  tags: z.string().optional().default(""),
 });
 
-// Define the form values type directly from the schema
+// Define form values from schema before transformation
 type FormValues = z.infer<typeof newsFormSchema>;
 
 const NewsManagement: React.FC<NewsManagementProps> = ({ 
@@ -115,8 +115,8 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: selectedArticle.content,
         category: selectedArticle.category,
         image: selectedArticle.image,
-        // Convert the array to comma-separated string for the form
-        tags: prepareTagsForForm(selectedArticle.tags),
+        // Convert the tags array to a comma-separated string for form display
+        tags: selectedArticle.tags ? selectedArticle.tags.join(', ') : "",
       });
     }
   }, [selectedArticle, isEditDialogOpen, form]);
@@ -135,10 +135,10 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   }, [isCreateDialogOpen, form]);
 
-  // Prepare tags field for display in form
-  const prepareTagsForForm = (tags: string[] | undefined) => {
-    if (!tags || tags.length === 0) return "";
-    return tags.join(', ');
+  // Parse tags string into array
+  const parseTags = (tagsString: string): string[] => {
+    if (!tagsString) return [];
+    return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   };
 
   // Handle creating a new article
@@ -152,8 +152,8 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: values.content,
         category: values.category,
         image: values.image,
-        // Ensure tags is an array
-        tags: Array.isArray(values.tags) ? values.tags : [],
+        // Parse the tags string into an array
+        tags: parseTags(values.tags || ""),
       };
       
       await onCreateNews(formData, status);
@@ -178,8 +178,8 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: values.content,
         category: values.category,
         image: values.image,
-        // Ensure tags is an array
-        tags: Array.isArray(values.tags) ? values.tags : [],
+        // Parse the tags string into an array
+        tags: parseTags(values.tags || ""),
       };
       
       await onUpdateNews(selectedArticle.id, formData);
