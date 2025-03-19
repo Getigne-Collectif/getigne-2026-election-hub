@@ -35,6 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
+import UserMembershipStatus from '@/components/admin/UserMembershipStatus';
 
 interface UserManagementProps {
   users: any[];
@@ -193,6 +194,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
               <TableHead>Date d'inscription</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead>Rôles</TableHead>
+              <TableHead>Adhésion</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -231,6 +233,15 @@ const UserManagement: React.FC<UserManagementProps> = ({
                       <Badge variant="outline">Utilisateur</Badge>
                     )}
                   </div>
+                </TableCell>
+                <TableCell>
+                  {user.status !== 'invited' && (
+                    <UserMembershipStatus 
+                      userId={user.id}
+                      isMember={user.is_member === true}
+                      onUpdate={() => fetchUsers()}
+                    />
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">

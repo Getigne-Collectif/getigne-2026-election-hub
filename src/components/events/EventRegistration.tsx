@@ -207,17 +207,28 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
     );
   }
 
+  // Conteneur unique pour les utilisateurs connectés mais non adhérents pour événements réservés
   if (isMembersOnly && !isMember) {
     return (
-      <div className="bg-getigne-50 p-4 rounded-lg mb-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Users size={18} className="text-getigne-700" />
-          <p className="font-medium text-getigne-900">Événement réservé aux adhérents</p>
+      <div className="border border-getigne-100 p-4 rounded-lg mb-6">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="font-medium">Inscription à l'événement</h3>
+          <div className="text-getigne-500 text-sm flex items-center">
+            <Users size={16} className="mr-1" />
+            <span>{participantCount} participant{participantCount > 1 ? 's' : ''}</span>
+          </div>
         </div>
-        <p className="text-getigne-700 mb-3">Cet événement est réservé aux adhérents. Devenez adhérent pour pouvoir vous inscrire.</p>
+        
+        <div className="flex items-center gap-2 mb-3 text-amber-600 bg-amber-50 p-2 rounded">
+          <Users size={18} />
+          <span>Événement réservé aux adhérents</span>
+        </div>
+        
+        <p className="text-getigne-700 mb-3 text-sm">Pour vous inscrire à cet événement, vous devez être adhérent de l'association.</p>
+        
         <Button 
           asChild
-          className="bg-getigne-accent hover:bg-getigne-accent/90"
+          className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
         >
           <Link to="/adherer">Devenir adhérent</Link>
         </Button>

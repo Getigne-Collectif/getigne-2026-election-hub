@@ -41,6 +41,7 @@ interface UserWithRoles {
   last_name: string;
   status?: string;
   roles: string[];
+  is_member?: boolean;
 }
 
 interface InviteUserData {
@@ -86,6 +87,7 @@ const AdminUsersPage = () => {
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
             status: profile.status || 'active',
+            is_member: profile.is_member || false,
             roles: roles || []
           };
         })

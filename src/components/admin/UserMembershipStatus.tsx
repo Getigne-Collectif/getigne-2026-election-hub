@@ -44,7 +44,7 @@ const UserMembershipStatus: React.FC<UserMembershipStatusProps> = ({
     } catch (error: any) {
       toast({
         title: 'Erreur de mise à jour',
-        description: error.message || 'Une erreur est survenue',
+        description: error.message || 'Une erreur est survenue lors de la mise à jour',
         variant: 'destructive'
       });
       setMemberStatus(isMember); // Reset to original value on error
