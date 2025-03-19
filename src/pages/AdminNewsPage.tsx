@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -125,17 +126,7 @@ const AdminNewsPage = () => {
 
   const handleUpdateNews = async (id: string, formData: Partial<NewsFormData>, status?: string) => {
     try {
-      let updateData: any = { ...formData };
-      
-      if (status !== undefined) {
-        updateData.status = status;
-      }
-
-      updateData.updated_at = new Date().toISOString();
-
-      console.log('Updating article with ID:', id);
-      console.log('Complete update data:', updateData);
-
+      // Si seul le statut est mis à jour, récupérer l'article complet d'abord
       if (Object.keys(formData).length === 0 && status !== undefined) {
         const { data: existingArticle, error: fetchError } = await supabase
           .from('news')
@@ -148,23 +139,56 @@ const AdminNewsPage = () => {
           throw fetchError;
         }
         
-        updateData = {
+        // S'assurer que tous les champs obligatoires sont présents
+        const updateData = {
           ...existingArticle,
           status,
           updated_at: new Date().toISOString()
         };
         
         delete updateData.id;
+        delete updateData.created_at;
+        
+        console.log('Updating article with data:', updateData);
+        
+        const { data, error } = await supabase
+          .from('news')
+          .update(updateData)
+          .eq('id', id)
+          .select();
+
+        if (error) {
+          console.error('Error updating news article:', error);
+          throw error;
+        }
+
+        console.log('Update response:', data);
+
+        toast({
+          title: 'Succès',
+          description: `L'article a été mis à jour avec succès.`
+        });
+
+        await fetchNewsArticles();
+        return;
       }
+      
+      // Pour les autres mises à jour (avec formData)
+      let updateData: any = { ...formData };
+      
+      if (status !== undefined) {
+        updateData.status = status;
+      }
+
+      updateData.updated_at = new Date().toISOString();
+
+      console.log('Updating article with ID:', id);
+      console.log('Complete update data:', updateData);
 
       const { data, error } = await supabase
         .from('news')
-        .upsert([
-          {
-            id,
-            ...updateData
-          }
-        ])
+        .update(updateData)
+        .eq('id', id)
         .select();
 
       if (error) {

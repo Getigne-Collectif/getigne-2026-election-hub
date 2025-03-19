@@ -177,14 +177,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   const handleToggleStatus = async (article: NewsArticle) => {
     const newStatus = article.status === 'published' ? 'draft' : 'published';
     try {
-      await onUpdateNews(article.id, {
-        title: article.title,
-        excerpt: article.excerpt,
-        content: article.content,
-        category: article.category,
-        image: article.image,
-        tags: article.tags
-      }, newStatus);
+      await onUpdateNews(article.id, {}, newStatus);
       
       toast({
         title: "Statut modifié",
