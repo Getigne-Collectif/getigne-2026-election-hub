@@ -71,19 +71,17 @@ const News = () => {
   const [newsArticles, setNewsArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 3;
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
         console.log('Fetching news articles...');
         
-        // Utiliser la requête anonyme pour la page d'accueil (uniquement news publiées)
+        // Utiliser une requête simplifiée pour éviter les problèmes de RLS
         const { data, error } = await supabase
           .from('news')
           .select('*')
-          .eq('status', 'published')  // Assurer que seuls les articles publiés sont affichés
+          .eq('status', 'published')
           .order('date', { ascending: false })
           .limit(3);
         
@@ -95,35 +93,22 @@ const News = () => {
         console.log('Fetched news articles:', data);
         setNewsArticles(data);
         setError(null);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des actualités:', error);
+      } catch (err) {
+        console.error('Erreur lors de la récupération des actualités:', err);
+        setError(err.message || "Impossible de récupérer les actualités.");
         
-        // Si nous n'avons pas dépassé le nombre maximal de tentatives, réessayer
-        if (retryCount < maxRetries) {
-          console.log(`Tentative ${retryCount + 1}/${maxRetries}...`);
-          setRetryCount(retryCount + 1);
-          // Attendre un peu avant de réessayer (avec un délai exponentiel)
-          setTimeout(() => {
-            setLoading(true); // Réactiver l'indicateur de chargement
-          }, 1000 * Math.pow(2, retryCount));
-        } else {
-          setError(error.message || "Impossible de récupérer les actualités après plusieurs tentatives.");
-          // Afficher une notification d'erreur
-          toast({
-            title: "Erreur de chargement",
-            description: "Impossible de récupérer les actualités. Veuillez rafraîchir la page.",
-            variant: "destructive"
-          });
-        }
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de récupérer les actualités. Veuillez rafraîchir la page.",
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    if (loading) {
-      fetchNews();
-    }
-  }, [loading, retryCount]);
+    fetchNews();
+  }, []);
 
   if (loading) {
     return (
@@ -151,7 +136,7 @@ const News = () => {
           <div className="text-center">
             <p className="text-red-500 mb-4">Nous n'avons pas pu charger les dernières actualités.</p>
             <Button 
-              onClick={() => {setLoading(true); setRetryCount(0);}}
+              onClick={() => window.location.reload()}
               className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
             >
               Réessayer
