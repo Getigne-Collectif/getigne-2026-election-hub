@@ -94,14 +94,6 @@ const Navbar = () => {
           Adhérer
         </Link>
       </li>
-      {isAdmin && (
-        <li>
-          <Link to="/admin/users" className={`${isActive('/admin/users')} flex items-center`}>
-            <Shield className="h-4 w-4 mr-1" />
-            Administration
-          </Link>
-        </li>
-      )}
     </>
   );
 

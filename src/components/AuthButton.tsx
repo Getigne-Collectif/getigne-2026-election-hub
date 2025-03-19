@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogIn, LogOut, User, Shield } from 'lucide-react';
+import {LogIn, LogOut, User, Shield, Newspaper} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,7 +50,7 @@ const AuthButton = () => {
   let displayName = user.email || '';
   let firstName = '';
   let lastName = '';
-  
+
   if (profile) {
     // Utiliser les données du profil si disponibles
     displayName = profile.first_name || displayName;
@@ -64,9 +64,6 @@ const AuthButton = () => {
       displayName = firstName;
     }
   }
-
-  console.log('AuthButton rendering with profile:', profile);
-  console.log('User metadata:', user.user_metadata);
 
   return (
     <DropdownMenu>
@@ -92,19 +89,25 @@ const AuthButton = () => {
           )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        
+
         {isAdmin && (
           <>
             <DropdownMenuItem asChild>
               <Link to="/admin/users" className="flex items-center w-full">
                 <Shield className="h-4 w-4 mr-2" />
-                Administration
+                Admin Utilisateurs
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/news" className="flex items-center w-full">
+                <Newspaper className="h-4 w-4 mr-2" />
+                Admin Actualités
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
-        
+
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
           <LogOut className="h-4 w-4 mr-2" />
           Se déconnecter

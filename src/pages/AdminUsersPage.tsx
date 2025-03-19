@@ -190,7 +190,7 @@ const AdminUsersPage = () => {
   const handleToggleUserStatus = async (userId: string, isActive: boolean) => {
     try {
       const newStatus = isActive ? 'active' : 'disabled';
-      
+
       const { error } = await supabase
         .from('profiles')
         .update({ status: newStatus })
