@@ -5,204 +5,36 @@ import { supabase } from '../../integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import AuthContext from './AuthContext';
 import { Profile, IAuthContext } from './types';
-import { 
-  fetchUserRoles, 
-  fetchUserProfile, 
-  calculateSessionRefreshTimer, 
-  fetchCompleteUserData 
-} from './utils';
+import { fetchUserRoles, fetchUserProfile } from './utils';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [isMember, setIsMember] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [sessionExpiryTimer, setSessionExpiryTimer] = useState<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   // Function to refresh user roles
   const refreshUserRoles = async () => {
     if (!user) {
-      console.log('[AUTH] Attempt to refresh roles without logged in user');
       return;
     }
     
-    console.log('[AUTH] Refreshing user roles for:', user.id);
-    
     try {
-      // Get active session to ensure tokens are valid
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error('[AUTH] Error getting session:', sessionError);
-        return;
-      }
-      
-      if (!sessionData.session) {
-        console.log('[AUTH] Session expired, login required');
-        setUser(null);
-        setSession(null);
-        setUserRoles([]);
-        setProfile(null);
-        setAuthChecked(true);
-        return;
-      }
-      
-      // Update the session state
-      setSession(sessionData.session);
-      setUser(sessionData.session.user);
-      
-      // Fetch user roles with active session
+      // Fetch user roles
       const roles = await fetchUserRoles(user.id);
-      console.log('[AUTH] Updated user roles:', roles);
       setUserRoles(roles);
       
       // Fetch user profile
       const profileData = await fetchUserProfile(user.id);
       if (profileData) {
-        console.log('[AUTH] Updated user profile:', profileData);
         setProfile(profileData);
         setIsMember(profileData.is_member === true);
       }
-      
-      // Update timestamps for automatic refresh
-      if (sessionData.session?.expires_at) {
-        setupSessionRefreshTimer(sessionData.session.expires_at);
-      }
     } catch (error) {
-      console.error('[AUTH] General error refreshing roles:', error);
-    }
-  };
-
-  // Function to setup a timer for refreshing based on token expiration
-  const setupSessionRefreshTimer = (expiresAt: number) => {
-    if (sessionExpiryTimer) {
-      clearTimeout(sessionExpiryTimer);
-    }
-    
-    const refreshTime = calculateSessionRefreshTimer(expiresAt);
-    
-    // If token is about to expire, refresh immediately
-    if (refreshTime === 0) {
-      console.log('[AUTH] Token about to expire, refreshing immediately');
-      refreshSession();
-      return;
-    }
-    
-    console.log(`[AUTH] Scheduling role refresh in ${Math.floor(refreshTime/1000/60)} minutes`);
-    
-    const timer = setTimeout(() => {
-      console.log('[AUTH] Executing scheduled role refresh');
-      refreshSession();
-    }, refreshTime);
-    
-    setSessionExpiryTimer(timer);
-  };
-
-  // Function to refresh the session
-  const refreshSession = async () => {
-    console.log('[AUTH] Refreshing session');
-    try {
-      // First try to get the current session
-      const { data: currentSession, error: currentSessionError } = await supabase.auth.getSession();
-      
-      if (currentSessionError) {
-        console.error('[AUTH] Error getting current session:', currentSessionError);
-        // If we can't get the current session, try to refresh it
-      } else if (currentSession?.session) {
-        console.log('[AUTH] Current session exists, using it');
-        setSession(currentSession.session);
-        setUser(currentSession.session.user);
-        
-        // After setting the session, also refresh roles
-        if (currentSession.session.user) {
-          await refreshUserRoles();
-        }
-        
-        // We found a valid session, no need to try refreshing
-        return;
-      }
-      
-      // If we're here, either there was an error or no session, try refreshing
-      const { data, error } = await supabase.auth.refreshSession();
-      
-      if (error) {
-        console.error('[AUTH] Error refreshing session:', error);
-        
-        // If refresh failed, clear state and require login again
-        if (error.message.includes('expired') || error.message.includes('invalid')) {
-          console.log('[AUTH] Session expired or invalid, clearing auth state');
-          setUser(null);
-          setSession(null);
-          setUserRoles([]);
-          setProfile(null);
-          setAuthChecked(true);
-        }
-        return;
-      }
-      
-      if (data && data.session) {
-        console.log('[AUTH] Session refreshed successfully');
-        setSession(data.session);
-        setUser(data.session.user);
-        
-        // After refreshing the session, also refresh roles
-        if (data.session.user) {
-          await refreshUserRoles();
-        }
-      } else {
-        console.log('[AUTH] No session data after refresh attempt');
-        setUser(null);
-        setSession(null);
-        setUserRoles([]);
-        setProfile(null);
-        setAuthChecked(true);
-      }
-    } catch (error) {
-      console.error('[AUTH] Unexpected error refreshing session:', error);
-    }
-  };
-
-  const fetchUserData = async (currentUser: User, currentSession: Session | null) => {
-    if (!currentUser) {
-      setLoading(false);
-      setAuthChecked(true);
-      return;
-    }
-    
-    console.log('[AUTH] Fetching complete user data for:', currentUser.id);
-    setUser(currentUser);
-    
-    if (currentSession) {
-      setSession(currentSession);
-    }
-    
-    try {
-      await fetchCompleteUserData(
-        currentUser,
-        (profileData) => {
-          if (profileData) {
-            setProfile(profileData);
-            setIsMember(profileData.is_member === true);
-          }
-        },
-        (roles) => {
-          setUserRoles(roles);
-        }
-      );
-      
-      // Setup timer for token refresh
-      if (currentSession?.expires_at) {
-        setupSessionRefreshTimer(currentSession.expires_at);
-      }
-    } catch (error) {
-      console.error('[AUTH] Error during user data fetch:', error);
-    } finally {
-      setLoading(false);
-      setAuthChecked(true);
+      console.error('[AUTH] Error refreshing roles:', error);
     }
   };
 
@@ -210,40 +42,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     setLoading(true);
     
-    // First, set up the auth state change listener
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      console.log('[AUTH] Auth state changed:', event, newSession?.user?.id);
+    // Set up the auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[AUTH] Auth state changed:', event, session?.user?.id);
       
-      if (event === 'SIGNED_IN' && newSession?.user) {
-        console.log('[AUTH] User signed in, fetching data for:', newSession.user.id);
-        await fetchUserData(newSession.user, newSession);
-      } else if (event === 'SIGNED_OUT') {
-        console.log('[AUTH] User signed out, clearing data');
-        setUser(null);
-        setSession(null);
-        setUserRoles([]);
-        setIsMember(false);
-        setProfile(null);
-        setAuthChecked(true);
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user);
+        await refreshUserRoles();
         setLoading(false);
-        
-        // Clean up timer on logout
-        if (sessionExpiryTimer) {
-          clearTimeout(sessionExpiryTimer);
-          setSessionExpiryTimer(null);
-        }
-      } else if (event === 'TOKEN_REFRESHED' && newSession?.user) {
-        console.log('[AUTH] Token refreshed, updating user data for:', newSession.user.id);
-        setSession(newSession);
-        await fetchUserData(newSession.user, newSession);
+        setAuthChecked(true);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setUserRoles([]);
+        setProfile(null);
+        setIsMember(false);
+        setLoading(false);
+        setAuthChecked(true);
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        setUser(session.user);
+        await refreshUserRoles();
       }
     });
     
-    // Then, check for an existing session
+    // Check for an existing session
     const getInitialSession = async () => {
       try {
-        console.log('[AUTH] Getting initial session...');
-        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('[AUTH] Error getting session:', error);
@@ -252,72 +76,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        if (initialSession?.user) {
-          console.log('[AUTH] Initial session found, fetching user data for:', initialSession.user.id);
-          setSession(initialSession);
-          await fetchUserData(initialSession.user, initialSession);
-        } else {
-          console.log('[AUTH] No initial session found');
-          setLoading(false);
-          setAuthChecked(true);
+        if (session?.user) {
+          setUser(session.user);
+          await refreshUserRoles();
         }
+        
+        setLoading(false);
+        setAuthChecked(true);
       } catch (error) {
-        console.error('[AUTH] Unexpected error during session initialization:', error);
+        console.error('[AUTH] Error during session initialization:', error);
         setLoading(false);
         setAuthChecked(true);
       }
     };
 
-    // Start with a slight delay to ensure everything is loaded properly
-    setTimeout(() => {
-      getInitialSession();
-    }, 100);
+    getInitialSession();
 
     // Clean up listeners on component unmount
     return () => {
       authListener.subscription.unsubscribe();
-      if (sessionExpiryTimer) {
-        clearTimeout(sessionExpiryTimer);
-      }
     };
   }, []);
-
-  // Handle network reconnection
-  useEffect(() => {
-    const handleOnline = () => {
-      console.log('[AUTH] Network connection restored');
-      if (user) {
-        console.log('[AUTH] Refreshing session after reconnection');
-        refreshSession();
-      }
-    };
-    
-    window.addEventListener('online', handleOnline);
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-    };
-  }, [user]);
 
   // Auth methods
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
-      
-      // Set session after login
-      if (data.session) {
-        setSession(data.session);
-        
-        // Setup refresh based on expiration if login successful
-        if (data.session.expires_at) {
-          setupSessionRefreshTimer(data.session.expires_at);
-        }
-      }
 
     } catch (error: any) {
       toast({
@@ -360,12 +149,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      // Clean up timer on logout
-      if (sessionExpiryTimer) {
-        clearTimeout(sessionExpiryTimer);
-        setSessionExpiryTimer(null);
-      }
-      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     } catch (error: any) {
