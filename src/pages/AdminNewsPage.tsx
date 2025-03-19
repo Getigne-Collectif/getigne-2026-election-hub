@@ -133,9 +133,27 @@ const AdminNewsPage = () => {
         updateData.status = status;
       }
 
-      console.log('Updating article with ID:', id);
-      console.log('Update data:', updateData);
+      // Ajouter un champ updated_at pour forcer la mise à jour
+      updateData.updated_at = new Date().toISOString();
 
+      console.log('Updating article with ID:', id);
+      console.log('Complete update data:', updateData);
+
+      // Vérifier d'abord si l'article existe
+      const { data: existingArticle, error: checkError } = await supabase
+        .from('news')
+        .select('id')
+        .eq('id', id)
+        .single();
+
+      if (checkError) {
+        console.error('Error checking if article exists:', checkError);
+        throw new Error(`L'article avec l'ID ${id} n'existe pas ou n'est pas accessible.`);
+      }
+
+      console.log('Article found, proceeding with update:', existingArticle);
+
+      // Procéder à la mise à jour
       const { error, data } = await supabase
         .from('news')
         .update(updateData)
@@ -149,11 +167,16 @@ const AdminNewsPage = () => {
 
       console.log('Update response:', data);
 
+      if (!data || data.length === 0) {
+        console.warn('Update succeeded but no data returned. Refreshing news list anyway.');
+      }
+
       toast({
         title: 'Succès',
         description: `L'article a été mis à jour avec succès.`
       });
 
+      // Force refresh the article list
       await fetchNewsArticles();
     } catch (error: any) {
       console.error('Erreur lors de la mise à jour de l\'article:', error);
@@ -169,6 +192,20 @@ const AdminNewsPage = () => {
   const handleDeleteNews = async (id: string) => {
     try {
       console.log('Deleting article with ID:', id);
+
+      // Vérifier d'abord si l'article existe
+      const { data: existingArticle, error: checkError } = await supabase
+        .from('news')
+        .select('id')
+        .eq('id', id)
+        .single();
+
+      if (checkError) {
+        console.error('Error checking if article exists:', checkError);
+        throw new Error(`L'article avec l'ID ${id} n'existe pas ou n'est pas accessible.`);
+      }
+
+      console.log('Article found, proceeding with delete:', existingArticle);
 
       const { error } = await supabase
         .from('news')
