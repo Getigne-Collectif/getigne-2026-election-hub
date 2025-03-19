@@ -48,7 +48,6 @@ const AdminNewsPage = () => {
   const fetchNewsArticles = async () => {
     setPageLoading(true);
     try {
-      // Utiliser une approche plus directe avec le rôle de service si possible
       const { data, error } = await supabase
         .from('news')
         .select('*')
@@ -132,18 +131,37 @@ const AdminNewsPage = () => {
         updateData.status = status;
       }
 
-      // Ajouter un champ updated_at pour forcer la mise à jour
       updateData.updated_at = new Date().toISOString();
 
       console.log('Updating article with ID:', id);
       console.log('Complete update data:', updateData);
 
-      // Utiliser upsert pour garantir la mise à jour malgré les politiques RLS
+      if (Object.keys(formData).length === 0 && status !== undefined) {
+        const { data: existingArticle, error: fetchError } = await supabase
+          .from('news')
+          .select('*')
+          .eq('id', id)
+          .single();
+          
+        if (fetchError) {
+          console.error('Error fetching existing article:', fetchError);
+          throw fetchError;
+        }
+        
+        updateData = {
+          ...existingArticle,
+          status,
+          updated_at: new Date().toISOString()
+        };
+        
+        delete updateData.id;
+      }
+
       const { data, error } = await supabase
         .from('news')
         .upsert([
           {
-            id, // Inclure l'ID pour que upsert sache quelle ligne mettre à jour
+            id,
             ...updateData
           }
         ])
@@ -161,7 +179,6 @@ const AdminNewsPage = () => {
         description: `L'article a été mis à jour avec succès.`
       });
 
-      // Rafraîchir la liste des articles pour afficher les données mises à jour
       await fetchNewsArticles();
     } catch (error: any) {
       console.error('Erreur lors de la mise à jour de l\'article:', error);

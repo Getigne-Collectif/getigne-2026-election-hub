@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -34,7 +33,6 @@ import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
-// Define the news article structure
 interface NewsArticle {
   id: string;
   title: string;
@@ -47,7 +45,6 @@ interface NewsArticle {
   status: string;
 }
 
-// Interface for form values after transformation
 interface NewsFormValues {
   title: string;
   excerpt: string;
@@ -65,18 +62,15 @@ interface NewsManagementProps {
   onDeleteNews: (id: string) => Promise<void>;
 }
 
-// Define the schema with proper tags transformation
 const newsFormSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères"),
   excerpt: z.string().min(10, "Le résumé doit contenir au moins 10 caractères"),
   content: z.string().min(50, "Le contenu doit contenir au moins 50 caractères"),
   category: z.string().min(2, "La catégorie est requise"),
   image: z.string().url("L'URL de l'image doit être valide"),
-  // We use string for form input but transform to string[] before submission
   tags: z.string().optional().default(""),
 });
 
-// Define form values from schema before transformation
 type FormValues = z.infer<typeof newsFormSchema>;
 
 const NewsManagement: React.FC<NewsManagementProps> = ({ 
@@ -93,7 +87,6 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Create/edit form
   const form = useForm<FormValues>({
     resolver: zodResolver(newsFormSchema),
     defaultValues: {
@@ -106,7 +99,6 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     },
   });
 
-  // Update form with selected article data
   React.useEffect(() => {
     if (selectedArticle && isEditDialogOpen) {
       form.reset({
@@ -115,13 +107,11 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: selectedArticle.content,
         category: selectedArticle.category,
         image: selectedArticle.image,
-        // Convert the tags array to a comma-separated string for form display
         tags: selectedArticle.tags ? selectedArticle.tags.join(', ') : "",
       });
     }
   }, [selectedArticle, isEditDialogOpen, form]);
 
-  // Reset form when create dialog opens
   React.useEffect(() => {
     if (isCreateDialogOpen) {
       form.reset({
@@ -135,24 +125,20 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   }, [isCreateDialogOpen, form]);
 
-  // Parse tags string into array
   const parseTags = (tagsString: string): string[] => {
     if (!tagsString) return [];
     return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   };
 
-  // Handle creating a new article
   const handleCreateNews = async (values: FormValues, status: 'draft' | 'published') => {
     setIsSubmitting(true);
     try {
-      // Create the news article with proper types
       const formData: NewsFormValues = {
         title: values.title,
         excerpt: values.excerpt,
         content: values.content,
         category: values.category,
         image: values.image,
-        // Parse the tags string into an array
         tags: parseTags(values.tags || ""),
       };
       
@@ -165,20 +151,17 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   };
 
-  // Handle updating an article
   const handleUpdateNews = async (values: FormValues) => {
     if (!selectedArticle) return;
     
     setIsSubmitting(true);
     try {
-      // Update the news article with proper types
       const formData: Partial<NewsFormValues> = {
         title: values.title,
         excerpt: values.excerpt,
         content: values.content,
         category: values.category,
         image: values.image,
-        // Parse the tags string into an array
         tags: parseTags(values.tags || ""),
       };
       
@@ -191,21 +174,32 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   };
 
-  // Handle publishing/unpublishing an article
   const handleToggleStatus = async (article: NewsArticle) => {
     const newStatus = article.status === 'published' ? 'draft' : 'published';
     try {
-      await onUpdateNews(article.id, {}, newStatus);
+      await onUpdateNews(article.id, {
+        title: article.title,
+        excerpt: article.excerpt,
+        content: article.content,
+        category: article.category,
+        image: article.image,
+        tags: article.tags
+      }, newStatus);
+      
       toast({
         title: "Statut modifié",
         description: newStatus === 'published' ? "L'article a été publié" : "L'article a été mis en brouillon",
       });
     } catch (error) {
       console.error("Error toggling article status:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier le statut de l'article.",
+        variant: "destructive"
+      });
     }
   };
 
-  // Handle deleting an article
   const handleConfirmDelete = async () => {
     if (!selectedArticle) return;
     
@@ -218,19 +212,16 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     }
   };
 
-  // Open edit dialog for an article
   const openEditDialog = (article: NewsArticle) => {
     setSelectedArticle(article);
     setIsEditDialogOpen(true);
   };
 
-  // Open delete dialog for an article
   const openDeleteDialog = (article: NewsArticle) => {
     setSelectedArticle(article);
     setIsDeleteDialogOpen(true);
   };
 
-  // Filter articles based on search term
   const filteredNews = news.filter(article => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -327,7 +318,6 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         </Table>
       )}
 
-      {/* Creation dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -456,7 +446,6 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Edit dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -579,7 +568,6 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirmation dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
