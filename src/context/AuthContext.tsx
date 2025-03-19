@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -9,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   profile: any;
   loading: boolean;
+  authChecked: boolean;
   userRoles: Role[];
   isAdmin: boolean;
   isModerator: boolean;
@@ -21,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
   loading: true,
+  authChecked: false,
   userRoles: [],
   isAdmin: false,
   isModerator: false,
@@ -40,9 +41,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [profile, setProfile] = useState<any>(null);
   const [userRoles, setUserRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const [authInitialized, setAuthInitialized] = useState(false);
 
-  // Fonction pour récupérer le profil utilisateur
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log('Fetching profile for user:', userId);
@@ -65,18 +66,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Fonction pour récupérer les rôles de l'utilisateur
   const fetchUserRoles = async (userId: string): Promise<Role[]> => {
     try {
       console.log('Fetching roles for user:', userId);
       
-      // Utiliser la fonction RPC qui évite la récursion RLS
       const { data, error } = await supabase.rpc('get_user_roles', { uid: userId });
       
       if (error) {
         console.error('Error fetching user roles via RPC:', error);
         
-        // Essayer une méthode alternative si l'RPC échoue
         const { data: rolesData, error: rolesError } = await supabase
           .from('user_roles')
           .select('role')
@@ -87,7 +85,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           return [];
         }
         
-        // Extraire la liste des rôles
         const roles = rolesData.map(item => item.role as Role);
         console.log('User roles retrieved from table:', roles);
         return roles;
@@ -101,7 +98,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Initialise l'état d'authentification au chargement
   useEffect(() => {
     const initializeAuth = async () => {
       setLoading(true);
@@ -134,13 +130,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } finally {
         setLoading(false);
         setAuthInitialized(true);
+        setAuthChecked(true);
       }
     };
 
     initializeAuth();
   }, []);
 
-  // Écoute les changements d'état d'authentification après l'initialisation
   useEffect(() => {
     if (!authInitialized) return;
     
@@ -151,7 +147,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (session?.user) {
           setUser(session.user);
           
-          // Important: await pour s'assurer que le profil est chargé avant de continuer
           const profileData = await fetchUserProfile(session.user.id);
           console.log('Profile data after auth state change:', profileData);
           
@@ -159,7 +154,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setProfile(profileData);
           }
           
-          // Récupérer les rôles de l'utilisateur
           const roles = await fetchUserRoles(session.user.id);
           setUserRoles(roles);
         } else {
@@ -189,7 +183,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setProfile(null);
       setUserRoles([]);
       
-      // Forcer un rechargement de la page pour effacer toutes les données en cache
       window.location.href = '/';
     } catch (error) {
       console.error('Error during sign out:', error);
@@ -213,9 +206,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Vérifier si l'utilisateur a un rôle spécifique
   const isAdmin = userRoles.includes('admin');
-  const isModerator = userRoles.includes('moderator') || isAdmin; // Un admin est aussi modérateur
+  const isModerator = userRoles.includes('moderator') || isAdmin;
 
   return (
     <AuthContext.Provider 
@@ -223,6 +215,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         user, 
         profile, 
         loading, 
+        authChecked,
         userRoles,
         isAdmin,
         isModerator,

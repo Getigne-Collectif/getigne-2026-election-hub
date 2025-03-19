@@ -41,11 +41,10 @@ interface NewsFormData {
 }
 
 const AdminNewsPage = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading, authChecked } = useAuth();
   const navigate = useNavigate();
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const fetchNewsArticles = async () => {
     setLoading(true);
@@ -57,7 +56,6 @@ const AdminNewsPage = () => {
 
       if (error) throw error;
 
-      // Transform the data to ensure consistent types
       const transformedData = data.map(article => ({
         ...article,
         status: article.status || 'published',
@@ -177,20 +175,8 @@ const AdminNewsPage = () => {
   };
 
   useEffect(() => {
-    const checkAuth = async () => {
-      // Attendre que le statut d'authentification soit chargé
-      if (user === null || user) {
-        setAuthChecked(true);
-      }
-    };
-
-    checkAuth();
-  }, [user]);
-
-  useEffect(() => {
     if (!authChecked) return;
 
-    // Rediriger si l'utilisateur n'est pas admin
     if (!user) {
       toast({
         title: 'Accès refusé',
@@ -221,7 +207,6 @@ const AdminNewsPage = () => {
       <div className="min-h-screen">
         <Navbar />
 
-        {/* Header */}
         <div className="pt-24 pb-12 bg-getigne-50">
           <div className="container mx-auto px-4">
             <Breadcrumb className="mb-6">
@@ -256,7 +241,7 @@ const AdminNewsPage = () => {
 
         <section className="py-16">
           <div className="container mx-auto px-4">
-            {!authChecked ? (
+            {!authChecked || loading ? (
               <div className="text-center py-10">
                 <p>Vérification des droits d'accès...</p>
               </div>
@@ -271,7 +256,7 @@ const AdminNewsPage = () => {
             ) : (
               <NewsManagement
                 news={newsArticles}
-                loading={loading}
+                loading={pageLoading}
                 onCreateNews={handleCreateNews}
                 onUpdateNews={handleUpdateNews}
                 onDeleteNews={handleDeleteNews}

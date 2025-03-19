@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -51,16 +50,14 @@ interface InviteUserData {
 }
 
 const AdminUsersPage = () => {
-  const { user, isAdmin, userRoles } = useAuth();
+  const { user, isAdmin, userRoles, loading, authChecked } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Récupérer tous les profils de la table profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
@@ -72,23 +69,20 @@ const AdminUsersPage = () => {
         return;
       }
 
-      // Récupérer les utilisateurs invités
       const { data: invitedUsers, error: invitedError } = await supabase
         .from('invited_users')
         .select('*');
 
       if (invitedError) console.error("Erreur lors de la récupération des invitations:", invitedError);
 
-      // Convertir les profils en utilisateurs avec rôles
       const profilesData = await Promise.all(
         profiles.map(async (profile: Profile) => {
-          // Récupérer les rôles de l'utilisateur
           const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
 
           return {
             id: profile.id,
             email: profile.email || '',
-            created_at: String(profile.created_at), // Ensure it's a string
+            created_at: String(profile.created_at),
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
             status: profile.status || 'active',
@@ -97,14 +91,13 @@ const AdminUsersPage = () => {
         })
       );
 
-      // Ajouter les utilisateurs invités
       const allUsers: UserWithRoles[] = [...profilesData];
       if (invitedUsers && invitedUsers.length > 0) {
         invitedUsers.forEach((invited: InvitedUser) => {
           allUsers.push({
             id: invited.id,
             email: invited.email,
-            created_at: String(invited.created_at), // Ensure it's a string
+            created_at: String(invited.created_at),
             first_name: invited.first_name || '',
             last_name: invited.last_name || '',
             status: 'invited',
@@ -129,7 +122,6 @@ const AdminUsersPage = () => {
   const handleRoleChange = async (userId: string, role: 'moderator' | 'admin', action: 'add' | 'remove') => {
     try {
       if (action === 'add') {
-        // Ajouter un rôle
         const { error } = await supabase
           .from('user_roles')
           .insert({ user_id: userId, role });
@@ -140,7 +132,6 @@ const AdminUsersPage = () => {
           description: `Le rôle ${role} a été ajouté.`
         });
       } else {
-        // Supprimer un rôle
         const { error } = await supabase
           .from('user_roles')
           .delete()
@@ -154,7 +145,6 @@ const AdminUsersPage = () => {
         });
       }
 
-      // Rafraîchir la liste des utilisateurs
       await fetchUsers();
     } catch (error: any) {
       console.error('Erreur lors de la modification du rôle:', error);
@@ -170,7 +160,6 @@ const AdminUsersPage = () => {
     try {
       console.log("Inviting user:", userData);
 
-      // Stocker l'invitation dans la table invited_users
       const { error: insertError } = await supabase
         .from('invited_users')
         .insert({
@@ -181,7 +170,6 @@ const AdminUsersPage = () => {
 
       if (insertError) throw insertError;
 
-      // Envoyer l'invitation via la fonction edge
       const { error: inviteError } = await supabase.functions.invoke('invite-user', {
         body: {
           email: userData.email,
@@ -192,7 +180,6 @@ const AdminUsersPage = () => {
 
       if (inviteError) throw inviteError;
 
-      // Rafraîchir la liste des utilisateurs
       await fetchUsers();
     } catch (error: any) {
       console.error('Erreur lors de l\'invitation:', error);
@@ -204,7 +191,6 @@ const AdminUsersPage = () => {
     try {
       const newStatus = isActive ? 'active' : 'disabled';
       
-      // Mettre à jour le statut dans la table profiles
       const { error } = await supabase
         .from('profiles')
         .update({ status: newStatus })
@@ -212,7 +198,6 @@ const AdminUsersPage = () => {
 
       if (error) throw error;
 
-      // Rafraîchir la liste des utilisateurs
       await fetchUsers();
     } catch (error: any) {
       console.error('Erreur lors de la modification du statut:', error);
@@ -221,20 +206,8 @@ const AdminUsersPage = () => {
   };
 
   useEffect(() => {
-    const checkAuth = async () => {
-      // Attendre que le statut d'authentification soit chargé
-      if (user === null || (user && userRoles.length > 0)) {
-        setAuthChecked(true);
-      }
-    };
-
-    checkAuth();
-  }, [user, userRoles]);
-
-  useEffect(() => {
     if (!authChecked) return;
 
-    // Rediriger si l'utilisateur n'est pas admin
     if (!user) {
       console.log("AdminUsersPage - Redirection: User not authenticated");
       toast({
@@ -268,7 +241,6 @@ const AdminUsersPage = () => {
         <div className="min-h-screen">
           <Navbar />
 
-          {/* Header */}
           <div className="pt-24 pb-12 bg-getigne-50">
             <div className="container mx-auto px-4">
               <Breadcrumb className="mb-6">
@@ -303,8 +275,7 @@ const AdminUsersPage = () => {
 
           <section className="py-16">
             <div className="container mx-auto px-4">
-
-              {!authChecked ? (
+              {!authChecked || loading ? (
                 <div className="text-center py-10">
                   <p>Vérification des droits d'accès...</p>
                 </div>
@@ -319,7 +290,7 @@ const AdminUsersPage = () => {
               ) : (
                 <UserManagement
                   users={users}
-                  loading={loading}
+                  loading={pageLoading}
                   onRoleChange={handleRoleChange}
                   onInviteUser={handleInviteUser}
                   onToggleUserStatus={handleToggleUserStatus}
