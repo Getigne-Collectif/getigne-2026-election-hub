@@ -53,7 +53,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         .from('comments')
         .select(`
           *,
-          profiles(first_name, last_name)
+          profiles:profiles(first_name, last_name)
         `)
         .eq('news_id', newsId);
 
@@ -76,10 +76,20 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       
       // Transform the data to match our Comment interface
       const transformedData = data?.map(item => {
-        // Handle the profiles property correctly
+        // Handle profiles which might be null, an empty array, or an array with objects
+        let profileData: Profile | undefined = undefined;
+        
+        if (item.profiles && Array.isArray(item.profiles) && item.profiles.length > 0) {
+          // If profiles is a non-empty array, take the first element
+          profileData = item.profiles[0];
+        } else if (item.profiles && typeof item.profiles === 'object' && 'first_name' in item.profiles) {
+          // If profiles is already an object with the right properties
+          profileData = item.profiles as unknown as Profile;
+        }
+        
         return {
           ...item,
-          profiles: item.profiles?.[0] || null
+          profiles: profileData
         };
       }) || [];
       
