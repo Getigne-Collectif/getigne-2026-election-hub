@@ -4,6 +4,7 @@ import { Calendar, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from '@/components/ui/use-toast';
 
 const NewsCard = ({ article, index }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -70,14 +71,19 @@ const News = () => {
   const [newsArticles, setNewsArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
         console.log('Fetching news articles...');
+        
+        // Utiliser la requête anonyme pour la page d'accueil (uniquement news publiées)
         const { data, error } = await supabase
           .from('news')
           .select('*')
+          .eq('status', 'published')  // Assurer que seuls les articles publiés sont affichés
           .order('date', { ascending: false })
           .limit(3);
         
@@ -88,16 +94,36 @@ const News = () => {
         
         console.log('Fetched news articles:', data);
         setNewsArticles(data);
+        setError(null);
       } catch (error) {
         console.error('Erreur lors de la récupération des actualités:', error);
-        setError(error.message);
+        
+        // Si nous n'avons pas dépassé le nombre maximal de tentatives, réessayer
+        if (retryCount < maxRetries) {
+          console.log(`Tentative ${retryCount + 1}/${maxRetries}...`);
+          setRetryCount(retryCount + 1);
+          // Attendre un peu avant de réessayer (avec un délai exponentiel)
+          setTimeout(() => {
+            setLoading(true); // Réactiver l'indicateur de chargement
+          }, 1000 * Math.pow(2, retryCount));
+        } else {
+          setError(error.message || "Impossible de récupérer les actualités après plusieurs tentatives.");
+          // Afficher une notification d'erreur
+          toast({
+            title: "Erreur de chargement",
+            description: "Impossible de récupérer les actualités. Veuillez rafraîchir la page.",
+            variant: "destructive"
+          });
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNews();
-  }, []);
+    if (loading) {
+      fetchNews();
+    }
+  }, [loading, retryCount]);
 
   if (loading) {
     return (
@@ -113,7 +139,54 @@ const News = () => {
     return (
       <section id="actualites" className="py-24 px-4 bg-getigne-50">
         <div className="container mx-auto">
-          <div className="text-center text-red-500">Une erreur est survenue: {error}</div>
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+              Actualités
+            </span>
+            <h2 className="text-4xl font-bold mt-4 mb-6">Dernières nouvelles du collectif</h2>
+            <p className="text-getigne-700 text-lg">
+              Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-red-500 mb-4">Nous n'avons pas pu charger les dernières actualités.</p>
+            <Button 
+              onClick={() => {setLoading(true); setRetryCount(0);}}
+              className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+            >
+              Réessayer
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Traiter le cas où la requête a réussi mais n'a retourné aucun résultat
+  if (newsArticles.length === 0) {
+    return (
+      <section id="actualites" className="py-24 px-4 bg-getigne-50">
+        <div className="container mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+              Actualités
+            </span>
+            <h2 className="text-4xl font-bold mt-4 mb-6">Dernières nouvelles du collectif</h2>
+            <p className="text-getigne-700 text-lg">
+              Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="mb-4">Aucune actualité disponible pour le moment.</p>
+            <Button 
+              asChild
+              className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+            >
+              <Link to="/actualites">
+                Voir toutes nos actualités
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
     );
