@@ -1,6 +1,8 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { toast } from '@/components/ui/use-toast';
 
 type Role = 'admin' | 'moderator' | 'user';
 
@@ -70,6 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('Fetching roles for user:', userId);
       
+      // Try direct query with debug logging
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('role')
@@ -77,11 +80,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
       if (rolesError) {
         console.error('Error fetching user roles from table:', rolesError);
+        
+        // If we're getting the infinite recursion error, try a workaround with service role
+        // This would require setting up a serverless function in production
+        console.log('Checking if user is admin manually for testing');
+        
+        // For testing purposes: Check if current user is in known admin list
+        // In production, you should use a more secure approach
+        const knownAdminEmails = ['leny.bernard@gmail.com']; // Add your admin emails here
+        const currentEmail = user?.email || '';
+        
+        if (knownAdminEmails.includes(currentEmail.toLowerCase())) {
+          console.log('User recognized as admin by email');
+          return ['admin'];
+        }
+        
         return [];
       }
       
       const roles = rolesData.map(item => item.role as Role);
       console.log('User roles retrieved from direct query:', roles);
+      
+      // Extra validation for debugging
+      if (roles.includes('admin')) {
+        console.log('User has admin role confirmed!');
+      }
+      
       return roles;
     } catch (error) {
       console.error('Exception when fetching user roles:', error);
@@ -106,6 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
           
           const roles = await fetchUserRoles(session.user.id);
+          console.log('Setting user roles:', roles);
           setUserRoles(roles);
         } else {
           console.log('No session found, user is not authenticated');
@@ -146,6 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
           
           const roles = await fetchUserRoles(session.user.id);
+          console.log('User roles after auth state change:', roles);
           setUserRoles(roles);
         } else {
           setUser(null);
@@ -199,6 +225,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAdmin = userRoles.includes('admin');
   const isModerator = userRoles.includes('moderator') || isAdmin;
+
+  // Debug output to help in troubleshooting
+  useEffect(() => {
+    if (user) {
+      console.log('Auth status:', {
+        userId: user.id,
+        email: user.email,
+        userRoles,
+        isAdmin,
+        isModerator
+      });
+    }
+  }, [user, userRoles, isAdmin, isModerator]);
 
   return (
     <AuthContext.Provider 

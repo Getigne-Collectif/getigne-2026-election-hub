@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +30,13 @@ const Navbar = () => {
       ? 'text-getigne-accent'
       : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200';
   };
+
+  useEffect(() => {
+    // Log admin status for debugging
+    if (user) {
+      console.log('Navbar admin status check:', { isAdmin, userId: user.id });
+    }
+  }, [isAdmin, user]);
 
   const NavLinks = () => (
     <>
@@ -94,6 +101,39 @@ const Navbar = () => {
           Adhérer
         </Link>
       </li>
+      {isAdmin && (
+        <li className="relative group">
+          <div className="flex items-center cursor-pointer">
+            <span
+              className={
+                isActive('/admin/users') ||
+                isActive('/admin/news')
+                  ? 'text-getigne-accent'
+                  : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
+              }
+            >
+              <Shield className="inline h-4 w-4 mr-1" />
+              Admin
+            </span>
+            <ChevronDown
+              size={16}
+              className="ml-1 transition-transform group-hover:rotate-180"
+            />
+          </div>
+          <ul className="absolute left-0 mt-2 bg-white shadow-md rounded-md py-2 w-48 z-10 hidden group-hover:block">
+            <li className="px-4 py-2 hover:bg-getigne-50">
+              <Link to="/admin/users" className="block">
+                Utilisateurs
+              </Link>
+            </li>
+            <li className="px-4 py-2 hover:bg-getigne-50">
+              <Link to="/admin/news" className="block">
+                Actualités
+              </Link>
+            </li>
+          </ul>
+        </li>
+      )}
     </>
   );
 
