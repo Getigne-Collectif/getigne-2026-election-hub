@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,8 +56,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         `)
         .eq('news_id', newsId);
 
-      // Si l'utilisateur n'est pas modérateur et qu'on ne montre pas tous les commentaires,
-      // on filtre pour ne montrer que les commentaires approuvés
       if (!isModerator && !showAllComments) {
         query = query.eq('status', 'approved');
       }
@@ -74,17 +71,15 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       
       console.log('Fetched comments:', data);
       
-      // Transform the data to match our Comment interface
       const transformedData = data?.map(item => {
-        // Handle profiles which might be null, an empty array, or an array with objects
         let profileData: Profile | undefined = undefined;
         
-        if (item.profiles && Array.isArray(item.profiles) && item.profiles.length > 0) {
-          // If profiles is a non-empty array, take the first element
-          profileData = item.profiles[0];
-        } else if (item.profiles && typeof item.profiles === 'object' && 'first_name' in item.profiles) {
-          // If profiles is already an object with the right properties
-          profileData = item.profiles as unknown as Profile;
+        if (item.profiles) {
+          if (Array.isArray(item.profiles) && item.profiles.length > 0) {
+            profileData = item.profiles[0];
+          } else if (typeof item.profiles === 'object' && 'first_name' in item.profiles) {
+            profileData = item.profiles as unknown as Profile;
+          }
         }
         
         return {
@@ -129,10 +124,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         user_id: user.id,
         news_id: newsId,
         content: newComment.trim(),
-        status: 'pending' // Tous les commentaires sont en attente par défaut
+        status: 'pending'
       });
       
-      // Insert the new comment
       const { data: commentData, error: commentError } = await supabase
         .from('comments')
         .insert([
@@ -152,7 +146,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       
       console.log('Comment inserted:', commentData);
       
-      // Fetch the profile data
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('first_name, last_name')
@@ -166,14 +159,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       
       console.log('Profile fetched:', profileData);
       
-      // Combine the comment and profile data
       const newCommentWithProfile = {
         ...commentData[0],
         profiles: profileData
       } as Comment;
       
       if (isModerator || showAllComments) {
-        // Si modérateur ou affichage de tous les commentaires, ajouter au début de la liste
         setComments([newCommentWithProfile, ...comments]);
       }
       
@@ -185,7 +176,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
           'Votre commentaire a été soumis et est en attente de validation par un modérateur'
       });
       
-      // Force reload comments to ensure we have the latest data
       fetchComments();
     } catch (error: any) {
       toast({
@@ -213,7 +203,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         throw error;
       }
 
-      // Mettre à jour l'état local
       setComments(comments.map(comment => 
         comment.id === commentId ? { ...comment, status: newStatus } : comment
       ));
@@ -225,7 +214,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
           'Le commentaire a été rejeté et ne sera pas visible publiquement'
       });
       
-      // Rafraîchir les commentaires pour s'assurer que tout est à jour
       fetchComments();
     } catch (error: any) {
       toast({
