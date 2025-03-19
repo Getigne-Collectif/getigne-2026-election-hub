@@ -42,7 +42,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
 
   const fetchComments = async () => {
     try {
-      // First, fetch the comments
+      // Fetch comments
       let query = supabase
         .from('comments')
         .select('*')
@@ -69,7 +69,8 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       
       console.log('Fetched comments:', commentsData);
       
-      // Now fetch profiles for these comments
+      // Since we can't use a JOIN due to apparent relationship issues,
+      // fetch profiles separately and combine them manually
       const userIds = [...new Set(commentsData.map(comment => comment.user_id))];
       
       const { data: profilesData, error: profilesError } = await supabase

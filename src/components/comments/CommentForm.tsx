@@ -69,6 +69,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, onCommentSubmitted })
       
       console.log('Comment inserted:', commentData);
       
+      // Fetch user profile to display name
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('first_name, last_name')
@@ -77,16 +78,16 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, onCommentSubmitted })
         
       if (profileError) {
         console.error('Error fetching profile:', profileError);
-        throw profileError;
+        // Continue without profile data
+      } else {
+        console.log('Profile fetched:', profileData);
       }
-      
-      console.log('Profile fetched:', profileData);
       
       setNewComment('');
       toast({
         title: 'Commentaire soumis',
         description: isModerator ? 
-          'Votre commentaire a été publié et est en attente de modération' : 
+          'Votre commentaire a été publié' : 
           'Votre commentaire a été soumis et est en attente de validation par un modérateur'
       });
       
