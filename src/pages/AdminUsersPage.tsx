@@ -53,7 +53,7 @@ interface InviteUserData {
 }
 
 const AdminUsersPage = () => {
-  const { user, isAdmin, userRoles, loading, authChecked } = useAuth();
+  const { user, isAdmin, userRoles, loading, authChecked, refreshUserRoles } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
@@ -131,6 +131,12 @@ const AdminUsersPage = () => {
           .insert({ user_id: userId, role });
 
         if (error) throw error;
+        
+        // Si l'utilisateur modifie son propre rôle, rafraîchir ses rôles
+        if (userId === user?.id) {
+          await refreshUserRoles();
+        }
+        
         toast({
           title: 'Succès',
           description: `Le rôle ${role} a été ajouté.`
@@ -143,6 +149,12 @@ const AdminUsersPage = () => {
           .eq('role', role);
 
         if (error) throw error;
+        
+        // Si l'utilisateur modifie son propre rôle, rafraîchir ses rôles
+        if (userId === user?.id) {
+          await refreshUserRoles();
+        }
+        
         toast({
           title: 'Succès',
           description: `Le rôle ${role} a été retiré.`
@@ -212,6 +224,8 @@ const AdminUsersPage = () => {
   useEffect(() => {
     if (!authChecked) return;
 
+    console.log("AdminUsersPage - Auth checked:", { user: !!user, isAdmin, userRoles });
+
     if (!user) {
       console.log("AdminUsersPage - Redirection: User not authenticated");
       toast({
@@ -225,12 +239,22 @@ const AdminUsersPage = () => {
 
     if (user && !isAdmin) {
       console.log("AdminUsersPage - Redirection: User not admin", { userRoles });
-      toast({
-        title: 'Accès refusé',
-        description: "Vous n'avez pas les droits d'accès à cette page.",
-        variant: 'destructive'
+      
+      // Tentative de rafraîchir les rôles si l'utilisateur pense être admin
+      refreshUserRoles().then(() => {
+        // Vérifier à nouveau après rafraîchissement
+        if (!isAdmin) {
+          toast({
+            title: 'Accès refusé',
+            description: "Vous n'avez pas les droits d'accès à cette page.",
+            variant: 'destructive'
+          });
+          navigate('/');
+        } else {
+          console.log("AdminUsersPage - Access granted after role refresh");
+          fetchUsers();
+        }
       });
-      navigate('/');
       return;
     }
 
@@ -238,7 +262,7 @@ const AdminUsersPage = () => {
       console.log("AdminUsersPage - Fetching users as admin");
       fetchUsers();
     }
-  }, [user, isAdmin, authChecked, navigate]);
+  }, [user, isAdmin, authChecked, navigate, refreshUserRoles]);
 
   return (
     <div>
@@ -290,6 +314,12 @@ const AdminUsersPage = () => {
             ) : !isAdmin ? (
               <div className="text-center py-10">
                 <p>Vous n'avez pas les droits pour accéder à cette page.</p>
+                <button 
+                  onClick={() => refreshUserRoles()}
+                  className="mt-4 px-4 py-2 bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90 transition-colors"
+                >
+                  Actualiser mes droits
+                </button>
               </div>
             ) : (
               <UserManagement

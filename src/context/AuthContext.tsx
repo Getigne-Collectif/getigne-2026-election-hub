@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -8,6 +7,8 @@ interface Profile {
   first_name?: string;
   last_name?: string;
   is_member: boolean;
+  status?: string;
+  email?: string;
   [key: string]: any;
 }
 
@@ -25,6 +26,7 @@ interface IAuthContext {
   authChecked: boolean;
   setUser: (user: any) => void;
   signInWithProvider: (provider: 'discord' | 'facebook' | 'google') => Promise<void>;
+  refreshUserRoles: () => Promise<void>;
 }
 
 const AuthContext = createContext<IAuthContext>({
@@ -41,6 +43,7 @@ const AuthContext = createContext<IAuthContext>({
   authChecked: false,
   setUser: () => {},
   signInWithProvider: async () => {},
+  refreshUserRoles: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -54,93 +57,144 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authChecked, setAuthChecked] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      // Get the current user from Supabase
-      const { data: { user } } = await supabase.auth.getUser();
+  const refreshUserRoles = async () => {
+    if (!user) return;
+    
+    console.log('Refreshing user roles for:', user.id);
+    
+    try {
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
 
-      // If there's a user, fetch their roles and profile
-      if (user) {
-        setUser(user);
-        
-        // Fetch user roles
-        const { data: rolesData, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id);
-
-        if (rolesError) {
-          console.error('Error fetching user roles:', rolesError);
-        } else {
-          const roles = rolesData.map(r => r.role);
-          setUserRoles(roles);
-        }
-
-        // Fetch user profile to check member status
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-        } else if (profileData) {
-          setProfile(profileData);
-          setIsMember(profileData.is_member === true);
-        }
+      if (rolesError) {
+        console.error('Error fetching user roles:', rolesError);
+        return;
       }
+      
+      const roles = rolesData.map(r => r.role);
+      console.log('Updated user roles:', roles);
+      setUserRoles(roles);
+      
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        return;
+      }
+      
+      if (profileData) {
+        console.log('Updated user profile:', profileData);
+        setProfile(profileData);
+        setIsMember(profileData.is_member === true);
+      }
+    } catch (error) {
+      console.error('Error during roles refresh:', error);
+    }
+  };
+
+  const fetchUserData = async (currentUser: any) => {
+    if (!currentUser) {
       setLoading(false);
       setAuthChecked(true);
+      return;
+    }
+    
+    console.log('Fetching complete user data for:', currentUser.id);
+    setUser(currentUser);
+    
+    try {
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', currentUser.id);
+
+      if (rolesError) {
+        console.error('Error fetching user roles:', rolesError);
+      } else {
+        const roles = rolesData.map(r => r.role);
+        console.log('Fetched user roles:', roles);
+        setUserRoles(roles);
+      }
+
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      } else if (profileData) {
+        console.log('Fetched user profile:', profileData);
+        setProfile(profileData);
+        setIsMember(profileData.is_member === true);
+      }
+    } catch (error) {
+      console.error('Error during user data fetch:', error);
+    } finally {
+      setLoading(false);
+      setAuthChecked(true);
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    
+    const getInitialSession = async () => {
+      try {
+        console.log('Getting initial session...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          setLoading(false);
+          setAuthChecked(true);
+          return;
+        }
+
+        if (session?.user) {
+          console.log('Initial session found, fetching user data for:', session.user.id);
+          await fetchUserData(session.user);
+        } else {
+          console.log('No initial session found');
+          setLoading(false);
+          setAuthChecked(true);
+        }
+      } catch (error) {
+        console.error('Unexpected error during session initialization:', error);
+        setLoading(false);
+        setAuthChecked(true);
+      }
     };
 
-    // Initial fetch
-    fetchUserData();
-
-    // Set up auth state change listener
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+      
       if (event === 'SIGNED_IN' && session?.user) {
-        setUser(session.user);
-        
-        // Fetch user roles
-        const { data: rolesData, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id);
-
-        if (rolesError) {
-          console.error('Error fetching user roles:', rolesError);
-        } else {
-          const roles = rolesData.map(r => r.role);
-          setUserRoles(roles);
-        }
-
-        // Fetch user profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-        } else if (profileData) {
-          setProfile(profileData);
-          setIsMember(profileData.is_member === true);
-        }
-        
-        setAuthChecked(true);
+        console.log('User signed in, fetching data for:', session.user.id);
+        await fetchUserData(session.user);
       } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out, clearing data');
         setUser(null);
         setUserRoles([]);
         setIsMember(false);
         setProfile(null);
         setAuthChecked(true);
+        setLoading(false);
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        console.log('Token refreshed, updating user data for:', session.user.id);
+        await fetchUserData(session.user);
       }
     });
 
-    // Cleanup
+    getInitialSession();
+
     return () => {
       authListener.subscription.unsubscribe();
     };
@@ -226,7 +280,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Check if user has specific roles
   const isAdmin = userRoles.includes('admin');
   const isModerator = userRoles.includes('moderator') || isAdmin;
 
@@ -244,6 +297,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     authChecked,
     setUser,
     signInWithProvider,
+    refreshUserRoles,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

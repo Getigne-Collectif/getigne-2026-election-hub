@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, ChevronDown, Shield } from 'lucide-react';
@@ -10,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, user, refreshUserRoles } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,11 +31,13 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    // Log admin status for debugging
+    // Log admin status for debugging and refresh user roles on initial load
     if (user) {
       console.log('Navbar admin status check:', { isAdmin, userId: user.id });
+      // S'assurer que les rôles sont à jour au chargement de la navbar
+      refreshUserRoles();
     }
-  }, [isAdmin, user]);
+  }, [isAdmin, user, refreshUserRoles]);
 
   const NavLinks = () => (
     <>
@@ -101,7 +102,6 @@ const Navbar = () => {
           Adhérer
         </Link>
       </li>
-
     </>
   );
 
