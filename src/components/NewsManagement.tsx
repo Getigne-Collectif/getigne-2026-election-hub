@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -114,6 +115,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: selectedArticle.content,
         category: selectedArticle.category,
         image: selectedArticle.image,
+        // Convert the array to comma-separated string for the form
         tags: prepareTagsForForm(selectedArticle.tags),
       });
     }
@@ -150,7 +152,8 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: values.content,
         category: values.category,
         image: values.image,
-        tags: Array.isArray(values.tags) ? values.tags : []
+        // Ensure tags is an array
+        tags: Array.isArray(values.tags) ? values.tags : [],
       };
       
       await onCreateNews(formData, status);
@@ -175,7 +178,8 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         content: values.content,
         category: values.category,
         image: values.image,
-        tags: Array.isArray(values.tags) ? values.tags : []
+        // Ensure tags is an array
+        tags: Array.isArray(values.tags) ? values.tags : [],
       };
       
       await onUpdateNews(selectedArticle.id, formData);
@@ -415,11 +419,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   <FormItem>
                     <FormLabel>Tags (séparés par des virgules)</FormLabel>
                     <FormControl>
-                      <Input 
-                        {...field} 
-                        value={typeof field.value === 'string' ? field.value : Array.isArray(field.value) ? field.value.join(', ') : ''}
-                        onChange={(e) => field.onChange(e.target.value)}
-                      />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
