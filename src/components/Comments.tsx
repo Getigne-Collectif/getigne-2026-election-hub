@@ -52,10 +52,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         .from('comments')
         .select(`
           *,
-          profiles:user_id (
-            first_name,
-            last_name
-          )
+          profiles:profiles!user_id(first_name, last_name)
         `)
         .eq('news_id', newsId);
 
@@ -75,14 +72,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       }
       
       console.log('Fetched comments:', data);
-      
-      // Transform the data to match our Comment interface
-      const transformedData = data?.map(item => ({
-        ...item,
-        profiles: item.profiles as unknown as Profile
-      })) || [];
-      
-      setComments(transformedData as Comment[]);
+      setComments(data as Comment[]);
     } catch (error) {
       console.error('Erreur lors de la récupération des commentaires:', error);
     } finally {

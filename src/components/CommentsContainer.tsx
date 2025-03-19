@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,10 +51,7 @@ const CommentsContainer: React.FC<CommentsContainerProps> = ({ newsId }) => {
         .from('comments')
         .select(`
           *,
-          profiles:user_id (
-            first_name,
-            last_name
-          )
+          profiles:profiles!user_id(first_name, last_name)
         `)
         .eq('news_id', newsId);
 
@@ -75,14 +71,7 @@ const CommentsContainer: React.FC<CommentsContainerProps> = ({ newsId }) => {
       }
       
       console.log('Fetched comments:', data);
-      
-      // Transform the data to match our Comment interface
-      const transformedData = data?.map(item => ({
-        ...item,
-        profiles: item.profiles as unknown as Profile
-      })) || [];
-      
-      setComments(transformedData as Comment[]);
+      setComments(data as Comment[]);
     } catch (error) {
       console.error('Erreur lors de la récupération des commentaires:', error);
     } finally {
@@ -180,7 +169,10 @@ const CommentsContainer: React.FC<CommentsContainerProps> = ({ newsId }) => {
     try {
       const { error } = await supabase
         .from('comments')
-        .update({ status: newStatus })
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', commentId);
 
       if (error) {
@@ -198,6 +190,9 @@ const CommentsContainer: React.FC<CommentsContainerProps> = ({ newsId }) => {
           'Le commentaire est maintenant visible pour tous les utilisateurs' : 
           'Le commentaire a été rejeté et ne sera pas visible publiquement'
       });
+      
+      // Refresh comments to ensure we have the latest data
+      fetchComments();
     } catch (error: any) {
       toast({
         title: 'Erreur de modération',
