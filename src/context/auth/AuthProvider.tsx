@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../../integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import AuthContext from './AuthContext';
@@ -14,6 +14,7 @@ import {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRoles, setUserRoles] = useState<string[]>([]);
@@ -44,11 +45,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!sessionData.session) {
         console.log('[AUTH] Session expired, login required');
         setUser(null);
+        setSession(null);
         setUserRoles([]);
         setProfile(null);
         setAuthChecked(true);
         return;
       }
+      
+      // Update the session state
+      setSession(sessionData.session);
       
       // Fetch user roles with active session
       const roles = await fetchUserRoles(user.id);
@@ -83,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // If token is about to expire, refresh immediately
     if (refreshTime === 0) {
       console.log('[AUTH] Token about to expire, refreshing immediately');
-      refreshUserRoles();
+      refreshSession();
       return;
     }
     
@@ -91,13 +96,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const timer = setTimeout(() => {
       console.log('[AUTH] Executing scheduled role refresh');
-      refreshUserRoles();
+      refreshSession();
     }, refreshTime);
     
     setSessionExpiryTimer(timer);
   };
 
-  const fetchUserData = async (currentUser: User, session: any) => {
+  // Function to refresh the session
+  const refreshSession = async () => {
+    console.log('[AUTH] Refreshing session');
+    try {
+      const { data, error } = await supabase.auth.refreshSession();
+      if (error) {
+        console.error('[AUTH] Error refreshing session:', error);
+        return;
+      }
+      
+      if (data && data.session) {
+        console.log('[AUTH] Session refreshed successfully');
+        setSession(data.session);
+        setUser(data.session.user);
+        
+        // After refreshing the session, also refresh roles
+        if (data.session.user) {
+          await refreshUserRoles();
+        }
+      }
+    } catch (error) {
+      console.error('[AUTH] Unexpected error refreshing session:', error);
+    }
+  };
+
+  const fetchUserData = async (currentUser: User, currentSession: Session | null) => {
     if (!currentUser) {
       setLoading(false);
       setAuthChecked(true);
@@ -106,6 +136,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     console.log('[AUTH] Fetching complete user data for:', currentUser.id);
     setUser(currentUser);
+    
+    if (currentSession) {
+      setSession(currentSession);
+    }
     
     try {
       await fetchCompleteUserData(
@@ -122,8 +156,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       
       // Setup timer for token refresh
-      if (session?.expires_at) {
-        setupSessionRefreshTimer(session.expires_at);
+      if (currentSession?.expires_at) {
+        setupSessionRefreshTimer(currentSession.expires_at);
       }
     } catch (error) {
       console.error('[AUTH] Error during user data fetch:', error);
@@ -136,12 +170,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Handle tab visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
-      console.log('[AUTH] Visibility changed:', document.visibilityState);
-      setVisibilityState(document.visibilityState);
+      const newVisibilityState = document.visibilityState;
+      console.log('[AUTH] Visibility changed:', newVisibilityState);
+      setVisibilityState(newVisibilityState);
       
-      if (document.visibilityState === 'visible' && user) {
+      if (newVisibilityState === 'visible' && user) {
         console.log('[AUTH] Tab became visible, refreshing user data');
-        refreshUserRoles();
+        refreshSession(); // Use refreshSession instead of just refreshUserRoles
       }
     };
     
@@ -156,42 +191,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     setLoading(true);
     
-    const getInitialSession = async () => {
-      try {
-        console.log('[AUTH] Getting initial session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('[AUTH] Error getting session:', error);
-          setLoading(false);
-          setAuthChecked(true);
-          return;
-        }
-
-        if (session?.user) {
-          console.log('[AUTH] Initial session found, fetching user data for:', session.user.id);
-          await fetchUserData(session.user, session);
-        } else {
-          console.log('[AUTH] No initial session found');
-          setLoading(false);
-          setAuthChecked(true);
-        }
-      } catch (error) {
-        console.error('[AUTH] Unexpected error during session initialization:', error);
-        setLoading(false);
-        setAuthChecked(true);
-      }
-    };
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AUTH] Auth state changed:', event, session?.user?.id);
+    // First, set up the auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log('[AUTH] Auth state changed:', event, newSession?.user?.id);
       
-      if (event === 'SIGNED_IN' && session?.user) {
-        console.log('[AUTH] User signed in, fetching data for:', session.user.id);
-        await fetchUserData(session.user, session);
+      if (event === 'SIGNED_IN' && newSession?.user) {
+        console.log('[AUTH] User signed in, fetching data for:', newSession.user.id);
+        await fetchUserData(newSession.user, newSession);
       } else if (event === 'SIGNED_OUT') {
         console.log('[AUTH] User signed out, clearing data');
         setUser(null);
+        setSession(null);
         setUserRoles([]);
         setIsMember(false);
         setProfile(null);
@@ -203,11 +213,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clearTimeout(sessionExpiryTimer);
           setSessionExpiryTimer(null);
         }
-      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        console.log('[AUTH] Token refreshed, updating user data for:', session.user.id);
-        await fetchUserData(session.user, session);
+      } else if (event === 'TOKEN_REFRESHED' && newSession?.user) {
+        console.log('[AUTH] Token refreshed, updating user data for:', newSession.user.id);
+        setSession(newSession);
+        await fetchUserData(newSession.user, newSession);
       }
     });
+    
+    // Then, check for an existing session
+    const getInitialSession = async () => {
+      try {
+        console.log('[AUTH] Getting initial session...');
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('[AUTH] Error getting session:', error);
+          setLoading(false);
+          setAuthChecked(true);
+          return;
+        }
+
+        if (initialSession?.user) {
+          console.log('[AUTH] Initial session found, fetching user data for:', initialSession.user.id);
+          setSession(initialSession);
+          await fetchUserData(initialSession.user, initialSession);
+        } else {
+          console.log('[AUTH] No initial session found');
+          setLoading(false);
+          setAuthChecked(true);
+        }
+      } catch (error) {
+        console.error('[AUTH] Unexpected error during session initialization:', error);
+        setLoading(false);
+        setAuthChecked(true);
+      }
+    };
 
     getInitialSession();
 
@@ -226,7 +266,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('[AUTH] Network connection restored');
       if (user) {
         console.log('[AUTH] Refreshing user data after reconnection');
-        refreshUserRoles();
+        refreshSession(); // Use refreshSession instead of just refreshUserRoles
       }
     };
     
@@ -247,9 +287,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
       
-      // Setup refresh based on expiration if login successful
-      if (data.session?.expires_at) {
-        setupSessionRefreshTimer(data.session.expires_at);
+      // Set session after login
+      if (data.session) {
+        setSession(data.session);
+        
+        // Setup refresh based on expiration if login successful
+        if (data.session.expires_at) {
+          setupSessionRefreshTimer(data.session.expires_at);
+        }
       }
 
     } catch (error: any) {
