@@ -1,10 +1,20 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from '@/components/ui/use-toast';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationEllipsis, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
+
+const ITEMS_PER_PAGE = 3;
 
 const NewsCard = ({ article, index }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -32,7 +42,6 @@ const NewsCard = ({ article, index }) => {
     };
   }, []);
 
-  // Déterminer l'URL de l'article - utiliser le slug s'il existe, sinon utiliser l'ID
   const articleUrl = article.slug 
     ? `/actualites/${article.slug}`
     : `/actualites/${article.id}`;
@@ -72,23 +81,43 @@ const NewsCard = ({ article, index }) => {
   );
 };
 
-const News = () => {
+const News = ({ limit, showPagination = false }) => {
   const [newsArticles, setNewsArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
         console.log('Fetching news articles...');
         
-        // Utiliser une requête simplifiée pour éviter les problèmes de RLS
+        const from = (currentPage - 1) * ITEMS_PER_PAGE;
+        const to = from + (limit || ITEMS_PER_PAGE) - 1;
+        
+        const { count, error: countError } = await supabase
+          .from('news')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'published');
+          
+        if (countError) {
+          console.error('Error fetching count:', countError);
+        } else {
+          setTotalCount(count || 0);
+        }
+        
         const { data, error } = await supabase
           .from('news')
-          .select('*')
-          .eq('status', 'published') // S'assurer de ne récupérer que les articles publiés
+          .select(`
+            *,
+            author:profiles(first_name, last_name)
+          `)
+          .eq('status', 'published')
           .order('date', { ascending: false })
-          .limit(3);
+          .range(from, to);
         
         if (error) {
           console.error('Error fetching news:', error);
@@ -113,7 +142,12 @@ const News = () => {
     };
 
     fetchNews();
-  }, []);
+  }, [currentPage, limit]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
 
   if (loading) {
     return (
@@ -152,7 +186,6 @@ const News = () => {
     );
   }
 
-  // Traiter le cas où la requête a réussi mais n'a retourné aucun résultat
   if (newsArticles.length === 0) {
     return (
       <section id="actualites" className="py-24 px-4 bg-getigne-50">
@@ -182,6 +215,96 @@ const News = () => {
     );
   }
 
+  const paginationItems = [];
+  const maxVisiblePages = 5;
+
+  if (totalPages > 1) {
+    if (currentPage > 1) {
+      paginationItems.push(
+        <PaginationItem key="prev">
+          <PaginationPrevious 
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="cursor-pointer" 
+          />
+        </PaginationItem>
+      );
+    }
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    if (startPage > 1) {
+      paginationItems.push(
+        <PaginationItem key="start">
+          <PaginationLink 
+            onClick={() => handlePageChange(1)}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      
+      if (startPage > 2) {
+        paginationItems.push(
+          <PaginationItem key="ellipsis-start">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <PaginationLink 
+            isActive={i === currentPage}
+            onClick={() => handlePageChange(i)}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        paginationItems.push(
+          <PaginationItem key="ellipsis-end">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      paginationItems.push(
+        <PaginationItem key="end">
+          <PaginationLink 
+            onClick={() => handlePageChange(totalPages)}
+            className="cursor-pointer"
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    if (currentPage < totalPages) {
+      paginationItems.push(
+        <PaginationItem key="next">
+          <PaginationNext 
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="cursor-pointer" 
+          />
+        </PaginationItem>
+      );
+    }
+  }
+
   return (
     <section id="actualites" className="py-24 px-4 bg-getigne-50">
       <div className="container mx-auto">
@@ -200,6 +323,16 @@ const News = () => {
             <NewsCard key={article.id} article={article} index={index} />
           ))}
         </div>
+
+        {showPagination && totalPages > 1 && (
+          <div className="mt-12">
+            <Pagination>
+              <PaginationContent>
+                {paginationItems}
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
 
         <div className="mt-12 text-center">
           <Button 

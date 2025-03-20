@@ -1,383 +1,484 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Calendar, ChevronRight, Home, Search, Rss, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.tsx";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { X, Search, Calendar, User, FileDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { NewsCard } from '@/components/NewsCard';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationEllipsis, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from '@/components/ui/pagination';
+import { toast } from '@/components/ui/use-toast';
 
-interface NewsArticle {
-  id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  category: string;
-  category_id?: string;
-  news_categories?: {
-    id: string;
-    name: string;
-  };
-  date: string;
-  image: string;
-  tags: string[];
-  created_at: string;
-  updated_at: string;
-  slug?: string;
-}
-
-const NewsCard = ({ article }: { article: NewsArticle }) => {
-  const tags = article.tags || [];
-  const categoryName = article.news_categories?.name || article.category || '';
-  const articleUrl = article.slug 
-    ? `/actualites/${article.slug}`
-    : `/actualites/${article.id}`;
-
-  return (
-    <Link to={articleUrl} className="block">
-      <article className="bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift h-full">
-        <div className="relative h-48 overflow-hidden">
-          <img
-            src={article.image}
-            alt={article.title}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          />
-          <div className="absolute top-0 right-0 bg-getigne-accent text-white px-3 py-1 text-sm font-medium">
-            {categoryName}
-          </div>
-        </div>
-        <div className="p-6">
-          <div className="flex items-center text-getigne-500 text-sm mb-3">
-            <Calendar size={14} className="mr-1" />
-            <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
-          </div>
-          <h3 className="font-medium text-xl mb-2">{article.title}</h3>
-          <p className="text-getigne-700 mb-4">{article.excerpt}</p>
-
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-4">
-              {tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="bg-getigne-50 text-getigne-700 px-2 py-0.5 rounded-full text-xs"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="text-getigne-accent flex items-center text-sm font-medium group">
-            Lire la suite
-            <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-          </div>
-        </div>
-      </article>
-    </Link>
-  );
-};
+const ITEMS_PER_PAGE = 9;
 
 const NewsPage = () => {
-  const [allNewsArticles, setAllNewsArticles] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Tous');
-  const [activeTags, setActiveTags] = useState<string[]>([]);
-  const [categories, setCategories] = useState(['Tous']);
-  const [availableTags, setAvailableTags] = useState<string[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const [newsArticles, setNewsArticles] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [allTags, setAllTags] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Calcul du nombre total de pages
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-
-    const categoryParam = searchParams.get('category');
+    const queryParams = new URLSearchParams(location.search);
+    const categoryParam = queryParams.get('category');
+    const tagParam = queryParams.get('tags');
+    const searchParam = queryParams.get('search');
+    const pageParam = queryParams.get('page');
+    
     if (categoryParam) {
-      setActiveCategory(categoryParam);
+      setSelectedCategory(categoryParam);
+    }
+    
+    if (tagParam) {
+      setSelectedTags(tagParam.split(','));
+    }
+    
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+    
+    if (pageParam && !isNaN(parseInt(pageParam))) {
+      setCurrentPage(parseInt(pageParam));
     }
 
-    const tagsParam = searchParams.getAll('tags');
-    if (tagsParam.length > 0) {
-      setActiveTags(tagsParam);
-    }
-
-    const fetchNews = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('news')
-          .select(`
-            *,
-            news_categories(id, name)
-          `)
-          .eq('status', 'published')
-          .order('date', { ascending: false });
-
-        if (error) throw error;
-
-        const processedData = data.map(article => {
-          if (!article.tags) {
-            article.tags = [];
-          }
-          
-          if (article.news_categories) {
-            article.category = article.news_categories.name;
-          } 
-          
-          return article as NewsArticle;
-        });
-
-        setAllNewsArticles(processedData);
-
-        const uniqueCategories = ['Tous', ...new Set(processedData.map(article => article.category || '').filter(Boolean))];
-        setCategories(uniqueCategories);
-
-        const allTags = new Set<string>();
-        processedData.forEach(article => {
-          if (Array.isArray(article.tags)) {
-            article.tags.forEach(tag => allTags.add(tag));
-          }
-        });
-        setAvailableTags(Array.from(allTags) as string[]);
-
-        setLoading(false);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des actualités:', error);
-        setError((error as Error).message);
-        setLoading(false);
-      }
-    };
-
-    fetchNews();
-  }, [searchParams]);
+    fetchCategories();
+    fetchTags();
+  }, [location.search]);
 
   useEffect(() => {
-    const params = new URLSearchParams();
+    fetchNews();
+  }, [selectedCategory, selectedTags, searchTerm, currentPage]);
 
-    if (activeCategory !== 'Tous') {
-      params.set('category', activeCategory);
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('news_categories')
+        .select('*');
+      
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
+  };
 
-    activeTags.forEach(tag => {
-      params.append('tags', tag);
+  const fetchTags = async () => {
+    try {
+      // Récupérer tous les articles pour extraire les tags uniques
+      const { data, error } = await supabase
+        .from('news')
+        .select('tags')
+        .eq('status', 'published');
+      
+      if (error) throw error;
+      
+      // Extraire et dédupliquer tous les tags
+      const allTagsArray = [];
+      data.forEach(item => {
+        if (Array.isArray(item.tags)) {
+          item.tags.forEach(tag => {
+            if (tag && !allTagsArray.includes(tag)) {
+              allTagsArray.push(tag);
+            }
+          });
+        }
+      });
+      
+      setAllTags(allTagsArray.sort());
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  };
+
+  const fetchNews = async () => {
+    try {
+      setLoading(true);
+      
+      // Calculer le nombre d'éléments à sauter pour la pagination
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+      
+      // Construire la requête de base
+      let query = supabase
+        .from('news')
+        .select(`
+          *,
+          news_categories(id, name),
+          author:profiles(first_name, last_name)
+        `, { count: 'exact' })
+        .eq('status', 'published');
+      
+      // Ajouter les filtres selon les paramètres
+      if (selectedCategory !== 'all') {
+        query = query.eq('category_id', selectedCategory);
+      }
+      
+      if (selectedTags.length > 0) {
+        query = query.overlaps('tags', selectedTags);
+      }
+      
+      if (searchTerm) {
+        query = query.or(`title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`);
+      }
+      
+      // Récupérer le décompte total pour la pagination
+      const { count } = await query.count();
+      setTotalCount(count || 0);
+      
+      // Compléter la requête avec le tri et la pagination
+      const { data, error, count: dataCount } = await query
+        .order('date', { ascending: false })
+        .range(from, to);
+      
+      if (error) throw error;
+      
+      // Transformer les données pour qu'elles soient utilisables par les composants
+      const processedData = data.map(item => {
+        return {
+          ...item,
+          category: item.news_categories ? item.news_categories.name : item.category,
+          tags: Array.isArray(item.tags) ? item.tags : []
+        };
+      });
+      
+      setNewsArticles(processedData);
+    } catch (error) {
+      console.error('Error fetching news:', error);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de récupérer les actualités. Veuillez rafraîchir la page.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadRSS = () => {
+    const baseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://jqpivqdwblrccjzicnxn.supabase.co';
+    window.open(`${baseUrl}/functions/v1/rss-feed`, '_blank');
+  };
+
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value);
+    setCurrentPage(1);
+    updateUrl({ category: value, page: 1 });
+  };
+
+  const handleTagClick = (tag) => {
+    const newSelectedTags = selectedTags.includes(tag)
+      ? selectedTags.filter(t => t !== tag)
+      : [...selectedTags, tag];
+    
+    setSelectedTags(newSelectedTags);
+    setCurrentPage(1);
+    updateUrl({ tags: newSelectedTags.join(','), page: 1 });
+  };
+
+  const handleClearFilters = () => {
+    setSelectedCategory('all');
+    setSelectedTags([]);
+    setSearchTerm('');
+    setCurrentPage(1);
+    navigate('/actualites');
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setCurrentPage(1);
+    updateUrl({ search: searchTerm, page: 1 });
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+    updateUrl({ page });
+  };
+
+  const updateUrl = (params) => {
+    const queryParams = new URLSearchParams(location.search);
+    
+    // Mettre à jour ou supprimer les paramètres
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === null || value === '' || value === 'all' || (Array.isArray(value) && value.length === 0)) {
+        queryParams.delete(key);
+      } else {
+        queryParams.set(key, value);
+      }
     });
-
-    setSearchParams(params);
-  }, [activeCategory, activeTags, setSearchParams]);
-
-  const handleCategoryChange = (category: string) => {
-    setActiveCategory(category);
-  };
-
-  const handleTagSelect = (tag: string) => {
-    if (!activeTags.includes(tag)) {
-      setActiveTags([...activeTags, tag]);
+    
+    // Si un paramètre n'est pas dans params, conserver sa valeur actuelle
+    if (!params.hasOwnProperty('category') && selectedCategory !== 'all') {
+      queryParams.set('category', selectedCategory);
     }
-  };
-
-  const handleTagRemove = (tag: string) => {
-    setActiveTags(activeTags.filter(t => t !== tag));
-  };
-
-  const filteredArticles = allNewsArticles.filter(article => {
-    const categoryName = article.news_categories?.name || article.category || '';
     
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeCategory === 'Tous' || categoryName === activeCategory;
-
-    const matchesTags = activeTags.length === 0 ||
-                        activeTags.every(tag =>
-                          Array.isArray(article.tags) && article.tags.includes(tag)
-                        );
-
-    return matchesSearch && matchesCategory && matchesTags;
-  });
-
-  const getRssFeedUrl = () => {
-    const baseUrl = window.location.origin.includes('localhost')
-      ? "http://localhost:54321/functions/v1/rss-feed"
-      : "https://jqpivqdwblrccjzicnxn.supabase.co/functions/v1/rss-feed";
+    if (!params.hasOwnProperty('tags') && selectedTags.length > 0) {
+      queryParams.set('tags', selectedTags.join(','));
+    }
     
-    return baseUrl;
+    if (!params.hasOwnProperty('search') && searchTerm) {
+      queryParams.set('search', searchTerm);
+    }
+    
+    if (!params.hasOwnProperty('page') && currentPage > 1) {
+      queryParams.set('page', currentPage);
+    }
+    
+    const queryString = queryParams.toString();
+    navigate({
+      pathname: '/actualites',
+      search: queryString ? `?${queryString}` : ''
+    });
   };
+
+  // Générer les éléments de pagination
+  const paginationItems = [];
+  const maxVisiblePages = 5; // Nombre max de pages à afficher
+
+  if (totalPages > 1) {
+    // Ajouter le bouton "Précédent"
+    if (currentPage > 1) {
+      paginationItems.push(
+        <PaginationItem key="prev">
+          <PaginationPrevious 
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="cursor-pointer" 
+          />
+        </PaginationItem>
+      );
+    }
+    
+    // Déterminer quelles pages afficher
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    // Ajuster si on est proche de la fin
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    // Ajouter ellipsis au début si nécessaire
+    if (startPage > 1) {
+      paginationItems.push(
+        <PaginationItem key="start">
+          <PaginationLink 
+            onClick={() => handlePageChange(1)}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      
+      if (startPage > 2) {
+        paginationItems.push(
+          <PaginationItem key="ellipsis-start">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+    
+    // Ajouter les pages
+    for (let i = startPage; i <= endPage; i++) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <PaginationLink 
+            isActive={i === currentPage}
+            onClick={() => handlePageChange(i)}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    // Ajouter ellipsis à la fin si nécessaire
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        paginationItems.push(
+          <PaginationItem key="ellipsis-end">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      paginationItems.push(
+        <PaginationItem key="end">
+          <PaginationLink 
+            onClick={() => handlePageChange(totalPages)}
+            className="cursor-pointer"
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    // Ajouter le bouton "Suivant"
+    if (currentPage < totalPages) {
+      paginationItems.push(
+        <PaginationItem key="next">
+          <PaginationNext 
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="cursor-pointer" 
+          />
+        </PaginationItem>
+      );
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-
-      <div className="pt-24 pb-12 bg-getigne-50">
+      
+      <div className="pt-24 pb-10 bg-getigne-50">
         <div className="container mx-auto px-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink to="/">
-                  <Home className="h-4 w-4 mr-1" />
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Actualités</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          <div className="max-w-3xl mx-auto text-center">
-            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-              Actualités
-            </span>
-            <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos dernières actualités</h1>
-            <p className="text-getigne-700 text-lg mb-4">
+          <div className="text-center max-w-3xl mx-auto mb-8">
+            <h1 className="text-4xl font-bold mb-4">Actualités</h1>
+            <p className="text-lg text-getigne-700">
               Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
             </p>
-            <div className="flex justify-center mt-2 mb-6">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a 
-                      href={getRssFeedUrl()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-getigne-accent text-white px-4 py-2 rounded-md hover:bg-getigne-accent/90 transition-colors"
-                    >
-                      <Rss size={16} />
-                      <span>S'abonner au flux RSS</span>
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Suivez nos actualités avec votre lecteur RSS préféré</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+          </div>
+          
+          <div className="flex flex-wrap gap-4 items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-getigne-100">
+            <form onSubmit={handleSearch} className="flex-1 min-w-[280px]">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <Input
+                  type="text"
+                  placeholder="Rechercher des articles..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </form>
+            
+            <div className="flex gap-2">
+              <Button onClick={handleClearFilters} variant="outline" size="sm">
+                <X size={16} className="mr-1" />
+                Réinitialiser
+              </Button>
+              <Button onClick={handleDownloadRSS} variant="outline" size="sm">
+                <FileDown size={16} className="mr-1" />
+                Flux RSS
+              </Button>
             </div>
           </div>
         </div>
       </div>
-
-      <main className="flex-grow py-16">
+      
+      <main className="flex-grow py-12 bg-white">
         <div className="container mx-auto px-4">
-          {loading ? (
-            <div className="text-center py-8">Chargement des actualités...</div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-500">Une erreur est survenue: {error}</div>
-          ) : (
-            <>
-              <div className="max-w-5xl mx-auto mb-12">
-                <div className="flex gap-4 items-start">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search size={18} className="text-getigne-500" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Rechercher un article..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 w-full md:w-80 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-accent"
-                    />
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <span className="text-getigne-700 self-center">Catégories:</span>
-                    {categories.map((category) => (
-                      <Button
-                        key={category}
-                        variant={activeCategory === category ? "default" : "outline"}
-                        size="sm"
-                        className={
-                          activeCategory === category
-                            ? "bg-getigne-accent hover:bg-getigne-accent/90 text-white"
-                            : "border-getigne-200 text-getigne-700"
-                        }
-                        onClick={() => handleCategoryChange(category)}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-1">
+              <div className="bg-getigne-50 p-6 rounded-lg sticky top-24">
+                <h2 className="font-bold text-lg mb-4">Catégories</h2>
+                <Tabs 
+                  value={selectedCategory} 
+                  onValueChange={handleCategoryChange}
+                  orientation="vertical"
+                  className="w-full"
+                >
+                  <TabsList className="flex flex-col h-auto w-full bg-transparent space-y-1">
+                    <TabsTrigger 
+                      value="all" 
+                      className="justify-start data-[state=active]:bg-getigne-accent data-[state=active]:text-white"
+                    >
+                      Toutes les catégories
+                    </TabsTrigger>
+                    {categories.map(category => (
+                      <TabsTrigger 
+                        key={category.id} 
+                        value={category.id}
+                        className="justify-start data-[state=active]:bg-getigne-accent data-[state=active]:text-white"
                       >
-                        {category}
-                      </Button>
+                        {category.name}
+                      </TabsTrigger>
                     ))}
-                  </div>
-                </div>
-                {availableTags.length > 0 && (
-                  <div>
-                    <div className="flex flex-wrap gap-2 w-full items-start">
-                      <span className="text-getigne-700 self-center">Tags populaires:</span>
-                      <div className="flex flex-wrap gap-2">
-                        {availableTags.slice(0, 10).map((tag) => (
-                          <Button
-                            key={tag}
-                            variant="outline"
-                            size="sm"
-                            className={
-                              activeTags.includes(tag)
-                                ? "bg-getigne-100 border-getigne-300 text-getigne-700"
-                                : "border-getigne-200 text-getigne-700"
-                            }
-                            onClick={() => handleTagSelect(tag)}
-                          >
-                            #{tag}
-                          </Button>
-                        ))}
-                      </div>
+                  </TabsList>
+                </Tabs>
+                
+                {allTags.length > 0 && (
+                  <div className="mt-8">
+                    <h2 className="font-bold text-lg mb-4">Tags</h2>
+                    <div className="flex flex-wrap gap-2">
+                      {allTags.map(tag => (
+                        <Badge 
+                          key={tag} 
+                          variant={selectedTags.includes(tag) ? "default" : "outline"}
+                          className="cursor-pointer"
+                          onClick={() => handleTagClick(tag)}
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
                     </div>
-                  </div>
-                )}
-                {(activeCategory !== 'Tous' || activeTags.length > 0) && (
-                  <div className="flex flex-wrap gap-2 items-center mt-5">
-                    {activeCategory !== 'Tous' && (
-                      <div className="flex items-center bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
-                        Catégorie: {activeCategory}
-                        <button
-                            onClick={() => handleCategoryChange('Tous')}
-                            className="ml-1 p-1 hover:text-getigne-accent"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    )}
-                    {activeTags.map(tag => (
-                      <div key={tag} className="flex items-center bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
-                        #{tag}
-                        <button
-                            onClick={() => handleTagRemove(tag)}
-                            className="ml-1 p-1 hover:text-getigne-accent"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ))}
                   </div>
                 )}
               </div>
-
-              {filteredArticles.length > 0 ? (
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-                  {filteredArticles.map(article => (
-                    <NewsCard key={article.id} article={article} />
-                  ))}
+            </div>
+            
+            <div className="lg:col-span-3">
+              {loading ? (
+                <div className="text-center py-12">Chargement des actualités...</div>
+              ) : newsArticles.length === 0 ? (
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-medium mb-2">Aucun résultat trouvé</h3>
+                  <p className="text-getigne-700 mb-4">
+                    Aucun article ne correspond à vos critères de recherche.
+                  </p>
+                  <Button variant="outline" onClick={handleClearFilters}>
+                    Réinitialiser les filtres
+                  </Button>
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <h3 className="text-xl font-medium mb-2">Aucun article ne correspond à votre recherche</h3>
-                  <p className="text-getigne-700">Essayez avec d'autres mots-clés, catégories ou tags</p>
-                </div>
+                <>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {newsArticles.map((article, index) => (
+                      <NewsCard key={article.id} article={article} />
+                    ))}
+                  </div>
+                  
+                  {totalPages > 1 && (
+                    <div className="mt-12">
+                      <Pagination>
+                        <PaginationContent>
+                          {paginationItems}
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
+            </div>
+          </div>
         </div>
       </main>
-
+      
       <Footer />
     </div>
   );

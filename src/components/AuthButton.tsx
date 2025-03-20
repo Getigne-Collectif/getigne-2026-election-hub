@@ -59,9 +59,9 @@ const AuthButton = () => {
 
   if (profile) {
     // Utiliser les données du profil si disponibles
-    displayName = profile.first_name || displayName;
     firstName = profile.first_name || '';
     lastName = profile.last_name || '';
+    displayName = firstName || displayName;
   } else if (user.user_metadata) {
     // Fallback sur les métadonnées utilisateur
     firstName = user.user_metadata.first_name || '';

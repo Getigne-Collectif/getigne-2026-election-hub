@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -36,7 +35,11 @@ interface NewsArticle {
   tags: string[];
   created_at: string;
   updated_at: string;
-  author?: string;
+  author_id?: string;
+  author?: {
+    first_name: string;
+    last_name: string;
+  };
   slug?: string;
   comments_enabled?: boolean;
 }
@@ -94,7 +97,8 @@ const NewsDetailPage = () => {
           .from('news')
           .select(`
             *,
-            news_categories(id, name)
+            news_categories(id, name),
+            author:profiles(first_name, last_name)
           `)
           .eq('status', 'published');
 
@@ -142,7 +146,8 @@ const NewsDetailPage = () => {
           const query = supabase.from('news')
             .select(`
               *,
-              news_categories(id, name)
+              news_categories(id, name),
+              author:profiles(first_name, last_name)
             `)
             .eq('status', 'published')
             .neq('id', data.id)
@@ -175,7 +180,8 @@ const NewsDetailPage = () => {
               .from('news')
               .select(`
                 *,
-                news_categories(id, name)
+                news_categories(id, name),
+                author:profiles(first_name, last_name)
               `)
               .eq('status', 'published')
               .neq('id', data.id)
@@ -227,6 +233,10 @@ const NewsDetailPage = () => {
   const tags = Array.isArray(article.tags) ? article.tags : [];
   const categoryName = article.news_categories?.name || article.category || '';
   const commentsEnabled = article.comments_enabled !== false;
+  
+  const authorName = article.author 
+    ? `${article.author.first_name} ${article.author.last_name}` 
+    : '';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -249,8 +259,6 @@ const NewsDetailPage = () => {
 
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
-
-
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium">
@@ -264,10 +272,10 @@ const NewsDetailPage = () => {
                   year: 'numeric'
                 })}</time>
               </div>
-              {article.author && (
+              {authorName && (
                 <div className="flex items-center text-getigne-500 text-sm">
                   <User size={16} className="mr-1" />
-                  <span>{article.author}</span>
+                  <span>{authorName}</span>
                 </div>
               )}
             </div>
