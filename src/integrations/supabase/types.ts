@@ -285,6 +285,7 @@ export type Database = {
         Row: {
           author_id: string | null
           category: string
+          category_id: string | null
           comments_enabled: boolean | null
           content: string
           created_at: string
@@ -301,6 +302,7 @@ export type Database = {
         Insert: {
           author_id?: string | null
           category: string
+          category_id?: string | null
           comments_enabled?: boolean | null
           content: string
           created_at?: string
@@ -317,6 +319,7 @@ export type Database = {
         Update: {
           author_id?: string | null
           category?: string
+          category_id?: string | null
           comments_enabled?: boolean | null
           content?: string
           created_at?: string
@@ -330,7 +333,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "news_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "news_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       news_categories: {
         Row: {

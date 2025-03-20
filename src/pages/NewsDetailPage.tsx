@@ -23,6 +23,11 @@ interface NewsArticle {
   excerpt: string;
   content: string;
   category: string;
+  category_id?: string;
+  news_categories?: {
+    id: string;
+    name: string;
+  };
   date: string;
   image: string;
   tags: string[];
@@ -74,7 +79,10 @@ const NewsDetailPage = () => {
         console.log('Fetching article with ID:', id);
         const { data, error } = await supabase
           .from('news')
-          .select('*')
+          .select(`
+            *,
+            news_categories(id, name)
+          `)
           .eq('id', id)
           .eq('status', 'published') // Ne récupérer que les articles publiés
           .single();
@@ -88,6 +96,11 @@ const NewsDetailPage = () => {
 
         // Ensure tags is an array
         const tags = Array.isArray(data.tags) ? data.tags : [];
+        
+        // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
+        if (data.news_categories) {
+          data.category = data.news_categories.name;
+        }
 
         const processedData = {
           ...data,
@@ -98,7 +111,10 @@ const NewsDetailPage = () => {
 
         if (tags.length > 0 || processedData.category) {
           let query = supabase.from('news')
-            .select('*')
+            .select(`
+              *,
+              news_categories(id, name)
+            `)
             .eq('status', 'published') // Assurons-nous que les articles liés sont également publiés
             .neq('id', id)
             .limit(3);
@@ -106,31 +122,59 @@ const NewsDetailPage = () => {
           if (tags.length > 0) {
             // Use overlap for array comparison
             query = query.overlaps('tags', tags);
+          } else if (processedData.category_id) {
+            query = query.eq('category_id', processedData.category_id);
           } else if (processedData.category) {
-            query = query.eq('category', processedData.category);
+            // Fallback à la recherche par nom de catégorie pour la compatibilité
+            const { data: categoryData } = await supabase
+              .from('news_categories')
+              .select('id')
+              .eq('name', processedData.category)
+              .maybeSingle();
+              
+            if (categoryData?.id) {
+              query = query.eq('category_id', categoryData.id);
+            }
           }
 
           const { data: relatedData, error: relatedError } = await query;
 
           if (!relatedError && relatedData.length > 0) {
-            const processedRelatedData = relatedData.map(item => ({
-              ...item,
-              tags: Array.isArray(item.tags) ? item.tags : []
-            }));
+            const processedRelatedData = relatedData.map(item => {
+              // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
+              if (item.news_categories) {
+                item.category = item.news_categories.name;
+              }
+              
+              return {
+                ...item,
+                tags: Array.isArray(item.tags) ? item.tags : []
+              };
+            });
             setRelatedArticles(processedRelatedData as NewsArticle[]);
           } else {
             const { data: recentData } = await supabase
               .from('news')
-              .select('*')
+              .select(`
+                *,
+                news_categories(id, name)
+              `)
               .eq('status', 'published') // Assurons-nous que les articles récents sont également publiés
               .neq('id', id)
               .order('date', { ascending: false })
               .limit(3);
 
-            const processedRecentData = recentData.map(item => ({
-              ...item,
-              tags: Array.isArray(item.tags) ? item.tags : []
-            }));
+            const processedRecentData = recentData.map(item => {
+              // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
+              if (item.news_categories) {
+                item.category = item.news_categories.name;
+              }
+              
+              return {
+                ...item,
+                tags: Array.isArray(item.tags) ? item.tags : []
+              };
+            });
             setRelatedArticles(processedRecentData as NewsArticle[]);
           }
         }
@@ -163,6 +207,7 @@ const NewsDetailPage = () => {
   }
 
   const tags = Array.isArray(article.tags) ? article.tags : [];
+  const categoryName = article.news_categories?.name || article.category || '';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -191,7 +236,7 @@ const NewsDetailPage = () => {
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium">
-                {article.category}
+                {categoryName}
               </span>
               <div className="flex items-center text-getigne-500 text-sm">
                 <Calendar size={16} className="mr-1" />
@@ -240,7 +285,6 @@ const NewsDetailPage = () => {
               )}
             </div>
 
-            {/* Système de commentaires */}
             {id && <CommentsSection newsId={id} />}
 
             {relatedArticles.length > 0 && (

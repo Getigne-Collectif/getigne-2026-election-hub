@@ -20,6 +20,11 @@ interface NewsArticle {
   excerpt: string;
   content: string;
   category: string;
+  category_id?: string;
+  news_categories?: {
+    id: string;
+    name: string;
+  };
   date: string;
   image: string;
   tags: string[];
@@ -30,6 +35,9 @@ interface NewsArticle {
 const NewsCard = ({ article }: { article: NewsArticle }) => {
   // Parse tags from the article if they exist
   const tags = article.tags || [];
+  
+  // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
+  const categoryName = article.news_categories?.name || article.category || '';
 
   return (
     <article className="bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift">
@@ -40,7 +48,7 @@ const NewsCard = ({ article }: { article: NewsArticle }) => {
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />
         <div className="absolute top-0 right-0 bg-getigne-accent text-white px-3 py-1 text-sm font-medium">
-          {article.category}
+          {categoryName}
         </div>
       </div>
       <div className="p-6">
@@ -109,25 +117,34 @@ const NewsPage = () => {
       try {
         const { data, error } = await supabase
           .from('news')
-          .select('*')
+          .select(`
+            *,
+            news_categories(id, name)
+          `)
           .eq('status', 'published')
           .order('date', { ascending: false });
 
         if (error) throw error;
 
-        // Ensure all articles have a valid tags array
+        // Ensure all articles have a valid tags array and category info
         const processedData = data.map(article => {
           // Make sure tags is always an array
           if (!article.tags) {
             article.tags = [];
           }
+          
+          // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
+          if (article.news_categories) {
+            article.category = article.news_categories.name;
+          } 
+          
           return article as NewsArticle;
         });
 
         setAllNewsArticles(processedData);
 
         // Extract unique categories
-        const uniqueCategories = ['Tous', ...new Set(data.map(article => article.category))];
+        const uniqueCategories = ['Tous', ...new Set(processedData.map(article => article.category || '').filter(Boolean))];
         setCategories(uniqueCategories);
 
         // Extract unique tags
@@ -184,9 +201,11 @@ const NewsPage = () => {
 
   // Filtrer les articles en fonction de la recherche, de la catégorie et des tags
   const filteredArticles = allNewsArticles.filter(article => {
+    const categoryName = article.news_categories?.name || article.category || '';
+    
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeCategory === 'Tous' || article.category === activeCategory;
+    const matchesCategory = activeCategory === 'Tous' || categoryName === activeCategory;
 
     // Check if article has all selected tags
     const matchesTags = activeTags.length === 0 ||

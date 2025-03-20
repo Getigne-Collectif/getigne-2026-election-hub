@@ -70,7 +70,7 @@ interface NewsFormValues {
   title: string;
   excerpt: string;
   content: string;
-  category: string;
+  category_id: string;
   image: string | File;
   tags: string[];
   author_id?: string;
@@ -91,7 +91,7 @@ const newsFormSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères"),
   excerpt: z.string().min(10, "Le résumé doit contenir au moins 10 caractères"),
   content: z.string().min(50, "Le contenu doit contenir au moins 50 caractères"),
-  category: z.string().min(2, "La catégorie est requise"),
+  category_id: z.string().min(2, "La catégorie est requise"),
   image: z.any(),
   tags: z.array(z.string()).default([]),
   author_id: z.string().optional(),
@@ -132,7 +132,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
       title: "",
       excerpt: "",
       content: "",
-      category: "",
+      category_id: "",
       image: undefined,
       tags: [],
       author_id: "",
@@ -187,7 +187,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         title: selectedArticle.title,
         excerpt: selectedArticle.excerpt,
         content: selectedArticle.content,
-        category: selectedArticle.category,
+        category_id: selectedArticle.category_id || "",
         image: selectedArticle.image,
         tags: selectedArticle.tags || [],
         author_id: selectedArticle.author_id || "",
@@ -207,7 +207,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         title: "",
         excerpt: "",
         content: "",
-        category: "",
+        category_id: "",
         image: undefined,
         tags: [],
         author_id: user?.id || "",
@@ -290,7 +290,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         title: values.title,
         excerpt: values.excerpt,
         content: values.content,
-        category: values.category,
+        category_id: values.category_id,
         image: imageUrl,
         tags: values.tags,
         author_id: values.author_id || user?.id,
@@ -333,7 +333,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         title: values.title,
         excerpt: values.excerpt,
         content: values.content,
-        category: values.category,
+        category_id: values.category_id,
         image: imageUrl,
         tags: values.tags,
         author_id: values.author_id || user?.id,
@@ -460,51 +460,55 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredNews.map((article) => (
-              <TableRow key={article.id}>
-                <TableCell className="font-medium"><Link to={article.status === 'draft' ? '#' : generatePath('/actualites/:id', {
-                  id: article.id
-                })}>{article.title}</Link></TableCell>
-                <TableCell>{article.category}</TableCell>
-                <TableCell>
-                  {article.publication_date ? 
-                    new Date(article.publication_date).toLocaleDateString('fr-FR') : 
-                    new Date(article.date).toLocaleDateString('fr-FR')}
-                </TableCell>
-                <TableCell>
-                  {article.status === 'draft' ? (
-                    <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Brouillon</Badge>
-                  ) : (
-                    <Badge variant="outline" className="bg-green-100 text-green-800">Publié</Badge>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditDialog(article)}
-                    >
-                      <FileEdit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant={article.status === 'draft' ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleToggleStatus(article)}
-                    >
-                      {article.status === 'draft' ? "Publier" : "Dépublier"}
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => openDeleteDialog(article)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {filteredNews.map((article) => {
+              const categoryName = categories.find(cat => cat.id === article.category_id)?.name || article.category || '';
+              
+              return (
+                <TableRow key={article.id}>
+                  <TableCell className="font-medium"><Link to={article.status === 'draft' ? '#' : generatePath('/actualites/:id', {
+                    id: article.id
+                  })}>{article.title}</Link></TableCell>
+                  <TableCell>{categoryName}</TableCell>
+                  <TableCell>
+                    {article.publication_date ? 
+                      new Date(article.publication_date).toLocaleDateString('fr-FR') : 
+                      new Date(article.date).toLocaleDateString('fr-FR')}
+                  </TableCell>
+                  <TableCell>
+                    {article.status === 'draft' ? (
+                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Brouillon</Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-green-100 text-green-800">Publié</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEditDialog(article)}
+                      >
+                        <FileEdit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant={article.status === 'draft' ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleToggleStatus(article)}
+                      >
+                        {article.status === 'draft' ? "Publier" : "Dépublier"}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => openDeleteDialog(article)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}
@@ -535,7 +539,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="category_id"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Catégorie</FormLabel>
@@ -549,7 +553,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                             </SelectTrigger>
                             <SelectContent>
                               {categories.map(category => (
-                                <SelectItem key={category.id} value={category.name}>
+                                <SelectItem key={category.id} value={category.id}>
                                   {category.name}
                                 </SelectItem>
                               ))}
@@ -818,7 +822,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
                     <FormField
                       control={form.control}
-                      name="category"
+                      name="category_id"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Catégorie</FormLabel>
@@ -832,7 +836,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                               </SelectTrigger>
                               <SelectContent>
                                 {categories.map(category => (
-                                  <SelectItem key={category.id} value={category.name}>
+                                  <SelectItem key={category.id} value={category.id}>
                                     {category.name}
                                   </SelectItem>
                                 ))}

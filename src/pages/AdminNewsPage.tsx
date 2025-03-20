@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -38,7 +37,7 @@ interface NewsFormData {
   title: string;
   excerpt: string;
   content: string;
-  category: string;
+  category_id: string;
   image: string;
   tags: string[];
   author_id?: string;
@@ -55,16 +54,19 @@ const AdminNewsPage = () => {
   const fetchNewsArticles = async () => {
     setPageLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data: newsData, error: newsError } = await supabase
         .from('news')
-        .select('*')
+        .select(`
+          *,
+          news_categories(id, name)
+        `)
         .order('date', { ascending: false });
 
-      if (error) throw error;
+      if (newsError) throw newsError;
 
-      // Transform the data to ensure it has all the expected properties
-      const transformedData = data.map(article => ({
+      const transformedData = newsData.map(article => ({
         ...article,
+        category: article.category || (article.news_categories ? article.news_categories.name : ''),
         status: article.status || 'published',
         tags: Array.isArray(article.tags) ? article.tags :
               (article.tags ?
@@ -76,14 +78,12 @@ const AdminNewsPage = () => {
                 ) :
                 []
               ),
-        // Ensure comments_enabled has a default value if undefined
         comments_enabled: article.comments_enabled !== false,
-        // Make sure author_id and publication_date exist
         author_id: article.author_id || null,
         publication_date: article.publication_date || null
       }));
 
-      setNewsArticles(transformedData as NewsArticle[]);
+      setNewsArticles(transformedData);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des actualités:', error);
       toast({
@@ -133,7 +133,6 @@ const AdminNewsPage = () => {
 
   const handleUpdateNews = async (id: string, formData: Partial<NewsFormData>, status?: string) => {
     try {
-      // Si seul le statut est mis à jour, récupérer l'article complet d'abord
       if (Object.keys(formData).length === 0 && status !== undefined) {
         const { data: existingArticle, error: fetchError } = await supabase
           .from('news')
@@ -146,7 +145,6 @@ const AdminNewsPage = () => {
           throw fetchError;
         }
 
-        // S'assurer que tous les champs obligatoires sont présents
         const updateData = {
           ...existingArticle,
           status,
@@ -158,7 +156,6 @@ const AdminNewsPage = () => {
 
         console.log('Updating article with data:', updateData);
 
-        // Utiliser update au lieu de insert
         const { data, error } = await supabase
           .from('news')
           .update(updateData)
@@ -176,7 +173,6 @@ const AdminNewsPage = () => {
         return;
       }
 
-      // Pour les autres mises à jour (avec formData)
       let updateData: any = { ...formData };
 
       if (status !== undefined) {
@@ -188,7 +184,6 @@ const AdminNewsPage = () => {
       console.log('Updating article with ID:', id);
       console.log('Complete update data:', updateData);
 
-      // Utiliser update
       const { data, error } = await supabase
         .from('news')
         .update(updateData)

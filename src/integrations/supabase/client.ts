@@ -17,3 +17,21 @@ export type NewsCategory = {
   name: string;
   created_at?: string;
 };
+
+// Helper type for news articles with category relation
+export type NewsArticleWithCategory = {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category?: string;
+  category_id?: string;
+  category_name?: string;
+  date: string;
+  image: string;
+  tags: string[];
+  status: string;
+  author_id?: string;
+  publication_date?: string;
+  comments_enabled?: boolean;
+};
