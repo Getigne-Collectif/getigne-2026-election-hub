@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 
 /**
  * Cette fonction vérifie si le bucket news_images existe et le crée si nécessaire.
