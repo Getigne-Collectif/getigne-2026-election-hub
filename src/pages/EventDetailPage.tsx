@@ -22,13 +22,24 @@ const EventDetailPage = () => {
   const { user, isMember } = useAuth();
   const [refreshRegistrations, setRefreshRegistrations] = useState(false);
 
+  // Fonction de log pour le débogage
+  const logDebug = (message: string, data?: any) => {
+    if (data) {
+      console.log(`[EventDetailPage] ${message}:`, data);
+    } else {
+      console.log(`[EventDetailPage] ${message}`);
+    }
+  };
+
+  logDebug('Params received', { id, slug });
+  
   // Si nous avons un slug, récupérer d'abord l'ID réel
   const { data: slugData, isLoading: isLoadingSlug } = useQuery({
     queryKey: ['event-slug', slug],
     queryFn: async () => {
       if (!slug) return null;
       
-      console.log("Fetching event by slug:", slug);
+      logDebug("Fetching event by slug", slug);
       const { data, error } = await supabase
         .from('events')
         .select('id')
@@ -36,11 +47,11 @@ const EventDetailPage = () => {
         .maybeSingle();
       
       if (error) {
-        console.error("Error fetching event by slug:", error);
+        logDebug("Error fetching event by slug", error);
         throw error;
       }
       
-      console.log("Found event by slug:", data);
+      logDebug("Found event by slug", data);
       return data;
     },
     enabled: !!slug && !id,
@@ -49,7 +60,7 @@ const EventDetailPage = () => {
   // Une fois que nous avons l'ID (soit directement, soit à partir du slug), récupérer les détails de l'événement
   useEffect(() => {
     if (slug && slugData && slugData.id) {
-      console.log("Setting event ID from slug data:", slugData.id);
+      logDebug("Setting event ID from slug data", slugData.id);
       setEventId(slugData.id);
     }
   }, [slug, slugData]);
@@ -59,7 +70,7 @@ const EventDetailPage = () => {
     queryFn: async () => {
       if (!eventId) return null;
       
-      console.log("Fetching event details by ID:", eventId);
+      logDebug("Fetching event details by ID", eventId);
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -67,15 +78,23 @@ const EventDetailPage = () => {
         .maybeSingle();
       
       if (error) {
-        console.error("Error fetching event details:", error);
+        logDebug("Error fetching event details", error);
         throw error;
       }
       
-      console.log("Found event details:", data);
+      logDebug("Found event details", data);
       return data;
     },
     enabled: !!eventId,
   });
+
+  // Rediriger vers l'URL avec slug si on est sur une URL avec ID et que l'événement a un slug
+  useEffect(() => {
+    if (id && event && event.slug && !slug) {
+      logDebug("Redirecting to slug URL", event.slug);
+      navigate(`/agenda/${event.slug}`, { replace: true });
+    }
+  }, [id, event, slug, navigate]);
 
   const isLoading = isLoadingSlug || isLoadingEvent;
 
@@ -123,13 +142,6 @@ const EventDetailPage = () => {
   
   // Vérifier si l'événement est passé
   const isPastEvent = new Date() > eventDate;
-
-  // Rediriger vers l'URL avec slug si on est sur une URL avec ID et que l'événement a un slug
-  useEffect(() => {
-    if (id && event && event.slug && !slug) {
-      navigate(`/agenda/${event.slug}`, { replace: true });
-    }
-  }, [id, event, slug, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col">

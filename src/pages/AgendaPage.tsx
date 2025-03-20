@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import {Calendar, MapPin, Clock, Users, ChevronRight, Home} from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -109,9 +110,12 @@ const EventCard = ({ event, index }) => {
 
   const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
   const IconComponent = committeeIcon || Users;
+  
+  // Utiliser le slug s'il existe, sinon utiliser l'ID
+  const eventUrl = event.slug ? `/agenda/${event.slug}` : `/agenda/${event.id}`;
 
   return (
-    <Link to={`/agenda/${event.id}`} className="block hover:no-underline">
+    <Link to={eventUrl} className="block hover:no-underline">
       <div
         ref={ref}
         className={`bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
