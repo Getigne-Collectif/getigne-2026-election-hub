@@ -60,8 +60,8 @@ function App() {
               <Route path="/admin/news" element={<AdminNewsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/admin/actualites/creer" element={<AdminNewsEditorPage />} />
-              <Route path="/admin/actualites/editer/:id" element={<AdminNewsEditorPage />} />
+              <Route path="/admin/news/creer" element={<AdminNewsEditorPage />} />
+              <Route path="/admin/news/editer/:id" element={<AdminNewsEditorPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

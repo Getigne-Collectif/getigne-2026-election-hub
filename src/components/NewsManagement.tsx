@@ -457,7 +457,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
           />
         </div>
         <Button
-          onClick={() => navigate('/admin/actualites/creer')}
+          onClick={() => navigate('/admin/news/creer')}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -511,7 +511,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/admin/actualites/editer/${article.id}`)}
+                        onClick={() => navigate(`/admin/news/editer/${article.id}`)}
                       >
                         <FileEdit className="h-4 w-4" />
                       </Button>

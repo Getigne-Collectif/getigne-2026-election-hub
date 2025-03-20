@@ -169,7 +169,7 @@ const AdminNewsEditorPage = () => {
         description: 'Impossible de récupérer les détails de l\'article.',
         variant: 'destructive'
       });
-      navigate('/admin/actualites');
+      navigate('/admin/news');
     }
   };
 
@@ -363,7 +363,7 @@ const AdminNewsEditorPage = () => {
         }
       }
 
-      navigate('/admin/actualites');
+      navigate('/admin/news');
     } catch (error: any) {
       console.error("Error saving news article:", error);
       toast({
@@ -391,7 +391,7 @@ const AdminNewsEditorPage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/actualites">Administration des actualités</BreadcrumbLink>
+                <BreadcrumbLink href="/admin/news">Administration des actualités</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -404,7 +404,7 @@ const AdminNewsEditorPage = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate('/admin/actualites')}
+              onClick={() => navigate('/admin/news')}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retour
