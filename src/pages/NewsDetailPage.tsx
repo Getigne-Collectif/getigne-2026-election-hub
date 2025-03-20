@@ -19,6 +19,7 @@ import {
 import { Home } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Json } from '@/integrations/supabase/types';
 
 interface NewsArticle {
   id: string;
@@ -125,8 +126,10 @@ const NewsDetailPage = () => {
           return;
         }
 
-        // Ensure tags is an array
-        const tags = Array.isArray(data.tags) ? data.tags : [];
+        // Ensure tags is an array of strings
+        const tags = Array.isArray(data.tags) 
+          ? data.tags.map(tag => String(tag)) 
+          : [];
 
         // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
         const categoryName = data.news_categories ? data.news_categories.name : data.category;
@@ -167,11 +170,16 @@ const NewsDetailPage = () => {
             const processedRelatedData = relatedData.map(item => {
               // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
               const catName = item.news_categories ? item.news_categories.name : item.category;
+              
+              // Ensure tags is an array of strings
+              const itemTags = Array.isArray(item.tags) 
+                ? item.tags.map(tag => String(tag)) 
+                : [];
 
               return {
                 ...item,
                 category: catName,
-                tags: Array.isArray(item.tags) ? item.tags : []
+                tags: itemTags
               } as NewsArticle;
             });
             setRelatedArticles(processedRelatedData);
@@ -193,11 +201,16 @@ const NewsDetailPage = () => {
               const processedRecentData = recentData.map(item => {
                 // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
                 const catName = item.news_categories ? item.news_categories.name : item.category;
+                
+                // Ensure tags is an array of strings
+                const itemTags = Array.isArray(item.tags) 
+                  ? item.tags.map(tag => String(tag)) 
+                  : [];
 
                 return {
                   ...item,
                   category: catName,
-                  tags: Array.isArray(item.tags) ? item.tags : []
+                  tags: itemTags
                 } as NewsArticle;
               });
               setRelatedArticles(processedRecentData);

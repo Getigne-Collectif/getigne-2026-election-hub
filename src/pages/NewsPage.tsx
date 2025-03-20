@@ -31,8 +31,8 @@ const NewsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [allTags, setAllTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [allTags, setAllTags] = useState<string[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -178,10 +178,15 @@ const NewsPage = () => {
       
       // Transformer les données pour qu'elles soient utilisables par les composants
       const processedData = data.map(item => {
+        // Ensure tags is an array of strings
+        const itemTags = Array.isArray(item.tags) 
+          ? item.tags.map(tag => String(tag)) 
+          : [];
+          
         return {
           ...item,
           category: item.news_categories ? item.news_categories.name : item.category,
-          tags: Array.isArray(item.tags) ? item.tags : []
+          tags: itemTags
         };
       });
       
@@ -206,7 +211,7 @@ const NewsPage = () => {
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     setCurrentPage(1);
-    updateUrl({ category: value, page: 1 });
+    updateUrl({ category: value, page: "1" });
   };
 
   const handleTagClick = (tag: string) => {
@@ -216,7 +221,7 @@ const NewsPage = () => {
     
     setSelectedTags(newSelectedTags);
     setCurrentPage(1);
-    updateUrl({ tags: newSelectedTags.join(','), page: 1 });
+    updateUrl({ tags: newSelectedTags.join(','), page: "1" });
   };
 
   const handleClearFilters = () => {
@@ -230,7 +235,7 @@ const NewsPage = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    updateUrl({ search: searchTerm, page: 1 });
+    updateUrl({ search: searchTerm, page: "1" });
   };
 
   const handlePageChange = (page: number) => {
