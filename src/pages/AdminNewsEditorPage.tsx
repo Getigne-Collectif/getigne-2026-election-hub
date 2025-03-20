@@ -93,6 +93,7 @@ const AdminNewsEditorPage = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [availableTags, setAvailableTags] = useState<{id: string, name: string}[]>([]);
   const isEditMode = !!id;
 
   const form = useForm<FormValues>({
@@ -138,18 +139,41 @@ const AdminNewsEditorPage = () => {
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('news_tags')
+        .select('id, name')
+        .order('name');
+
+      if (error) throw error;
+      setAvailableTags(data || []);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des tags:', error);
+    }
+  };
+
   const fetchArticle = async (articleId: string) => {
     try {
       const { data, error } = await supabase
         .from('news')
-        .select(`*`)
+        .select('*')
         .eq('id', articleId)
         .single();
 
       if (error) throw error;
 
+      const { data: tagData, error: tagError } = await supabase
+        .from('news_to_tags')
+        .select('news_tags(id, name)')
+        .eq('news_id', articleId);
+
+      if (tagError) throw tagError;
+
+      const articleTags = tagData.map(item => item.news_tags.name);
+      
       setImagePreview(data.image);
-      setSelectedTags(Array.isArray(data.tags) ? data.tags.map(tag => String(tag)) : []);
+      setSelectedTags(articleTags);
 
       form.reset({
         title: data.title,
@@ -157,7 +181,7 @@ const AdminNewsEditorPage = () => {
         content: data.content,
         category_id: data.category_id || "",
         image: data.image,
-        tags: Array.isArray(data.tags) ? data.tags.map(tag => String(tag)) : [],
+        tags: articleTags,
         author_id: data.author_id || "",
         publication_date: data.publication_date ? new Date(data.publication_date) : new Date(),
         comments_enabled: data.comments_enabled !== false,
@@ -202,6 +226,7 @@ const AdminNewsEditorPage = () => {
 
     fetchCategories();
     fetchUsers();
+    fetchTags();
 
     if (isEditMode && id) {
       fetchArticle(id);
@@ -241,6 +266,14 @@ const AdminNewsEditorPage = () => {
       setSelectedTags(updatedTags);
       form.setValue("tags", updatedTags);
       setNewTag('');
+    }
+  };
+
+  const handleSelectExistingTag = (tagName: string) => {
+    if (!selectedTags.includes(tagName)) {
+      const updatedTags = [...selectedTags, tagName];
+      setSelectedTags(updatedTags);
+      form.setValue("tags", updatedTags);
     }
   };
 
@@ -306,7 +339,6 @@ const AdminNewsEditorPage = () => {
         category_id: values.category_id,
         category: categories.find(cat => cat.id === values.category_id)?.name || '',
         image: imageUrl,
-        tags: values.tags,
         author_id: values.author_id || user?.id,
         publication_date: values.publication_date ? format(values.publication_date, 'yyyy-MM-dd') : undefined,
         comments_enabled: values.comments_enabled,
@@ -322,6 +354,48 @@ const AdminNewsEditorPage = () => {
           .select('id, slug');
 
         if (error) throw error;
+
+        const { error: deleteTagsError } = await supabase
+          .from('news_to_tags')
+          .delete()
+          .eq('news_id', id);
+
+        if (deleteTagsError) throw deleteTagsError;
+
+        if (selectedTags.length > 0) {
+          for (const tagName of selectedTags) {
+            let tagId;
+            const { data: existingTag, error: tagFetchError } = await supabase
+              .from('news_tags')
+              .select('id')
+              .eq('name', tagName)
+              .maybeSingle();
+
+            if (tagFetchError) throw tagFetchError;
+
+            if (existingTag) {
+              tagId = existingTag.id;
+            } else {
+              const { data: newTag, error: createTagError } = await supabase
+                .from('news_tags')
+                .insert({ name: tagName })
+                .select('id')
+                .single();
+
+              if (createTagError) throw createTagError;
+              tagId = newTag.id;
+            }
+
+            const { error: linkError } = await supabase
+              .from('news_to_tags')
+              .insert({
+                news_id: id,
+                tag_id: tagId
+              });
+
+            if (linkError) throw linkError;
+          }
+        }
 
         toast({
           title: "Article mis à jour",
@@ -346,6 +420,43 @@ const AdminNewsEditorPage = () => {
           .select('id, slug');
 
         if (error) throw error;
+
+        const articleId = data[0].id;
+
+        if (selectedTags.length > 0) {
+          for (const tagName of selectedTags) {
+            let tagId;
+            const { data: existingTag, error: tagFetchError } = await supabase
+              .from('news_tags')
+              .select('id')
+              .eq('name', tagName)
+              .maybeSingle();
+
+            if (tagFetchError) throw tagFetchError;
+
+            if (existingTag) {
+              tagId = existingTag.id;
+            } else {
+              const { data: newTag, error: createTagError } = await supabase
+                .from('news_tags')
+                .insert({ name: tagName })
+                .select('id')
+                .single();
+
+              if (createTagError) throw createTagError;
+              tagId = newTag.id;
+            }
+
+            const { error: linkError } = await supabase
+              .from('news_to_tags')
+              .insert({
+                news_id: articleId,
+                tag_id: tagId
+              });
+
+            if (linkError) throw linkError;
+          }
+        }
 
         toast({
           title: "Article créé",
@@ -599,12 +710,29 @@ const AdminNewsEditorPage = () => {
 
                   <div>
                     <FormLabel>Tags</FormLabel>
+                    <div className="mt-2">
+                      <Select onValueChange={handleSelectExistingTag}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un tag existant" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableTags
+                            .filter(tag => !selectedTags.includes(tag.name))
+                            .map(tag => (
+                              <SelectItem key={tag.id} value={tag.name}>
+                                {tag.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
                     <div className="flex items-center mt-2">
                       <Input
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ajouter un tag..."
+                        placeholder="Ajouter un nouveau tag..."
                         className="mr-2"
                       />
                       <Button

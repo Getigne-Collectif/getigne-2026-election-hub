@@ -10,6 +10,12 @@ interface NewsCardProps {
     excerpt: string;
     date: string;
     image: string;
+    tags?: string[];
+    news_to_tags?: Array<{
+      news_tags: {
+        name: string;
+      };
+    }>;
     slug?: string;
     author?: {
       first_name?: string;

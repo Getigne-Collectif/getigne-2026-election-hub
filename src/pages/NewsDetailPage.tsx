@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -34,7 +33,12 @@ interface NewsArticle {
   };
   date: string;
   image: string;
-  tags: string[];
+  news_to_tags?: Array<{
+    news_tags: {
+      name: string;
+    };
+  }>;
+  tags?: string[];
   created_at: string;
   updated_at: string;
   author_id?: string;
@@ -98,7 +102,10 @@ const NewsDetailPage = () => {
           .from('news')
           .select(`
             *,
-            news_categories(id, name)
+            news_categories(id, name),
+            news_to_tags(
+              news_tags(name)
+            )
           `)
           .eq('status', 'published');
 
@@ -123,23 +130,21 @@ const NewsDetailPage = () => {
           return;
         }
 
-        const tags = Array.isArray(data.tags) 
-          ? data.tags.map(tag => String(tag)) 
+        const tags = data.news_to_tags
+          ? data.news_to_tags.map(tag => tag.news_tags.name)
           : [];
 
         const categoryName = data.news_categories ? data.news_categories.name : data.category;
         const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
 
-        // Initialiser l'article sans l'auteur
         const processedData: NewsArticle = {
           ...data,
           category: categoryName,
           category_id: categoryId,
-          tags,
+          tags: tags,
           author: null
         };
 
-        // Si un author_id est présent, chercher les détails de l'auteur dans la table profiles
         if (data.author_id) {
           const { data: authorData, error: authorError } = await supabase
             .from('profiles')
@@ -155,63 +160,102 @@ const NewsDetailPage = () => {
         setArticle(processedData);
 
         if (tags.length > 0 || categoryId) {
-          const query = supabase.from('news')
-            .select(`
-              *,
-              news_categories(id, name)
-            `)
-            .eq('status', 'published')
-            .neq('id', data.id)
-            .limit(3);
-
+          let relatedArticlesQuery;
+          
           if (tags.length > 0) {
-            query.overlaps('tags', tags);
+            const { data: tagData } = await supabase
+              .from('news_tags')
+              .select('id')
+              .in('name', tags);
+            
+            if (tagData && tagData.length > 0) {
+              const tagIds = tagData.map(t => t.id);
+              
+              const { data: relatedIds } = await supabase
+                .from('news_to_tags')
+                .select('news_id')
+                .in('tag_id', tagIds)
+                .neq('news_id', data.id);
+              
+              if (relatedIds && relatedIds.length > 0) {
+                const uniqueNewsIds = [...new Set(relatedIds.map(r => r.news_id))];
+                
+                relatedArticlesQuery = supabase.from('news')
+                  .select(`
+                    *,
+                    news_categories(id, name),
+                    news_to_tags(
+                      news_tags(name)
+                    )
+                  `)
+                  .eq('status', 'published')
+                  .in('id', uniqueNewsIds)
+                  .limit(3);
+              }
+            }
           } else if (categoryId) {
-            query.eq('category_id', categoryId);
+            relatedArticlesQuery = supabase.from('news')
+              .select(`
+                *,
+                news_categories(id, name),
+                news_to_tags(
+                  news_tags(name)
+                )
+              `)
+              .eq('status', 'published')
+              .eq('category_id', categoryId)
+              .neq('id', data.id)
+              .limit(3);
           }
 
-          const { data: relatedData, error: relatedError } = await query;
+          if (relatedArticlesQuery) {
+            const { data: relatedData, error: relatedError } = await relatedArticlesQuery;
 
-          if (!relatedError && relatedData && relatedData.length > 0) {
-            const processedRelatedArticles = [];
-            
-            for (const item of relatedData) {
-              const catName = item.news_categories ? item.news_categories.name : item.category;
+            if (!relatedError && relatedData && relatedData.length > 0) {
+              const processedRelatedArticles = [];
               
-              const itemTags = Array.isArray(item.tags) 
-                ? item.tags.map(tag => String(tag)) 
-                : [];
-
-              const relatedArticle: NewsArticle = {
-                ...item,
-                category: catName,
-                tags: itemTags,
-                author: null
-              };
-
-              // Récupérer les détails de l'auteur si author_id est présent
-              if (item.author_id) {
-                const { data: relatedAuthorData } = await supabase
-                  .from('profiles')
-                  .select('first_name, last_name')
-                  .eq('id', item.author_id)
-                  .single();
+              for (const item of relatedData) {
+                const catName = item.news_categories ? item.news_categories.name : item.category;
                 
-                if (relatedAuthorData) {
-                  relatedArticle.author = relatedAuthorData;
+                const itemTags = item.news_to_tags
+                  ? item.news_to_tags.map(tag => tag.news_tags.name)
+                  : [];
+
+                const relatedArticle: NewsArticle = {
+                  ...item,
+                  category: catName,
+                  tags: itemTags,
+                  author: null
+                };
+
+                if (item.author_id) {
+                  const { data: relatedAuthorData } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name')
+                    .eq('id', item.author_id)
+                    .single();
+                  
+                  if (relatedAuthorData) {
+                    relatedArticle.author = relatedAuthorData;
+                  }
                 }
+                
+                processedRelatedArticles.push(relatedArticle);
               }
               
-              processedRelatedArticles.push(relatedArticle);
+              setRelatedArticles(processedRelatedArticles);
             }
-            
-            setRelatedArticles(processedRelatedArticles);
-          } else {
+          }
+          
+          if (relatedArticles.length === 0) {
             const { data: recentData } = await supabase
               .from('news')
               .select(`
                 *,
-                news_categories(id, name)
+                news_categories(id, name),
+                news_to_tags(
+                  news_tags(name)
+                )
               `)
               .eq('status', 'published')
               .neq('id', data.id)
@@ -224,8 +268,8 @@ const NewsDetailPage = () => {
               for (const item of recentData) {
                 const catName = item.news_categories ? item.news_categories.name : item.category;
                 
-                const itemTags = Array.isArray(item.tags) 
-                  ? item.tags.map(tag => String(tag)) 
+                const itemTags = item.news_to_tags
+                  ? item.news_to_tags.map(tag => tag.news_tags.name)
                   : [];
 
                 const recentArticle: NewsArticle = {
@@ -235,7 +279,6 @@ const NewsDetailPage = () => {
                   author: null
                 };
 
-                // Récupérer les détails de l'auteur si author_id est présent
                 if (item.author_id) {
                   const { data: recentAuthorData } = await supabase
                     .from('profiles')
@@ -282,7 +325,7 @@ const NewsDetailPage = () => {
     return <NotFound />;
   }
 
-  const tags = Array.isArray(article.tags) ? article.tags : [];
+  const tags = article.tags || [];
   const categoryName = article.news_categories?.name || article.category || '';
   const commentsEnabled = article.comments_enabled !== false;
   

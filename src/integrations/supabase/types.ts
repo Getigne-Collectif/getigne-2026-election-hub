@@ -302,7 +302,6 @@ export type Database = {
           publication_date: string | null
           slug: string | null
           status: string
-          tags: Json | null
           title: string
           updated_at: string
         }
@@ -320,7 +319,6 @@ export type Database = {
           publication_date?: string | null
           slug?: string | null
           status?: string
-          tags?: Json | null
           title: string
           updated_at?: string
         }
@@ -338,11 +336,17 @@ export type Database = {
           publication_date?: string | null
           slug?: string | null
           status?: string
-          tags?: Json | null
           title?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_news_author"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "news_category_id_fkey"
             columns: ["category_id"]
@@ -369,6 +373,60 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      news_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      news_to_tags: {
+        Row: {
+          created_at: string
+          id: string
+          news_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          news_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          news_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_to_tags_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_to_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "news_tags"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -85,27 +84,17 @@ const NewsPage = () => {
 
   const fetchTags = async () => {
     try {
-      // Récupérer tous les articles pour extraire les tags uniques
+      // Récupérer tous les tags disponibles
       const { data, error } = await supabase
-        .from('news')
-        .select('tags')
-        .eq('status', 'published');
+        .from('news_tags')
+        .select('name')
+        .order('name');
 
       if (error) throw error;
 
-      // Extraire et dédupliquer tous les tags
-      const allTagsArray = [];
-      data.forEach(item => {
-        if (Array.isArray(item.tags)) {
-          item.tags.forEach(tag => {
-            if (tag && !allTagsArray.includes(tag)) {
-              allTagsArray.push(tag);
-            }
-          });
-        }
-      });
-
-      setAllTags(allTagsArray.sort());
+      // Extraire les noms des tags
+      const tagNames = data.map(tag => tag.name);
+      setAllTags(tagNames);
     } catch (error) {
       console.error('Error fetching tags:', error);
     }
@@ -125,8 +114,11 @@ const NewsPage = () => {
         .select(`
           *,
           news_categories(id, name),
+          news_to_tags(
+            news_tags(name)
+          ),
           author:profiles(first_name, last_name)
-        `)
+        `, { count: 'exact' })
         .eq('status', 'published');
 
       // Ajouter les filtres selon les paramètres
@@ -134,62 +126,67 @@ const NewsPage = () => {
         query = query.eq('category_id', selectedCategory);
       }
 
-      if (selectedTags.length > 0) {
-        const tagConditions = selectedTags
-            .map(tag => `tags.cs.["${tag}"]`)
-            .join(',');
-        query = query.or(tagConditions);
-      }
-
       if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`);
       }
 
-      // Get total count first with a separate query
-      const countQuery = supabase
-        .from('news')
-        .select('id', { count: 'exact', head: false })
-        .eq('status', 'published');
-
-      // Apply the same filters to count query
-      if (selectedCategory !== 'all') {
-        countQuery.eq('category_id', selectedCategory);
-      }
-
+      // Pour le filtre par tags, nous devons faire une requête un peu différente
       if (selectedTags.length > 0) {
-        countQuery.overlaps('tags', selectedTags);
-      }
+        // Récupérer d'abord les IDs des tags sélectionnés
+        const { data: selectedTagData } = await supabase
+          .from('news_tags')
+          .select('id')
+          .in('name', selectedTags);
 
-      if (searchTerm) {
-        countQuery.or(`title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`);
-      }
+        if (selectedTagData && selectedTagData.length > 0) {
+          const tagIds = selectedTagData.map(tag => tag.id);
+          
+          // Récupérer les IDs des articles ayant ces tags
+          const { data: newsWithTags } = await supabase
+            .from('news_to_tags')
+            .select('news_id')
+            .in('tag_id', tagIds);
 
-      const { count, error: countError } = await countQuery;
-
-      if (countError) {
-        console.error('Error getting count:', countError);
-      } else {
-        setTotalCount(count || 0);
+          if (newsWithTags && newsWithTags.length > 0) {
+            const newsIds = [...new Set(newsWithTags.map(item => item.news_id))];
+            query = query.in('id', newsIds);
+          } else {
+            // Aucun article ne correspond aux tags sélectionnés
+            setNewsArticles([]);
+            setTotalCount(0);
+            setLoading(false);
+            return;
+          }
+        } else {
+          // Aucun tag ne correspond aux tags sélectionnés
+          setNewsArticles([]);
+          setTotalCount(0);
+          setLoading(false);
+          return;
+        }
       }
 
       // Compléter la requête avec le tri et la pagination
-      const { data, error } = await query
+      const { data, error, count } = await query
         .order('date', { ascending: false })
         .range(from, to);
 
       if (error) throw error;
 
+      // Mettre à jour le compteur total
+      setTotalCount(count || 0);
+
       // Transformer les données pour qu'elles soient utilisables par les composants
       const processedData = data.map(item => {
-        // Ensure tags is an array of strings
-        const itemTags = Array.isArray(item.tags)
-          ? item.tags.map(tag => String(tag))
+        // Extraire les tags depuis news_to_tags
+        const tags = item.news_to_tags 
+          ? item.news_to_tags.map(tag => tag.news_tags.name)
           : [];
 
         return {
           ...item,
           category: item.news_categories ? item.news_categories.name : item.category,
-          tags: itemTags
+          tags
         };
       });
 

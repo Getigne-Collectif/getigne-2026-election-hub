@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -70,7 +71,12 @@ interface NewsArticle {
   category_id?: string;
   date: string;
   image: string;
-  tags: string[];
+  tags?: string[];
+  news_to_tags?: Array<{
+    news_tags: {
+      name: string;
+    };
+  }>;
   status: string;
   author_id?: string;
   publication_date?: string;
@@ -213,12 +219,25 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     setIsDeleteDialogOpen(true);
   };
 
+  const getDisplayTags = (article: NewsArticle) => {
+    if (article.tags && article.tags.length > 0) {
+      return article.tags;
+    }
+    if (article.news_to_tags && article.news_to_tags.length > 0) {
+      return article.news_to_tags.map(tag => tag.news_tags.name);
+    }
+    return [];
+  };
+
   const filteredNews = news.filter(article => {
     const searchLower = searchTerm.toLowerCase();
+    const articleTags = getDisplayTags(article);
+    
     return (
       article.title.toLowerCase().includes(searchLower) ||
       article.excerpt.toLowerCase().includes(searchLower) ||
-      article.category.toLowerCase().includes(searchLower)
+      article.category.toLowerCase().includes(searchLower) ||
+      articleTags.some(tag => tag.toLowerCase().includes(searchLower))
     );
   });
 
@@ -259,6 +278,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
               <TableHead>Titre</TableHead>
               <TableHead>Catégorie</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead>Tags</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -266,6 +286,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
           <TableBody>
             {filteredNews.map((article) => {
               const categoryName = categories.find(cat => cat.id === article.category_id)?.name || article.category || '';
+              const displayTags = getDisplayTags(article);
 
               return (
                 <TableRow key={article.id}>
@@ -277,6 +298,20 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                     {article.publication_date ?
                       new Date(article.publication_date).toLocaleDateString('fr-FR') :
                       new Date(article.date).toLocaleDateString('fr-FR')}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {displayTags.slice(0, 3).map((tag, i) => (
+                        <Badge key={i} variant="outline" className="bg-getigne-50">
+                          {tag}
+                        </Badge>
+                      ))}
+                      {displayTags.length > 3 && (
+                        <Badge variant="outline" className="bg-getigne-50">
+                          +{displayTags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {article.status === 'draft' ? (

@@ -32,7 +32,12 @@ interface NewsArticle {
   category_id?: string;
   date: string;
   image: string;
-  tags: string[];
+  news_to_tags?: Array<{
+    news_tags: {
+      name: string;
+    };
+  }>;
+  tags?: string[];
   status: string;
   created_at: string;
   updated_at: string;
@@ -67,30 +72,28 @@ const AdminNewsPage = () => {
         .from('news')
         .select(`
           *,
-          news_categories(id, name)
+          news_categories(id, name),
+          news_to_tags(news_tags(id, name))
         `)
         .order('date', { ascending: false });
 
       if (newsError) throw newsError;
 
-      const transformedData = newsData.map(article => ({
-        ...article,
-        category: article.category || (article.news_categories ? article.news_categories.name : ''),
-        status: article.status || 'published',
-        tags: Array.isArray(article.tags) ? article.tags :
-              (article.tags ?
-                (typeof article.tags === 'string' ?
-                  [article.tags] :
-                  Array.isArray(JSON.parse(JSON.stringify(article.tags))) ?
-                    JSON.parse(JSON.stringify(article.tags)) :
-                    []
-                ) :
-                []
-              ),
-        comments_enabled: article.comments_enabled !== false,
-        author_id: article.author_id || null,
-        publication_date: article.publication_date || null
-      }));
+      const transformedData = newsData.map(article => {
+        const tags = article.news_to_tags 
+          ? article.news_to_tags.map(tag => tag.news_tags.name) 
+          : [];
+
+        return {
+          ...article,
+          category: article.category || (article.news_categories ? article.news_categories.name : ''),
+          status: article.status || 'published',
+          tags,
+          comments_enabled: article.comments_enabled !== false,
+          author_id: article.author_id || null,
+          publication_date: article.publication_date || null
+        };
+      });
 
       setNewsArticles(transformedData);
     } catch (error: any) {
@@ -182,6 +185,7 @@ const AdminNewsPage = () => {
 
         delete updateData.id;
         delete updateData.created_at;
+        delete updateData.news_to_tags;
 
         console.log('Updating article with data:', updateData);
 
@@ -245,6 +249,15 @@ const AdminNewsPage = () => {
   const handleDeleteNews = async (id: string) => {
     try {
       console.log('Deleting article with ID:', id);
+
+      const { error: tagRelationsError } = await supabase
+        .from('news_to_tags')
+        .delete()
+        .eq('news_id', id);
+
+      if (tagRelationsError) {
+        console.error('Error deleting tag relations:', tagRelationsError);
+      }
 
       const { error } = await supabase
         .from('news')
