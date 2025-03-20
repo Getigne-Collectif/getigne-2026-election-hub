@@ -135,11 +135,18 @@ const NewsDetailPage = () => {
         const categoryName = data.news_categories ? data.news_categories.name : data.category;
         const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
 
+        // Handle author which might be an error object
+        let authorData = null;
+        if (data.author && typeof data.author === 'object' && !('error' in data.author)) {
+          authorData = data.author;
+        }
+
         const processedData: NewsArticle = {
           ...data,
           category: categoryName,
           category_id: categoryId,
-          tags
+          tags,
+          author: authorData
         };
 
         setArticle(processedData);
@@ -176,10 +183,17 @@ const NewsDetailPage = () => {
                 ? item.tags.map(tag => String(tag)) 
                 : [];
 
+              // Handle author which might be an error object
+              let itemAuthorData = null;
+              if (item.author && typeof item.author === 'object' && !('error' in item.author)) {
+                itemAuthorData = item.author;
+              }
+
               return {
                 ...item,
                 category: catName,
-                tags: itemTags
+                tags: itemTags,
+                author: itemAuthorData
               } as NewsArticle;
             });
             setRelatedArticles(processedRelatedData);
@@ -207,10 +221,17 @@ const NewsDetailPage = () => {
                   ? item.tags.map(tag => String(tag)) 
                   : [];
 
+                // Handle author which might be an error object
+                let itemAuthorData = null;
+                if (item.author && typeof item.author === 'object' && !('error' in item.author)) {
+                  itemAuthorData = item.author;
+                }
+
                 return {
                   ...item,
                   category: catName,
-                  tags: itemTags
+                  tags: itemTags,
+                  author: itemAuthorData
                 } as NewsArticle;
               });
               setRelatedArticles(processedRecentData);
