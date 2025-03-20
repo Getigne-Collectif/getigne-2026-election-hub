@@ -47,7 +47,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             .upload(filePath, file);
 
           if (uploadError) {
-            throw uploadError;
+            console.error('Erreur d\'upload:', uploadError);
+            throw new Error(`Erreur d'upload: ${uploadError.message}`);
           }
 
           // Récupérer l'URL publique
@@ -113,7 +114,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         .upload(filePath, file);
 
       if (uploadError) {
-        throw uploadError;
+        console.error('Erreur d\'upload:', uploadError);
+        throw new Error(`Erreur d'upload: ${uploadError.message}`);
       }
 
       // Récupérer l'URL publique

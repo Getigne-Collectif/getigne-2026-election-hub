@@ -20,22 +20,18 @@ export const setupNewsImagesBucket = async () => {
     const newsImagesBucketExists = buckets.some(bucket => bucket.name === 'news_images');
     
     if (!newsImagesBucketExists) {
-      // Crée le bucket s'il n'existe pas
-      const { error: createError } = await supabase
-        .storage
-        .createBucket('news_images', {
-          public: true,
-          fileSizeLimit: 10485760, // 10MB
-        });
-        
-      if (createError) {
-        console.error('Erreur lors de la création du bucket news_images:', createError);
-        return false;
-      }
-      
-      console.log('Bucket news_images créé avec succès');
+      console.log('Le bucket news_images n\'existe pas, une action SQL est nécessaire');
+      // Au lieu d'essayer de créer le bucket ici (ce qui pourrait échouer à cause des politiques RLS),
+      // on informe simplement l'utilisateur que le bucket n'existe pas
+      toast({
+        title: 'Attention',
+        description: 'Le bucket de stockage pour les images n\'existe pas. Contactez l\'administrateur.',
+        variant: 'destructive'
+      });
+      return false;
     }
     
+    console.log('Bucket news_images trouvé avec succès');
     return true;
   } catch (error) {
     console.error('Erreur lors de la configuration du bucket news_images:', error);

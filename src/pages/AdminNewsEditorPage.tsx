@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -139,7 +138,7 @@ const AdminNewsEditorPage = () => {
       if (error) throw error;
 
       setImagePreview(data.image);
-      setSelectedTags(Array.isArray(data.tags) ? data.tags : []);
+      setSelectedTags(Array.isArray(data.tags) ? data.tags.map(tag => String(tag)) : []);
 
       form.reset({
         title: data.title,
@@ -147,7 +146,7 @@ const AdminNewsEditorPage = () => {
         content: data.content,
         category_id: data.category_id || "",
         image: data.image,
-        tags: Array.isArray(data.tags) ? data.tags : [],
+        tags: Array.isArray(data.tags) ? data.tags.map(tag => String(tag)) : [],
         author_id: data.author_id || "",
         publication_date: data.publication_date ? new Date(data.publication_date) : new Date(),
         comments_enabled: data.comments_enabled !== false,

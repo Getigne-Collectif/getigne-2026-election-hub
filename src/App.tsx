@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,7 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage.tsx";
 import ProfileSetupModal from "@/components/auth/ProfileSetupModal.tsx";
 import { setupNewsImagesBucket } from "./utils/setupNewsImages";
 import { useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
 import AdminNewsEditorPage from './pages/AdminNewsEditorPage';
 
 const queryClient = new QueryClient();
@@ -33,7 +35,9 @@ const queryClient = new QueryClient();
 function App() {
   useEffect(() => {
     // Setup le bucket pour les images des articles
-    setupNewsImagesBucket().catch(console.error);
+    setupNewsImagesBucket().catch(error => {
+      console.error("Erreur lors de la vérification du bucket d'images:", error);
+    });
   }, []);
 
   return (
