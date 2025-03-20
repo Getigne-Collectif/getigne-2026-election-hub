@@ -51,6 +51,17 @@ import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import RichTextEditor from './RichTextEditor';
 
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .normalize('NFD') // Decompose accented characters
+    .replace(/[\u0300-\u036f]/g, '') // Remove accent marks
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with a single hyphen
+    .trim();
+};
+
 interface NewsArticle {
   id: string;
   title: string;
@@ -65,6 +76,7 @@ interface NewsArticle {
   author_id?: string;
   publication_date?: string;
   comments_enabled?: boolean;
+  slug?: string;
 }
 
 interface NewsFormValues {
@@ -78,6 +90,7 @@ interface NewsFormValues {
   status?: string;
   publication_date?: string;
   comments_enabled?: boolean;
+  slug?: string;
 }
 
 interface NewsManagementProps {
@@ -288,6 +301,9 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         imageUrl = values.image;
       }
 
+      // Generate slug from title
+      const slug = generateSlug(values.title);
+
       const formData: NewsFormValues = {
         title: values.title,
         excerpt: values.excerpt,
@@ -298,6 +314,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         author_id: values.author_id || user?.id,
         publication_date: values.publication_date ? format(values.publication_date, 'yyyy-MM-dd') : undefined,
         comments_enabled: values.comments_enabled,
+        slug: slug,
       };
 
       await onCreateNews(formData, status);
@@ -331,6 +348,11 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         imageUrl = values.image;
       }
 
+      // Generate slug from title if it's been changed
+      const slug = values.title !== selectedArticle.title 
+        ? generateSlug(values.title) 
+        : selectedArticle.slug || generateSlug(values.title);
+
       const formData: Partial<NewsFormValues> = {
         title: values.title,
         excerpt: values.excerpt,
@@ -341,6 +363,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
         author_id: values.author_id || user?.id,
         publication_date: values.publication_date ? format(values.publication_date, 'yyyy-MM-dd') : undefined,
         comments_enabled: values.comments_enabled,
+        slug: slug,
       };
 
       await onUpdateNews(selectedArticle.id, formData);
@@ -467,8 +490,8 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
               
               return (
                 <TableRow key={article.id}>
-                  <TableCell className="font-medium"><Link to={article.status === 'draft' ? '#' : generatePath('/actualites/:id', {
-                    id: article.id
+                  <TableCell className="font-medium"><Link to={article.status === 'draft' ? '#' : generatePath('/actualites/:slug', {
+                    slug: article.slug || article.id
                   })}>{article.title}</Link></TableCell>
                   <TableCell>{categoryName}</TableCell>
                   <TableCell>
@@ -997,108 +1020,4 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                       <FormLabel>Image</FormLabel>
                       <div className="mt-2">
                         <div className="flex items-center gap-3">
-                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md border-gray-300 cursor-pointer bg-gray-50 hover:bg-gray-100">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <Image className="w-8 h-8 mb-3 text-gray-400" />
-                              <p className="text-sm text-gray-500">Cliquez pour télécharger</p>
-                            </div>
-                            <input 
-                              type="file" 
-                              accept="image/*" 
-                              className="hidden" 
-                              onChange={handleImageChange}
-                            />
-                          </label>
-                        </div>
-                        {imagePreview && (
-                          <div className="mt-4 relative">
-                            <img 
-                              src={imagePreview} 
-                              alt="Aperçu" 
-                              className="max-w-full max-h-48 rounded-md object-cover" 
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setImagePreview(null);
-                                form.setValue("image", "");
-                              }}
-                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </FormItem>
-
-                    <FormField
-                      control={form.control}
-                      name="content"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contenu</FormLabel>
-                          <FormControl>
-                            <RichTextEditor
-                              value={field.value}
-                              onChange={field.onChange}
-                              height={500}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-
-                <DialogFooter className="gap-2 sm:gap-0 mt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsEditDialogOpen(false)}
-                    disabled={isSubmitting}
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={form.handleSubmit(handleUpdateNews)}
-                    disabled={isSubmitting}
-                  >
-                    Mettre à jour
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action ne peut pas être annulée. Cela supprimera définitivement l'article
-              "{selectedArticle?.title}" de la base de données.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Annuler</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmDelete}
-              disabled={isSubmitting}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
-
-export default NewsManagement;
-
+                          <label className="flex flex-col items-center justify-center w-full h-3

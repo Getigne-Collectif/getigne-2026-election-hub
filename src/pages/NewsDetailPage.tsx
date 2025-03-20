@@ -37,11 +37,17 @@ interface NewsArticle {
   created_at: string;
   updated_at: string;
   author?: string;
+  slug?: string;
+  comments_enabled?: boolean;
 }
 
 const RelatedArticleCard = ({ article }) => {
+  const articleUrl = article.slug 
+    ? `/actualites/${article.slug}`
+    : `/actualites/${article.id}`;
+    
   return (
-    <Link to={`/actualites/${article.id}`} className="block">
+    <Link to={articleUrl} className="block">
       <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-getigne-100 hover:shadow-md transition-shadow">
         <div className="h-40 overflow-hidden">
           <img
@@ -67,7 +73,7 @@ const RelatedArticleCard = ({ article }) => {
 };
 
 const NewsDetailPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
@@ -79,16 +85,27 @@ const NewsDetailPage = () => {
 
     const fetchArticle = async () => {
       try {
-        console.log('Fetching article with ID:', id);
-        const { data, error } = await supabase
+        console.log('Fetching article with slug or ID:', slug);
+        
+        // Try to find by slug first, then by ID if not found
+        let query = supabase
           .from('news')
           .select(`
             *,
             news_categories(id, name)
           `)
-          .eq('id', id)
-          .eq('status', 'published') // Ne récupérer que les articles publiés
-          .single();
+          .eq('status', 'published');
+          
+        // Check if slug is a UUID (for backward compatibility)
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+        
+        if (isUuid) {
+          query = query.eq('id', slug);
+        } else {
+          query = query.eq('slug', slug);
+        }
+        
+        const { data, error } = await query.single();
 
         if (error) {
           console.error('Error fetching article:', error);
@@ -120,7 +137,7 @@ const NewsDetailPage = () => {
               news_categories(id, name)
             `)
             .eq('status', 'published') // Assurons-nous que les articles liés sont également publiés
-            .neq('id', id)
+            .neq('id', data.id)
             .limit(3);
 
           if (tags.length > 0) {
@@ -152,7 +169,7 @@ const NewsDetailPage = () => {
                 news_categories(id, name)
               `)
               .eq('status', 'published') // Assurons-nous que les articles récents sont également publiés
-              .neq('id', id)
+              .neq('id', data.id)
               .order('date', { ascending: false })
               .limit(3);
 
@@ -179,7 +196,7 @@ const NewsDetailPage = () => {
     };
 
     fetchArticle();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -281,7 +298,7 @@ const NewsDetailPage = () => {
               )}
             </div>
 
-            {id && <CommentsSection newsId={id} />}
+            {article.id && <CommentsSection newsId={article.id} />}
 
             {relatedArticles.length > 0 && (
               <div className="mt-16 border-t border-getigne-100 pt-8">

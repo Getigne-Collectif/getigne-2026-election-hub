@@ -25,7 +25,6 @@ import AdminNewsPage from "./pages/AdminNewsPage";
 import ProfilePage from "@/pages/ProfilePage.tsx";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.tsx";
 import ProfileSetupModal from "@/components/auth/ProfileSetupModal.tsx";
-import { setupNewsImagesBucket } from "./utils/setupNewsImages";
 import AdminNewsEditorPage from './pages/AdminNewsEditorPage';
 
 const queryClient = new QueryClient();
@@ -46,7 +45,7 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/programme" element={<ProgramPage />} />
               <Route path="/actualites" element={<NewsPage />} />
-              <Route path="/actualites/:id" element={<NewsDetailPage />} />
+              <Route path="/actualites/:slug" element={<NewsDetailPage />} />
               <Route path="/agenda" element={<AgendaPage />} />
               <Route path="/evenements/:id" element={<EventDetailPage />} />
               <Route path="/equipe" element={<TeamPage />} />

@@ -72,6 +72,17 @@ const newsFormSchema = z.object({
 
 type FormValues = z.infer<typeof newsFormSchema>;
 
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .normalize('NFD') // Decompose accented characters
+    .replace(/[\u0300-\u036f]/g, '') // Remove accent marks
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with a single hyphen
+    .trim();
+};
+
 const AdminNewsEditorPage = () => {
   const { id } = useParams();
   const { user, isAdmin, loading, authChecked } = useAuth();
@@ -288,6 +299,8 @@ const AdminNewsEditorPage = () => {
         imageUrl = await uploadImage(values.image);
       }
 
+      const slug = generateSlug(values.title);
+
       const formData: any = {
         title: values.title,
         excerpt: values.excerpt,
@@ -299,15 +312,17 @@ const AdminNewsEditorPage = () => {
         author_id: values.author_id || user?.id,
         publication_date: values.publication_date ? format(values.publication_date, 'yyyy-MM-dd') : undefined,
         comments_enabled: values.comments_enabled,
+        slug: slug,
         status
       };
 
       if (isEditMode && id) {
         // Update existing
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('news')
           .update(formData)
-          .eq('id', id);
+          .eq('id', id)
+          .select('id, slug');
 
         if (error) throw error;
 
@@ -317,13 +332,21 @@ const AdminNewsEditorPage = () => {
             ? "L'article a été publié avec succès" 
             : "L'article a été enregistré comme brouillon",
         });
+        
+        if (status === 'published' && data && data[0]) {
+          // Redirect to the article page using slug
+          const redirectUrl = `/actualites/${data[0].slug || data[0].id}`;
+          navigate(redirectUrl);
+          return;
+        }
       } else {
         // Create new
         formData.date = new Date().toISOString().split('T')[0];
         
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('news')
-          .insert(formData);
+          .insert(formData)
+          .select('id, slug');
 
         if (error) throw error;
 
@@ -333,8 +356,16 @@ const AdminNewsEditorPage = () => {
             ? "L'article a été publié avec succès" 
             : "L'article a été enregistré comme brouillon",
         });
+        
+        if (status === 'published' && data && data[0]) {
+          // Redirect to the article page using slug
+          const redirectUrl = `/actualites/${data[0].slug || data[0].id}`;
+          navigate(redirectUrl);
+          return;
+        }
       }
 
+      // Only navigate to the admin news page if we didn't redirect to the article
       navigate('/admin/actualites');
     } catch (error: any) {
       console.error("Error saving news article:", error);
