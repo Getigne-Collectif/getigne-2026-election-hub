@@ -11,7 +11,7 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 152 60% 45%; /* Changé de bleu à vert (#34b190) */
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -23,7 +23,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 152 60% 45%; /* Changé de bleu à vert */
     --radius: 0.5rem;
     
     --getigne-50: 150 33% 97%;
@@ -38,9 +38,9 @@
     --getigne-900: 150 33% 13%;
     --getigne-950: 150 33% 6.5%;
     
-    --getigne-accent: 221.2 83.2% 53.3%;
-    --getigne-accent-light: 221.2 83.2% 63.3%;
-    --getigne-accent-darker: 221.2 83.2% 43.3%;
+    --getigne-accent: 152 60% 45%; /* Changé à la même teinte de vert */
+    --getigne-accent-light: 152 60% 55%;
+    --getigne-accent-darker: 152 60% 35%;
   }
 
   .dark {

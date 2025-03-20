@@ -75,10 +75,10 @@ export default {
 					'700': '#4a4a5d',
 					'800': '#40404f',
 					'900': '#1d1d1f',
-					'accent': '#34b190', // Changed from #10B981 to #34b190
+					'accent': '#34b190', // Vert accent
 					'green': {
 						'100': '#DCFCE7',
-						'500': '#34b190', // Changed from #10B981 to #34b190
+						'500': '#34b190', // Vert principal
 						'600': '#059669',
 						'700': '#047857'
 					}
