@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,7 +62,6 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors
 				getigne: {
 					'50': '#f5f5f7',
 					'100': '#e3e3e8',
@@ -75,12 +73,12 @@ export default {
 					'700': '#4a4a5d',
 					'800': '#40404f',
 					'900': '#1d1d1f',
-					'accent': '#34b190', // Vert accent
+					'accent': '#20B2AA',
 					'green': {
 						'100': '#DCFCE7',
-						'500': '#34b190', // Vert principal
-						'600': '#059669',
-						'700': '#047857'
+						'500': '#20B2AA',
+						'600': '#0E8F8A',
+						'700': '#0A6D6A'
 					}
 				}
 			},
