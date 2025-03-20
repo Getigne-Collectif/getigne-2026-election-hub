@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -49,6 +50,7 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
+import { Tables } from '@/integrations/supabase/types';
 
 interface NewsArticle {
   id: string;
@@ -142,6 +144,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
   const fetchCategories = async () => {
     try {
+      // Type assertion to fix the issue with news_categories
       const { data, error } = await (supabase
         .from('news_categories' as any)
         .select('id, name'));
@@ -149,7 +152,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
       if (error) throw error;
       
       if (data) {
-        setCategories(data as unknown as CategoryType[]);
+        setCategories(data as CategoryType[]);
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des catégories:', error);
