@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import {Loader2, Save, Eye, ArrowLeft, Home} from 'lucide-react';
+import {Loader2, Save, Eye, ArrowLeft, Home, Upload, ImageIcon} from 'lucide-react';
 import EventRegistrationAdmin from '@/components/events/EventRegistrationAdmin';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +21,7 @@ import {
   BreadcrumbList, BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
+import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -38,7 +39,7 @@ const AdminEventEditorPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAdmin, isModerator } = useAuth();
+  const { isAdmin, isModerator, user } = useAuth();
   const isEditMode = Boolean(id);
 
   const [title, setTitle] = useState('');
@@ -53,6 +54,8 @@ const AdminEventEditorPage = () => {
   const [isMembersOnly, setIsMembersOnly] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slug, setSlug] = useState('');
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch committees data
   const { data: committees = [] } = useQuery({
@@ -113,10 +116,55 @@ const AdminEventEditorPage = () => {
     }
   }, [event]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setUploadedImage(e.target.files[0]);
+      // Afficher un aperçu local
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setImage(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  const uploadImage = async (): Promise<string> => {
+    if (!uploadedImage) return image;
+    
+    try {
+      const fileExt = uploadedImage.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `event-images/${fileName}`;
+      
+      const { error } = await supabase.storage
+        .from('public')
+        .upload(filePath, uploadedImage);
+        
+      if (error) throw error;
+      
+      const { data } = supabase.storage
+        .from('public')
+        .getPublicUrl(filePath);
+        
+      return data.publicUrl;
+      
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Erreur d'upload",
+        description: error.message || "Une erreur est survenue lors de l'upload de l'image",
+        variant: "destructive"
+      });
+      return image;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent, saveStatus: 'draft' | 'published' | 'archived' = 'published') => {
     e.preventDefault();
 
-    if (!title || !date || !location || !description || !image) {
+    if (!title || !date || !location || !description) {
       toast({
         title: "Formulaire incomplet",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -128,7 +176,25 @@ const AdminEventEditorPage = () => {
     setIsSubmitting(true);
 
     try {
+      // Générer le slug si nécessaire
       const eventSlug = slug || generateSlug(title);
+      
+      // Upload de l'image si une nouvelle a été sélectionnée
+      let imageUrl = image;
+      if (uploadedImage) {
+        imageUrl = await uploadImage();
+      }
+
+      // Si nous n'avons pas d'URL d'image à ce stade, afficher une erreur
+      if (!imageUrl) {
+        toast({
+          title: "Image manquante",
+          description: "Veuillez télécharger une image pour l'événement",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
       const eventData = {
         title,
@@ -136,7 +202,7 @@ const AdminEventEditorPage = () => {
         location,
         description,
         content,
-        image,
+        image: imageUrl,
         committee_id: committeeId || null,
         committee: committeeId ? committees.find(c => c.id === committeeId)?.title : null,
         allow_registration: allowRegistration,
@@ -148,7 +214,7 @@ const AdminEventEditorPage = () => {
       let result;
 
       if (isEditMode && id) {
-        // Fix: Don't try to return data; just perform the update
+        // Mise à jour d'un événement existant
         const { error } = await supabase
           .from('events')
           .update(eventData)
@@ -156,7 +222,6 @@ const AdminEventEditorPage = () => {
 
         if (error) throw error;
         
-        // If no error, we can assume the update was successful
         result = { id, ...eventData };
 
         toast({
@@ -164,6 +229,7 @@ const AdminEventEditorPage = () => {
           description: "L'événement a été mis à jour avec succès",
         });
       } else {
+        // Création d'un nouvel événement
         const { data, error } = await supabase
           .from('events')
           .insert(eventData)
@@ -183,6 +249,7 @@ const AdminEventEditorPage = () => {
         });
       }
 
+      // Redirection vers la liste des événements
       navigate('/admin/events');
     } catch (error: any) {
       console.error('Error saving event:', error);
@@ -199,6 +266,12 @@ const AdminEventEditorPage = () => {
   const handleRegistrationUpdate = () => {
     if (id) {
       // Refetch event data
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -340,14 +413,41 @@ const AdminEventEditorPage = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="image">URL de l'image *</Label>
-                    <Input
-                      id="image"
-                      value={image}
-                      onChange={(e) => setImage(e.target.value)}
-                      placeholder="URL de l'image"
-                      required
-                    />
+                    <Label>Image principale *</Label>
+                    <div className="mt-2 border rounded-md p-4 space-y-4">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      
+                      {image ? (
+                        <div className="space-y-3">
+                          <div className="relative w-full h-48 rounded-md overflow-hidden">
+                            <img 
+                              src={image} 
+                              alt="Aperçu" 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={triggerFileInput}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            Remplacer l'image
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-48 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer" onClick={triggerFileInput}>
+                          <ImageIcon className="h-10 w-10 text-gray-400" />
+                          <p className="mt-2 text-sm text-gray-500">Cliquez pour ajouter une image</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div>
@@ -425,18 +525,44 @@ const AdminEventEditorPage = () => {
               </div>
 
               <div className="bg-getigne-50 p-4 rounded-lg">
+                <h3 className="font-medium mb-4">Options</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="allowRegistration"
+                      checked={allowRegistration}
+                      onChange={(e) => setAllowRegistration(e.target.checked)}
+                      className="mr-2 h-4 w-4"
+                    />
+                    <Label htmlFor="allowRegistration">Permettre les inscriptions</Label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="isMembersOnly"
+                      checked={isMembersOnly}
+                      onChange={(e) => setIsMembersOnly(e.target.checked)}
+                      className="mr-2 h-4 w-4"
+                    />
+                    <Label htmlFor="isMembersOnly">Réservé aux adhérents</Label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-getigne-50 p-4 rounded-lg">
                 <h3 className="font-medium mb-4">Prévisualisation</h3>
-                {isEditMode && (
+                {isEditMode && slug && (
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => window.open(`/agenda/${slug || id}`, '_blank')}
+                    onClick={() => window.open(`/agenda/${slug}`, '_blank')}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     Prévisualiser
                   </Button>
                 )}
-                {!isEditMode && (
+                {(!isEditMode || !slug) && (
                   <p className="text-sm text-getigne-500">
                     La prévisualisation sera disponible après la création de l'événement.
                   </p>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -205,9 +206,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
             {filteredEvents.map((event) => (
               <TableRow key={event.id}>
                 <TableCell className="font-medium">
-                  <Link to={event.status === 'published' && event.slug ? 
-                    generatePath('/agenda/:slug', { slug: event.slug }) : 
-                    generatePath('/agenda/:id', { id: event.id })}>
+                  <Link to={event.slug ? `/agenda/${event.slug}` : `/agenda/${event.id}`}>
                     {event.title}
                   </Link>
                 </TableCell>

@@ -16,36 +16,40 @@ import '../styles/richTextContent.css';
 import { useAuth } from '@/context/auth';
 
 const EventDetailPage = () => {
-  const { id, slug } = useParams();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
   const [eventId, setEventId] = useState<string | null>(id || null);
   const { user, isMember } = useAuth();
   const [refreshRegistrations, setRefreshRegistrations] = useState(false);
 
-  // If we have a slug, fetch the actual ID first
+  // Si nous avons un slug, récupérer d'abord l'ID réel
   const { data: slugData, isLoading: isLoadingSlug } = useQuery({
     queryKey: ['event-slug', slug],
     queryFn: async () => {
       if (!slug) return null;
       
+      console.log("Fetching event by slug:", slug);
       const { data, error } = await supabase
         .from('events')
         .select('id')
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
       
       if (error) {
+        console.error("Error fetching event by slug:", error);
         throw error;
       }
       
+      console.log("Found event by slug:", data);
       return data;
     },
-    enabled: !!slug,
+    enabled: !!slug && !id,
   });
 
-  // Once we have the ID (either directly or from slug), fetch the event details
+  // Une fois que nous avons l'ID (soit directement, soit à partir du slug), récupérer les détails de l'événement
   useEffect(() => {
-    if (slug && slugData) {
+    if (slug && slugData && slugData.id) {
+      console.log("Setting event ID from slug data:", slugData.id);
       setEventId(slugData.id);
     }
   }, [slug, slugData]);
@@ -55,16 +59,19 @@ const EventDetailPage = () => {
     queryFn: async () => {
       if (!eventId) return null;
       
+      console.log("Fetching event details by ID:", eventId);
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .eq('id', eventId)
-        .single();
+        .maybeSingle();
       
       if (error) {
+        console.error("Error fetching event details:", error);
         throw error;
       }
       
+      console.log("Found event details:", data);
       return data;
     },
     enabled: !!eventId,
@@ -106,7 +113,7 @@ const EventDetailPage = () => {
     );
   }
 
-  // Check if the event is members-only and the user is not a member
+  // Vérifier si l'événement est réservé aux membres et si l'utilisateur n'est pas membre
   const isMembersOnly = event.is_members_only === true;
   const hasAccess = !isMembersOnly || isMember;
 
@@ -114,8 +121,15 @@ const EventDetailPage = () => {
   const formattedDate = format(eventDate, "PPPP", { locale: fr });
   const formattedTime = format(eventDate, "HH'h'mm", { locale: fr });
   
-  // Check if the event is in the past
+  // Vérifier si l'événement est passé
   const isPastEvent = new Date() > eventDate;
+
+  // Rediriger vers l'URL avec slug si on est sur une URL avec ID et que l'événement a un slug
+  useEffect(() => {
+    if (id && event && event.slug && !slug) {
+      navigate(`/agenda/${event.slug}`, { replace: true });
+    }
+  }, [id, event, slug, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col">

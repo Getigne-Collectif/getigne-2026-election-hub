@@ -13,6 +13,7 @@ const committeeColors = {
   "Culture": "border-[#9b87f5]",
   "Économie": "border-[#0EA5E9]",
   "Éducation": "border-[#F97316]",
+  "Biodiversité": "border-green-500",
 };
 
 // Map for the committee icons
@@ -100,9 +101,12 @@ const EventCard = ({ event, index }) => {
   const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
 
   const IconComponent = committeeIcon || Users;
+  
+  // Utiliser le slug s'il existe, sinon l'ID
+  const eventUrl = event.slug ? `/agenda/${event.slug}` : `/agenda/${event.id}`;
 
   return (
-    <Link to={`/agenda/${event.id}`} className="block hover:no-underline">
+    <Link to={eventUrl} className="block hover:no-underline">
       <article 
         ref={ref}
         className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
@@ -171,6 +175,7 @@ const Events = () => {
         const { data, error } = await supabase
           .from('events')
           .select('*')
+          .eq('status', 'published')
           .order('date', { ascending: true })
           .limit(2);
         
@@ -229,7 +234,7 @@ const Events = () => {
 
         <div className="mt-12 text-center">
           <Link 
-            to="/agenda/evenement"
+            to="/agenda"
             className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90 px-4 py-2 inline-flex items-center"
           >
             Voir tous les événements
