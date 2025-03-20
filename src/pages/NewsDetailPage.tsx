@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -141,7 +142,8 @@ const NewsDetailPage = () => {
 
         // Only fetch related articles if there are tags or a category_id
         if (tags.length > 0 || categoryId) {
-          let query = supabase.from('news')
+          // Use a type annotation here to avoid deep type instantiation
+          const query = supabase.from('news')
             .select(`
               *,
               news_categories(id, name)
@@ -152,9 +154,9 @@ const NewsDetailPage = () => {
 
           if (tags.length > 0) {
             // Use overlap for array comparison
-            query = query.overlaps('tags', tags);
+            query.overlaps('tags', tags);
           } else if (categoryId) {
-            query = query.eq('category_id', categoryId);
+            query.eq('category_id', categoryId);
           }
 
           const { data: relatedData, error: relatedError } = await query;
