@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import {Calendar, ChevronRight, Home, Search, Tag, X} from 'lucide-react';
+import { Calendar, ChevronRight, Home, Search, Rss, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Breadcrumb,
@@ -13,6 +13,12 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface NewsArticle {
   id: string;
@@ -201,6 +207,14 @@ const NewsPage = () => {
     return matchesSearch && matchesCategory && matchesTags;
   });
 
+  const getRssFeedUrl = () => {
+    const baseUrl = window.location.origin.includes('localhost')
+      ? "http://localhost:54321/functions/v1/rss-feed"
+      : "https://jqpivqdwblrccjzicnxn.supabase.co/functions/v1/rss-feed";
+    
+    return baseUrl;
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -226,9 +240,29 @@ const NewsPage = () => {
               Actualités
             </span>
             <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos dernières actualités</h1>
-            <p className="text-getigne-700 text-lg mb-8">
+            <p className="text-getigne-700 text-lg mb-4">
               Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
             </p>
+            <div className="flex justify-center mt-2 mb-6">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <a 
+                      href={getRssFeedUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-getigne-accent text-white px-4 py-2 rounded-md hover:bg-getigne-accent/90 transition-colors"
+                    >
+                      <Rss size={16} />
+                      <span>S'abonner au flux RSS</span>
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Suivez nos actualités avec votre lecteur RSS préféré</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
         </div>
       </div>

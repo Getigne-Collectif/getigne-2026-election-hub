@@ -14,7 +14,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
-import { Home } from "lucide-react";
+import { Home, Rss } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface NewsArticle {
   id: string;
@@ -263,6 +270,14 @@ const AdminNewsPage = () => {
     }
   };
 
+  const getRssFeedUrl = () => {
+    const baseUrl = window.location.origin.includes('localhost')
+      ? "http://localhost:54321/functions/v1/rss-feed"
+      : "https://jqpivqdwblrccjzicnxn.supabase.co/functions/v1/rss-feed";
+    
+    return baseUrl;
+  };
+
   useEffect(() => {
     if (!authChecked) return;
 
@@ -338,9 +353,29 @@ const AdminNewsPage = () => {
               <div className="text-center my-4">
                 <h1 className="text-4xl md:text-5xl font-bold">Actualités</h1>
               </div>
-              <p className="text-getigne-700 text-lg mb-6">
+              <p className="text-getigne-700 text-lg mb-4">
                 Gérez l'actualité du collectif.
               </p>
+              <div className="flex justify-center mt-2 mb-4">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a 
+                        href={getRssFeedUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-getigne-50 border border-getigne-200 hover:bg-getigne-100 transition-colors"
+                      >
+                        <Rss size={16} />
+                        <span>Voir le flux RSS</span>
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Prévisualisez le flux RSS des actualités</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
           </div>
         </div>

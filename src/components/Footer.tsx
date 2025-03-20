@@ -1,9 +1,11 @@
 
 import { Link } from 'react-router-dom';
-import { Facebook, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { subscribeToNewsletter } from '../utils/newsletter';
 import { toast } from 'sonner';
+import {DiscordLogoIcon} from "@radix-ui/react-icons";
+import FacebookIcon from '@/components/icons/facebook.svg?react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -12,14 +14,14 @@ const Footer = () => {
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast.error("Veuillez saisir votre adresse email");
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await subscribeToNewsletter({ email });
       toast.success("Merci de votre inscription à notre newsletter !");
@@ -39,9 +41,9 @@ const Footer = () => {
           {/* About */}
           <div>
             <div className="mb-4">
-              <img 
-                src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png" 
-                alt="Gétigné Collectif" 
+              <img
+                src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png"
+                alt="Gétigné Collectif"
                 className="h-14 mb-4"
               />
             </div>
@@ -50,11 +52,11 @@ const Footer = () => {
               Ensemble, construisons une commune plus solidaire, écologique et participative.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-getigne-100 hover:text-white transition-colors" aria-label="Facebook">
-                <Facebook size={20} />
+              <a href="#" aria-label="Facebook">
+                <FacebookIcon />
               </a>
               <a href="https://discord.gg/ePHjxJssex" className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
-                <MessageSquare size={20} />
+                <DiscordLogoIcon />
               </a>
             </div>
           </div>
