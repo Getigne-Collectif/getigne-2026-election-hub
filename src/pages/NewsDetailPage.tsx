@@ -264,10 +264,52 @@ const NewsDetailPage = () => {
               />
             </div>
 
-            <div className="prose prose-lg mx-auto">
+            <div className="prose prose-lg max-w-none mx-auto">
               <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
 
-              <div dangerouslySetInnerHTML={{ __html: article.content }}></div>
+              <div 
+                className="rich-content" 
+                dangerouslySetInnerHTML={{ __html: article.content }}
+                style={{
+                  '& img': {
+                    maxWidth: '100%',
+                    height: 'auto',
+                    borderRadius: '0.5rem',
+                    margin: '1.5rem 0'
+                  },
+                  '& h2': {
+                    fontSize: '1.75rem',
+                    fontWeight: '700',
+                    margin: '1.5rem 0 1rem'
+                  },
+                  '& h3': {
+                    fontSize: '1.5rem',
+                    fontWeight: '600',
+                    margin: '1.25rem 0 0.75rem'
+                  },
+                  '& p': {
+                    margin: '1rem 0',
+                    lineHeight: '1.7'
+                  },
+                  '& ul, & ol': {
+                    paddingLeft: '1.5rem',
+                    margin: '1rem 0'
+                  },
+                  '& li': {
+                    margin: '0.5rem 0'
+                  },
+                  '& blockquote': {
+                    borderLeft: '4px solid #e5e7eb',
+                    paddingLeft: '1rem',
+                    fontStyle: 'italic',
+                    margin: '1.5rem 0'
+                  },
+                  '& a': {
+                    color: '#1d4ed8',
+                    textDecoration: 'underline'
+                  }
+                }}
+              ></div>
 
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-8">

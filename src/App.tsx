@@ -24,10 +24,18 @@ import AdminNewsPage from "./pages/AdminNewsPage";
 import ProfilePage from "@/pages/ProfilePage.tsx";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.tsx";
 import ProfileSetupModal from "@/components/auth/ProfileSetupModal.tsx";
+import { setupNewsImagesBucket } from "./utils/setupNewsImages";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+function App() {
+  useEffect(() => {
+    // Setup le bucket pour les images des articles
+    setupNewsImagesBucket().catch(console.error);
+  }, []);
+
+  return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
@@ -61,7 +69,7 @@ const App = () => (
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
-);
+  );
+}
 
 export default App;
-

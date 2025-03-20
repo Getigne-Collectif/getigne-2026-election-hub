@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
-import { Tables } from '@/integrations/supabase/types';
+import RichTextEditor from './RichTextEditor';
 
 interface NewsArticle {
   id: string;
@@ -104,7 +104,7 @@ type FormValues = z.infer<typeof newsFormSchema>;
 
 type CategoryType = {
   id: string;
-  name: string;
+  name: string
 }
 
 const NewsManagement: React.FC<NewsManagementProps> = ({
@@ -515,7 +515,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
       )}
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Créer un nouvel article</DialogTitle>
           </DialogHeader>
@@ -754,9 +754,10 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                       <FormItem>
                         <FormLabel>Contenu</FormLabel>
                         <FormControl>
-                          <Textarea
-                            rows={12}
-                            {...field}
+                          <RichTextEditor
+                            value={field.value}
+                            onChange={field.onChange}
+                            height={500}
                           />
                         </FormControl>
                         <FormMessage />
@@ -797,7 +798,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
       </Dialog>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Modifier l'article</DialogTitle>
           </DialogHeader>
@@ -1037,61 +1038,5 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                         <FormItem>
                           <FormLabel>Contenu</FormLabel>
                           <FormControl>
-                            <Textarea
-                              rows={12}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-
-                <DialogFooter className="gap-2 sm:gap-0 mt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsEditDialogOpen(false)}
-                    disabled={isSubmitting}
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    type="submit"
-                    onClick={form.handleSubmit(handleUpdateNews)}
-                    disabled={isSubmitting}
-                  >
-                    Mettre à jour
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action ne peut pas être annulée. Cela supprimera définitivement l'article
-              <strong> {selectedArticle?.title}</strong>.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground">
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
-
-export default NewsManagement;
+                            <Rich
 
