@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X, Search, Calendar, User, FileDown } from 'lucide-react';
+import {X, Search, Calendar, User, FileDown, Rss} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { NewsCard } from '@/components/NewsCard';
 import {
@@ -133,32 +133,46 @@ const NewsPage = () => {
       // Pour le filtre par tags, nous devons faire une requête un peu différente
       if (selectedTags.length > 0) {
         // Récupérer d'abord les IDs des tags sélectionnés
-        const { data: selectedTagData } = await supabase
-          .from('news_tags')
-          .select('id')
-          .in('name', selectedTags);
+        const { data: selectedTagData, error: tagError } = await supabase
+            .from('news_tags')
+            .select('id')
+            .in('name', selectedTags);
 
-        if (selectedTagData && selectedTagData.length > 0) {
-          const tagIds = selectedTagData.map(tag => tag.id);
-          
-          // Récupérer les IDs des articles ayant ces tags
-          const { data: newsWithTags } = await supabase
+        if (tagError) throw tagError;
+
+        // Vérifier que tous les tags sélectionnés existent bien
+        if (!selectedTagData || selectedTagData.length !== selectedTags.length) {
+          setNewsArticles([]);
+          setTotalCount(0);
+          setLoading(false);
+          return;
+        }
+
+        const tagIds = selectedTagData.map(tag => tag.id);
+
+        // Récupérer les correspondances dans news_to_tags pour ces tags
+        const { data: newsWithTags, error: newsTagsError } = await supabase
             .from('news_to_tags')
-            .select('news_id')
+            .select('news_id, tag_id')
             .in('tag_id', tagIds);
 
-          if (newsWithTags && newsWithTags.length > 0) {
-            const newsIds = [...new Set(newsWithTags.map(item => item.news_id))];
-            query = query.in('id', newsIds);
-          } else {
-            // Aucun article ne correspond aux tags sélectionnés
-            setNewsArticles([]);
-            setTotalCount(0);
-            setLoading(false);
-            return;
-          }
+        if (newsTagsError) throw newsTagsError;
+
+        // Grouper par news_id pour compter le nombre de tags correspondants
+        const newsTagCount = {};
+        newsWithTags.forEach(item => {
+          newsTagCount[item.news_id] = (newsTagCount[item.news_id] || 0) + 1;
+        });
+
+        // Filtrer les articles ayant exactement autant de tags correspondants que de tags sélectionnés
+        const newsIds = Object.keys(newsTagCount).filter(
+            newsId => newsTagCount[newsId] === tagIds.length
+        );
+
+        if (newsIds.length > 0) {
+          query = query.in('id', newsIds);
         } else {
-          // Aucun tag ne correspond aux tags sélectionnés
+          // Aucun article ne correspond à TOUS les tags sélectionnés
           setNewsArticles([]);
           setTotalCount(0);
           setLoading(false);
@@ -179,7 +193,7 @@ const NewsPage = () => {
       // Transformer les données pour qu'elles soient utilisables par les composants
       const processedData = data.map(item => {
         // Extraire les tags depuis news_to_tags
-        const tags = item.news_to_tags 
+        const tags = item.news_to_tags
           ? item.news_to_tags.map(tag => tag.news_tags.name)
           : [];
 
@@ -411,7 +425,7 @@ const NewsPage = () => {
                 Réinitialiser
               </Button>
               <Button onClick={handleDownloadRSS} variant="outline" size="sm">
-                <FileDown size={16} className="mr-1" />
+                <Rss size={16} className="mr-1" />
                 Flux RSS
               </Button>
             </div>
