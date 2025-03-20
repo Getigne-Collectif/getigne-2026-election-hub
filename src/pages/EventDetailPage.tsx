@@ -45,6 +45,7 @@ const EventDetailPage = () => {
         .from('events')
         .select('id')
         .eq('slug', slug)
+        .eq('status', 'published')
         .maybeSingle();
       
       if (error) {
@@ -76,6 +77,7 @@ const EventDetailPage = () => {
         .from('events')
         .select('*')
         .eq('id', eventId)
+        .eq('status', 'published')
         .maybeSingle();
       
       if (error) {
