@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -35,7 +34,7 @@ import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { generatePath, Link } from "react-router-dom";
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, NewsCategory } from '@/integrations/supabase/client';
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -144,18 +143,19 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
   const fetchCategories = async () => {
     try {
-      // Type assertion to fix the issue with news_categories
-      const { data, error } = await (supabase
-        .from('news_categories' as any)
-        .select('id, name'));
+      const { data, error } = await supabase
+        .from('news_categories')
+        .select('id, name')
+        .returns<NewsCategory[]>();
 
       if (error) throw error;
       
       if (data) {
-        setCategories(data as CategoryType[]);
+        setCategories(data);
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des catégories:', error);
+      setCategories([]);
     }
   };
 
