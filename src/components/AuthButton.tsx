@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, User, Shield, Newspaper, RefreshCw, UserCog} from 'lucide-react';
+import {LogIn, LogOut, User, Shield, Newspaper, UserCog} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,24 +31,6 @@ const AuthButton = () => {
       toast({
         title: "Erreur lors de la déconnexion",
         description: "Une erreur est survenue lors de la déconnexion",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleRefreshRoles = async () => {
-    console.log('AuthButton: Manually refreshing user roles');
-    try {
-      await refreshUserRoles();
-      toast({
-        title: "Droits actualisés",
-        description: "Vos droits d'accès ont été actualisés"
-      });
-    } catch (error) {
-      console.error('Error refreshing roles:', error);
-      toast({
-        title: "Erreur d'actualisation",
-        description: "Impossible d'actualiser vos droits d'accès",
         variant: "destructive"
       });
     }
@@ -142,10 +125,6 @@ const AuthButton = () => {
           )}
         </DropdownMenuItem>
         
-        <DropdownMenuItem onClick={handleRefreshRoles} className="flex items-center">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Actualiser mes droits
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
 
         {isAdmin && (

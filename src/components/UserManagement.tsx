@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, UserCheck, Shield, UserX, UserPlus } from 'lucide-react';
+import { Search, UserCheck, Shield, UserX, UserPlus, Inbox } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -31,14 +31,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
 import UserMembershipStatus from '@/components/admin/UserMembershipStatus';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface UserManagementProps {
   users: any[];
+  invitedUsers: any[];
   loading: boolean;
   onRoleChange: (userId: string, role: 'moderator' | 'admin', action: 'add' | 'remove') => Promise<void>;
   onInviteUser: (userData: InviteUserFormValues) => Promise<void>;
@@ -56,6 +59,7 @@ type InviteUserFormValues = z.infer<typeof inviteUserSchema>;
 
 const UserManagement: React.FC<UserManagementProps> = ({ 
   users, 
+  invitedUsers,
   loading, 
   onRoleChange,
   onInviteUser,
@@ -65,6 +69,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("users");
 
   // Formulaire d'invitation
   const form = useForm<InviteUserFormValues>({
@@ -122,6 +127,16 @@ const UserManagement: React.FC<UserManagementProps> = ({
     );
   });
 
+  // Filtrer les invitations en fonction du terme de recherche
+  const filteredInvitedUsers = invitedUsers.filter(user => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      user.email?.toLowerCase().includes(searchLower) ||
+      user.first_name?.toLowerCase().includes(searchLower) ||
+      user.last_name?.toLowerCase().includes(searchLower)
+    );
+  });
+
   // Ouvrir le dialogue pour modifier les rôles d'un utilisateur
   const openRoleDialog = (user: any) => {
     setSelectedUser(user);
@@ -155,6 +170,13 @@ const UserManagement: React.FC<UserManagementProps> = ({
     });
   };
 
+  // Obtenir les initiales pour l'avatar
+  const getInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
+    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+    return firstInitial + lastInitial || '?';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
@@ -162,7 +184,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Rechercher un utilisateur..."
+            placeholder="Rechercher..."
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -181,92 +203,149 @@ const UserManagement: React.FC<UserManagementProps> = ({
         <div className="text-center py-10">
           <p>Chargement des utilisateurs...</p>
         </div>
-      ) : filteredUsers.length === 0 ? (
-        <div className="text-center py-10">
-          <p>Aucun utilisateur trouvé.</p>
-        </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Utilisateur</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Date d'inscription</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Rôles</TableHead>
-              <TableHead>Adhésion</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  {user.first_name && user.last_name 
-                    ? `${user.first_name} ${user.last_name}` 
-                    : 'Utilisateur'}
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  {new Date(user.created_at).toLocaleDateString('fr-FR')}
-                </TableCell>
-                <TableCell>
-                  {user.status === 'invited' && (
-                    <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Invité</Badge>
-                  )}
-                  {user.status === 'disabled' && (
-                    <Badge variant="outline" className="bg-red-100 text-red-800">Désactivé</Badge>
-                  )}
-                  {(!user.status || user.status === 'active') && (
-                    <Badge variant="outline" className="bg-green-100 text-green-800">Actif</Badge>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {hasRole(user, 'admin') && (
-                      <Badge className="bg-red-500">Admin</Badge>
-                    )}
-                    {hasRole(user, 'moderator') && (
-                      <Badge className="bg-blue-500">Modérateur</Badge>
-                    )}
-                    {(!user.roles || user.roles.length === 0) && (
-                      <Badge variant="outline">Utilisateur</Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {user.status !== 'invited' && (
-                    <UserMembershipStatus 
-                      userId={user.id}
-                      isMember={user.is_member === true}
-                      onUpdate={() => onToggleUserStatus(user.id, user.status !== 'disabled')}
-                    />
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => openRoleDialog(user)}
-                    >
-                      Gérer les rôles
-                    </Button>
-                    {user.status !== 'invited' && (
-                      <Button 
-                        variant={user.status === 'disabled' ? "default" : "destructive"}
-                        size="sm"
-                        onClick={() => handleToggleUserStatus(user.id, user.status === 'disabled')}
-                      >
-                        {user.status === 'disabled' ? "Activer" : "Désactiver"}
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <Tabs defaultValue="users" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Utilisateurs ({filteredUsers.length})
+            </TabsTrigger>
+            <TabsTrigger value="invited" className="flex items-center gap-2">
+              <Inbox className="h-4 w-4" />
+              Invitations ({filteredInvitedUsers.length})
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="users">
+            {filteredUsers.length === 0 ? (
+              <div className="text-center py-10">
+                <p>Aucun utilisateur trouvé.</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Avatar</TableHead>
+                    <TableHead>Utilisateur</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Date d'inscription</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead>Rôles</TableHead>
+                    <TableHead>Adhésion</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <Avatar className="h-9 w-9">
+                          {user.avatar_url ? (
+                            <AvatarImage src={user.avatar_url} alt={`${user.first_name} ${user.last_name}`} />
+                          ) : null}
+                          <AvatarFallback>{getInitials(user.first_name, user.last_name)}</AvatarFallback>
+                        </Avatar>
+                      </TableCell>
+                      <TableCell>
+                        {user.first_name && user.last_name 
+                          ? `${user.first_name} ${user.last_name}` 
+                          : 'Utilisateur'}
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        {new Date(user.created_at).toLocaleDateString('fr-FR')}
+                      </TableCell>
+                      <TableCell>
+                        {user.status === 'disabled' ? (
+                          <Badge variant="outline" className="bg-red-100 text-red-800">Désactivé</Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-green-100 text-green-800">Actif</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {hasRole(user, 'admin') && (
+                            <Badge className="bg-red-500">Admin</Badge>
+                          )}
+                          {hasRole(user, 'moderator') && (
+                            <Badge className="bg-blue-500">Modérateur</Badge>
+                          )}
+                          {(!user.roles || user.roles.length === 0) && (
+                            <Badge variant="outline">Utilisateur</Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <UserMembershipStatus 
+                          userId={user.id}
+                          isMember={user.is_member === true}
+                          onUpdate={() => {/* Cette fonction n'est pas utilisée ici */}}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => openRoleDialog(user)}
+                          >
+                            Gérer les rôles
+                          </Button>
+                          <Button 
+                            variant={user.status === 'disabled' ? "default" : "destructive"}
+                            size="sm"
+                            onClick={() => handleToggleUserStatus(user.id, user.status === 'disabled')}
+                          >
+                            {user.status === 'disabled' ? "Activer" : "Désactiver"}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="invited">
+            {filteredInvitedUsers.length === 0 ? (
+              <div className="text-center py-10">
+                <p>Aucune invitation en attente.</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Utilisateur</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Date d'invitation</TableHead>
+                    <TableHead>Statut</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredInvitedUsers.map((invited) => (
+                    <TableRow key={invited.id}>
+                      <TableCell>
+                        {invited.first_name && invited.last_name 
+                          ? `${invited.first_name} ${invited.last_name}` 
+                          : 'Invité'}
+                      </TableCell>
+                      <TableCell>{invited.email}</TableCell>
+                      <TableCell>
+                        {new Date(invited.created_at).toLocaleDateString('fr-FR')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+                          En attente
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </TabsContent>
+        </Tabs>
       )}
 
       {/* Dialogue de gestion des rôles */}

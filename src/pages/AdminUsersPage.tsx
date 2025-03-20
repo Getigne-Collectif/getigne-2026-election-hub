@@ -23,6 +23,7 @@ interface Profile {
   email?: string;
   status?: string;
   is_member?: boolean;
+  avatar_url?: string;
   [key: string]: string | number | object | boolean | undefined;
 }
 
@@ -44,6 +45,7 @@ interface UserWithRoles {
   status?: string;
   roles: string[];
   is_member?: boolean;
+  avatar_url?: string;
 }
 
 interface InviteUserData {
@@ -56,87 +58,75 @@ const AdminUsersPage = () => {
   const { user, isAdmin, userRoles, loading, authChecked, refreshUserRoles } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
+  const [invitedUsers, setInvitedUsers] = useState<UserWithRoles[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
 
   const fetchUsers = async () => {
     setPageLoading(true);
     try {
+      // Récupérer les profils des utilisateurs existants
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
 
       if (profilesError) throw profilesError;
 
-      if (!profiles) {
-        setUsers([]);
-        return;
-      }
-
-      const { data: invitedUsers, error: invitedError } = await supabase
+      // Récupérer les utilisateurs invités
+      const { data: invitedUsersData, error: invitedError } = await supabase
         .from('invited_users')
         .select('*');
 
-      if (invitedError) console.error("Erreur lors de la récupération des invitations:", invitedError);
+      if (invitedError) throw invitedError;
 
       // Récupérer tous les profils avec leurs rôles
       const profilesData = await Promise.all(
         profiles.map(async (profile: Profile) => {
           const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
+          
+          // Récupérer l'email de l'invitation si nécessaire
+          let email = profile.email;
+          if (!email && invitedUsersData) {
+            const matchingInvite = invitedUsersData.find((invited: InvitedUser) => invited.id === profile.id);
+            if (matchingInvite) {
+              email = matchingInvite.email;
+            }
+          }
 
           return {
             id: profile.id,
-            email: profile.email || '',
+            email: email || '',
             created_at: String(profile.created_at),
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
             status: profile.status || 'active',
-            is_member: profile.is_member === true, // Ensure boolean type
+            is_member: profile.is_member === true,
+            avatar_url: profile.avatar_url,
             roles: roles || []
           };
         })
       );
 
-      // Obtenir les IDs des profils existants pour filtrer les invitations
+      // Obtenir les IDs des profils existants pour ne pas les re-afficher comme invités
       const existingProfileIds = profiles.map((profile: Profile) => profile.id);
 
-      // Filtrer pour ne garder que les invitations qui n'ont pas encore été converties en utilisateurs
-      const pendingInvitations = invitedUsers ? invitedUsers.filter((invited: InvitedUser) => 
-        !existingProfileIds.includes(invited.id)
-      ) : [];
+      // Filtrer les invitations pour ne garder que celles qui n'ont pas encore été acceptées
+      const pendingInvitationsData = invitedUsersData 
+        ? invitedUsersData
+            .filter((invited: InvitedUser) => !existingProfileIds.includes(invited.id))
+            .map((invited: InvitedUser) => ({
+              id: invited.id,
+              email: invited.email,
+              created_at: String(invited.created_at),
+              first_name: invited.first_name || '',
+              last_name: invited.last_name || '',
+              status: 'invited',
+              roles: [],
+              is_member: false
+            }))
+        : [];
 
-      // Enrichir les profils avec les emails des invitations si nécessaire
-      const enrichedProfiles = profilesData.map(profile => {
-        // Si l'email du profil est vide, chercher s'il existe une invitation avec cet ID
-        if (!profile.email && invitedUsers) {
-          const matchingInvite = invitedUsers.find(invite => invite.id === profile.id);
-          if (matchingInvite) {
-            return {
-              ...profile,
-              email: matchingInvite.email
-            };
-          }
-        }
-        return profile;
-      });
-
-      // Ajouter les invitations en attente à la liste des utilisateurs
-      const allUsers: UserWithRoles[] = [...enrichedProfiles];
-      
-      if (pendingInvitations.length > 0) {
-        pendingInvitations.forEach((invited: InvitedUser) => {
-          allUsers.push({
-            id: invited.id,
-            email: invited.email,
-            created_at: String(invited.created_at),
-            first_name: invited.first_name || '',
-            last_name: invited.last_name || '',
-            status: 'invited',
-            roles: []
-          });
-        });
-      }
-
-      setUsers(allUsers);
+      setUsers(profilesData);
+      setInvitedUsers(pendingInvitationsData);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
       toast({
@@ -223,6 +213,8 @@ const AdminUsersPage = () => {
       if (inviteError) throw inviteError;
 
       await fetchUsers();
+      
+      return { success: true };
     } catch (error: any) {
       console.error('Erreur lors de l\'invitation:', error);
       throw error;
@@ -232,15 +224,18 @@ const AdminUsersPage = () => {
   const handleToggleUserStatus = async (userId: string, isActive: boolean) => {
     try {
       const newStatus = isActive ? 'active' : 'disabled';
-
+      
       const { error } = await supabase
         .from('profiles')
         .update({ status: newStatus })
         .eq('id', userId);
 
       if (error) throw error;
-
+      
+      // Rafraîchir la liste après la mise à jour
       await fetchUsers();
+      
+      return { success: true };
     } catch (error: any) {
       console.error('Erreur lors de la modification du statut:', error);
       throw error;
@@ -250,10 +245,7 @@ const AdminUsersPage = () => {
   useEffect(() => {
     if (!authChecked) return;
 
-    console.log("AdminUsersPage - Auth checked:", { user: !!user, isAdmin, userRoles });
-
     if (!user) {
-      console.log("AdminUsersPage - Redirection: User not authenticated");
       toast({
         title: 'Accès refusé',
         description: "Veuillez vous connecter pour accéder à cette page.",
@@ -264,11 +256,8 @@ const AdminUsersPage = () => {
     }
 
     if (user && !isAdmin) {
-      console.log("AdminUsersPage - Redirection: User not admin", { userRoles });
-      
-      // Tentative de rafraîchir les rôles si l'utilisateur pense être admin
+      // Vérifier à nouveau après rafraîchissement
       refreshUserRoles().then(() => {
-        // Vérifier à nouveau après rafraîchissement
         if (!isAdmin) {
           toast({
             title: 'Accès refusé',
@@ -277,7 +266,6 @@ const AdminUsersPage = () => {
           });
           navigate('/');
         } else {
-          console.log("AdminUsersPage - Access granted after role refresh");
           fetchUsers();
         }
       });
@@ -285,7 +273,6 @@ const AdminUsersPage = () => {
     }
 
     if (user && isAdmin) {
-      console.log("AdminUsersPage - Fetching users as admin");
       fetchUsers();
     }
   }, [user, isAdmin, authChecked, navigate, refreshUserRoles]);
@@ -350,6 +337,7 @@ const AdminUsersPage = () => {
             ) : (
               <UserManagement
                 users={users}
+                invitedUsers={invitedUsers}
                 loading={pageLoading}
                 onRoleChange={handleRoleChange}
                 onInviteUser={handleInviteUser}
