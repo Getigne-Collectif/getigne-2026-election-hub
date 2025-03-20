@@ -53,6 +53,7 @@ async function processRequest(token) {
   // Décoder le token pour obtenir l'ID de l'utilisateur
   let userId;
   try {
+    // Parse the JWT token directly from the token string
     const decoded = JSON.parse(atob(token.split('.')[1]));
     userId = decoded.sub;
     console.log("User ID from token:", userId);
