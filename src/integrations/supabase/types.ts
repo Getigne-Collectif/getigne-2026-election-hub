@@ -283,43 +283,70 @@ export type Database = {
       }
       news: {
         Row: {
+          author_id: string | null
           category: string
+          comments_enabled: boolean | null
           content: string
           created_at: string
           date: string
           excerpt: string
           id: string
           image: string
+          publication_date: string | null
           status: string
           tags: Json | null
           title: string
           updated_at: string
         }
         Insert: {
+          author_id?: string | null
           category: string
+          comments_enabled?: boolean | null
           content: string
           created_at?: string
           date: string
           excerpt: string
           id?: string
           image: string
+          publication_date?: string | null
           status?: string
           tags?: Json | null
           title: string
           updated_at?: string
         }
         Update: {
+          author_id?: string | null
           category?: string
+          comments_enabled?: boolean | null
           content?: string
           created_at?: string
           date?: string
           excerpt?: string
           id?: string
           image?: string
+          publication_date?: string | null
           status?: string
           tags?: Json | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      news_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }

@@ -76,8 +76,11 @@ const AdminNewsPage = () => {
                 ) :
                 []
               ),
-        // Fix: Ensure comments_enabled has a default value if undefined
-        comments_enabled: article.comments_enabled !== false
+        // Ensure comments_enabled has a default value if undefined
+        comments_enabled: article.comments_enabled !== false,
+        // Make sure author_id and publication_date exist
+        author_id: article.author_id || null,
+        publication_date: article.publication_date || null
       }));
 
       setNewsArticles(transformedData as NewsArticle[]);

@@ -100,6 +100,11 @@ const newsFormSchema = z.object({
 
 type FormValues = z.infer<typeof newsFormSchema>;
 
+type CategoryType = {
+  id: string;
+  name: string;
+}
+
 const NewsManagement: React.FC<NewsManagementProps> = ({
   news,
   loading,
@@ -116,7 +121,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
-  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
+  const [categories, setCategories] = useState<CategoryType[]>([]);
   const [users, setUsers] = useState<{id: string, first_name: string, last_name: string, avatar_url?: string}[]>([]);
   const { user } = useAuth();
 
@@ -137,14 +142,14 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
   const fetchCategories = async () => {
     try {
-      const { data, error } = await supabase
-        .from('news_categories')
-        .select('id, name');
+      const { data, error } = await (supabase
+        .from('news_categories' as any)
+        .select('id, name'));
 
       if (error) throw error;
       
       if (data) {
-        setCategories(data as {id: string, name: string}[]);
+        setCategories(data as unknown as CategoryType[]);
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des catégories:', error);
@@ -1081,4 +1086,3 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 };
 
 export default NewsManagement;
-
