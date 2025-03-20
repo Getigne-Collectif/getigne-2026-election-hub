@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -98,18 +99,19 @@ const NewsDetailPage = () => {
         const tags = Array.isArray(data.tags) ? data.tags : [];
         
         // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
-        if (data.news_categories) {
-          data.category = data.news_categories.name;
-        }
+        const categoryName = data.news_categories ? data.news_categories.name : data.category;
+        const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
 
         const processedData = {
           ...data,
+          category: categoryName,
+          category_id: categoryId,
           tags
         };
 
         setArticle(processedData as NewsArticle);
 
-        if (tags.length > 0 || processedData.category) {
+        if (tags.length > 0 || categoryId) {
           let query = supabase.from('news')
             .select(`
               *,
@@ -122,19 +124,8 @@ const NewsDetailPage = () => {
           if (tags.length > 0) {
             // Use overlap for array comparison
             query = query.overlaps('tags', tags);
-          } else if (processedData.category_id) {
-            query = query.eq('category_id', processedData.category_id);
-          } else if (processedData.category) {
-            // Fallback à la recherche par nom de catégorie pour la compatibilité
-            const { data: categoryData } = await supabase
-              .from('news_categories')
-              .select('id')
-              .eq('name', processedData.category)
-              .maybeSingle();
-              
-            if (categoryData?.id) {
-              query = query.eq('category_id', categoryData.id);
-            }
+          } else if (categoryId) {
+            query = query.eq('category_id', categoryId);
           }
 
           const { data: relatedData, error: relatedError } = await query;
@@ -142,12 +133,11 @@ const NewsDetailPage = () => {
           if (!relatedError && relatedData.length > 0) {
             const processedRelatedData = relatedData.map(item => {
               // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
-              if (item.news_categories) {
-                item.category = item.news_categories.name;
-              }
+              const catName = item.news_categories ? item.news_categories.name : item.category;
               
               return {
                 ...item,
+                category: catName,
                 tags: Array.isArray(item.tags) ? item.tags : []
               };
             });
@@ -166,12 +156,11 @@ const NewsDetailPage = () => {
 
             const processedRecentData = recentData.map(item => {
               // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
-              if (item.news_categories) {
-                item.category = item.news_categories.name;
-              }
+              const catName = item.news_categories ? item.news_categories.name : item.category;
               
               return {
                 ...item,
+                category: catName,
                 tags: Array.isArray(item.tags) ? item.tags : []
               };
             });

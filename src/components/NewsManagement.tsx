@@ -33,7 +33,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useNavigate } from "react-router-dom";
 import { supabase, NewsCategory } from '@/integrations/supabase/client';
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -126,6 +126,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [users, setUsers] = useState<{id: string, first_name: string, last_name: string, avatar_url?: string}[]>([]);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(newsFormSchema),
@@ -433,7 +434,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
           />
         </div>
         <Button
-          onClick={() => setIsCreateDialogOpen(true)}
+          onClick={() => navigate('/admin/actualites/creer')}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -487,7 +488,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => openEditDialog(article)}
+                        onClick={() => navigate(`/admin/actualites/editer/${article.id}`)}
                       >
                         <FileEdit className="h-4 w-4" />
                       </Button>
@@ -1100,3 +1101,4 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 };
 
 export default NewsManagement;
+

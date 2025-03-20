@@ -15,6 +15,8 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import { Home } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 interface NewsArticle {
   id: string;
@@ -335,7 +337,16 @@ const AdminNewsPage = () => {
               <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
                 Administration
               </span>
-              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Actualités</h1>
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-4xl md:text-5xl font-bold">Actualités</h1>
+                <Button 
+                  onClick={() => navigate('/admin/actualites/creer')}
+                  className="gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Créer un article
+                </Button>
+              </div>
               <p className="text-getigne-700 text-lg mb-6">
                 Gérez l'actualité du collectif.
               </p>
