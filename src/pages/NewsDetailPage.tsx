@@ -289,7 +289,6 @@ const NewsDetailPage = () => {
             <div className="prose prose-lg max-w-none mx-auto">
               <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
 
-              {/* Remplacement du dangerouslySetInnerHTML par ReactMarkdown */}
               <div className="rich-content">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {article.content}

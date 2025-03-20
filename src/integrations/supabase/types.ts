@@ -294,6 +294,7 @@ export type Database = {
           id: string
           image: string
           publication_date: string | null
+          slug: string | null
           status: string
           tags: Json | null
           title: string
@@ -311,6 +312,7 @@ export type Database = {
           id?: string
           image: string
           publication_date?: string | null
+          slug?: string | null
           status?: string
           tags?: Json | null
           title: string
@@ -328,6 +330,7 @@ export type Database = {
           id?: string
           image?: string
           publication_date?: string | null
+          slug?: string | null
           status?: string
           tags?: Json | null
           title?: string

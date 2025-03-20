@@ -196,7 +196,6 @@ const AdminNewsEditorPage = () => {
       return;
     }
 
-    // Initialiser le bucket si nécessaire
     setupNewsImagesBucket().catch(err => {
       console.error('Erreur lors de la configuration du bucket news_images:', err);
     });
@@ -207,7 +206,6 @@ const AdminNewsEditorPage = () => {
     if (isEditMode && id) {
       fetchArticle(id);
     } else {
-      // Reset form for new article
       form.reset({
         title: "",
         excerpt: "",
@@ -317,7 +315,6 @@ const AdminNewsEditorPage = () => {
       };
 
       if (isEditMode && id) {
-        // Update existing
         const { data, error } = await supabase
           .from('news')
           .update(formData)
@@ -334,14 +331,13 @@ const AdminNewsEditorPage = () => {
         });
         
         if (status === 'published' && data && data.length > 0) {
-          // Redirect to the article page using slug
-          const articleSlug = data[0].slug || data[0].id;
+          const articleData = data[0];
+          const articleSlug = articleData.slug || articleData.id;
           const redirectUrl = `/actualites/${articleSlug}`;
           navigate(redirectUrl);
           return;
         }
       } else {
-        // Create new
         formData.date = new Date().toISOString().split('T')[0];
         
         const { data, error } = await supabase
@@ -359,15 +355,14 @@ const AdminNewsEditorPage = () => {
         });
         
         if (status === 'published' && data && data.length > 0) {
-          // Redirect to the article page using slug
-          const articleSlug = data[0].slug || data[0].id;
+          const articleData = data[0];
+          const articleSlug = articleData.slug || articleData.id;
           const redirectUrl = `/actualites/${articleSlug}`;
           navigate(redirectUrl);
           return;
         }
       }
 
-      // Only navigate to the admin news page if we didn't redirect to the article
       navigate('/admin/actualites');
     } catch (error: any) {
       console.error("Error saving news article:", error);
@@ -423,7 +418,6 @@ const AdminNewsEditorPage = () => {
         <Form {...form}>
           <form>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Colonne principale (2/3) */}
               <div className="lg:col-span-2 space-y-8">
                 <FormField
                   control={form.control}
@@ -462,7 +456,6 @@ const AdminNewsEditorPage = () => {
                 />
               </div>
 
-              {/* Sidebar (1/3) */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg border border-getigne-100 p-6 space-y-6 sticky top-24">
                   <div className="flex justify-between items-center">
