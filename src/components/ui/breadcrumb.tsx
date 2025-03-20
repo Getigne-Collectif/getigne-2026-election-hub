@@ -1,6 +1,8 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
+import { Link as RouterLink } from "react-router-dom"
 
 import { cn } from "@/lib/utils"
 
@@ -42,14 +44,29 @@ BreadcrumbItem.displayName = "BreadcrumbItem"
 const BreadcrumbLink = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentPropsWithoutRef<"a"> & {
-    asChild?: boolean
+    asChild?: boolean;
+    to?: string;
   }
->(({ asChild, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : "a"
-
+>(({ asChild, className, href, to, ...props }, ref) => {
+  const Comp = asChild ? Slot : to ? RouterLink : "a"
+  
+  // Si to est défini, on utilise RouterLink
+  if (to) {
+    return (
+      <Comp
+        ref={ref}
+        to={to}
+        className={cn("transition-colors hover:text-foreground", className)}
+        {...props}
+      />
+    )
+  }
+  
+  // Sinon, on utilise un lien standard
   return (
     <Comp
       ref={ref}
+      href={href}
       className={cn("transition-colors hover:text-foreground", className)}
       {...props}
     />

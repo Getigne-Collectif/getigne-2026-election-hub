@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import {Calendar, ChevronRight, Home, Search, Tag, X} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { supabase } from "@/integrations/supabase/client";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbList,
+  BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 
@@ -34,13 +33,8 @@ interface NewsArticle {
 }
 
 const NewsCard = ({ article }: { article: NewsArticle }) => {
-  // Parse tags from the article if they exist
   const tags = article.tags || [];
-  
-  // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
   const categoryName = article.news_categories?.name || article.category || '';
-
-  // Déterminer l'URL de l'article - utiliser le slug s'il existe, sinon utiliser l'ID
   const articleUrl = article.slug 
     ? `/actualites/${article.slug}`
     : `/actualites/${article.id}`;
@@ -66,7 +60,6 @@ const NewsCard = ({ article }: { article: NewsArticle }) => {
           <h3 className="font-medium text-xl mb-2">{article.title}</h3>
           <p className="text-getigne-700 mb-4">{article.excerpt}</p>
 
-          {/* Tags */}
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-4">
               {tags.map((tag, index) => (
@@ -102,11 +95,9 @@ const NewsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // Parse URL params on first load
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
       setActiveCategory(categoryParam);
@@ -130,14 +121,11 @@ const NewsPage = () => {
 
         if (error) throw error;
 
-        // Ensure all articles have a valid tags array and category info
         const processedData = data.map(article => {
-          // Make sure tags is always an array
           if (!article.tags) {
             article.tags = [];
           }
           
-          // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
           if (article.news_categories) {
             article.category = article.news_categories.name;
           } 
@@ -147,11 +135,9 @@ const NewsPage = () => {
 
         setAllNewsArticles(processedData);
 
-        // Extract unique categories
         const uniqueCategories = ['Tous', ...new Set(processedData.map(article => article.category || '').filter(Boolean))];
         setCategories(uniqueCategories);
 
-        // Extract unique tags
         const allTags = new Set<string>();
         processedData.forEach(article => {
           if (Array.isArray(article.tags)) {
@@ -171,7 +157,6 @@ const NewsPage = () => {
     fetchNews();
   }, [searchParams]);
 
-  // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
 
@@ -186,24 +171,20 @@ const NewsPage = () => {
     setSearchParams(params);
   }, [activeCategory, activeTags, setSearchParams]);
 
-  // Handle category change
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
   };
 
-  // Handle tag selection
   const handleTagSelect = (tag: string) => {
     if (!activeTags.includes(tag)) {
       setActiveTags([...activeTags, tag]);
     }
   };
 
-  // Handle tag removal
   const handleTagRemove = (tag: string) => {
     setActiveTags(activeTags.filter(t => t !== tag));
   };
 
-  // Filtrer les articles en fonction de la recherche, de la catégorie et des tags
   const filteredArticles = allNewsArticles.filter(article => {
     const categoryName = article.news_categories?.name || article.category || '';
     
@@ -211,7 +192,6 @@ const NewsPage = () => {
                           article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === 'Tous' || categoryName === activeCategory;
 
-    // Check if article has all selected tags
     const matchesTags = activeTags.length === 0 ||
                         activeTags.every(tag =>
                           Array.isArray(article.tags) && article.tags.includes(tag)
@@ -224,13 +204,12 @@ const NewsPage = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Header */}
       <div className="pt-24 pb-12 bg-getigne-50">
         <div className="container mx-auto px-4">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">
+                <BreadcrumbLink to="/">
                   <Home className="h-4 w-4 mr-1" />
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -240,6 +219,7 @@ const NewsPage = () => {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+
           <div className="max-w-3xl mx-auto text-center">
             <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
               Actualités
@@ -252,7 +232,6 @@ const NewsPage = () => {
         </div>
       </div>
 
-      {/* News content */}
       <main className="flex-grow py-16">
         <div className="container mx-auto px-4">
           {loading ? (
@@ -261,10 +240,8 @@ const NewsPage = () => {
             <div className="text-center py-8 text-red-500">Une erreur est survenue: {error}</div>
           ) : (
             <>
-              {/* Search and filters */}
               <div className="max-w-5xl mx-auto mb-12">
                 <div className="flex gap-4 items-start">
-                  {/* Search */}
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Search size={18} className="text-getigne-500" />
@@ -278,7 +255,6 @@ const NewsPage = () => {
                     />
                   </div>
 
-                  {/* Categories */}
                   <div className="flex flex-wrap gap-2">
                     <span className="text-getigne-700 self-center">Catégories:</span>
                     {categories.map((category) => (
@@ -300,62 +276,56 @@ const NewsPage = () => {
                 </div>
                 {availableTags.length > 0 && (
                   <div>
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 w-full items-start">
-                    <span className="text-getigne-700 self-center">Tags populaires:</span>
-                    <div className="flex flex-wrap gap-2">
-                      {availableTags.slice(0, 10).map((tag) => (
-                        <Button
-                          key={tag}
-                          variant="outline"
-                          size="sm"
-                          className={
-                            activeTags.includes(tag)
-                              ? "bg-getigne-100 border-getigne-300 text-getigne-700"
-                              : "border-getigne-200 text-getigne-700"
-                          }
-                          onClick={() => handleTagSelect(tag)}
-                        >
-                          #{tag}
-                        </Button>
-                      ))}
+                    <div className="flex flex-wrap gap-2 w-full items-start">
+                      <span className="text-getigne-700 self-center">Tags populaires:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {availableTags.slice(0, 10).map((tag) => (
+                          <Button
+                            key={tag}
+                            variant="outline"
+                            size="sm"
+                            className={
+                              activeTags.includes(tag)
+                                ? "bg-getigne-100 border-getigne-300 text-getigne-700"
+                                : "border-getigne-200 text-getigne-700"
+                            }
+                            onClick={() => handleTagSelect(tag)}
+                          >
+                            #{tag}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
                 )}
-                {/* Applied filters */}
                 {(activeCategory !== 'Tous' || activeTags.length > 0) && (
-                    <div className="flex flex-wrap gap-2 items-center mt-5">
-                      {/* Category chip */}
-                      {activeCategory !== 'Tous' && (
-                          <div className="flex items-center bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
-                            Catégorie: {activeCategory}
-                            <button
-                                onClick={() => handleCategoryChange('Tous')}
-                                className="ml-1 p-1 hover:text-getigne-accent"
-                            >
-                              <X size={14} />
-                            </button>
-                          </div>
-                      )}
-
-                      {/* Tag chips */}
-                      {activeTags.map(tag => (
-                          <div key={tag} className="flex items-center bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
-                            #{tag}
-                            <button
-                                onClick={() => handleTagRemove(tag)}
-                                className="ml-1 p-1 hover:text-getigne-accent"
-                            >
-                              <X size={14} />
-                            </button>
-                          </div>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-2 items-center mt-5">
+                    {activeCategory !== 'Tous' && (
+                      <div className="flex items-center bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
+                        Catégorie: {activeCategory}
+                        <button
+                            onClick={() => handleCategoryChange('Tous')}
+                            className="ml-1 p-1 hover:text-getigne-accent"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    )}
+                    {activeTags.map(tag => (
+                      <div key={tag} className="flex items-center bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
+                        #{tag}
+                        <button
+                            onClick={() => handleTagRemove(tag)}
+                            className="ml-1 p-1 hover:text-getigne-accent"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
 
-              {/* Articles grid */}
               {filteredArticles.length > 0 ? (
                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
                   {filteredArticles.map(article => (
