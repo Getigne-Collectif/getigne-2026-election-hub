@@ -3,7 +3,7 @@ import React from 'react';
 import { Check, X, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Table, 
   TableBody, 
@@ -18,6 +18,7 @@ import { getInitials } from './utils';
 interface Profile {
   first_name: string;
   last_name: string;
+  avatar_url?: string;  // Added avatar_url property
 }
 
 interface Comment {
