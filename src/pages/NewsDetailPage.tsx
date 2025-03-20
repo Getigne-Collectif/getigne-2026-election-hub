@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -94,7 +93,6 @@ const NewsDetailPage = () => {
 
     const fetchArticle = async () => {
       try {
-        // Try to find by slug first, then by ID if not found
         let query = supabase
           .from('news')
           .select(`
@@ -104,7 +102,6 @@ const NewsDetailPage = () => {
           `)
           .eq('status', 'published');
 
-        // Check if slug is a UUID (for backward compatibility)
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug || '');
 
         if (isUuid) {
@@ -126,16 +123,13 @@ const NewsDetailPage = () => {
           return;
         }
 
-        // Ensure tags is an array of strings
         const tags = Array.isArray(data.tags) 
           ? data.tags.map(tag => String(tag)) 
           : [];
 
-        // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
         const categoryName = data.news_categories ? data.news_categories.name : data.category;
         const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
 
-        // Handle author which might be an error object
         let authorData = null;
         if (data.author && typeof data.author === 'object' && !('error' in data.author)) {
           authorData = data.author;
@@ -151,9 +145,7 @@ const NewsDetailPage = () => {
 
         setArticle(processedData);
 
-        // Only fetch related articles if there are tags or a category_id
         if (tags.length > 0 || categoryId) {
-          // Use a type annotation here to avoid deep type instantiation
           const query = supabase.from('news')
             .select(`
               *,
@@ -165,7 +157,6 @@ const NewsDetailPage = () => {
             .limit(3);
 
           if (tags.length > 0) {
-            // Use overlap for array comparison
             query.overlaps('tags', tags);
           } else if (categoryId) {
             query.eq('category_id', categoryId);
@@ -175,15 +166,12 @@ const NewsDetailPage = () => {
 
           if (!relatedError && relatedData && relatedData.length > 0) {
             const processedRelatedData = relatedData.map(item => {
-              // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
               const catName = item.news_categories ? item.news_categories.name : item.category;
               
-              // Ensure tags is an array of strings
               const itemTags = Array.isArray(item.tags) 
                 ? item.tags.map(tag => String(tag)) 
                 : [];
 
-              // Handle author which might be an error object
               let itemAuthorData = null;
               if (item.author && typeof item.author === 'object' && !('error' in item.author)) {
                 itemAuthorData = item.author;
@@ -198,7 +186,6 @@ const NewsDetailPage = () => {
             });
             setRelatedArticles(processedRelatedData);
           } else {
-            // If no related articles by tag or category, get recent articles
             const { data: recentData } = await supabase
               .from('news')
               .select(`
@@ -213,15 +200,12 @@ const NewsDetailPage = () => {
 
             if (recentData && recentData.length > 0) {
               const processedRecentData = recentData.map(item => {
-                // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
                 const catName = item.news_categories ? item.news_categories.name : item.category;
                 
-                // Ensure tags is an array of strings
                 const itemTags = Array.isArray(item.tags) 
                   ? item.tags.map(tag => String(tag)) 
                   : [];
 
-                // Handle author which might be an error object
                 let itemAuthorData = null;
                 if (item.author && typeof item.author === 'object' && !('error' in item.author)) {
                   itemAuthorData = item.author;
