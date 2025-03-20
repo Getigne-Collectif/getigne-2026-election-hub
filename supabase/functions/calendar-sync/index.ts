@@ -20,95 +20,24 @@ serve(async (req) => {
     const token = url.searchParams.get("token");
     
     if (!token) {
+      // Try to get the token from the authorization header as a fallback
+      const authHeader = req.headers.get("authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        // Extract the token from the authorization header
+        const headerToken = authHeader.substring(7);
+        if (headerToken) {
+          // Continue processing with the token from header
+          return await processRequest(headerToken);
+        }
+      }
+      
       return new Response(
         JSON.stringify({ error: "Token d'authentification manquant" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Décoder le token pour obtenir l'ID de l'utilisateur
-    let userId;
-    try {
-      const decoded = JSON.parse(atob(token.split('.')[1]));
-      userId = decoded.sub;
-    } catch (error) {
-      console.error("Erreur de décodage du token:", error);
-      return new Response(
-        JSON.stringify({ error: "Token invalide" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Initialisation du client Supabase
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Récupération des événements auxquels l'utilisateur est inscrit
-    const { data: registrations, error: registrationsError } = await supabase
-      .from("event_registrations")
-      .select("event_id")
-      .eq("user_id", userId)
-      .eq("status", "registered");
-
-    if (registrationsError) {
-      console.error("Erreur lors de la récupération des inscriptions:", registrationsError);
-      return new Response(
-        JSON.stringify({ error: "Erreur lors de la récupération des inscriptions" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!registrations || registrations.length === 0) {
-      // Générer un calendrier vide si l'utilisateur n'est inscrit à aucun événement
-      const emptyCalendar = generateICalendar([]);
-      return new Response(emptyCalendar, {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "text/calendar",
-          "Content-Disposition": "attachment; filename=mes-evenements.ics"
-        }
-      });
-    }
-
-    // Récupération des détails des événements
-    const eventIds = registrations.map(reg => reg.event_id);
-    const { data: events, error: eventsError } = await supabase
-      .from("events")
-      .select("*")
-      .in("id", eventIds)
-      .eq("status", "published");
-
-    if (eventsError) {
-      console.error("Erreur lors de la récupération des événements:", eventsError);
-      return new Response(
-        JSON.stringify({ error: "Erreur lors de la récupération des événements" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Récupération du profil utilisateur pour personnaliser le calendrier
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("first_name, last_name")
-      .eq("id", userId)
-      .single();
-
-    if (profileError) {
-      console.error("Erreur lors de la récupération du profil:", profileError);
-    }
-
-    // Génération du fichier iCalendar
-    const calendarContent = generateICalendar(events, profile);
-
-    // Renvoyer le contenu du calendrier
-    return new Response(calendarContent, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "text/calendar",
-        "Content-Disposition": "attachment; filename=mes-evenements.ics"
-      }
-    });
+    return await processRequest(token);
 
   } catch (error) {
     console.error("Erreur inattendue:", error);
@@ -118,6 +47,103 @@ serve(async (req) => {
     );
   }
 });
+
+// Extract the request processing logic into a separate function
+async function processRequest(token) {
+  // Décoder le token pour obtenir l'ID de l'utilisateur
+  let userId;
+  try {
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    userId = decoded.sub;
+    console.log("User ID from token:", userId);
+  } catch (error) {
+    console.error("Erreur de décodage du token:", error);
+    return new Response(
+      JSON.stringify({ error: "Token invalide" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  // Initialisation du client Supabase
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  console.log("Fetching registrations for user:", userId);
+  
+  // Récupération des événements auxquels l'utilisateur est inscrit
+  const { data: registrations, error: registrationsError } = await supabase
+    .from("event_registrations")
+    .select("event_id")
+    .eq("user_id", userId)
+    .eq("status", "registered");
+
+  if (registrationsError) {
+    console.error("Erreur lors de la récupération des inscriptions:", registrationsError);
+    return new Response(
+      JSON.stringify({ error: "Erreur lors de la récupération des inscriptions" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  console.log("Found registrations:", registrations?.length || 0);
+
+  if (!registrations || registrations.length === 0) {
+    // Générer un calendrier vide si l'utilisateur n'est inscrit à aucun événement
+    console.log("No registrations found, generating empty calendar");
+    const emptyCalendar = generateICalendar([]);
+    return new Response(emptyCalendar, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "text/calendar",
+        "Content-Disposition": "attachment; filename=mes-evenements.ics"
+      }
+    });
+  }
+
+  // Récupération des détails des événements
+  const eventIds = registrations.map(reg => reg.event_id);
+  console.log("Fetching events with IDs:", eventIds);
+  
+  const { data: events, error: eventsError } = await supabase
+    .from("events")
+    .select("*")
+    .in("id", eventIds)
+    .eq("status", "published");
+
+  if (eventsError) {
+    console.error("Erreur lors de la récupération des événements:", eventsError);
+    return new Response(
+      JSON.stringify({ error: "Erreur lors de la récupération des événements" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  console.log("Found events:", events?.length || 0);
+
+  // Récupération du profil utilisateur pour personnaliser le calendrier
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("first_name, last_name")
+    .eq("id", userId)
+    .single();
+
+  if (profileError) {
+    console.error("Erreur lors de la récupération du profil:", profileError);
+  }
+
+  // Génération du fichier iCalendar
+  const calendarContent = generateICalendar(events, profile);
+
+  // Renvoyer le contenu du calendrier
+  return new Response(calendarContent, {
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "text/calendar",
+      "Content-Disposition": "attachment; filename=mes-evenements.ics"
+    }
+  });
+}
 
 // Fonction pour générer le contenu iCalendar
 function generateICalendar(events: any[], profile?: { first_name?: string; last_name?: string }) {

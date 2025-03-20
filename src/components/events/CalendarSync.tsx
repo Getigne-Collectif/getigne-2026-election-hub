@@ -21,6 +21,7 @@ const CalendarSync: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!user) return null;
 
@@ -42,17 +43,18 @@ const CalendarSync: React.FC = () => {
   };
 
   const copyToClipboard = async () => {
-    const url = await getCalendarUrl();
-    if (!url) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de générer le lien du calendrier",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    setIsLoading(true);
     try {
+      const url = await getCalendarUrl();
+      if (!url) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de générer le lien du calendrier",
+          variant: "destructive"
+        });
+        return;
+      }
+
       await navigator.clipboard.writeText(url);
       toast({
         title: "Lien copié",
@@ -64,20 +66,54 @@ const CalendarSync: React.FC = () => {
         description: "Impossible de copier le lien",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const openCalendar = async () => {
-    const url = await getCalendarUrl();
-    if (!url) {
+    setIsLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Session introuvable");
+
+      // For direct access, we need to use the supabase functions client
+      const { data, error } = await supabase.functions.invoke('calendar-sync', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (error) {
+        console.error("Erreur lors de la récupération du calendrier:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de récupérer le calendrier",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create a blob from the response and download it
+      const blob = new Blob([data], { type: 'text/calendar' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mes-evenements.ics';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Erreur lors du téléchargement du calendrier:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de générer le lien du calendrier",
+        description: "Impossible de télécharger le calendrier",
         variant: "destructive"
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-    window.open(url, '_blank');
   };
 
   return (
@@ -113,6 +149,7 @@ const CalendarSync: React.FC = () => {
               size="sm" 
               className="w-full justify-start" 
               onClick={copyToClipboard}
+              disabled={isLoading}
             >
               <Copy size={16} className="mr-2" />
               Copier le lien
@@ -123,6 +160,7 @@ const CalendarSync: React.FC = () => {
               size="sm" 
               className="w-full justify-start" 
               onClick={openCalendar}
+              disabled={isLoading}
             >
               <ExternalLink size={16} className="mr-2" />
               Télécharger le calendrier (.ics)
