@@ -51,7 +51,7 @@ ${formData.message}
         color: DiscordColors.PURPLE,
         username: "Formulaire Commission"
       });
-      
+
       // Clear form data
       setFormData({
         firstName: '',
@@ -79,10 +79,10 @@ ${formData.message}
 
   return (
     <div className={`bg-white shadow-sm rounded-xl p-6 border ${themeColor.border}`}>
-      <h2 className="text-2xl font-bold mb-6">Rejoindre cette commission</h2>
+      <h2 className="text-2xl font-bold mb-6">Contacter la commission</h2>
       <p className="text-getigne-700 mb-6">
-        Vous souhaitez rejoindre la commission {committeeName} ou obtenir plus d'informations ? 
-        Remplissez ce formulaire pour nous contacter. Le pilote de la commission vous répondra dans les plus brefs délais.
+        Vous souhaitez joindre (ou rejoindre 😉) la commission {committeeName} ?
+        Remplissez ce formulaire, nous vous répondrons dans les plus brefs délais.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">

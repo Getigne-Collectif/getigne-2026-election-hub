@@ -138,7 +138,7 @@ const AuthButton = () => {
             <DropdownMenuItem asChild>
               <Link to="/admin/news" className="flex items-center w-full">
                 <Newspaper className="h-4 w-4 mr-2" />
-                Blog
+                Actualités
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>

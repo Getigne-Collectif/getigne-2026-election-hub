@@ -58,7 +58,7 @@ const Navbar = () => {
       </li>
       <li>
         <Link to="/programme" className={isActive('/programme')}>
-          Notre programme
+          Programme
         </Link>
       </li>
       <li>

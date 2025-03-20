@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,10 +46,10 @@ interface RelatedArticleProps {
 }
 
 const RelatedArticleCard = ({ article }: RelatedArticleProps) => {
-  const articleUrl = article.slug 
+  const articleUrl = article.slug
     ? `/actualites/${article.slug}`
     : `/actualites/${article.id}`;
-    
+
   return (
     <Link to={articleUrl} className="block">
       <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-getigne-100 hover:shadow-md transition-shadow">
@@ -89,8 +89,6 @@ const NewsDetailPage = () => {
 
     const fetchArticle = async () => {
       try {
-        console.log('Fetching article with slug or ID:', slug);
-        
         // Try to find by slug first, then by ID if not found
         let query = supabase
           .from('news')
@@ -99,24 +97,22 @@ const NewsDetailPage = () => {
             news_categories(id, name)
           `)
           .eq('status', 'published');
-          
+
         // Check if slug is a UUID (for backward compatibility)
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug || '');
-        
+
         if (isUuid) {
           query = query.eq('id', slug);
         } else {
           query = query.eq('slug', slug);
         }
-        
+
         const { data, error } = await query.single();
 
         if (error) {
           console.error('Error fetching article:', error);
           throw error;
         }
-
-        console.log('Fetched article:', data);
 
         if (!data) {
           setError('Article not found');
@@ -126,7 +122,7 @@ const NewsDetailPage = () => {
 
         // Ensure tags is an array
         const tags = Array.isArray(data.tags) ? data.tags : [];
-        
+
         // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
         const categoryName = data.news_categories ? data.news_categories.name : data.category;
         const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
@@ -148,7 +144,7 @@ const NewsDetailPage = () => {
               *,
               news_categories(id, name)
             `)
-            .eq('status', 'published') 
+            .eq('status', 'published')
             .neq('id', data.id)
             .limit(3);
 
@@ -165,7 +161,7 @@ const NewsDetailPage = () => {
             const processedRelatedData = relatedData.map(item => {
               // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
               const catName = item.news_categories ? item.news_categories.name : item.category;
-              
+
               return {
                 ...item,
                 category: catName,
@@ -190,7 +186,7 @@ const NewsDetailPage = () => {
               const processedRecentData = recentData.map(item => {
                 // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
                 const catName = item.news_categories ? item.news_categories.name : item.category;
-                
+
                 return {
                   ...item,
                   category: catName,
@@ -204,7 +200,6 @@ const NewsDetailPage = () => {
 
         setLoading(false);
       } catch (error) {
-        console.error('Erreur lors de la récupération de l\'article:', error);
         setError((error as Error).message);
         setLoading(false);
       }
@@ -237,25 +232,24 @@ const NewsDetailPage = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
+      <div className="pt-24 pb-4 bg-getigne-50">
+        <div className="container mx-auto px-4">
+          <div className="mb-4">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/actualites')}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour aux actualités
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
-          <Breadcrumb className="mb-8">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">
-                  <Home className="h-4 w-4 mr-1" />
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/actualites">Actualités</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{article.title}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+
 
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-wrap items-center gap-3 mb-4">

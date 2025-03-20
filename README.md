@@ -1,69 +1,50 @@
-# Welcome to your Lovable project
+# Bienvenue
 
-## Project info
+## Infos du projet
 
-**URL**: https://lovable.dev/projects/69df2b64-5c3e-4cc5-919e-0bd401709269
+**URL**: https://getigne-collectif.fr
 
-## How can I edit this code?
+## Installation
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/69df2b64-5c3e-4cc5-919e-0bd401709269) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+yarn install
 ```
 
-**Edit a file directly in GitHub**
+## Démarrage
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+yarn dev
+```
 
-**Use GitHub Codespaces**
+## Déploiement
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Just push and deploy to Vercel
 
-## What technologies are used for this project?
+## Supabase
 
-This project is built with .
+Le projet utilise Supabase pour plusieurs choses :
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- l'authentification
+- les données liées à notre collectif, notamment :
+  - l'association / collectif
+  - le programme
+  - les commissions
+  - l'agenda (événements) et inscriptions
+  - le blog (actualités) et commentaires
+  - ...
+- fonctions (webhooks et API) pour :
+  - synchroniser les calendriers
+  - générer les flux RSS
+  - notifications Discord
+  - formulaire de contact
+  - invitation d'utilisateur
 
-## How can I deploy this project?
+### Fonctionnement
 
-Simply open [Lovable](https://lovable.dev/projects/69df2b64-5c3e-4cc5-919e-0bd401709269) and click on Share -> Publish.
+Pour déployer les fonctions, suivez la documentation [Supabase](https://supabase.com/docs/guides/functions) puis, une fois la fonction créé dans le répertoire `supabase/functions`, déployez-la comme ceci :
 
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+```
+SUPABASE_ACCESS_TOKEN=<access-token> supabase functions deploy <nom-de-la-fonction> --project-ref <project-id>
+```
+> - `jqpivqdwblrccjzicnxn` est le project-id de notre projet
+> - les access token peuvent être générés dans [Accounts > Access Tokens](https://supabase.com/dashboard/account/tokens)
