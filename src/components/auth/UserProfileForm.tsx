@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Upload } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 
 interface PasswordInputProps {
   value: string;
@@ -42,6 +42,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({ value, onChange, id, plac
 
 const UserProfileForm: React.FC = () => {
   const { user, profile, updateProfile, updatePassword } = useAuth();
+  const { toast } = useToast();
   
   const [firstName, setFirstName] = useState(profile?.first_name || '');
   const [lastName, setLastName] = useState(profile?.last_name || '');
@@ -92,8 +93,19 @@ const UserProfileForm: React.FC = () => {
         last_name: lastName,
         avatar_url: avatarUrl
       });
+      
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été enregistrées avec succès."
+      });
     } catch (error: any) {
+      console.error('Erreur lors de la mise à jour:', error);
       setError(error.message || 'Une erreur est survenue lors de la mise à jour du profil');
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || 'Une erreur est survenue lors de la mise à jour du profil'
+      });
     } finally {
       setLoading(false);
     }
@@ -112,8 +124,10 @@ const UserProfileForm: React.FC = () => {
       const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
       
-      // Créer le bucket s'il n'existe pas déjà
-      const { data: bucketData, error: bucketError } = await supabase.storage.getBucket('avatars');
+      // Vérifier si le bucket existe déjà
+      const { data: bucketData } = await supabase.storage.getBucket('avatars');
+      
+      // Si le bucket n'existe pas, le créer
       if (!bucketData) {
         await supabase.storage.createBucket('avatars', {
           public: true,
@@ -127,6 +141,7 @@ const UserProfileForm: React.FC = () => {
         .upload(filePath, file);
         
       if (uploadError) {
+        console.error('Erreur upload:', uploadError);
         throw uploadError;
       }
       
@@ -134,9 +149,19 @@ const UserProfileForm: React.FC = () => {
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
       
       setAvatarUrl(data.publicUrl);
-    } catch (error) {
+      
+      toast({
+        title: "Avatar téléchargé",
+        description: "L'image a été téléchargée avec succès."
+      });
+    } catch (error: any) {
       console.error('Error uploading avatar:', error);
       setError('Erreur lors du téléchargement de l\'avatar');
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de télécharger l'avatar : " + error.message
+      });
     } finally {
       setUploading(false);
     }
