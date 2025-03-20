@@ -9,12 +9,14 @@ interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   height?: number;
+  placeholder?: string; // Added placeholder prop
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ 
   value, 
   onChange,
-  height = 500 
+  height = 500,
+  placeholder
 }) => {
   const editorRef = useRef<any>(null);
   const { toast } = useToast();
@@ -95,6 +97,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           image_caption: true,
           image_title: true,
           image_dimensions: true,
+          placeholder: placeholder, // Use the placeholder if provided
         }}
       />
     </div>
