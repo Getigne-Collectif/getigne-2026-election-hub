@@ -1,9 +1,36 @@
 
 import { Link } from 'react-router-dom';
 import { Facebook, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
+import { useState } from 'react';
+import { subscribeToNewsletter } from '../utils/newsletter';
+import { toast } from 'sonner';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast.error("Veuillez saisir votre adresse email");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      await subscribeToNewsletter({ email });
+      toast.success("Merci de votre inscription à notre newsletter !");
+      setEmail(''); // Réinitialiser le champ email
+    } catch (error) {
+      console.error("Erreur lors de l'inscription:", error);
+      toast.error("Une erreur est survenue lors de l'inscription. Veuillez réessayer.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <footer className="bg-getigne-900 text-white pt-16 pb-8">
@@ -103,18 +130,21 @@ const Footer = () => {
             <p className="text-getigne-100 mb-4">
               Inscrivez-vous à notre newsletter pour suivre nos actualités et événements.
             </p>
-            <form className="space-y-3">
+            <form className="space-y-3" onSubmit={handleNewsletterSubmit}>
               <input
                 type="email"
                 placeholder="Votre email"
                 className="bg-getigne-800 text-white w-full px-4 py-2 rounded-md border border-getigne-700 focus:outline-none focus:ring-2 focus:ring-getigne-accent"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <button
                 type="submit"
                 className="bg-getigne-accent hover:bg-getigne-accent/90 text-white font-medium px-4 py-2 rounded-md w-full transition-colors"
+                disabled={isSubmitting}
               >
-                S'inscrire
+                {isSubmitting ? 'Envoi...' : "S'inscrire"}
               </button>
             </form>
           </div>
