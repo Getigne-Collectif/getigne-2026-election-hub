@@ -96,8 +96,9 @@ async function processRequest(token) {
     return new Response(emptyCalendar, {
       headers: {
         ...corsHeaders,
-        "Content-Type": "text/calendar",
-        "Content-Disposition": "attachment; filename=mes-evenements.ics"
+        "Content-Type": "text/calendar; charset=utf-8",
+        "Content-Disposition": "attachment; filename=\"evenements-getigne-collectif.ics\"",
+        "X-WR-CALNAME": "Événements Gétigné Collectif"
       }
     });
   }
@@ -136,12 +137,13 @@ async function processRequest(token) {
   // Génération du fichier iCalendar
   const calendarContent = generateICalendar(events, profile);
 
-  // Renvoyer le contenu du calendrier
+  // Renvoyer le contenu du calendrier avec des headers améliorés
   return new Response(calendarContent, {
     headers: {
       ...corsHeaders,
-      "Content-Type": "text/calendar",
-      "Content-Disposition": "attachment; filename=mes-evenements.ics"
+      "Content-Type": "text/calendar; charset=utf-8",
+      "Content-Disposition": "attachment; filename=\"evenements-getigne-collectif.ics\"",
+      "X-WR-CALNAME": "Événements Gétigné Collectif"
     }
   });
 }
@@ -151,6 +153,7 @@ function generateICalendar(events: any[], profile?: { first_name?: string; last_
   const now = new Date();
   const timestamp = formatDate(now, true);
   const userName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Utilisateur';
+  const calendarName = `Événements Gétigné Collectif - ${userName}`;
   
   let icalContent = [
     "BEGIN:VCALENDAR",
@@ -158,8 +161,11 @@ function generateICalendar(events: any[], profile?: { first_name?: string; last_
     "PRODID:-//Gétigné Collectif//Agenda//FR",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
-    `X-WR-CALNAME:Événements Gétigné Collectif - ${userName}`,
+    `X-WR-CALNAME:${calendarName}`,
+    `NAME:${calendarName}`,
     "X-WR-CALDESC:Événements auxquels vous êtes inscrit",
+    "REFRESH-INTERVAL;VALUE=DURATION:PT12H",
+    "X-PUBLISHED-TTL:PT12H",
   ];
 
   // Ajouter chaque événement au calendrier
@@ -206,3 +212,4 @@ function formatDate(date: Date, withTime = true): string {
   }
   return `${year}${month}${day}`;
 }
+

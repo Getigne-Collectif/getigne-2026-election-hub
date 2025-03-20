@@ -37,7 +37,7 @@ const CalendarSync: React.FC = () => {
       
       // Create a URL with the access token directly in the URL for calendar applications
       // This is a special case for calendar sync as it needs to work with external apps
-      return `${baseUrl}?token=${session.access_token}`;
+      return `webcal://${baseUrl.replace(/^https?:\/\//, '')}?token=${session.access_token}`;
     } catch (error) {
       console.error("Erreur lors de la génération de l'URL du calendrier:", error);
       return null;
@@ -101,7 +101,7 @@ const CalendarSync: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'mes-evenements.ics';
+      a.download = 'evenements-getigne-collectif.ics';
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -176,6 +176,9 @@ const CalendarSync: React.FC = () => {
               <li>Apple Calendar : Fichier → Nouvel abonnement à un calendrier</li>
               <li>Outlook : Fichier → Informations → Comptes → Abonnements calendrier</li>
             </ul>
+            <p className="mt-2">
+              Note : Pour Google Agenda, si le lien ne fonctionne pas, vous devrez peut-être télécharger le fichier .ics et l'importer manuellement.
+            </p>
           </div>
         </div>
       </PopoverContent>
