@@ -19,7 +19,8 @@ const EventDetailPage = () => {
   const { id, slug } = useParams();
   const navigate = useNavigate();
   const [eventId, setEventId] = useState<string | null>(id || null);
-  const { isLoggedIn, isMember, user } = useAuth();
+  const { user, isMember } = useAuth();
+  const [refreshRegistrations, setRefreshRegistrations] = useState(false);
 
   // If we have a slug, fetch the actual ID first
   const { data: slugData, isLoading: isLoadingSlug } = useQuery({
@@ -50,7 +51,7 @@ const EventDetailPage = () => {
   }, [slug, slugData]);
 
   const { data: event, isLoading: isLoadingEvent } = useQuery({
-    queryKey: ['event', eventId],
+    queryKey: ['event', eventId, refreshRegistrations],
     queryFn: async () => {
       if (!eventId) return null;
       
@@ -70,6 +71,10 @@ const EventDetailPage = () => {
   });
 
   const isLoading = isLoadingSlug || isLoadingEvent;
+
+  const handleRegistrationChange = () => {
+    setRefreshRegistrations(prev => !prev);
+  };
 
   if (isLoading) {
     return (
@@ -108,6 +113,9 @@ const EventDetailPage = () => {
   const eventDate = new Date(event.date);
   const formattedDate = format(eventDate, "PPPP", { locale: fr });
   const formattedTime = format(eventDate, "HH'h'mm", { locale: fr });
+  
+  // Check if the event is in the past
+  const isPastEvent = new Date() > eventDate;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -171,7 +179,7 @@ const EventDetailPage = () => {
                     <p className="text-yellow-700">
                       Cet événement est réservé aux adhérents. Veuillez vous connecter avec un compte adhérent pour accéder au contenu complet.
                     </p>
-                    {!isLoggedIn && (
+                    {!user && (
                       <Button 
                         onClick={() => navigate('/auth?redirect=' + window.location.pathname)} 
                         className="mt-4"
@@ -196,6 +204,9 @@ const EventDetailPage = () => {
                 <EventRegistration 
                   eventId={event.id} 
                   isMembersOnly={isMembersOnly}
+                  allowRegistration={event.allow_registration}
+                  isPastEvent={isPastEvent}
+                  onRegistrationChange={handleRegistrationChange}
                 />
               </div>
             )}
