@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -131,7 +132,7 @@ const NewsDetailPage = () => {
         const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
 
         let authorData = null;
-        if (data.author && typeof data.author === 'object' && !('error' in data.author)) {
+        if (data.author && typeof data.author === 'object' && data.author !== null && !('error' in data.author)) {
           authorData = data.author;
         }
 
@@ -173,7 +174,7 @@ const NewsDetailPage = () => {
                 : [];
 
               let itemAuthorData = null;
-              if (item.author && typeof item.author === 'object' && !('error' in item.author)) {
+              if (item.author && typeof item.author === 'object' && item.author !== null && !('error' in item.author)) {
                 itemAuthorData = item.author;
               }
 
@@ -207,7 +208,7 @@ const NewsDetailPage = () => {
                   : [];
 
                 let itemAuthorData = null;
-                if (item.author && typeof item.author === 'object' && !('error' in item.author)) {
+                if (item.author && typeof item.author === 'object' && item.author !== null && !('error' in item.author)) {
                   itemAuthorData = item.author;
                 }
 
