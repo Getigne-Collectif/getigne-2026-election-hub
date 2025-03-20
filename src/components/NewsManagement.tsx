@@ -57,6 +57,7 @@ interface NewsArticle {
   excerpt: string;
   content: string;
   category: string;
+  category_id?: string;
   date: string;
   image: string;
   tags: string[];
@@ -1093,3 +1094,4 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 };
 
 export default NewsManagement;
+

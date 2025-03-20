@@ -22,6 +22,7 @@ interface NewsArticle {
   excerpt: string;
   content: string;
   category: string;
+  category_id?: string;
   date: string;
   image: string;
   tags: string[];
@@ -50,6 +51,7 @@ const AdminNewsPage = () => {
   const navigate = useNavigate();
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
   const [pageLoading, setPageLoading] = useState(true);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
 
   const fetchNewsArticles = async () => {
     setPageLoading(true);
@@ -96,10 +98,30 @@ const AdminNewsPage = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('news_categories')
+        .select('id, name');
+
+      if (error) throw error;
+      if (data) {
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des catégories:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   const handleCreateNews = async (formData: NewsFormData, status: 'draft' | 'published') => {
     try {
       const newArticle = {
         ...formData,
+        category: categories.find(cat => cat.id === formData.category_id)?.name || '',
         date: new Date().toISOString().split('T')[0],
         status
       };
@@ -174,6 +196,10 @@ const AdminNewsPage = () => {
       }
 
       let updateData: any = { ...formData };
+
+      if (formData.category_id) {
+        updateData.category = categories.find(cat => cat.id === formData.category_id)?.name || '';
+      }
 
       if (status !== undefined) {
         updateData.status = status;
