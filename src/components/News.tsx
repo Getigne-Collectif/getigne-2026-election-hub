@@ -32,11 +32,16 @@ const NewsCard = ({ article, index }) => {
     };
   }, []);
 
+  // Déterminer l'URL de l'article - utiliser le slug s'il existe, sinon utiliser l'ID
+  const articleUrl = article.slug 
+    ? `/actualites/${article.slug}`
+    : `/actualites/${article.id}`;
+
   return (
-    <Link to={`/actualites/${article.id}`} className="block">
+    <Link to={articleUrl} className="block h-full">
       <article 
         ref={ref}
-        className={`bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift ${
+        className={`bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift h-full ${
           isVisible 
             ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
             : 'opacity-0 translate-y-10'

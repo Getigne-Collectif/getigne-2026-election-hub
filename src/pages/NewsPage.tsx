@@ -30,6 +30,7 @@ interface NewsArticle {
   tags: string[];
   created_at: string;
   updated_at: string;
+  slug?: string;
 }
 
 const NewsCard = ({ article }: { article: NewsArticle }) => {
@@ -39,50 +40,53 @@ const NewsCard = ({ article }: { article: NewsArticle }) => {
   // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
   const categoryName = article.news_categories?.name || article.category || '';
 
+  // Déterminer l'URL de l'article - utiliser le slug s'il existe, sinon utiliser l'ID
+  const articleUrl = article.slug 
+    ? `/actualites/${article.slug}`
+    : `/actualites/${article.id}`;
+
   return (
-    <article className="bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift">
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={article.image}
-          alt={article.title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-        />
-        <div className="absolute top-0 right-0 bg-getigne-accent text-white px-3 py-1 text-sm font-medium">
-          {categoryName}
-        </div>
-      </div>
-      <div className="p-6">
-        <div className="flex items-center text-getigne-500 text-sm mb-3">
-          <Calendar size={14} className="mr-1" />
-          <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
-        </div>
-        <h3 className="font-medium text-xl mb-2">{article.title}</h3>
-        <p className="text-getigne-700 mb-4">{article.excerpt}</p>
-
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-4">
-            {tags.map((tag, index) => (
-              <Link
-                key={index}
-                to={`/actualites?tags=${tag}`}
-                className="bg-getigne-50 text-getigne-700 px-2 py-0.5 rounded-full text-xs hover:bg-getigne-100 transition-colors"
-              >
-                #{tag}
-              </Link>
-            ))}
+    <Link to={articleUrl} className="block">
+      <article className="bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift h-full">
+        <div className="relative h-48 overflow-hidden">
+          <img
+            src={article.image}
+            alt={article.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          />
+          <div className="absolute top-0 right-0 bg-getigne-accent text-white px-3 py-1 text-sm font-medium">
+            {categoryName}
           </div>
-        )}
+        </div>
+        <div className="p-6">
+          <div className="flex items-center text-getigne-500 text-sm mb-3">
+            <Calendar size={14} className="mr-1" />
+            <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
+          </div>
+          <h3 className="font-medium text-xl mb-2">{article.title}</h3>
+          <p className="text-getigne-700 mb-4">{article.excerpt}</p>
 
-        <Link
-          to={`/actualites/${article.id}`}
-          className="text-getigne-accent flex items-center text-sm font-medium group"
-        >
-          Lire la suite
-          <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-        </Link>
-      </div>
-    </article>
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-4">
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="bg-getigne-50 text-getigne-700 px-2 py-0.5 rounded-full text-xs"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="text-getigne-accent flex items-center text-sm font-medium group">
+            Lire la suite
+            <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
+          </div>
+        </div>
+      </article>
+    </Link>
   );
 };
 
