@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../../integrations/supabase/client';
@@ -17,18 +16,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isInvitedUser, setIsInvitedUser] = useState(false);
   const { toast } = useToast();
 
-  // Function to refresh user roles
   const refreshUserRoles = async () => {
     if (!user) {
       return;
     }
     
     try {
-      // Fetch user roles
       const roles = await fetchUserRoles(user.id);
       setUserRoles(roles);
       
-      // Fetch user profile
       const profileData = await fetchUserProfile(user.id);
       if (profileData) {
         setProfile(profileData);
@@ -39,11 +35,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Initial authentication setup
   useEffect(() => {
     setLoading(true);
     
-    // Set up the auth state change listener
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('[AUTH] Auth state changed:', event, session?.user?.id);
       
@@ -51,8 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session.user);
         await refreshUserRoles();
         
-        // Détecter si c'est un utilisateur invité qui n'a pas encore défini son mot de passe
-        // Les utilisateurs invités ont leur email_confirmed_at défini mais n'ont pas de last_sign_in_at
         const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
         setIsInvitedUser(isNewInvitedUser);
         
@@ -72,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
     
-    // Check for an existing session
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -87,7 +78,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           setUser(session.user);
           
-          // Détecter si c'est un utilisateur invité
           const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
           setIsInvitedUser(isNewInvitedUser);
           
@@ -105,13 +95,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     getInitialSession();
 
-    // Clean up listeners on component unmount
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
 
-  // Auth methods
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -243,7 +231,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return false;
     
     try {
-      // Mettre à jour le profil dans la base de données
       const { error } = await supabase
         .from('profiles')
         .update(profileData)
@@ -251,7 +238,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) throw error;
       
-      // Mettre à jour l'état local
       if (profile) {
         setProfile({
           ...profile,
