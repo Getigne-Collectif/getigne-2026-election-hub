@@ -98,8 +98,7 @@ const NewsDetailPage = () => {
           .from('news')
           .select(`
             *,
-            news_categories(id, name),
-            author:profiles(first_name, last_name)
+            news_categories(id, name)
           `)
           .eq('status', 'published');
 
@@ -131,18 +130,27 @@ const NewsDetailPage = () => {
         const categoryName = data.news_categories ? data.news_categories.name : data.category;
         const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
 
-        let authorData = null;
-        if (data.author && typeof data.author === 'object' && data.author !== null && !('error' in data.author)) {
-          authorData = data.author;
-        }
-
+        // Initialiser l'article sans l'auteur
         const processedData: NewsArticle = {
           ...data,
           category: categoryName,
           category_id: categoryId,
           tags,
-          author: authorData
+          author: null
         };
+
+        // Si un author_id est présent, chercher les détails de l'auteur dans la table profiles
+        if (data.author_id) {
+          const { data: authorData, error: authorError } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', data.author_id)
+            .single();
+          
+          if (!authorError && authorData) {
+            processedData.author = authorData;
+          }
+        }
 
         setArticle(processedData);
 
@@ -150,8 +158,7 @@ const NewsDetailPage = () => {
           const query = supabase.from('news')
             .select(`
               *,
-              news_categories(id, name),
-              author:profiles(first_name, last_name)
+              news_categories(id, name)
             `)
             .eq('status', 'published')
             .neq('id', data.id)
@@ -166,33 +173,45 @@ const NewsDetailPage = () => {
           const { data: relatedData, error: relatedError } = await query;
 
           if (!relatedError && relatedData && relatedData.length > 0) {
-            const processedRelatedData = relatedData.map(item => {
+            const processedRelatedArticles = [];
+            
+            for (const item of relatedData) {
               const catName = item.news_categories ? item.news_categories.name : item.category;
               
               const itemTags = Array.isArray(item.tags) 
                 ? item.tags.map(tag => String(tag)) 
                 : [];
 
-              let itemAuthorData = null;
-              if (item.author && typeof item.author === 'object' && item.author !== null && !('error' in item.author)) {
-                itemAuthorData = item.author;
-              }
-
-              return {
+              const relatedArticle: NewsArticle = {
                 ...item,
                 category: catName,
                 tags: itemTags,
-                author: itemAuthorData
-              } as NewsArticle;
-            });
-            setRelatedArticles(processedRelatedData);
+                author: null
+              };
+
+              // Récupérer les détails de l'auteur si author_id est présent
+              if (item.author_id) {
+                const { data: relatedAuthorData } = await supabase
+                  .from('profiles')
+                  .select('first_name, last_name')
+                  .eq('id', item.author_id)
+                  .single();
+                
+                if (relatedAuthorData) {
+                  relatedArticle.author = relatedAuthorData;
+                }
+              }
+              
+              processedRelatedArticles.push(relatedArticle);
+            }
+            
+            setRelatedArticles(processedRelatedArticles);
           } else {
             const { data: recentData } = await supabase
               .from('news')
               .select(`
                 *,
-                news_categories(id, name),
-                author:profiles(first_name, last_name)
+                news_categories(id, name)
               `)
               .eq('status', 'published')
               .neq('id', data.id)
@@ -200,26 +219,39 @@ const NewsDetailPage = () => {
               .limit(3);
 
             if (recentData && recentData.length > 0) {
-              const processedRecentData = recentData.map(item => {
+              const processedRecentArticles = [];
+              
+              for (const item of recentData) {
                 const catName = item.news_categories ? item.news_categories.name : item.category;
                 
                 const itemTags = Array.isArray(item.tags) 
                   ? item.tags.map(tag => String(tag)) 
                   : [];
 
-                let itemAuthorData = null;
-                if (item.author && typeof item.author === 'object' && item.author !== null && !('error' in item.author)) {
-                  itemAuthorData = item.author;
-                }
-
-                return {
+                const recentArticle: NewsArticle = {
                   ...item,
                   category: catName,
                   tags: itemTags,
-                  author: itemAuthorData
-                } as NewsArticle;
-              });
-              setRelatedArticles(processedRecentData);
+                  author: null
+                };
+
+                // Récupérer les détails de l'auteur si author_id est présent
+                if (item.author_id) {
+                  const { data: recentAuthorData } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name')
+                    .eq('id', item.author_id)
+                    .single();
+                  
+                  if (recentAuthorData) {
+                    recentArticle.author = recentAuthorData;
+                  }
+                }
+                
+                processedRecentArticles.push(recentArticle);
+              }
+              
+              setRelatedArticles(processedRecentArticles);
             }
           }
         }
