@@ -29,6 +29,9 @@ interface NewsArticle {
   status: string;
   created_at: string;
   updated_at: string;
+  author_id?: string;
+  publication_date?: string;
+  comments_enabled?: boolean;
 }
 
 interface NewsFormData {
@@ -38,6 +41,9 @@ interface NewsFormData {
   category: string;
   image: string;
   tags: string[];
+  author_id?: string;
+  publication_date?: string;
+  comments_enabled?: boolean;
 }
 
 const AdminNewsPage = () => {
@@ -68,7 +74,8 @@ const AdminNewsPage = () => {
                     []
                 ) :
                 []
-              )
+              ),
+        comments_enabled: article.comments_enabled !== false
       }));
 
       setNewsArticles(transformedData as NewsArticle[]);
@@ -105,11 +112,6 @@ const AdminNewsPage = () => {
       }
 
       console.log('Successfully created article, response:', data);
-
-      toast({
-        title: 'Succès',
-        description: `L'article a été créé avec succès.`
-      });
 
       await fetchNewsArticles();
       return data[0];
@@ -151,7 +153,7 @@ const AdminNewsPage = () => {
 
         console.log('Updating article with data:', updateData);
 
-        // Utiliser PATCH au lieu de POST (update)
+        // Utiliser update au lieu de insert
         const { data, error } = await supabase
           .from('news')
           .update(updateData)
@@ -164,11 +166,6 @@ const AdminNewsPage = () => {
         }
 
         console.log('Update response:', data);
-
-        toast({
-          title: 'Succès',
-          description: `L'article a été mis à jour avec succès.`
-        });
 
         await fetchNewsArticles();
         return;
@@ -186,7 +183,7 @@ const AdminNewsPage = () => {
       console.log('Updating article with ID:', id);
       console.log('Complete update data:', updateData);
 
-      // Utiliser PATCH au lieu de POST (update)
+      // Utiliser update
       const { data, error } = await supabase
         .from('news')
         .update(updateData)
@@ -199,11 +196,6 @@ const AdminNewsPage = () => {
       }
 
       console.log('Update response:', data);
-
-      toast({
-        title: 'Succès',
-        description: `L'article a été mis à jour avec succès.`
-      });
 
       await fetchNewsArticles();
     } catch (error: any) {
@@ -232,11 +224,6 @@ const AdminNewsPage = () => {
       }
 
       console.log('Successfully deleted article');
-
-      toast({
-        title: 'Succès',
-        description: `L'article a été supprimé avec succès.`
-      });
 
       setNewsArticles(prevArticles => prevArticles.filter(article => article.id !== id));
     } catch (error: any) {
