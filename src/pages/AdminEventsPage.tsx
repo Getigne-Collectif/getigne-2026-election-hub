@@ -1,226 +1,94 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventsManagement from '@/components/EventsManagement';
-import { toast } from '@/components/ui/use-toast';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb";
-import { Home } from "lucide-react";
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  content: string;
-  date: string;
-  location: string;
-  image: string;
-  committee?: string;
-  committee_id?: string;
-  allow_registration?: boolean;
-  is_members_only?: boolean;
-  status?: string;
-  slug?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface EventFormData {
-  title: string;
-  description: string;
-  content: string;
-  date: string;
-  location: string;
-  image: string;
-  committee_id?: string;
-  allow_registration?: boolean;
-  is_members_only?: boolean;
-  status?: string;
-  slug?: string;
-}
+import { useAuth } from '@/context/auth';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const AdminEventsPage = () => {
-  const { user, isAdmin, loading, authChecked } = useAuth();
+  const { toast } = useToast();
+  const { isAdmin, isModerator } = useAuth();
   const navigate = useNavigate();
-  const [events, setEvents] = useState<Event[]>([]);
-  const [pageLoading, setPageLoading] = useState(true);
-  const [committees, setCommittees] = useState<{id: string, title: string}[]>([]);
 
-  const fetchEvents = async () => {
-    setPageLoading(true);
-    try {
-      const { data: eventsData, error: eventsError } = await supabase
+  // Query to fetch events
+  const { data: events = [], isLoading: isLoadingEvents, refetch: refetchEvents } = useQuery({
+    queryKey: ['admin-events'],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('events')
-        .select(`
-          *,
-          citizen_committees(id, title)
-        `)
+        .select('*')
         .order('date', { ascending: false });
 
-      if (eventsError) throw eventsError;
+      if (error) throw error;
+      return data;
+    },
+  });
 
-      const transformedData = eventsData.map(event => ({
-        ...event,
-        committee: event.committee || (event.citizen_committees ? event.citizen_committees.title : ''),
-        status: event.status || 'published',
-        allow_registration: event.allow_registration !== false,
-        is_members_only: event.is_members_only || false
-      }));
-
-      setEvents(transformedData);
-    } catch (error: any) {
-      console.error('Erreur lors de la récupération des événements:', error);
-      toast({
-        title: 'Erreur',
-        description: error.message || "Impossible de récupérer la liste des événements.",
-        variant: 'destructive'
-      });
-    } finally {
-      setPageLoading(false);
-    }
-  };
-
-  const fetchCommittees = async () => {
-    try {
+  // Query to fetch committees for the dropdown
+  const { data: committees = [] } = useQuery({
+    queryKey: ['committees'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('citizen_committees')
         .select('id, title');
 
       if (error) throw error;
-      if (data) {
-        setCommittees(data);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la récupération des commissions:', error);
-    }
-  };
+      return data;
+    },
+  });
 
-  useEffect(() => {
-    fetchCommittees();
-  }, []);
-
-  const handleCreateEvent = async (formData: EventFormData, status: 'draft' | 'published' | 'archived') => {
+  const handleCreateEvent = async (formData: any, status: 'draft' | 'published' | 'archived') => {
     try {
-      const newEvent = {
-        ...formData,
-        committee: committees.find(com => com.id === formData.committee_id)?.title || '',
-        status
-      };
-
-      console.log('Creating new event with data:', newEvent);
-
       const { data, error } = await supabase
         .from('events')
-        .insert(newEvent)
-        .select();
+        .insert({
+          ...formData,
+          status: status 
+        })
+        .select()
+        .single();
 
-      if (error) {
-        console.error('Supabase error during insert:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Successfully created event, response:', data);
-
-      await fetchEvents();
-      return data[0];
+      refetchEvents();
+      return data;
     } catch (error: any) {
-      console.error('Erreur lors de la création de l\'événement:', error);
+      console.error('Error creating event:', error);
       toast({
         title: 'Erreur',
-        description: error.message || "Une erreur est survenue lors de la création de l'événement.",
-        variant: 'destructive'
+        description: error.message || 'Une erreur est survenue lors de la création de l\'événement',
+        variant: 'destructive',
       });
       throw error;
     }
   };
 
-  const handleUpdateEvent = async (id: string, formData: Partial<EventFormData>, status?: string) => {
+  const handleUpdateEvent = async (id: string, formData: any, status?: string) => {
     try {
-      if (Object.keys(formData).length === 0 && status !== undefined) {
-        const { data: existingEvent, error: fetchError } = await supabase
-          .from('events')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (fetchError) {
-          console.error('Error fetching existing event:', fetchError);
-          throw fetchError;
-        }
-
-        const updateData = {
-          ...existingEvent,
-          status,
-          updated_at: new Date().toISOString()
-        };
-
-        delete updateData.id;
-        delete updateData.created_at;
-
-        console.log('Updating event with data:', updateData);
-
-        const { data, error } = await supabase
-          .from('events')
-          .update(updateData)
-          .eq('id', id)
-          .select();
-
-        if (error) {
-          console.error('Error updating event:', error);
-          throw error;
-        }
-
-        console.log('Update response:', data);
-
-        await fetchEvents();
-        return;
-      }
-
-      let updateData: any = { ...formData };
-
-      if (formData.committee_id) {
-        updateData.committee = committees.find(com => com.id === formData.committee_id)?.title || '';
-      }
-
-      if (status !== undefined) {
+      const updateData = { ...formData };
+      if (status) {
         updateData.status = status;
       }
 
-      updateData.updated_at = new Date().toISOString();
-
-      console.log('Updating event with ID:', id);
-      console.log('Complete update data:', updateData);
-
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('events')
         .update(updateData)
-        .eq('id', id)
-        .select();
+        .eq('id', id);
 
-      if (error) {
-        console.error('Error updating event:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Update response:', data);
-
-      await fetchEvents();
+      await refetchEvents();
     } catch (error: any) {
-      console.error('Erreur lors de la mise à jour de l\'événement:', error);
+      console.error('Error updating event:', error);
       toast({
         title: 'Erreur',
-        description: error.message || "Une erreur est survenue lors de la mise à jour de l'événement.",
-        variant: 'destructive'
+        description: error.message || 'Une erreur est survenue lors de la mise à jour de l\'événement',
+        variant: 'destructive',
       });
       throw error;
     }
@@ -228,140 +96,57 @@ const AdminEventsPage = () => {
 
   const handleDeleteEvent = async (id: string) => {
     try {
-      console.log('Deleting event with ID:', id);
-
       const { error } = await supabase
         .from('events')
         .delete()
         .eq('id', id);
 
-      if (error) {
-        console.error('Supabase error during delete:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Successfully deleted event');
-
-      setEvents(prevEvents => prevEvents.filter(event => event.id !== id));
+      await refetchEvents();
     } catch (error: any) {
-      console.error('Erreur lors de la suppression de l\'événement:', error);
+      console.error('Error deleting event:', error);
       toast({
         title: 'Erreur',
-        description: error.message || "Une erreur est survenue lors de la suppression de l'événement.",
-        variant: 'destructive'
+        description: error.message || 'Une erreur est survenue lors de la suppression de l\'événement',
+        variant: 'destructive',
       });
       throw error;
     }
   };
 
-  useEffect(() => {
-    if (!authChecked) return;
-
-    if (!user) {
-      toast({
-        title: 'Accès refusé',
-        description: "Veuillez vous connecter pour accéder à cette page.",
-        variant: 'destructive'
-      });
-      navigate('/auth');
-      return;
-    }
-
-    if (user && !isAdmin) {
-      toast({
-        title: 'Accès refusé',
-        description: "Vous n'avez pas les droits d'accès à cette page.",
-        variant: 'destructive'
-      });
-      navigate('/');
-      return;
-    }
-
-    if (user && isAdmin) {
-      console.log("User is admin, fetching events");
-      fetchEvents();
-    }
-  }, [user, isAdmin, authChecked, navigate]);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && user && isAdmin && authChecked) {
-        fetchEvents();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [user, isAdmin, authChecked]);
-
-  return (
-    <div>
-      <div className="min-h-screen">
+  if (!isAdmin && !isModerator) {
+    return (
+      <div className="min-h-screen flex flex-col">
         <Navbar />
-
-        <div className="pt-24 pb-12 bg-getigne-50">
-          <div className="container mx-auto px-4">
-            <Breadcrumb className="mb-6">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink to="/">
-                    <Home className="h-4 w-4 mr-1" />
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Administration</BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Événements</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            <div className="max-w-3xl mx-auto text-center">
-              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-                Administration
-              </span>
-              <div className="text-center my-4">
-                <h1 className="text-4xl md:text-5xl font-bold">Événements</h1>
-              </div>
-              <p className="text-getigne-700 text-lg mb-6">
-                Gérez les événements du collectif.
-              </p>
-            </div>
+        <div className="flex-grow container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold">Accès refusé</h1>
+            <p className="mt-4">Vous n'avez pas les autorisations nécessaires pour accéder à cette page.</p>
+            <Button onClick={() => navigate('/')} className="mt-6">
+              Retour à l'accueil
+            </Button>
           </div>
         </div>
+        <Footer />
+      </div>
+    );
+  }
 
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            {!authChecked || loading ? (
-              <div className="text-center py-10">
-                <p>Vérification des droits d'accès...</p>
-              </div>
-            ) : !user ? (
-              <div className="text-center py-10">
-                <p>Veuillez vous connecter pour accéder à l'administration.</p>
-              </div>
-            ) : !isAdmin ? (
-              <div className="text-center py-10">
-                <p>Vous n'avez pas les droits pour accéder à cette page.</p>
-              </div>
-            ) : (
-              <EventsManagement
-                events={events}
-                loading={pageLoading}
-                onCreateEvent={handleCreateEvent}
-                onUpdateEvent={handleUpdateEvent}
-                onDeleteEvent={handleDeleteEvent}
-                committees={committees}
-              />
-            )}
-          </div>
-        </section>
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-6">Gestion des événements</h1>
+        
+        <EventsManagement
+          events={events}
+          loading={isLoadingEvents}
+          committees={committees}
+          onCreateEvent={handleCreateEvent}
+          onUpdateEvent={handleUpdateEvent}
+          onDeleteEvent={handleDeleteEvent}
+        />
       </div>
       <Footer />
     </div>

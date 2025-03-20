@@ -211,6 +211,8 @@ export type Database = {
           image: string
           is_members_only: boolean | null
           location: string
+          slug: string | null
+          status: string | null
           title: string
           updated_at: string
         }
@@ -226,6 +228,8 @@ export type Database = {
           image: string
           is_members_only?: boolean | null
           location: string
+          slug?: string | null
+          status?: string | null
           title: string
           updated_at?: string
         }
@@ -241,6 +245,8 @@ export type Database = {
           image?: string
           is_members_only?: boolean | null
           location?: string
+          slug?: string | null
+          status?: string | null
           title?: string
           updated_at?: string
         }

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -135,8 +134,10 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
     setIsDeleteDialogOpen(true);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (status: string | undefined) => {
+    const eventStatus = status || 'published';
+    
+    switch (eventStatus) {
       case 'published':
         return <Badge variant="outline" className="bg-green-100 text-green-800">Publié</Badge>;
       case 'draft':
@@ -144,7 +145,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
       case 'archived':
         return <Badge variant="outline" className="bg-gray-100 text-gray-800">Archivé</Badge>;
       default:
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800">{status}</Badge>;
+        return <Badge variant="outline" className="bg-blue-100 text-blue-800">{eventStatus}</Badge>;
     }
   };
 
@@ -172,7 +173,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
           />
         </div>
         <Button
-          onClick={() => navigate('/admin/evenements/creer')}
+          onClick={() => navigate('/evenements/creer')}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -230,13 +231,13 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
                     </div>
                   )}
                 </TableCell>
-                <TableCell>{getStatusBadge(event.status || 'published')}</TableCell>
+                <TableCell>{getStatusBadge(event.status)}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/admin/evenements/editer/${event.id}`)}
+                      onClick={() => navigate(`/evenements/editer/${event.id}`)}
                     >
                       <FileEdit className="h-4 w-4" />
                     </Button>
