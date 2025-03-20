@@ -18,7 +18,7 @@ import { useAuth } from '@/context/auth';
 const EventDetailPage = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
-  const [eventId, setEventId] = useState<string | null>(id || null);
+  const [eventId, setEventId] = useState<string | null>(null);
   const { user, isMember } = useAuth();
   const [refreshRegistrations, setRefreshRegistrations] = useState(false);
 
@@ -31,20 +31,38 @@ const EventDetailPage = () => {
     }
   };
 
+  // Détermine si nous avons un ID ou un slug
+  useEffect(() => {
+    // Vérifie si nous avons un ID ou un slug
+    if (id) {
+      // Vérifie si l'ID est un UUID (36 caractères avec des tirets)
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      
+      if (isUuid) {
+        logDebug("Setting event ID from UUID param", id);
+        setEventId(id);
+      } else {
+        // Si ce n'est pas un UUID, c'est probablement un slug
+        logDebug("ID param is not a UUID, treating as slug", id);
+      }
+    }
+  }, [id]);
+
   logDebug('Params received', { id, slug });
   logDebug('Auth state', { isLoggedIn: !!user, isMember });
   
   // Si nous avons un slug, récupérer d'abord l'ID réel
   const { data: slugData, isLoading: isLoadingSlug, error: slugError } = useQuery({
-    queryKey: ['event-slug', slug],
+    queryKey: ['event-slug', id, slug],
     queryFn: async () => {
-      if (!slug) return null;
+      const slugToUse = slug || (!eventId ? id : null);
+      if (!slugToUse) return null;
       
-      logDebug("Fetching event by slug", slug);
+      logDebug("Fetching event by slug", slugToUse);
       const { data, error } = await supabase
         .from('events')
         .select('id')
-        .eq('slug', slug)
+        .eq('slug', slugToUse)
         .eq('status', 'published')
         .maybeSingle();
       
@@ -56,16 +74,16 @@ const EventDetailPage = () => {
       logDebug("Found event by slug", data);
       return data;
     },
-    enabled: !!slug && !id,
+    enabled: !!slug || (!!id && !eventId),
   });
 
   // Une fois que nous avons l'ID (soit directement, soit à partir du slug), récupérer les détails de l'événement
   useEffect(() => {
-    if (slug && slugData && slugData.id) {
+    if (slugData && slugData.id) {
       logDebug("Setting event ID from slug data", slugData.id);
       setEventId(slugData.id);
     }
-  }, [slug, slugData]);
+  }, [slugData]);
 
   const { data: event, isLoading: isLoadingEvent, error: eventError } = useQuery({
     queryKey: ['event', eventId, refreshRegistrations],
@@ -93,13 +111,13 @@ const EventDetailPage = () => {
 
   // Rediriger vers l'URL avec slug si on est sur une URL avec ID et que l'événement a un slug
   useEffect(() => {
-    if (id && event && event.slug && !slug) {
+    if (eventId && event && event.slug && (id === eventId)) {
       logDebug("Redirecting to slug URL", event.slug);
       navigate(`/agenda/${event.slug}`, { replace: true });
     }
-  }, [id, event, slug, navigate]);
+  }, [eventId, event, id, navigate]);
 
-  const isLoading = isLoadingSlug || isLoadingEvent;
+  const isLoading = isLoadingSlug || isLoadingEvent || (!eventId && !slugError);
   const error = slugError || eventError;
 
   const handleRegistrationChange = () => {
