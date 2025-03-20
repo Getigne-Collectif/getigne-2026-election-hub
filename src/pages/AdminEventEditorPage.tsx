@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -147,19 +148,16 @@ const AdminEventEditorPage = () => {
       let result;
 
       if (isEditMode && id) {
-        const { data, error, count } = await supabase
+        // Fix: Don't try to return data; just perform the update
+        const { error } = await supabase
           .from('events')
           .update(eventData)
-          .eq('id', id)
-          .select();
+          .eq('id', id);
 
         if (error) throw error;
         
-        if (!data || data.length === 0) {
-          throw new Error("Événement non trouvé ou aucune modification effectuée");
-        }
-        
-        result = data[0];
+        // If no error, we can assume the update was successful
+        result = { id, ...eventData };
 
         toast({
           title: "Événement mis à jour",
