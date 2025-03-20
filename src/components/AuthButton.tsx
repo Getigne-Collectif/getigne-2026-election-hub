@@ -16,7 +16,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const AuthButton = () => {
-  const { user, profile, signOut, isAdmin, refreshUserRoles, isInvitedUser } = useAuth();
+  const { user, profile, signOut, isAdmin, isInvitedUser } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {

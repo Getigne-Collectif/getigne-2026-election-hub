@@ -213,8 +213,6 @@ const AdminUsersPage = () => {
       if (inviteError) throw inviteError;
 
       await fetchUsers();
-      
-      return { success: true };
     } catch (error: any) {
       console.error('Erreur lors de l\'invitation:', error);
       throw error;
@@ -234,8 +232,6 @@ const AdminUsersPage = () => {
       
       // Rafraîchir la liste après la mise à jour
       await fetchUsers();
-      
-      return { success: true };
     } catch (error: any) {
       console.error('Erreur lors de la modification du statut:', error);
       throw error;
@@ -327,12 +323,6 @@ const AdminUsersPage = () => {
             ) : !isAdmin ? (
               <div className="text-center py-10">
                 <p>Vous n'avez pas les droits pour accéder à cette page.</p>
-                <button 
-                  onClick={() => refreshUserRoles()}
-                  className="mt-4 px-4 py-2 bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90 transition-colors"
-                >
-                  Actualiser mes droits
-                </button>
               </div>
             ) : (
               <UserManagement
