@@ -1019,24 +1019,4 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                             <button
                               type="button"
                               onClick={() => {
-                                setImagePreview(null);
-                                form.setValue("image", "");
-                              }}
-                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </FormItem>
-
-                    <FormField
-                      control={form.control}
-                      name="content"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contenu</FormLabel>
-                          <FormControl>
-                            <Rich
-
+                                setImagePreview
