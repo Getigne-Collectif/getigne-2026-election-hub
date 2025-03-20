@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -118,6 +117,12 @@ const NewsDetailPage = () => {
 
         console.log('Fetched article:', data);
 
+        if (!data) {
+          setError('Article not found');
+          setLoading(false);
+          return;
+        }
+
         // Ensure tags is an array
         const tags = Array.isArray(data.tags) ? data.tags : [];
         
@@ -134,13 +139,14 @@ const NewsDetailPage = () => {
 
         setArticle(processedData as NewsArticle);
 
+        // Only fetch related articles if there are tags or a category_id
         if (tags.length > 0 || categoryId) {
           let query = supabase.from('news')
             .select(`
               *,
               news_categories(id, name)
             `)
-            .eq('status', 'published') // Assurons-nous que les articles liés sont également publiés
+            .eq('status', 'published') 
             .neq('id', data.id)
             .limit(3);
 
@@ -166,13 +172,14 @@ const NewsDetailPage = () => {
             });
             setRelatedArticles(processedRelatedData as NewsArticle[]);
           } else {
+            // If no related articles by tag or category, get recent articles
             const { data: recentData } = await supabase
               .from('news')
               .select(`
                 *,
                 news_categories(id, name)
               `)
-              .eq('status', 'published') // Assurons-nous que les articles récents sont également publiés
+              .eq('status', 'published')
               .neq('id', data.id)
               .order('date', { ascending: false })
               .limit(3);
@@ -222,6 +229,7 @@ const NewsDetailPage = () => {
 
   const tags = Array.isArray(article.tags) ? article.tags : [];
   const categoryName = article.news_categories?.name || article.category || '';
+  const commentsEnabled = article.comments_enabled !== false;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -304,7 +312,7 @@ const NewsDetailPage = () => {
               )}
             </div>
 
-            {article.id && <CommentsSection newsId={article.id} />}
+            {commentsEnabled && article.id && <CommentsSection newsId={article.id} />}
 
             {relatedArticles.length > 0 && (
               <div className="mt-16 border-t border-getigne-100 pt-8">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -334,9 +333,10 @@ const AdminNewsEditorPage = () => {
             : "L'article a été enregistré comme brouillon",
         });
         
-        if (status === 'published' && data && data[0]) {
+        if (status === 'published' && data && data.length > 0) {
           // Redirect to the article page using slug
-          const redirectUrl = `/actualites/${data[0].slug || data[0].id}`;
+          const articleSlug = data[0].slug || data[0].id;
+          const redirectUrl = `/actualites/${articleSlug}`;
           navigate(redirectUrl);
           return;
         }
@@ -358,9 +358,10 @@ const AdminNewsEditorPage = () => {
             : "L'article a été enregistré comme brouillon",
         });
         
-        if (status === 'published' && data && data[0]) {
+        if (status === 'published' && data && data.length > 0) {
           // Redirect to the article page using slug
-          const redirectUrl = `/actualites/${data[0].slug || data[0].id}`;
+          const articleSlug = data[0].slug || data[0].id;
+          const redirectUrl = `/actualites/${articleSlug}`;
           navigate(redirectUrl);
           return;
         }
