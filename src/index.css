@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,7 +11,7 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 175 70% 41%; /* Changé de vert à teal (#20B2AA) */
+    --primary: 159 54% 45%; /* Changé pour #34b190 */
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -22,7 +23,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 175 70% 41%; /* Changé de vert à teal */
+    --ring: 159 54% 45%; /* Changé pour #34b190 */
     --radius: 0.5rem;
     
     --getigne-50: 150 33% 97%;
@@ -37,9 +38,9 @@
     --getigne-900: 150 33% 13%;
     --getigne-950: 150 33% 6.5%;
     
-    --getigne-accent: 175 70% 41%; /* Changé à teal */
-    --getigne-accent-light: 175 70% 51%;
-    --getigne-accent-darker: 175 70% 31%;
+    --getigne-accent: 159 54% 45%; /* Changé pour #34b190 */
+    --getigne-accent-light: 159 54% 55%;
+    --getigne-accent-darker: 159 54% 35%;
   }
 
   .dark {
