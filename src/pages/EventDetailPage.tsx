@@ -32,9 +32,10 @@ const EventDetailPage = () => {
   };
 
   logDebug('Params received', { id, slug });
+  logDebug('Auth state', { isLoggedIn: !!user, isMember });
   
   // Si nous avons un slug, récupérer d'abord l'ID réel
-  const { data: slugData, isLoading: isLoadingSlug } = useQuery({
+  const { data: slugData, isLoading: isLoadingSlug, error: slugError } = useQuery({
     queryKey: ['event-slug', slug],
     queryFn: async () => {
       if (!slug) return null;
@@ -65,7 +66,7 @@ const EventDetailPage = () => {
     }
   }, [slug, slugData]);
 
-  const { data: event, isLoading: isLoadingEvent } = useQuery({
+  const { data: event, isLoading: isLoadingEvent, error: eventError } = useQuery({
     queryKey: ['event', eventId, refreshRegistrations],
     queryFn: async () => {
       if (!eventId) return null;
@@ -97,6 +98,7 @@ const EventDetailPage = () => {
   }, [id, event, slug, navigate]);
 
   const isLoading = isLoadingSlug || isLoadingEvent;
+  const error = slugError || eventError;
 
   const handleRegistrationChange = () => {
     setRefreshRegistrations(prev => !prev);
@@ -108,6 +110,25 @@ const EventDetailPage = () => {
         <Navbar />
         <div className="flex-grow container mx-auto px-4 py-24 flex justify-center items-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    logDebug("Error displaying event", error);
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow container mx-auto px-4 py-24">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Erreur</h1>
+            <p className="mb-6">Une erreur s'est produite lors du chargement de l'événement.</p>
+            <Button onClick={() => navigate('/agenda')}>
+              Retour à l'agenda
+            </Button>
+          </div>
         </div>
         <Footer />
       </div>
