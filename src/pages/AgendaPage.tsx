@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
+import CalendarSync from '@/components/events/CalendarSync';
+import { useAuth } from '@/context/auth';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -179,6 +181,7 @@ const AgendaPage = () => {
   const [pastEvents, setPastEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -259,10 +262,16 @@ const AgendaPage = () => {
                     Agenda
                   </span>
                   <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos prochains événements</h1>
-                  <p className="text-getigne-700 text-lg">
+                  <p className="text-getigne-700 text-lg mb-6">
                     Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échange
                     pour construire ensemble l'avenir de Gétigné.
                   </p>
+                  
+                  {user && (
+                    <div className="flex justify-center mt-4">
+                      <CalendarSync />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
