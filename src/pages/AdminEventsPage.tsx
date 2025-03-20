@@ -9,6 +9,14 @@ import EventsManagement from '@/components/EventsManagement';
 import { useAuth } from '@/context/auth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
+import {Home} from "lucide-react";
 
 const AdminEventsPage = () => {
   const { toast } = useToast();
@@ -48,7 +56,7 @@ const AdminEventsPage = () => {
         .from('events')
         .insert({
           ...formData,
-          status: status 
+          status: status
         })
         .select()
         .single();
@@ -134,19 +142,57 @@ const AdminEventsPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <div className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Gestion des événements</h1>
-        
-        <EventsManagement
-          events={events}
-          loading={isLoadingEvents}
-          committees={committees}
-          onCreateEvent={handleCreateEvent}
-          onUpdateEvent={handleUpdateEvent}
-          onDeleteEvent={handleDeleteEvent}
-        />
+
+      <div>
+        <div className="min-h-screen">
+          <Navbar />
+
+          <div className="pt-24 pb-12 bg-getigne-50">
+            <div className="container mx-auto px-4">
+              <Breadcrumb className="mb-6">
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/">
+                      <Home className="h-4 w-4 mr-1" />
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Administration</BreadcrumbPage>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Agenda</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              <div className="max-w-3xl mx-auto text-center">
+              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+                Administration
+              </span>
+                <div className="text-center my-4">
+                  <h1 className="text-4xl md:text-5xl font-bold">Agenda</h1>
+                </div>
+                <p className="text-getigne-700 text-lg mb-6">
+                  Gérez les événements du collectif.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <section className="py-16">
+            <div className="container mx-auto px-4">
+            <EventsManagement
+              events={events}
+              loading={isLoadingEvents}
+              committees={committees}
+              onCreateEvent={handleCreateEvent}
+              onUpdateEvent={handleUpdateEvent}
+              onDeleteEvent={handleDeleteEvent}
+            />
+            </div>
+          </section>
       </div>
       <Footer />
     </div>

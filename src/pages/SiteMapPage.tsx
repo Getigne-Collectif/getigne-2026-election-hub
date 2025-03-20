@@ -119,7 +119,7 @@ const SiteMapPage = () => {
     },
     {
       title: 'Événements',
-      path: '/evenements',
+      path: '/agenda/evenement',
       description: 'Nos événements et rencontres à venir',
       icon: <Calendar className="h-5 w-5" />
     },
@@ -306,7 +306,7 @@ const SiteMapPage = () => {
                   eventsQuery.data?.map((event) => (
                     <Link
                       key={event.id}
-                      to={`/evenements/${event.id}`}
+                      to={`/agenda/${event.id}`}
                       className="p-6 bg-white rounded-lg border border-getigne-100 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <div className="mb-4 h-40 rounded-md overflow-hidden">
@@ -332,7 +332,7 @@ const SiteMapPage = () => {
                 )}
 
                 <Link
-                  to="/evenements"
+                  to="/agenda/evenement"
                   className="col-span-full flex items-center justify-center text-getigne-accent hover:text-getigne-accent/80 font-medium mt-2"
                 >
                   Voir tous les événements

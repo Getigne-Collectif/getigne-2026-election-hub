@@ -111,7 +111,7 @@ const EventCard = ({ event, index }) => {
   const IconComponent = committeeIcon || Users;
 
   return (
-    <Link to={`/evenements/${event.id}`} className="block hover:no-underline">
+    <Link to={`/agenda/${event.id}`} className="block hover:no-underline">
       <div
         ref={ref}
         className={`bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${

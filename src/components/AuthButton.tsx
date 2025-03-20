@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, User, Shield, Newspaper, UserCog} from 'lucide-react';
+import {LogIn, LogOut, User, Shield, Newspaper, UserCog, Calendar, Users} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,7 @@ const AuthButton = () => {
       });
     }
   };
-  
+
   const handleProfileClick = () => {
     navigate('/profile');
   };
@@ -70,7 +70,7 @@ const AuthButton = () => {
       displayName = firstName;
     }
   }
-  
+
   // Obtenir les initiales pour l'avatar
   const getInitials = () => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
@@ -114,7 +114,7 @@ const AuthButton = () => {
           )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem onClick={handleProfileClick} className="flex items-center">
           <UserCog className="h-4 w-4 mr-2" />
           Mon profil
@@ -124,21 +124,27 @@ const AuthButton = () => {
             </span>
           )}
         </DropdownMenuItem>
-        
+
         <DropdownMenuSeparator />
 
         {isAdmin && (
           <>
             <DropdownMenuItem asChild>
               <Link to="/admin/users" className="flex items-center w-full">
-                <Shield className="h-4 w-4 mr-2" />
-                Admin Utilisateurs
+                <Users className="h-4 w-4 mr-2" />
+                Utilisateurs
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/admin/news" className="flex items-center w-full">
                 <Newspaper className="h-4 w-4 mr-2" />
-                Admin Actualités
+                Blog
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/events" className="flex items-center w-full">
+                <Calendar className="h-4 w-4 mr-2" />
+                Agenda
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

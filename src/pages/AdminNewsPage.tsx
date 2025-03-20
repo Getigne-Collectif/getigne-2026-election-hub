@@ -15,8 +15,6 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import { Home } from "lucide-react";
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 
 interface NewsArticle {
   id: string;

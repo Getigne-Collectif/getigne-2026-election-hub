@@ -173,7 +173,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
           />
         </div>
         <Button
-          onClick={() => navigate('/evenements/creer')}
+          onClick={() => navigate('/admin/events/new')}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -206,8 +206,8 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
               <TableRow key={event.id}>
                 <TableCell className="font-medium">
                   <Link to={event.status === 'published' && event.slug ? 
-                    generatePath('/evenements/:slug', { slug: event.slug }) : 
-                    generatePath('/evenements/:id', { id: event.id })}>
+                    generatePath('/agenda/:slug', { slug: event.slug }) : 
+                    generatePath('/agenda/:id', { id: event.id })}>
                     {event.title}
                   </Link>
                 </TableCell>
@@ -237,7 +237,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/evenements/editer/${event.id}`)}
+                      onClick={() => navigate(`/admin/events/edit/${event.id}`)}
                     >
                       <FileEdit className="h-4 w-4" />
                     </Button>

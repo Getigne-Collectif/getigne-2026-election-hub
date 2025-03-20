@@ -193,7 +193,7 @@ const EventDetailPage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/evenements">Événements</BreadcrumbLink>
+                <BreadcrumbLink href="/agenda/evenement">Événements</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -328,7 +328,7 @@ const EventDetailPage = () => {
                       {relatedEvents.map((relEvent) => (
                         <Link
                           key={relEvent.id}
-                          to={`/evenements/${relEvent.id}`}
+                          to={`/agenda/${relEvent.id}`}
                           className="flex gap-3 group"
                         >
                           <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">

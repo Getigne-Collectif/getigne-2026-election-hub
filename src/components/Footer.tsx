@@ -79,7 +79,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/evenements" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to="/agenda/evenement" className="text-getigne-100 hover:text-white transition-colors">
                   Événements
                 </Link>
               </li>

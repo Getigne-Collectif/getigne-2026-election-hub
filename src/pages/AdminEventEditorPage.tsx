@@ -7,13 +7,20 @@ import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Eye, ArrowLeft } from 'lucide-react';
-import RichTextEditor from '@/components/RichTextEditor';
+import {Loader2, Save, Eye, ArrowLeft, Home} from 'lucide-react';
 import EventRegistrationAdmin from '@/components/events/EventRegistrationAdmin';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/auth';
+import MarkdownEditor from "@/components/MarkdownEditor.tsx";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -54,7 +61,7 @@ const AdminEventEditorPage = () => {
       const { data, error } = await supabase
         .from('citizen_committees')
         .select('id, title');
-      
+
       if (error) throw error;
       return data;
     },
@@ -65,13 +72,13 @@ const AdminEventEditorPage = () => {
     queryKey: ['event', id],
     queryFn: async () => {
       if (!id) return null;
-      
+
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .eq('id', id)
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -97,7 +104,7 @@ const AdminEventEditorPage = () => {
 
   const handleSubmit = async (e: React.FormEvent, saveStatus: 'draft' | 'published' | 'archived' = 'published') => {
     e.preventDefault();
-    
+
     if (!title || !date || !location || !description || !image) {
       toast({
         title: "Formulaire incomplet",
@@ -106,12 +113,12 @@ const AdminEventEditorPage = () => {
       });
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const eventSlug = slug || generateSlug(title);
-      
+
       const eventData = {
         title,
         date,
@@ -126,9 +133,9 @@ const AdminEventEditorPage = () => {
         status: saveStatus,
         slug: eventSlug
       };
-      
+
       let result;
-      
+
       if (isEditMode) {
         const { data, error } = await supabase
           .from('events')
@@ -136,10 +143,10 @@ const AdminEventEditorPage = () => {
           .eq('id', id)
           .select()
           .single();
-        
+
         if (error) throw error;
         result = data;
-        
+
         toast({
           title: "Événement mis à jour",
           description: "L'événement a été mis à jour avec succès",
@@ -150,17 +157,17 @@ const AdminEventEditorPage = () => {
           .insert(eventData)
           .select()
           .single();
-        
+
         if (error) throw error;
         result = data;
-        
+
         toast({
           title: "Événement créé",
           description: "L'événement a été créé avec succès",
         });
       }
-      
-      navigate('/evenements');
+
+      navigate('/agenda/evenement');
     } catch (error: any) {
       console.error('Error saving event:', error);
       toast({
@@ -202,22 +209,48 @@ const AdminEventEditorPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-grow container mx-auto px-4 py-8">
-        <div className="flex items-center mb-6">
-          <Button
-            variant="ghost"
-            className="mr-2"
-            onClick={() => navigate('/evenements')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
-          
-          <h1 className="text-2xl font-bold">
-            {isEditMode ? 'Modifier l\'événement' : 'Créer un nouvel événement'}
-          </h1>
+
+
+      <div className="pt-24 pb-8 bg-getigne-50">
+        <div className="container mx-auto px-4">
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">
+                  <Home className="h-4 w-4 mr-1" />
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/admin">Administration</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/admin/events">Agenda</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{isEditMode ? "Modifier l'événement" : "Nouvel article"}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
+          <div className="flex items-center gap-4">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/admin/events')}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour
+            </Button>
+            <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'événement" : "Créer un événement"}</h1>
+          </div>
         </div>
-        
+      </div>
+
+
+      <div className="flex-grow container mx-auto px-4 py-8">
         {isLoadingEvent ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -242,7 +275,7 @@ const AdminEventEditorPage = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="slug">Slug</Label>
                     <Input
@@ -255,7 +288,7 @@ const AdminEventEditorPage = () => {
                       Identifiant URL de l'événement (généré automatiquement si laissé vide)
                     </p>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="date">Date et heure *</Label>
@@ -267,7 +300,7 @@ const AdminEventEditorPage = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="location">Lieu *</Label>
                       <Input
@@ -279,7 +312,7 @@ const AdminEventEditorPage = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="description">Description courte *</Label>
                     <Textarea
@@ -291,7 +324,7 @@ const AdminEventEditorPage = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="image">URL de l'image *</Label>
                     <Input
@@ -302,7 +335,7 @@ const AdminEventEditorPage = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="committee">Commission</Label>
                     <select
@@ -319,19 +352,18 @@ const AdminEventEditorPage = () => {
                       ))}
                     </select>
                   </div>
-                  
+
                   <div>
                     <Label>Contenu détaillé</Label>
                     <div className="mt-2 border rounded-md">
-                      <RichTextEditor
+                      <MarkdownEditor
                         value={content}
                         onChange={setContent}
-                        placeholder="Contenu détaillé de l'événement..."
                       />
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-3 justify-end">
                   <Button
                     type="button"
@@ -342,7 +374,7 @@ const AdminEventEditorPage = () => {
                     {isSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                     Enregistrer comme brouillon
                   </Button>
-                  
+
                   <Button
                     type="submit"
                     disabled={isSubmitting}
@@ -353,7 +385,7 @@ const AdminEventEditorPage = () => {
                 </div>
               </form>
             </div>
-            
+
             <div className="space-y-6">
               {isEditMode && (
                 <EventRegistrationAdmin
@@ -363,7 +395,7 @@ const AdminEventEditorPage = () => {
                   onUpdate={handleRegistrationUpdate}
                 />
               )}
-              
+
               <div className="bg-getigne-50 p-4 rounded-lg">
                 <h3 className="font-medium mb-4">État de publication</h3>
                 <select
@@ -376,14 +408,14 @@ const AdminEventEditorPage = () => {
                   <option value="archived">Archivé</option>
                 </select>
               </div>
-              
+
               <div className="bg-getigne-50 p-4 rounded-lg">
                 <h3 className="font-medium mb-4">Prévisualisation</h3>
                 {isEditMode && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
-                    onClick={() => window.open(`/evenements/${id}`, '_blank')}
+                    onClick={() => window.open(`/agenda/${id}`, '_blank')}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     Prévisualiser

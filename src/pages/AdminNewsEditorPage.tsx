@@ -94,7 +94,7 @@ const AdminNewsEditorPage = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const isEditMode = !!id;
-  
+
   const form = useForm<FormValues>({
     resolver: zodResolver(newsFormSchema),
     defaultValues: {
@@ -226,7 +226,7 @@ const AdminNewsEditorPage = () => {
     const file = event.target.files?.[0];
     if (file) {
       form.setValue("image", file);
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
@@ -292,7 +292,7 @@ const AdminNewsEditorPage = () => {
     setIsSubmitting(true);
     try {
       let imageUrl = typeof values.image === 'string' ? values.image : "";
-      
+
       if (values.image instanceof File) {
         imageUrl = await uploadImage(values.image);
       }
@@ -325,11 +325,11 @@ const AdminNewsEditorPage = () => {
 
         toast({
           title: "Article mis à jour",
-          description: status === 'published' 
-            ? "L'article a été publié avec succès" 
+          description: status === 'published'
+            ? "L'article a été publié avec succès"
             : "L'article a été enregistré comme brouillon",
         });
-        
+
         if (status === 'published' && data && data.length > 0) {
           const articleData = data[0];
           const articleSlug = articleData.slug || articleData.id;
@@ -339,7 +339,7 @@ const AdminNewsEditorPage = () => {
         }
       } else {
         formData.date = new Date().toISOString().split('T')[0];
-        
+
         const { data, error } = await supabase
           .from('news')
           .insert(formData)
@@ -349,11 +349,11 @@ const AdminNewsEditorPage = () => {
 
         toast({
           title: "Article créé",
-          description: status === 'published' 
-            ? "L'article a été publié avec succès" 
+          description: status === 'published'
+            ? "L'article a été publié avec succès"
             : "L'article a été enregistré comme brouillon",
         });
-        
+
         if (status === 'published' && data && data.length > 0) {
           const articleData = data[0];
           const articleSlug = articleData.slug || articleData.id;
@@ -379,7 +379,6 @@ const AdminNewsEditorPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-
       <div className="pt-24 pb-8 bg-getigne-50">
         <div className="container mx-auto px-4">
           <Breadcrumb className="mb-6">
@@ -391,7 +390,11 @@ const AdminNewsEditorPage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/news">Administration des actualités</BreadcrumbLink>
+                <BreadcrumbLink href="/admin">Administration</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/admin/news">Actualités</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -402,9 +405,9 @@ const AdminNewsEditorPage = () => {
 
           <div className="flex items-center gap-4">
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/admin/news')}
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/admin/news')}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retour
@@ -426,10 +429,10 @@ const AdminNewsEditorPage = () => {
                     <FormItem>
                       <FormLabel className="text-xl font-bold">Titre</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Titre de l'article" 
-                          className="text-lg p-3" 
-                          {...field} 
+                        <Input
+                          placeholder="Titre de l'article"
+                          className="text-lg p-3"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -506,7 +509,7 @@ const AdminNewsEditorPage = () => {
                       <FormItem>
                         <FormLabel>Catégorie</FormLabel>
                         <FormControl>
-                          <Select 
+                          <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
@@ -536,20 +539,20 @@ const AdminNewsEditorPage = () => {
                             <Image className="w-8 h-8 mb-3 text-gray-400" />
                             <p className="text-sm text-gray-500">Cliquez pour télécharger</p>
                           </div>
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
                             onChange={handleImageChange}
                           />
                         </label>
                       </div>
                       {imagePreview && (
                         <div className="mt-4 relative">
-                          <img 
-                            src={imagePreview} 
-                            alt="Aperçu" 
-                            className="w-full h-48 rounded-md object-cover" 
+                          <img
+                            src={imagePreview}
+                            alt="Aperçu"
+                            className="w-full h-48 rounded-md object-cover"
                           />
                           <button
                             type="button"
@@ -573,7 +576,7 @@ const AdminNewsEditorPage = () => {
                       <FormItem>
                         <FormLabel>Auteur</FormLabel>
                         <FormControl>
-                          <Select 
+                          <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
@@ -604,8 +607,8 @@ const AdminNewsEditorPage = () => {
                         placeholder="Ajouter un tag..."
                         className="mr-2"
                       />
-                      <Button 
-                        type="button" 
+                      <Button
+                        type="button"
                         variant="outline"
                         size="sm"
                         onClick={handleAddTag}

@@ -62,7 +62,7 @@ serve(async (req) => {
           contextUrl = `${PUBLIC_URL}/actualites/${resourceId}`;
           break;
         case 'event':
-          contextUrl = `${PUBLIC_URL}/evenements/${resourceId}`;
+          contextUrl = `${PUBLIC_URL}/agenda/${resourceId}`;
           break;
         case 'committee':
           contextUrl = `${PUBLIC_URL}/commissions/${resourceId}`;

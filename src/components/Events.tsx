@@ -102,7 +102,7 @@ const EventCard = ({ event, index }) => {
   const IconComponent = committeeIcon || Users;
 
   return (
-    <Link to={`/evenements/${event.id}`} className="block hover:no-underline">
+    <Link to={`/agenda/${event.id}`} className="block hover:no-underline">
       <article 
         ref={ref}
         className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
@@ -229,7 +229,7 @@ const Events = () => {
 
         <div className="mt-12 text-center">
           <Link 
-            to="/evenements"
+            to="/agenda/evenement"
             className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90 px-4 py-2 inline-flex items-center"
           >
             Voir tous les événements

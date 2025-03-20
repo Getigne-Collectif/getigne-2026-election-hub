@@ -45,10 +45,7 @@ function App() {
               <Route path="/actualites" element={<NewsPage />} />
               <Route path="/actualites/:slug" element={<NewsDetailPage />} />
               <Route path="/agenda" element={<AgendaPage />} />
-              <Route path="/evenements/:id" element={<EventDetailPage />} />
-              <Route path="/evenements" element={<AdminEventsPage />} />
-              <Route path="/evenements/creer" element={<AdminEventEditorPage />} />
-              <Route path="/evenements/editer/:id" element={<AdminEventEditorPage />} />
+              <Route path="/agenda/:id" element={<EventDetailPage />} />
               <Route path="/equipe" element={<TeamPage />} />
               <Route path="/commissions" element={<CommitteesPage />} />
               <Route path="/commissions/:id" element={<CommitteePage />} />
@@ -61,8 +58,11 @@ function App() {
               <Route path="/admin/news" element={<AdminNewsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/admin/news/creer" element={<AdminNewsEditorPage />} />
-              <Route path="/admin/news/editer/:id" element={<AdminNewsEditorPage />} />
+              <Route path="/admin/news/new" element={<AdminNewsEditorPage />} />
+              <Route path="/admin/news/edit/:id" element={<AdminNewsEditorPage />} />
+              <Route path="/admin/events" element={<AdminEventsPage />} />
+              <Route path="/admin/events/new" element={<AdminEventEditorPage />} />
+              <Route path="/admin/events/edit/:id" element={<AdminEventEditorPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
