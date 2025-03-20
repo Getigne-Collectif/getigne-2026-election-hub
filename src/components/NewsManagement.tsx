@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -140,11 +139,13 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     try {
       const { data, error } = await supabase
         .from('news_categories')
-        .select('id, name')
-        .order('name');
+        .select('id, name');
 
       if (error) throw error;
-      setCategories(data || []);
+      
+      if (data) {
+        setCategories(data as {id: string, name: string}[]);
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération des catégories:', error);
     }
@@ -170,13 +171,10 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
   useEffect(() => {
     if (selectedArticle && isEditDialogOpen) {
-      // Reset the image preview if editing
       setImagePreview(selectedArticle.image);
       
-      // Set selected tags
       setSelectedTags(selectedArticle.tags || []);
 
-      // Reset the form with the article data
       form.reset({
         title: selectedArticle.title,
         excerpt: selectedArticle.excerpt,
@@ -193,13 +191,10 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
   useEffect(() => {
     if (isCreateDialogOpen) {
-      // Reset the image preview
       setImagePreview(null);
       
-      // Reset selected tags
       setSelectedTags([]);
 
-      // Reset the form
       form.reset({
         title: "",
         excerpt: "",
@@ -217,10 +212,8 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Update the form value
       form.setValue("image", file);
       
-      // Create a preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
@@ -279,7 +272,6 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     try {
       let imageUrl = "";
       
-      // Upload the image if it's a File
       if (values.image instanceof File) {
         imageUrl = await uploadImage(values.image);
       } else if (typeof values.image === 'string') {
@@ -323,7 +315,6 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
     try {
       let imageUrl = selectedArticle.image;
       
-      // Upload the image if it's a File
       if (values.image instanceof File) {
         imageUrl = await uploadImage(values.image);
       } else if (typeof values.image === 'string' && values.image !== selectedArticle.image) {
@@ -1090,3 +1081,4 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 };
 
 export default NewsManagement;
+

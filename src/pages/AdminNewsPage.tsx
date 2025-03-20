@@ -62,6 +62,7 @@ const AdminNewsPage = () => {
 
       if (error) throw error;
 
+      // Transform the data to ensure it has all the expected properties
       const transformedData = data.map(article => ({
         ...article,
         status: article.status || 'published',
@@ -75,6 +76,7 @@ const AdminNewsPage = () => {
                 ) :
                 []
               ),
+        // Fix: Ensure comments_enabled has a default value if undefined
         comments_enabled: article.comments_enabled !== false
       }));
 
