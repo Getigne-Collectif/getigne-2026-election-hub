@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -44,6 +45,7 @@ interface NewsArticle {
   author_id?: string;
   publication_date?: string;
   comments_enabled?: boolean;
+  slug?: string;
 }
 
 interface NewsFormData {
