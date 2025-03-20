@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useAuth } from '@/context/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash } from 'lucide-react';
 
 interface Profile {
   first_name: string;
   last_name: string;
+  avatar_url?: string;
 }
 
 interface Comment {
@@ -63,6 +64,9 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({
         >
           <div className="flex items-center gap-2 mb-3">
             <Avatar className="h-10 w-10 bg-getigne-100">
+              {comment.profiles?.avatar_url ? (
+                <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
+              ) : null}
               <AvatarFallback className="text-getigne-700">
                 {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
               </AvatarFallback>

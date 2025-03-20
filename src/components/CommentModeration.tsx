@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Table, 
   TableBody, 
@@ -16,6 +15,7 @@ import {
 interface Profile {
   first_name: string;
   last_name: string;
+  avatar_url?: string;
 }
 
 interface Comment {
@@ -35,12 +35,10 @@ interface CommentModerationProps {
 }
 
 const CommentModeration: React.FC<CommentModerationProps> = ({ comments, onModerate }) => {
-  // Helper function to get initials from name
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase() || 'UN';
   };
 
-  // Function to get badge props based on status
   const getStatusBadgeProps = (status: string) => {
     switch (status) {
       case 'approved':
@@ -75,6 +73,9 @@ const CommentModeration: React.FC<CommentModerationProps> = ({ comments, onModer
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8 bg-getigne-100">
+                      {comment.profiles?.avatar_url ? (
+                        <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
+                      ) : null}
                       <AvatarFallback className="text-getigne-700">
                         {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
                       </AvatarFallback>

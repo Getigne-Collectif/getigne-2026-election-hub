@@ -94,6 +94,9 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8 bg-getigne-100">
+                        {comment.profiles?.avatar_url ? (
+                          <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
+                        ) : null}
                         <AvatarFallback className="text-getigne-700">
                           {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
                         </AvatarFallback>

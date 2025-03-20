@@ -11,6 +11,7 @@ import ModeratorView from './ModeratorView';
 interface Profile {
   first_name: string;
   last_name: string;
+  avatar_url?: string;
 }
 
 interface Comment {
@@ -75,7 +76,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
       
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, avatar_url')
         .in('id', userIds);
         
       if (profilesError) {
@@ -96,7 +97,8 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
           ...comment,
           profiles: profile ? {
             first_name: profile.first_name,
-            last_name: profile.last_name
+            last_name: profile.last_name,
+            avatar_url: profile.avatar_url
           } : undefined
         };
       });
