@@ -17,6 +17,8 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
 import { Home } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface NewsArticle {
   id: string;
@@ -256,10 +258,12 @@ const NewsDetailPage = () => {
             <div className="prose prose-lg max-w-none mx-auto">
               <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
 
-              <div 
-                className="rich-content" 
-                dangerouslySetInnerHTML={{ __html: article.content }}
-              ></div>
+              {/* Remplacement du dangerouslySetInnerHTML par ReactMarkdown */}
+              <div className="rich-content">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {article.content}
+                </ReactMarkdown>
+              </div>
 
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-8">

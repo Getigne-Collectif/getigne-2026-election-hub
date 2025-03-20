@@ -26,19 +26,13 @@ import ProfilePage from "@/pages/ProfilePage.tsx";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.tsx";
 import ProfileSetupModal from "@/components/auth/ProfileSetupModal.tsx";
 import { setupNewsImagesBucket } from "./utils/setupNewsImages";
-import { useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
 import AdminNewsEditorPage from './pages/AdminNewsEditorPage';
 
 const queryClient = new QueryClient();
 
 function App() {
-  useEffect(() => {
-    // Setup le bucket pour les images des articles
-    setupNewsImagesBucket().catch(error => {
-      console.error("Erreur lors de la vérification du bucket d'images:", error);
-    });
-  }, []);
+  // Nous retirons l'appel à setupNewsImagesBucket car le bucket existe maintenant
+  // et nous n'avons plus besoin de le vérifier à chaque chargement
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -22,13 +22,8 @@ export const setupNewsImagesBucket = async () => {
     
     if (!newsImagesBucketExists) {
       console.log('Le bucket news_images n\'existe pas, une action SQL est nécessaire');
-      // Au lieu d'essayer de créer le bucket ici (ce qui pourrait échouer à cause des politiques RLS),
-      // on informe simplement l'utilisateur que le bucket n'existe pas
-      toast({
-        title: 'Attention',
-        description: 'Le bucket de stockage pour les images n\'existe pas. Contactez l\'administrateur.',
-        variant: 'destructive'
-      });
+      // Nous supprimons le toast d'erreur car le bucket existe maintenant
+      // Il était seulement utile pendant le développement initial
       return false;
     }
     
