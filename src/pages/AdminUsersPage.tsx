@@ -78,6 +78,7 @@ const AdminUsersPage = () => {
 
       if (invitedError) console.error("Erreur lors de la récupération des invitations:", invitedError);
 
+      // Récupérer tous les profils avec leurs rôles
       const profilesData = await Promise.all(
         profiles.map(async (profile: Profile) => {
           const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
@@ -95,9 +96,34 @@ const AdminUsersPage = () => {
         })
       );
 
-      const allUsers: UserWithRoles[] = [...profilesData];
-      if (invitedUsers && invitedUsers.length > 0) {
-        invitedUsers.forEach((invited: InvitedUser) => {
+      // Obtenir les IDs des profils existants pour filtrer les invitations
+      const existingProfileIds = profiles.map((profile: Profile) => profile.id);
+
+      // Filtrer pour ne garder que les invitations qui n'ont pas encore été converties en utilisateurs
+      const pendingInvitations = invitedUsers ? invitedUsers.filter((invited: InvitedUser) => 
+        !existingProfileIds.includes(invited.id)
+      ) : [];
+
+      // Enrichir les profils avec les emails des invitations si nécessaire
+      const enrichedProfiles = profilesData.map(profile => {
+        // Si l'email du profil est vide, chercher s'il existe une invitation avec cet ID
+        if (!profile.email && invitedUsers) {
+          const matchingInvite = invitedUsers.find(invite => invite.id === profile.id);
+          if (matchingInvite) {
+            return {
+              ...profile,
+              email: matchingInvite.email
+            };
+          }
+        }
+        return profile;
+      });
+
+      // Ajouter les invitations en attente à la liste des utilisateurs
+      const allUsers: UserWithRoles[] = [...enrichedProfiles];
+      
+      if (pendingInvitations.length > 0) {
+        pendingInvitations.forEach((invited: InvitedUser) => {
           allUsers.push({
             id: invited.id,
             email: invited.email,
