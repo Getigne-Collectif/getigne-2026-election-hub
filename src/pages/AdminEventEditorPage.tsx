@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -77,9 +76,20 @@ const AdminEventEditorPage = () => {
         .from('events')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      
+      if (!data) {
+        toast({
+          title: "Événement non trouvé",
+          description: "L'événement que vous essayez de modifier n'existe pas",
+          variant: "destructive"
+        });
+        navigate('/admin/events');
+        return null;
+      }
+      
       return data;
     },
     enabled: isEditMode,
@@ -136,16 +146,20 @@ const AdminEventEditorPage = () => {
 
       let result;
 
-      if (isEditMode) {
-        const { data, error } = await supabase
+      if (isEditMode && id) {
+        const { data, error, count } = await supabase
           .from('events')
           .update(eventData)
           .eq('id', id)
-          .select()
-          .single();
+          .select();
 
         if (error) throw error;
-        result = data;
+        
+        if (!data || data.length === 0) {
+          throw new Error("Événement non trouvé ou aucune modification effectuée");
+        }
+        
+        result = data[0];
 
         toast({
           title: "Événement mis à jour",
@@ -155,11 +169,15 @@ const AdminEventEditorPage = () => {
         const { data, error } = await supabase
           .from('events')
           .insert(eventData)
-          .select()
-          .single();
+          .select();
 
         if (error) throw error;
-        result = data;
+        
+        if (!data || data.length === 0) {
+          throw new Error("Erreur lors de la création de l'événement");
+        }
+        
+        result = data[0];
 
         toast({
           title: "Événement créé",
@@ -181,8 +199,6 @@ const AdminEventEditorPage = () => {
   };
 
   const handleRegistrationUpdate = () => {
-    // This function will be called after EventRegistrationAdmin updates registration settings
-    // Refresh event data if needed
     if (id) {
       // Refetch event data
     }
