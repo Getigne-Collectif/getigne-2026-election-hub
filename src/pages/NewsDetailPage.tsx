@@ -41,7 +41,11 @@ interface NewsArticle {
   comments_enabled?: boolean;
 }
 
-const RelatedArticleCard = ({ article }) => {
+interface RelatedArticleProps {
+  article: NewsArticle;
+}
+
+const RelatedArticleCard = ({ article }: RelatedArticleProps) => {
   const articleUrl = article.slug 
     ? `/actualites/${article.slug}`
     : `/actualites/${article.id}`;
@@ -73,7 +77,7 @@ const RelatedArticleCard = ({ article }) => {
 };
 
 const NewsDetailPage = () => {
-  const { slug } = useParams();
+  const { slug } = useParams<{slug: string}>();
   const navigate = useNavigate();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
@@ -97,7 +101,7 @@ const NewsDetailPage = () => {
           .eq('status', 'published');
           
         // Check if slug is a UUID (for backward compatibility)
-        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug || '');
         
         if (isUuid) {
           query = query.eq('id', slug);
@@ -149,7 +153,7 @@ const NewsDetailPage = () => {
 
           const { data: relatedData, error: relatedError } = await query;
 
-          if (!relatedError && relatedData.length > 0) {
+          if (!relatedError && relatedData && relatedData.length > 0) {
             const processedRelatedData = relatedData.map(item => {
               // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
               const catName = item.news_categories ? item.news_categories.name : item.category;
@@ -173,17 +177,19 @@ const NewsDetailPage = () => {
               .order('date', { ascending: false })
               .limit(3);
 
-            const processedRecentData = recentData.map(item => {
-              // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
-              const catName = item.news_categories ? item.news_categories.name : item.category;
-              
-              return {
-                ...item,
-                category: catName,
-                tags: Array.isArray(item.tags) ? item.tags : []
-              };
-            });
-            setRelatedArticles(processedRecentData as NewsArticle[]);
+            if (recentData && recentData.length > 0) {
+              const processedRecentData = recentData.map(item => {
+                // Utiliser le nom de la catégorie depuis la relation news_categories si disponible
+                const catName = item.news_categories ? item.news_categories.name : item.category;
+                
+                return {
+                  ...item,
+                  category: catName,
+                  tags: Array.isArray(item.tags) ? item.tags : []
+                };
+              });
+              setRelatedArticles(processedRecentData as NewsArticle[]);
+            }
           }
         }
 
