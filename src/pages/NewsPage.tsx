@@ -12,6 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
+import { supabase } from "@/integrations/supabase/client";
 
 interface NewsArticle {
   id: string;
@@ -144,7 +145,7 @@ const NewsPage = () => {
             article.tags.forEach(tag => allTags.add(tag));
           }
         });
-        setAvailableTags(Array.from(allTags));
+        setAvailableTags(Array.from(allTags) as string[]);
 
         setLoading(false);
       } catch (error) {

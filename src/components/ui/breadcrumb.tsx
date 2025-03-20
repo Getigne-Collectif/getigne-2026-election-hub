@@ -48,12 +48,20 @@ const BreadcrumbLink = React.forwardRef<
     to?: string;
   }
 >(({ asChild, className, href, to, ...props }, ref) => {
-  const Comp = asChild ? Slot : to ? RouterLink : "a"
+  if (asChild) {
+    return (
+      <Slot
+        ref={ref}
+        className={cn("transition-colors hover:text-foreground", className)}
+        {...props}
+      />
+    )
+  }
   
   // Si to est défini, on utilise RouterLink
   if (to) {
     return (
-      <Comp
+      <RouterLink
         ref={ref}
         to={to}
         className={cn("transition-colors hover:text-foreground", className)}
@@ -64,7 +72,7 @@ const BreadcrumbLink = React.forwardRef<
   
   // Sinon, on utilise un lien standard
   return (
-    <Comp
+    <a
       ref={ref}
       href={href}
       className={cn("transition-colors hover:text-foreground", className)}
