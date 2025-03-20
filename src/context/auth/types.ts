@@ -8,6 +8,7 @@ export interface Profile {
   is_member: boolean;
   status?: string;
   email?: string;
+  avatar_url?: string;
   [key: string]: any;
 }
 
@@ -23,7 +24,11 @@ export interface IAuthContext {
   isMember: boolean;
   userRoles: string[];
   authChecked: boolean;
+  isInvitedUser: boolean;
   setUser: (user: any) => void;
   signInWithProvider: (provider: 'discord' | 'facebook' | 'google') => Promise<void>;
   refreshUserRoles: () => Promise<void>;
+  updatePassword: (password: string) => Promise<boolean>;
+  resetPassword: (email: string) => Promise<boolean>;
+  updateProfile: (profile: Partial<Profile>) => Promise<boolean>;
 }

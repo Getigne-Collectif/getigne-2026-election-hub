@@ -15,9 +15,13 @@ const defaultAuthContext: IAuthContext = {
   isMember: false,
   userRoles: [],
   authChecked: false,
+  isInvitedUser: false,
   setUser: () => {},
   signInWithProvider: async () => {},
   refreshUserRoles: async () => {},
+  updatePassword: async () => false,
+  resetPassword: async () => false,
+  updateProfile: async () => false,
 };
 
 const AuthContext = createContext<IAuthContext>(defaultAuthContext);

@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, User, Shield, Newspaper, RefreshCw} from 'lucide-react';
+import {LogIn, LogOut, User, Shield, Newspaper, RefreshCw, UserCog} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +13,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const AuthButton = () => {
-  const { user, profile, signOut, isAdmin, refreshUserRoles } = useAuth();
+  const { user, profile, signOut, isAdmin, refreshUserRoles, isInvitedUser } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -52,6 +53,10 @@ const AuthButton = () => {
       });
     }
   };
+  
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
   // Pas d'utilisateur - afficher bouton connexion
   if (!user) {
@@ -83,15 +88,34 @@ const AuthButton = () => {
       displayName = firstName;
     }
   }
+  
+  // Obtenir les initiales pour l'avatar
+  const getInitials = () => {
+    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
+    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+    return firstInitial + lastInitial || displayName.charAt(0).toUpperCase();
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-2">
-          <User className="h-4 w-4" />
+          {profile?.avatar_url ? (
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={profile.avatar_url} alt={displayName} />
+              <AvatarFallback>{getInitials()}</AvatarFallback>
+            </Avatar>
+          ) : (
+            <User className="h-4 w-4" />
+          )}
           <span className="hidden sm:inline">
             {displayName}
           </span>
+          {isInvitedUser && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs py-0.5 px-1.5 rounded ml-1">
+              Nouveau
+            </span>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -108,6 +132,16 @@ const AuthButton = () => {
           )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        
+        <DropdownMenuItem onClick={handleProfileClick} className="flex items-center">
+          <UserCog className="h-4 w-4 mr-2" />
+          Mon profil
+          {isInvitedUser && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs py-0.5 px-1.5 rounded ml-auto">
+              Nouveau
+            </span>
+          )}
+        </DropdownMenuItem>
         
         <DropdownMenuItem onClick={handleRefreshRoles} className="flex items-center">
           <RefreshCw className="h-4 w-4 mr-2" />

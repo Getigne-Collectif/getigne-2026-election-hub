@@ -14,6 +14,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [isMember, setIsMember] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const [isInvitedUser, setIsInvitedUser] = useState(false);
   const { toast } = useToast();
 
   // Function to refresh user roles
@@ -49,6 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user);
         await refreshUserRoles();
+        
+        // Détecter si c'est un utilisateur invité qui n'a pas encore défini son mot de passe
+        // Les utilisateurs invités ont leur email_confirmed_at défini mais n'ont pas de last_sign_in_at
+        const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
+        setIsInvitedUser(isNewInvitedUser);
+        
         setLoading(false);
         setAuthChecked(true);
       } else if (event === 'SIGNED_OUT') {
@@ -56,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRoles([]);
         setProfile(null);
         setIsMember(false);
+        setIsInvitedUser(false);
         setLoading(false);
         setAuthChecked(true);
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
@@ -78,6 +86,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (session?.user) {
           setUser(session.user);
+          
+          // Détecter si c'est un utilisateur invité
+          const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
+          setIsInvitedUser(isNewInvitedUser);
+          
           await refreshUserRoles();
         }
         
@@ -179,6 +192,89 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updatePassword = async (password: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      
+      setIsInvitedUser(false);
+      
+      toast({
+        title: 'Mot de passe mis à jour',
+        description: 'Votre mot de passe a été mis à jour avec succès.',
+      });
+      
+      return true;
+    } catch (error: any) {
+      toast({
+        title: 'Erreur de mise à jour du mot de passe',
+        description: error.message,
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/auth/reset-password',
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: 'Email de réinitialisation envoyé',
+        description: 'Vérifiez votre email pour réinitialiser votre mot de passe.',
+      });
+      
+      return true;
+    } catch (error: any) {
+      toast({
+        title: 'Erreur d\'envoi',
+        description: error.message,
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const updateProfile = async (profileData: Partial<Profile>) => {
+    if (!user) return false;
+    
+    try {
+      // Mettre à jour le profil dans la base de données
+      const { error } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      
+      // Mettre à jour l'état local
+      if (profile) {
+        setProfile({
+          ...profile,
+          ...profileData
+        });
+      }
+      
+      toast({
+        title: 'Profil mis à jour',
+        description: 'Votre profil a été mis à jour avec succès.',
+      });
+      
+      return true;
+    } catch (error: any) {
+      toast({
+        title: 'Erreur de mise à jour du profil',
+        description: error.message,
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
   const isAdmin = userRoles.includes('admin');
   const isModerator = userRoles.includes('moderator') || isAdmin;
 
@@ -194,9 +290,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isMember,
     userRoles,
     authChecked,
+    isInvitedUser,
     setUser,
     signInWithProvider,
     refreshUserRoles,
+    updatePassword,
+    resetPassword,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
