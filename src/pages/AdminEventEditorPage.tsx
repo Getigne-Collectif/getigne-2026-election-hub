@@ -167,7 +167,7 @@ const AdminEventEditorPage = () => {
         });
       }
 
-      navigate('/agenda/evenement');
+      navigate('/admin/events');
     } catch (error: any) {
       console.error('Error saving event:', error);
       toast({
@@ -359,6 +359,7 @@ const AdminEventEditorPage = () => {
                       <MarkdownEditor
                         value={content}
                         onChange={setContent}
+                        contentType="event"
                       />
                     </div>
                   </div>
@@ -415,7 +416,7 @@ const AdminEventEditorPage = () => {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => window.open(`/agenda/${id}`, '_blank')}
+                    onClick={() => window.open(`/agenda/${slug || id}`, '_blank')}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     Prévisualiser

@@ -1,362 +1,240 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import {Calendar, Clock, MapPin, Users, ArrowLeft, Tag, Home} from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import NotFound from './NotFound';
+import { Loader2, Clock, Calendar, MapPin, Users, ArrowLeft } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import EventRegistration from '@/components/events/EventRegistration';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.tsx";
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  content: string;
-  date: string;
-  location: string;
-  image: string;
-  committee?: string;
-  committee_id?: string;
-  is_members_only?: boolean;
-  allow_registration?: boolean;
-}
-
-interface Committee {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-}
-
-// Map committee names to colors
-const committeeColors = {
-  "Environnement": "bg-getigne-green-500",
-  "Mobilité": "bg-getigne-accent",
-  "Solidarité": "bg-getigne-700",
-  "Culture": "bg-[#9b87f5]",
-  "Économie": "bg-[#0EA5E9]",
-  "Éducation": "bg-[#F97316]",
-};
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import '../styles/richTextContent.css';
+import { useAuth } from '@/context/auth';
 
 const EventDetailPage = () => {
-  const { id } = useParams();
+  const { id, slug } = useParams();
   const navigate = useNavigate();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [committee, setCommittee] = useState<Committee | null>(null);
-  const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [eventId, setEventId] = useState<string | null>(id || null);
+  const { isLoggedIn, isMember, user } = useAuth();
 
+  // If we have a slug, fetch the actual ID first
+  const { data: slugData, isLoading: isLoadingSlug } = useQuery({
+    queryKey: ['event-slug', slug],
+    queryFn: async () => {
+      if (!slug) return null;
+      
+      const { data, error } = await supabase
+        .from('events')
+        .select('id')
+        .eq('slug', slug)
+        .single();
+      
+      if (error) {
+        throw error;
+      }
+      
+      return data;
+    },
+    enabled: !!slug,
+  });
+
+  // Once we have the ID (either directly or from slug), fetch the event details
   useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchEvent();
-  }, [id]);
+    if (slug && slugData) {
+      setEventId(slugData.id);
+    }
+  }, [slug, slugData]);
 
-  const fetchEvent = async () => {
-    try {
+  const { data: event, isLoading: isLoadingEvent } = useQuery({
+    queryKey: ['event', eventId],
+    queryFn: async () => {
+      if (!eventId) return null;
+      
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('id', id)
+        .eq('id', eventId)
         .single();
-
-      if (error) throw error;
-
-      const eventData = data as Event;
-      setEvent(eventData);
-
-      // Fetch committee information if event is associated with one
-      if (eventData.committee_id) {
-        const { data: committeeData, error: committeeError } = await supabase
-          .from('citizen_committees')
-          .select('*')
-          .eq('id', eventData.committee_id)
-          .single();
-
-        if (!committeeError && committeeData) {
-          setCommittee(committeeData as Committee);
-        }
+      
+      if (error) {
+        throw error;
       }
+      
+      return data;
+    },
+    enabled: !!eventId,
+  });
 
-      // Fetch related events (same committee or recent events)
-      if (eventData.committee_id) {
-        const { data: committeeEvents } = await supabase
-          .from('events')
-          .select('*')
-          .eq('committee_id', eventData.committee_id)
-          .neq('id', id)
-          .order('date', { ascending: false })
-          .limit(3);
+  const isLoading = isLoadingSlug || isLoadingEvent;
 
-        if (committeeEvents && committeeEvents.length > 0) {
-          setRelatedEvents(committeeEvents as Event[]);
-        } else {
-          // If no committee events, fetch recent events
-          const { data: recentEvents } = await supabase
-            .from('events')
-            .select('*')
-            .neq('id', id)
-            .order('date', { ascending: false })
-            .limit(3);
-
-          setRelatedEvents(recentEvents as Event[] || []);
-        }
-      } else {
-        // If no committee, fetch recent events
-        const { data: recentEvents } = await supabase
-          .from('events')
-          .select('*')
-          .neq('id', id)
-          .order('date', { ascending: false })
-          .limit(3);
-
-        setRelatedEvents(recentEvents as Event[] || []);
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error('Erreur lors de la récupération de l\'événement:', error);
-      setError((error as Error).message);
-      setLoading(false);
-    }
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
-  const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  // Function to get committee color based on name
-  const getCommitteeColor = (committeeName?: string) => {
-    if (!committeeName) return "bg-getigne-accent";
-    return committeeColors[committeeName as keyof typeof committeeColors] || "bg-getigne-accent";
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="container mx-auto px-4 py-24 flex-grow flex items-center justify-center">
-          <div className="text-center">Chargement de l'événement...</div>
+        <div className="flex-grow container mx-auto px-4 py-24 flex justify-center items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
         <Footer />
       </div>
     );
   }
 
-  if (error || !event) {
-    return <NotFound />;
+  if (!event) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow container mx-auto px-4 py-24">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Événement non trouvé</h1>
+            <p className="mb-6">L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
+            <Button onClick={() => navigate('/agenda')}>
+              Retour à l'agenda
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
-  // Determine if the event has passed
-  const isPastEvent = new Date(event.date).getTime() < new Date().getTime();
+  // Check if the event is members-only and the user is not a member
+  const isMembersOnly = event.is_members_only === true;
+  const hasAccess = !isMembersOnly || isMember;
 
-  // Get committee color
-  const committeeColor = committee ? getCommitteeColor(committee.title) : "";
-  const committeeTextColor = committeeColor.replace('bg-', 'text-');
-
-  // Default event.allow_registration to true if undefined (for backward compatibility)
-  const allowRegistration = event.allow_registration !== false;
+  const eventDate = new Date(event.date);
+  const formattedDate = format(eventDate, "PPPP", { locale: fr });
+  const formattedTime = format(eventDate, "HH'h'mm", { locale: fr });
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-
-      <main className="flex-grow pt-24 pb-16">
+      
+      <div className="pt-24 pb-4 bg-getigne-50">
         <div className="container mx-auto px-4">
-
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">
-                  <Home className="h-4 w-4 mr-1" />
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/agenda/evenement">Événements</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{event.title}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <div className="max-w-5xl mx-auto mt-10">
-            {/* Header with event title and committee tag if available */}
+          <div className="mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/agenda')}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour à l'agenda
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
             <div className="mb-8">
-              <div className="flex flex-wrap gap-2 items-center mb-4">
-                {isPastEvent && (
-                  <span className="bg-getigne-100 text-getigne-700 px-3 py-1 rounded-full text-sm">
-                    Événement passé
-                  </span>
-                )}
-
-                {event.is_members_only && (
-                  <span className="bg-getigne-700 text-white px-3 py-1 rounded-full text-sm flex items-center">
-                    <Users size={14} className="mr-1" />
-                    Réservé aux adhérents
-                  </span>
-                )}
-
-                {committee && (
-                  <span className={`${committeeColor} text-white px-3 py-1 rounded-full text-sm flex items-center`}>
-                    <Users size={14} className="mr-1" />
-                    Commission {committee.title}
-                  </span>
-                )}
-              </div>
-
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">{event.title}</h1>
-
-              {/* Event details cards */}
-              <div className="flex flex-wrap gap-4 my-6">
-                <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
-                  <Calendar size={20} className="text-getigne-accent mr-3" />
-                  <div>
-                    <div className="text-xs uppercase font-medium text-getigne-500">Date</div>
-                    <div>{formatDate(event.date)}</div>
-                  </div>
+              <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
+              
+              <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex items-center text-getigne-700">
+                  <Calendar className="mr-2 h-5 w-5" />
+                  <span>{formattedDate}</span>
                 </div>
-
-                <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
-                  <Clock size={20} className="text-getigne-accent mr-3" />
-                  <div>
-                    <div className="text-xs uppercase font-medium text-getigne-500">Heure</div>
-                    <div>{formatTime(event.date)}</div>
-                  </div>
+                <div className="flex items-center text-getigne-700">
+                  <Clock className="mr-2 h-5 w-5" />
+                  <span>{formattedTime}</span>
                 </div>
-
-                <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
-                  <MapPin size={20} className="text-getigne-accent mr-3" />
-                  <div>
-                    <div className="text-xs uppercase font-medium text-getigne-500">Lieu</div>
-                    <div>{event.location}</div>
-                  </div>
+                <div className="flex items-center text-getigne-700">
+                  <MapPin className="mr-2 h-5 w-5" />
+                  <span>{event.location}</span>
                 </div>
-
-                {committee && (
-                  <div className="flex items-center bg-getigne-50 px-4 py-3 rounded-lg text-getigne-700">
-                    <Users size={20} className={committeeTextColor + " mr-3"} />
-                    <div>
-                      <div className="text-xs uppercase font-medium text-getigne-500">Commission</div>
-                      <div>{committee.title}</div>
-                    </div>
+                {event.committee && (
+                  <div className="flex items-center text-getigne-700">
+                    <Users className="mr-2 h-5 w-5" />
+                    <span>{event.committee}</span>
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Main content */}
-              <div className="md:col-span-2">
-                <div className="prose prose-lg max-w-none">
-                  <h2 className="text-2xl font-medium mb-4">À propos de cet événement</h2>
-                  <p className="text-lg text-getigne-700 mb-6">{event.description}</p>
-
-                  {/* Render event content if available */}
-                  {event.content && (
-                    <div dangerouslySetInnerHTML={{ __html: event.content }} className="mt-8"></div>
-                  )}
-                </div>
-
-                {/* Registration component */}
-                {id && (
-                  <div className="mt-8">
-                    <EventRegistration 
-                      eventId={id}
-                      isMembersOnly={!!event.is_members_only}
-                      allowRegistration={allowRegistration}
-                      isPastEvent={isPastEvent}
-                      onRegistrationChange={fetchEvent}
-                    />
-                  </div>
-                )}
-
-                {/* Call to action - only show for members-only events */}
-                {event.is_members_only && (
-                  <div className="bg-getigne-50 p-6 rounded-lg mt-8">
-                    <h3 className="text-xl font-medium mb-2">Événement réservé aux adhérents</h3>
-                    <p className="mb-4">Cet événement est exclusivement réservé aux adhérents de notre collectif. Rejoignez-nous pour y participer et soutenir nos actions.</p>
-                    <Button
-                      asChild
-                      className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
-                    >
-                      <Link to="/adherer">
-                        En savoir plus sur l'adhésion
-                      </Link>
-                    </Button>
-                  </div>
-                )}
+              
+              <div className="mb-8">
+                <img 
+                  src={event.image} 
+                  alt={event.title} 
+                  className="w-full rounded-lg object-cover h-64 md:h-80"
+                />
               </div>
-
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Event image */}
-                <div className="rounded-lg overflow-hidden">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-auto"
-                  />
-                </div>
-
-                {/* Related events or other sidebar content */}
-                {relatedEvents.length > 0 && (
-                  <div className="border border-getigne-100 rounded-lg p-4">
-                    <h3 className="text-lg font-medium mb-4">Autres événements</h3>
-                    <div className="space-y-4">
-                      {relatedEvents.map((relEvent) => (
-                        <Link
-                          key={relEvent.id}
-                          to={`/agenda/${relEvent.id}`}
-                          className="flex gap-3 group"
-                        >
-                          <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
-                            <img
-                              src={relEvent.image}
-                              alt={relEvent.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-sm group-hover:text-getigne-accent transition-colors line-clamp-2">
-                              {relEvent.title}
-                            </h4>
-                            <p className="text-xs text-getigne-500">
-                              {formatDate(relEvent.date)}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
+              
+              <div className="prose max-w-none rich-content">
+                <p className="text-lg font-medium mb-4">{event.description}</p>
+                
+                {isMembersOnly && !hasAccess ? (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-6">
+                    <p className="text-yellow-700">
+                      Cet événement est réservé aux adhérents. Veuillez vous connecter avec un compte adhérent pour accéder au contenu complet.
+                    </p>
+                    {!isLoggedIn && (
+                      <Button 
+                        onClick={() => navigate('/auth?redirect=' + window.location.pathname)} 
+                        className="mt-4"
+                      >
+                        Se connecter
+                      </Button>
+                    )}
                   </div>
+                ) : (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {event.content || ''}
+                  </ReactMarkdown>
                 )}
               </div>
             </div>
           </div>
+          
+          <div>
+            {event.allow_registration && (
+              <div className="bg-getigne-50 p-6 rounded-lg mb-6">
+                <h2 className="text-xl font-bold mb-4">Inscription</h2>
+                <EventRegistration 
+                  eventId={event.id} 
+                  isMembersOnly={isMembersOnly}
+                />
+              </div>
+            )}
+            
+            <div className="bg-getigne-50 p-6 rounded-lg">
+              <h2 className="text-xl font-bold mb-4">À retenir</h2>
+              <ul className="space-y-3">
+                <li className="flex">
+                  <Calendar className="mr-3 h-5 w-5 text-getigne-600 flex-shrink-0" />
+                  <div>
+                    <span className="font-medium">Date:</span> {formattedDate}
+                  </div>
+                </li>
+                <li className="flex">
+                  <Clock className="mr-3 h-5 w-5 text-getigne-600 flex-shrink-0" />
+                  <div>
+                    <span className="font-medium">Heure:</span> {formattedTime}
+                  </div>
+                </li>
+                <li className="flex">
+                  <MapPin className="mr-3 h-5 w-5 text-getigne-600 flex-shrink-0" />
+                  <div>
+                    <span className="font-medium">Lieu:</span> {event.location}
+                  </div>
+                </li>
+                {event.committee && (
+                  <li className="flex">
+                    <Users className="mr-3 h-5 w-5 text-getigne-600 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium">Commission:</span> {event.committee}
+                    </div>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
         </div>
-      </main>
-
+      </div>
+      
       <Footer />
     </div>
   );

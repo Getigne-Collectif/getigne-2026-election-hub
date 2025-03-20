@@ -12,16 +12,34 @@ interface MarkdownEditorProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  contentType?: 'news' | 'event';
 }
 
 const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ 
   value, 
   onChange,
-  className = ''
+  className = '',
+  contentType = 'news'
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [currentTab, setCurrentTab] = useState<string>('write');
+
+  // Déterminer le bucket et le chemin en fonction du type de contenu
+  const getBucketConfig = () => {
+    if (contentType === 'event') {
+      return {
+        bucket: 'event_images',
+        path: 'content',
+        bucketName: 'event_images'
+      };
+    }
+    return {
+      bucket: 'news_images',
+      path: 'news_content',
+      bucketName: 'news_images'
+    };
+  };
 
   const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
     const items = e.clipboardData?.items;
@@ -36,14 +54,16 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         try {
           setIsUploading(true);
           
+          const { bucket, path, bucketName } = getBucketConfig();
+          
           // Générer un nom unique pour le fichier
           const fileExt = file.name?.split('.').pop() || 'png';
           const fileName = `${uuidv4()}.${fileExt}`;
-          const filePath = `news_content/${fileName}`;
+          const filePath = `${path}/${fileName}`;
 
           // Uploader l'image vers Supabase Storage
           const { error: uploadError, data } = await supabase.storage
-            .from('news_images')
+            .from(bucket)
             .upload(filePath, file);
 
           if (uploadError) {
@@ -53,7 +73,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
           // Récupérer l'URL publique
           const { data: { publicUrl } } = supabase.storage
-            .from('news_images')
+            .from(bucketName)
             .getPublicUrl(filePath);
 
           // Insérer l'image dans l'éditeur markdown
@@ -94,7 +114,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         break;
       }
     }
-  }, [value, onChange]);
+  }, [value, onChange, contentType]);
 
   const handleInsertImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -103,14 +123,16 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     try {
       setIsUploading(true);
       
+      const { bucket, path, bucketName } = getBucketConfig();
+      
       // Générer un nom unique pour le fichier
       const fileExt = file.name?.split('.').pop() || 'png';
       const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `news_content/${fileName}`;
+      const filePath = `${path}/${fileName}`;
 
       // Uploader l'image vers Supabase Storage
       const { error: uploadError, data } = await supabase.storage
-        .from('news_images')
+        .from(bucket)
         .upload(filePath, file);
 
       if (uploadError) {
@@ -120,7 +142,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
       // Récupérer l'URL publique
       const { data: { publicUrl } } = supabase.storage
-        .from('news_images')
+        .from(bucketName)
         .getPublicUrl(filePath);
 
       // Insérer l'image dans l'éditeur markdown
