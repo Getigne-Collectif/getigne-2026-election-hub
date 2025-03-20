@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
@@ -37,9 +38,9 @@ interface NewsArticle {
   updated_at: string;
   author_id?: string;
   author?: {
-    first_name: string;
-    last_name: string;
-  };
+    first_name?: string;
+    last_name?: string;
+  } | null;
   slug?: string;
   comments_enabled?: boolean;
 }
@@ -131,14 +132,14 @@ const NewsDetailPage = () => {
         const categoryName = data.news_categories ? data.news_categories.name : data.category;
         const categoryId = data.category_id || (data.news_categories ? data.news_categories.id : null);
 
-        const processedData = {
+        const processedData: NewsArticle = {
           ...data,
           category: categoryName,
           category_id: categoryId,
           tags
         };
 
-        setArticle(processedData as NewsArticle);
+        setArticle(processedData);
 
         // Only fetch related articles if there are tags or a category_id
         if (tags.length > 0 || categoryId) {
@@ -171,9 +172,9 @@ const NewsDetailPage = () => {
                 ...item,
                 category: catName,
                 tags: Array.isArray(item.tags) ? item.tags : []
-              };
+              } as NewsArticle;
             });
-            setRelatedArticles(processedRelatedData as NewsArticle[]);
+            setRelatedArticles(processedRelatedData);
           } else {
             // If no related articles by tag or category, get recent articles
             const { data: recentData } = await supabase
@@ -197,9 +198,9 @@ const NewsDetailPage = () => {
                   ...item,
                   category: catName,
                   tags: Array.isArray(item.tags) ? item.tags : []
-                };
+                } as NewsArticle;
               });
-              setRelatedArticles(processedRecentData as NewsArticle[]);
+              setRelatedArticles(processedRecentData);
             }
           }
         }
@@ -235,7 +236,7 @@ const NewsDetailPage = () => {
   const commentsEnabled = article.comments_enabled !== false;
   
   const authorName = article.author 
-    ? `${article.author.first_name} ${article.author.last_name}` 
+    ? `${article.author.first_name || ''} ${article.author.last_name || ''}`.trim() 
     : '';
 
   return (

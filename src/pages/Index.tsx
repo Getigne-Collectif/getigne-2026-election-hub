@@ -25,7 +25,7 @@ const Index = () => (
       <Hero />
       <Program />
       <Values />
-      <News />
+      <News limit={3} />
       <Events />
       <CitizenCommittees />
       <Team />

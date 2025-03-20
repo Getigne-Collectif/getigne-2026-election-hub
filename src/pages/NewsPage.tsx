@@ -126,7 +126,7 @@ const NewsPage = () => {
           *,
           news_categories(id, name),
           author:profiles(first_name, last_name)
-        `, { count: 'exact' })
+        `)
         .eq('status', 'published');
       
       // Ajouter les filtres selon les paramètres
@@ -142,12 +142,35 @@ const NewsPage = () => {
         query = query.or(`title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`);
       }
       
-      // Récupérer le décompte total pour la pagination
-      const { count } = await query.count();
-      setTotalCount(count || 0);
+      // Get total count first with a separate query
+      const countQuery = supabase
+        .from('news')
+        .select('id', { count: 'exact', head: false })
+        .eq('status', 'published');
+        
+      // Apply the same filters to count query
+      if (selectedCategory !== 'all') {
+        countQuery.eq('category_id', selectedCategory);
+      }
+      
+      if (selectedTags.length > 0) {
+        countQuery.overlaps('tags', selectedTags);
+      }
+      
+      if (searchTerm) {
+        countQuery.or(`title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`);
+      }
+      
+      const { count, error: countError } = await countQuery;
+      
+      if (countError) {
+        console.error('Error getting count:', countError);
+      } else {
+        setTotalCount(count || 0);
+      }
       
       // Compléter la requête avec le tri et la pagination
-      const { data, error, count: dataCount } = await query
+      const { data, error } = await query
         .order('date', { ascending: false })
         .range(from, to);
       
@@ -180,13 +203,13 @@ const NewsPage = () => {
     window.open(`${baseUrl}/functions/v1/rss-feed`, '_blank');
   };
 
-  const handleCategoryChange = (value) => {
+  const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     setCurrentPage(1);
     updateUrl({ category: value, page: 1 });
   };
 
-  const handleTagClick = (tag) => {
+  const handleTagClick = (tag: string) => {
     const newSelectedTags = selectedTags.includes(tag)
       ? selectedTags.filter(t => t !== tag)
       : [...selectedTags, tag];
@@ -204,19 +227,19 @@ const NewsPage = () => {
     navigate('/actualites');
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
     updateUrl({ search: searchTerm, page: 1 });
   };
 
-  const handlePageChange = (page) => {
+  const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo(0, 0);
-    updateUrl({ page });
+    updateUrl({ page: page.toString() });
   };
 
-  const updateUrl = (params) => {
+  const updateUrl = (params: Record<string, string>) => {
     const queryParams = new URLSearchParams(location.search);
     
     // Mettre à jour ou supprimer les paramètres
@@ -242,7 +265,7 @@ const NewsPage = () => {
     }
     
     if (!params.hasOwnProperty('page') && currentPage > 1) {
-      queryParams.set('page', currentPage);
+      queryParams.set('page', currentPage.toString());
     }
     
     const queryString = queryParams.toString();

@@ -12,9 +12,9 @@ interface NewsCardProps {
     image: string;
     slug?: string;
     author?: {
-      first_name: string;
-      last_name: string;
-    };
+      first_name?: string;
+      last_name?: string;
+    } | null;
   };
   index?: number;
 }
@@ -52,7 +52,7 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
     
   // Format de l'auteur
   const authorName = article.author 
-    ? `${article.author.first_name} ${article.author.last_name}` 
+    ? `${article.author.first_name || ''} ${article.author.last_name || ''}`.trim() 
     : '';
 
   return (
