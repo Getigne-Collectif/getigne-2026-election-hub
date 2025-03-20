@@ -29,10 +29,10 @@ const CalendarSync: React.FC = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Session introuvable");
 
-      // Construire l'URL avec le token comme paramètre
-      const baseUrl = import.meta.env.PROD 
-        ? "https://jqpivqdwblrccjzicnxn.supabase.co/functions/v1/calendar-sync" 
-        : "http://localhost:54321/functions/v1/calendar-sync";
+      // Get production or development URL from window.location
+      const baseUrl = window.location.origin.includes('localhost')
+        ? "http://localhost:54321/functions/v1/calendar-sync"
+        : "https://jqpivqdwblrccjzicnxn.supabase.co/functions/v1/calendar-sync";
       
       return `${baseUrl}?token=${session.access_token}`;
     } catch (error) {
