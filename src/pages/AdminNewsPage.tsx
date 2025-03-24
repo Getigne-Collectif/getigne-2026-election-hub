@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
@@ -44,7 +45,7 @@ interface NewsArticle {
   content: string;
   created_at: string;
   published_at: string | null;
-  is_published: boolean;
+  status: string;
   category_id: string;
   category: string;
   tags: string;
@@ -57,7 +58,7 @@ interface NewsCategory {
 }
 
 const AdminNewsPage = () => {
-  const { isAdmin, isLoading: authLoading } = useAuth();
+  const { isAdmin, loading, authChecked } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -72,7 +73,9 @@ const AdminNewsPage = () => {
   const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
+    if (!authChecked || loading) return;
+
+    if (!isAdmin) {
       navigate('/');
       toast({
         title: 'Accès refusé',
@@ -80,7 +83,7 @@ const AdminNewsPage = () => {
         variant: 'destructive',
       });
     }
-  }, [authLoading, isAdmin, navigate, toast]);
+  }, [authChecked, loading, isAdmin, navigate, toast]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -161,16 +164,16 @@ const AdminNewsPage = () => {
 
     // Filter by status
     if (statusFilter === 'published') {
-      filtered = filtered.filter(article => article.is_published);
+      filtered = filtered.filter(article => article.status === 'published');
     } else if (statusFilter === 'draft') {
-      filtered = filtered.filter(article => !article.is_published);
+      filtered = filtered.filter(article => article.status === 'draft');
     }
 
     // Filter by tab
     if (activeTab === 'published') {
-      filtered = filtered.filter(article => article.is_published);
+      filtered = filtered.filter(article => article.status === 'published');
     } else if (activeTab === 'draft') {
-      filtered = filtered.filter(article => !article.is_published);
+      filtered = filtered.filter(article => article.status === 'draft');
     }
 
     setFilteredArticles(filtered);
@@ -202,13 +205,14 @@ const AdminNewsPage = () => {
     }
   };
 
-  const handlePublishToggle = async (id: string, currentStatus: boolean) => {
+  const handlePublishToggle = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'published' ? 'draft' : 'published';
     try {
       const { error } = await supabase
         .from('news')
         .update({
-          is_published: !currentStatus,
-          published_at: !currentStatus ? new Date().toISOString() : null,
+          status: newStatus,
+          published_at: newStatus === 'published' ? new Date().toISOString() : null,
         })
         .eq('id', id);
 
@@ -219,8 +223,8 @@ const AdminNewsPage = () => {
           article.id === id
             ? {
                 ...article,
-                is_published: !currentStatus,
-                published_at: !currentStatus ? new Date().toISOString() : null,
+                status: newStatus,
+                published_at: newStatus === 'published' ? new Date().toISOString() : null,
               }
             : article
         )
@@ -228,7 +232,7 @@ const AdminNewsPage = () => {
 
       toast({
         title: 'Succès',
-        description: `L'article a été ${!currentStatus ? 'publié' : 'dépublié'}.`,
+        description: `L'article a été ${newStatus === 'published' ? 'publié' : 'dépublié'}.`,
       });
     } catch (error) {
       console.error('Error toggling publish status:', error);
@@ -284,11 +288,13 @@ const AdminNewsPage = () => {
   const handleBulkPublish = async (publish: boolean) => {
     if (selectedArticles.length === 0) return;
 
+    const newStatus = publish ? 'published' : 'draft';
+    
     try {
       const { error } = await supabase
         .from('news')
         .update({
-          is_published: publish,
+          status: newStatus,
           published_at: publish ? new Date().toISOString() : null,
         })
         .in('id', selectedArticles);
@@ -300,7 +306,7 @@ const AdminNewsPage = () => {
           selectedArticles.includes(article.id)
             ? {
                 ...article,
-                is_published: publish,
+                status: newStatus,
                 published_at: publish ? new Date().toISOString() : null,
               }
             : article
@@ -317,7 +323,7 @@ const AdminNewsPage = () => {
     }
   };
 
-  if (authLoading) {
+  if (loading && !authChecked) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -499,9 +505,9 @@ const AdminNewsPage = () => {
                         </TableCell>
                         <TableCell>
                           <Badge
-                            variant={article.is_published ? 'default' : 'secondary'}
+                            variant={article.status === 'published' ? 'default' : 'secondary'}
                           >
-                            {article.is_published ? 'Publié' : 'Brouillon'}
+                            {article.status === 'published' ? 'Publié' : 'Brouillon'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
@@ -519,9 +525,9 @@ const AdminNewsPage = () => {
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => handlePublishToggle(article.id, article.is_published)}
+                                onClick={() => handlePublishToggle(article.id, article.status)}
                               >
-                                {article.is_published ? 'Dépublier' : 'Publier'}
+                                {article.status === 'published' ? 'Dépublier' : 'Publier'}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-destructive"
