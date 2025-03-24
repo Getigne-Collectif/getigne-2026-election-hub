@@ -10,7 +10,7 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, Users, Newspaper, Calendar, Settings, TrendingUp, Eye, MessageSquare } from 'lucide-react';
+import { Home, Users, Newspaper, Calendar, Settings, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const AdminDashboardPage = () => {
@@ -124,7 +124,7 @@ const AdminDashboardPage = () => {
 
       <div className="page-content">
         <Navbar />
-        
+
         <div className="pt-24 pb-12 bg-getigne-50">
           <div className="container mx-auto px-4">
             <Breadcrumb className="mb-6">
@@ -136,11 +136,13 @@ const AdminDashboardPage = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Administration</BreadcrumbPage>
+                  <Link to="/admin">
+                    <BreadcrumbPage>Administration</BreadcrumbPage>
+                  </Link>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            
+
             <div className="max-w-3xl mx-auto text-center">
               <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
                 Administration
@@ -168,7 +170,7 @@ const AdminDashboardPage = () => {
                   <CardDescription>utilisateurs inscrits</CardDescription>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xl flex items-center">
@@ -181,7 +183,7 @@ const AdminDashboardPage = () => {
                   <CardDescription>articles publiés</CardDescription>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xl flex items-center">
@@ -194,7 +196,7 @@ const AdminDashboardPage = () => {
                   <CardDescription>événements créés</CardDescription>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xl flex items-center">
@@ -207,29 +209,6 @@ const AdminDashboardPage = () => {
                   <CardDescription>commentaires publiés</CardDescription>
                 </CardContent>
               </Card>
-            </div>
-
-            <h2 className="text-2xl font-bold mb-6">Gestion du site</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {adminLinks.map((link) => (
-                <Card key={link.title} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-0">
-                    <Button 
-                      variant="ghost" 
-                      className="w-full h-full flex flex-col items-center justify-center p-6 space-y-3"
-                      asChild
-                    >
-                      <Link to={link.url}>
-                        <div className="bg-getigne-50 p-3 rounded-full">
-                          {link.icon}
-                        </div>
-                        <span className="font-medium">{link.title}</span>
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
             </div>
 
             <div className="mt-16">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
@@ -78,7 +78,7 @@ const AdminUsersPage = () => {
       const profilesData = await Promise.all(
         profiles.map(async (profile: Profile) => {
           const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
-          
+
           let email = profile.email;
           if (!email && invitedUsersData) {
             const matchingInvite = invitedUsersData.find((invited: InvitedUser) => invited.id === profile.id);
@@ -103,7 +103,7 @@ const AdminUsersPage = () => {
 
       const existingProfileIds = profiles.map((profile: Profile) => profile.id);
 
-      const pendingInvitationsData = invitedUsersData 
+      const pendingInvitationsData = invitedUsersData
         ? invitedUsersData
             .filter((invited: InvitedUser) => !existingProfileIds.includes(invited.id))
             .map((invited: InvitedUser) => ({
@@ -140,11 +140,11 @@ const AdminUsersPage = () => {
           .insert({ user_id: userId, role });
 
         if (error) throw error;
-        
+
         if (userId === user?.id) {
           await refreshUserRoles();
         }
-        
+
         toast({
           title: 'Succès',
           description: `Le rôle ${role} a été ajouté.`
@@ -157,11 +157,11 @@ const AdminUsersPage = () => {
           .eq('role', role);
 
         if (error) throw error;
-        
+
         if (userId === user?.id) {
           await refreshUserRoles();
         }
-        
+
         toast({
           title: 'Succès',
           description: `Le rôle ${role} a été retiré.`
@@ -213,14 +213,14 @@ const AdminUsersPage = () => {
   const handleToggleUserStatus = async (userId: string, isActive: boolean) => {
     try {
       const newStatus = isActive ? 'active' : 'disabled';
-      
+
       const { error } = await supabase
         .from('profiles')
         .update({ status: newStatus })
         .eq('id', userId);
 
       if (error) throw error;
-      
+
       await fetchUsers();
     } catch (error: any) {
       console.error('Erreur lors de la modification du statut:', error);
@@ -278,7 +278,9 @@ const AdminUsersPage = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Administration</BreadcrumbPage>
+                  <Link to="/admin">
+                    <BreadcrumbPage>Administration</BreadcrumbPage>
+                  </Link>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>

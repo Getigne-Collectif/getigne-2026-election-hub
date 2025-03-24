@@ -58,7 +58,7 @@ interface NewsCategory {
 }
 
 const AdminNewsPage = () => {
-  const { isAdmin, loading, authChecked } = useAuth();
+  const { isAdmin, authChecked } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -289,7 +289,7 @@ const AdminNewsPage = () => {
     if (selectedArticles.length === 0) return;
 
     const newStatus = publish ? 'published' : 'draft';
-    
+
     try {
       const { error } = await supabase
         .from('news')

@@ -58,8 +58,7 @@ const Navbar = () => {
           Accueil
         </Link>
       </li>
-      <li className="relative group">
-        <div className="flex items-center cursor-pointer">
+      <li>
           <Link
             to="/objectif-2026"
             className={
@@ -72,30 +71,6 @@ const Navbar = () => {
           >
             Objectif 2026
           </Link>
-          <ChevronDown
-            size={16}
-            className="ml-1 transition-transform group-hover:rotate-180"
-          />
-        </div>
-        <ul className="absolute left-0 mt-2 bg-white shadow-md rounded-md py-2 w-48 z-10 hidden group-hover:block">
-          <li className="px-4 py-2 hover:bg-getigne-50">
-            <Link to="/objectif-2026" className="block">
-              Notre projet
-            </Link>
-          </li>
-          {(isProgramManager || location.pathname === '/objectif-2026/programme') && (
-            <li className="px-4 py-2 hover:bg-getigne-50">
-              <Link to="/objectif-2026/programme" className="block">
-                Programme
-              </Link>
-            </li>
-          )}
-          <li className="px-4 py-2 hover:bg-getigne-50">
-            <Link to="/objectif-2026/commissions" className="block">
-              Commissions citoyennes
-            </Link>
-          </li>
-        </ul>
       </li>
       <li>
         <Link to="/actualites" className={isActive('/actualites')}>

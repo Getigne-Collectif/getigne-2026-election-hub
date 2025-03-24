@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -68,7 +68,7 @@ const AdminSettingsPage = () => {
 
       <div className="page-content">
         <Navbar />
-        
+
         <div className="pt-24 pb-12 bg-getigne-50">
           <div className="container mx-auto px-4">
             <Breadcrumb className="mb-6">
@@ -80,7 +80,9 @@ const AdminSettingsPage = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Administration</BreadcrumbPage>
+                  <Link to="/admin">
+                    <BreadcrumbPage>Administration</BreadcrumbPage>
+                  </Link>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -88,7 +90,7 @@ const AdminSettingsPage = () => {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            
+
             <div className="max-w-3xl mx-auto text-center">
               <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
                 Administration

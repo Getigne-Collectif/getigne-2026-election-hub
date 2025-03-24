@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventsManagement from '@/components/EventsManagement';
 import { useAuth } from '@/context/auth';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Breadcrumb,
@@ -158,7 +158,9 @@ const AdminEventsPage = () => {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Administration</BreadcrumbPage>
+                    <Link to="/admin">
+                      <BreadcrumbPage>Administration</BreadcrumbPage>
+                    </Link>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>

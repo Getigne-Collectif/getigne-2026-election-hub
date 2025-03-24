@@ -358,11 +358,11 @@ const CommitteePage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/programme">Programme</BreadcrumbLink>
+                <BreadcrumbLink href="/objectif-2026">Objectif 2026</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/commissions">Commissions</BreadcrumbLink>
+                <BreadcrumbLink href="/commissions">Commissions citoyennes</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
