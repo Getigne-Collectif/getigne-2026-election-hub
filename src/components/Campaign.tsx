@@ -62,7 +62,7 @@ const Campaign = () => {
             </div>
             <div className="relative h-64 md:h-96 rounded-xl overflow-hidden">
               <img 
-                src="/lovable-uploads/07e7372b-7c2e-4584-9a92-9becd5096172.png" 
+                src="/placeholder.svg" 
                 alt="Gétigné Collectif en campagne" 
                 className="absolute inset-0 w-full h-full object-cover"
               />

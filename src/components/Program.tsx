@@ -145,7 +145,7 @@ const Program = () => {
         <div className="flex flex-col md:flex-row gap-6 mt-10 items-center justify-center">
           <div className="bg-getigne-50 p-6 rounded-xl flex items-center gap-4 max-w-lg w-full">
             <img 
-              src="/lovable-uploads/07e7372b-7c2e-4584-9a92-9becd5096172.png" 
+              src="/placeholder.svg" 
               alt="Logo de l'aggloh!" 
               className="w-24 h-auto"
             />

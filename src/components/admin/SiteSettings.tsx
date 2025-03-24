@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,13 @@ const SiteSettings = () => {
   });
 
   // Mettre à jour les paramètres locaux quand les paramètres sont chargés
-  useState(() => {
+  useEffect(() => {
     if (!loading) {
       setLocalSettings({
         showProgram: settings.showProgram,
       });
     }
-  });
+  }, [loading, settings]);
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
