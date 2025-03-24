@@ -6,7 +6,6 @@ import Team from '@/components/Team';
 import Footer from '@/components/Footer';
 
 const TeamPage = () => {
-  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -17,10 +16,10 @@ const TeamPage = () => {
         <title>Notre équipe | Gétigné Collectif</title>
         <meta
           name="description"
-          content="Découvrez l'équipe du Gétigné Collectif, engagée pour une commune plus écologique, solidaire et démocratique."
+          content="Découvrez l'équipe de Gétigné Collectif, engagée pour une commune plus écologique, solidaire et démocratique."
         />
       </Helmet>
-      
+
       <div className="page-content">
         <Navbar />
         <div className="pt-20">

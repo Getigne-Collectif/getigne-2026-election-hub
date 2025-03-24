@@ -116,7 +116,7 @@ const AboutUsPage = () => {
                 </span>
                 <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Qui sommes-nous ?</h1>
                 <p className="text-getigne-700 text-lg mb-6">
-                  Découvrez l'histoire du Gétigné Collectif, nos valeurs, notre vision pour la commune
+                  Découvrez l'histoire de Gétigné Collectif, nos valeurs, notre vision pour la commune
                   et les personnes engagées dans ce projet citoyen.
                 </p>
               </div>
@@ -231,10 +231,11 @@ const AboutUsPage = () => {
                     Notre association est ouverte à toutes les personnes qui partagent nos valeurs et souhaitent s'engager pour l'avenir de Gétigné. Nous accueillons la diversité des compétences, des idées et des énergies.
                   </p>
                   <div className="flex space-x-4">
-                    <Button
-                      className="bg-getigne-accent hover:bg-getigne-accent/90 text-white flex items-center"
+                    <Button asChild className="bg-getigne-accent hover:bg-getigne-accent/90 text-white flex items-center"
                     >
-                      <Download className="mr-2 h-4 w-4" /> Télécharger nos statuts
+                      <a href={"https://portail.getigne-collectif.fr/cloud/s/C2NCZ6dNQ59ijLH"} target="_blank" rel="noreferrer">
+                        <Download className="mr-2 h-4 w-4" /> Télécharger nos statuts
+                      </a>
                     </Button>
                     <Button
                       asChild
@@ -316,7 +317,7 @@ const AboutUsPage = () => {
                 </span>
                 <h2 className="text-3xl font-bold mt-4 mb-6">Les membres du collectif</h2>
                 <p className="text-getigne-700 mb-8">
-                  Découvrez les personnes engagées qui portent le projet de Gétigné Collectif.
+                  Découvrez les personnes engagées qui portent le projet .
                 </p>
 
                 <Tabs defaultValue="bureau" className="max-w-2xl mx-auto">

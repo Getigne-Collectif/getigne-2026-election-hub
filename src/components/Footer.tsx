@@ -48,7 +48,7 @@ const Footer = () => {
               />
             </div>
             <p className="text-getigne-100 mb-6">
-              Collectif citoyen engagé pour les élections municipales de 2026 à Gétigné.
+              Collectif citoyen engagé pour les élections municipales depuis 2020 à Gétigné.
               Ensemble, construisons une commune plus solidaire, écologique et participative.
             </p>
             <div className="flex space-x-4">
@@ -113,13 +113,12 @@ const Footer = () => {
               </li>
               <li className="flex items-start">
                 <Phone size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
-                <span className="text-getigne-100">06 12 34 56 78</span>
+                <span className="text-getigne-100">06 66 77 75 20</span>
               </li>
               <li className="flex items-start">
                 <MapPin size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
                 <span className="text-getigne-100">
-                  Local du collectif<br />
-                  1 rue de la Mairie<br />
+                  19 le bois de la roche<br />
                   44190 Gétigné
                 </span>
               </li>

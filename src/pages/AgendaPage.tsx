@@ -232,7 +232,7 @@ const AgendaPage = () => {
         <title>Agenda | Gétigné Collectif</title>
         <meta
           name="description"
-          content="Retrouvez tous les événements à venir du Gétigné Collectif, réunions publiques, ateliers participatifs et moments d'échange."
+          content="Retrouvez tous les événements à venir de Gétigné Collectif, réunions publiques, ateliers participatifs et moments d'échange."
         />
       </Helmet>
       
