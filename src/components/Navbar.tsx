@@ -116,41 +116,6 @@ const Navbar = () => {
           Adhérer
         </Link>
       </li>
-      {isAdmin && (
-        <li className="relative group">
-          <div className="flex items-center cursor-pointer">
-            <span className="text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200">
-              Admin
-            </span>
-            <ChevronDown
-              size={16}
-              className="ml-1 transition-transform group-hover:rotate-180"
-            />
-          </div>
-          <ul className="absolute left-0 mt-2 bg-white shadow-md rounded-md py-2 w-48 z-10 hidden group-hover:block">
-            <li className="px-4 py-2 hover:bg-getigne-50">
-              <Link to="/admin/users" className="block">
-                Utilisateurs
-              </Link>
-            </li>
-            <li className="px-4 py-2 hover:bg-getigne-50">
-              <Link to="/admin/news" className="block">
-                Actualités
-              </Link>
-            </li>
-            <li className="px-4 py-2 hover:bg-getigne-50">
-              <Link to="/admin/events" className="block">
-                Événements
-              </Link>
-            </li>
-            <li className="px-4 py-2 hover:bg-getigne-50">
-              <Link to="/admin/settings" className="block">
-                Paramètres
-              </Link>
-            </li>
-          </ul>
-        </li>
-      )}
     </>
   );
 
