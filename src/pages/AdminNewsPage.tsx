@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -83,7 +82,7 @@ const AdminNewsPage = () => {
 
       const transformedData = newsData.map(article => {
         const tags = article.news_to_tags 
-          ? article.news_to_tags.map(tag => tag.news_tags.name) 
+          ? article.news_to_tags.map((tag: any) => tag.news_tags.name) 
           : [];
 
         return {
@@ -93,11 +92,12 @@ const AdminNewsPage = () => {
           tags,
           comments_enabled: article.comments_enabled !== false,
           author_id: article.author_id || null,
-          publication_date: article.publication_date || null
+          publication_date: article.publication_date || null,
+          news_to_tags: article.news_to_tags || []
         };
       });
 
-      setNewsArticles(transformedData);
+      setNewsArticles(transformedData as NewsArticle[]);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des actualités:', error);
       toast({

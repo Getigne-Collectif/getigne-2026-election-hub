@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -21,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, UserCheck, Shield, UserX, UserPlus, Inbox } from 'lucide-react';
+import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -43,12 +42,11 @@ interface UserManagementProps {
   users: any[];
   invitedUsers: any[];
   loading: boolean;
-  onRoleChange: (userId: string, role: 'moderator' | 'admin', action: 'add' | 'remove') => Promise<void>;
+  onRoleChange: (userId: string, role: 'moderator' | 'admin' | 'program_manager', action: 'add' | 'remove') => Promise<void>;
   onInviteUser: (userData: InviteUserFormValues) => Promise<void>;
   onToggleUserStatus: (userId: string, isActive: boolean) => Promise<void>;
 }
 
-// Schéma de validation pour le formulaire d'invitation
 const inviteUserSchema = z.object({
   first_name: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
   last_name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -71,7 +69,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
 
-  // Formulaire d'invitation
   const form = useForm<InviteUserFormValues>({
     resolver: zodResolver(inviteUserSchema),
     defaultValues: {
@@ -81,7 +78,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
     },
   });
 
-  // Gérer l'invitation d'un utilisateur
   const handleInviteUser = async (values: InviteUserFormValues) => {
     try {
       await onInviteUser(values);
@@ -100,7 +96,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
     }
   };
 
-  // Gérer la désactivation/réactivation d'un utilisateur
   const handleToggleUserStatus = async (userId: string, isActive: boolean) => {
     try {
       await onToggleUserStatus(userId, isActive);
@@ -117,7 +112,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
     }
   };
 
-  // Filtrer les utilisateurs en fonction du terme de recherche
   const filteredUsers = users.filter(user => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -127,7 +121,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
     );
   });
 
-  // Filtrer les invitations en fonction du terme de recherche
   const filteredInvitedUsers = invitedUsers.filter(user => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -137,19 +130,16 @@ const UserManagement: React.FC<UserManagementProps> = ({
     );
   });
 
-  // Ouvrir le dialogue pour modifier les rôles d'un utilisateur
   const openRoleDialog = (user: any) => {
     setSelectedUser(user);
     setIsDialogOpen(true);
   };
 
-  // Vérifier si un utilisateur a un rôle spécifique
   const hasRole = (user: any, role: string) => {
     return user.roles?.includes(role) || false;
   };
 
-  // Gérer le changement de rôle
-  const handleRoleToggle = async (role: 'moderator' | 'admin') => {
+  const handleRoleToggle = async (role: 'moderator' | 'admin' | 'program_manager') => {
     if (!selectedUser) return;
     
     const hasRoleNow = hasRole(selectedUser, role);
@@ -159,7 +149,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
       hasRoleNow ? 'remove' : 'add'
     );
     
-    // Mettre à jour l'utilisateur sélectionné localement
     const updatedRoles = hasRoleNow 
       ? selectedUser.roles.filter((r: string) => r !== role)
       : [...(selectedUser.roles || []), role];
@@ -170,7 +159,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
     });
   };
 
-  // Obtenir les initiales pour l'avatar
   const getInitials = (firstName: string, lastName: string) => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
@@ -348,7 +336,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
         </Tabs>
       )}
 
-      {/* Dialogue de gestion des rôles */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -388,7 +375,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
                 />
               </div>
 
-              {/* Nouveau switch pour le rôle Program Manager */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <PenTool className="h-5 w-5 text-green-500" />
@@ -409,7 +395,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Dialogue d'invitation */}
       <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
         <DialogContent>
           <DialogHeader>

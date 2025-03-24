@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -64,26 +63,22 @@ const AdminUsersPage = () => {
   const fetchUsers = async () => {
     setPageLoading(true);
     try {
-      // Récupérer les profils des utilisateurs existants
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
 
       if (profilesError) throw profilesError;
 
-      // Récupérer les utilisateurs invités
       const { data: invitedUsersData, error: invitedError } = await supabase
         .from('invited_users')
         .select('*');
 
       if (invitedError) throw invitedError;
 
-      // Récupérer tous les profils avec leurs rôles
       const profilesData = await Promise.all(
         profiles.map(async (profile: Profile) => {
           const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
           
-          // Récupérer l'email de l'invitation si nécessaire
           let email = profile.email;
           if (!email && invitedUsersData) {
             const matchingInvite = invitedUsersData.find((invited: InvitedUser) => invited.id === profile.id);
@@ -106,10 +101,8 @@ const AdminUsersPage = () => {
         })
       );
 
-      // Obtenir les IDs des profils existants pour ne pas les re-afficher comme invités
       const existingProfileIds = profiles.map((profile: Profile) => profile.id);
 
-      // Filtrer les invitations pour ne garder que celles qui n'ont pas encore été acceptées
       const pendingInvitationsData = invitedUsersData 
         ? invitedUsersData
             .filter((invited: InvitedUser) => !existingProfileIds.includes(invited.id))
@@ -139,7 +132,7 @@ const AdminUsersPage = () => {
     }
   };
 
-  const handleRoleChange = async (userId: string, role: 'moderator' | 'admin', action: 'add' | 'remove') => {
+  const handleRoleChange = async (userId: string, role: 'moderator' | 'admin' | 'program_manager', action: 'add' | 'remove') => {
     try {
       if (action === 'add') {
         const { error } = await supabase
@@ -148,7 +141,6 @@ const AdminUsersPage = () => {
 
         if (error) throw error;
         
-        // Si l'utilisateur modifie son propre rôle, rafraîchir ses rôles
         if (userId === user?.id) {
           await refreshUserRoles();
         }
@@ -166,7 +158,6 @@ const AdminUsersPage = () => {
 
         if (error) throw error;
         
-        // Si l'utilisateur modifie son propre rôle, rafraîchir ses rôles
         if (userId === user?.id) {
           await refreshUserRoles();
         }
@@ -230,7 +221,6 @@ const AdminUsersPage = () => {
 
       if (error) throw error;
       
-      // Rafraîchir la liste après la mise à jour
       await fetchUsers();
     } catch (error: any) {
       console.error('Erreur lors de la modification du statut:', error);
@@ -252,7 +242,6 @@ const AdminUsersPage = () => {
     }
 
     if (user && !isAdmin) {
-      // Vérifier à nouveau après rafraîchissement
       refreshUserRoles().then(() => {
         if (!isAdmin) {
           toast({

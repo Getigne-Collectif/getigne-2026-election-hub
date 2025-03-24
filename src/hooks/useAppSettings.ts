@@ -30,7 +30,13 @@ export function useAppSettings() {
         data.forEach((setting) => {
           switch (setting.key) {
             case 'show_program':
-              formattedSettings.showProgram = setting.value.enabled;
+              // Vérifier si value est un objet avec une propriété enabled
+              if (typeof setting.value === 'object' && setting.value !== null && 'enabled' in setting.value) {
+                formattedSettings.showProgram = setting.value.enabled === true;
+              } else {
+                console.warn('Format inattendu pour le paramètre show_program:', setting.value);
+                formattedSettings.showProgram = false;
+              }
               break;
             default:
               formattedSettings[setting.key] = setting.value;
