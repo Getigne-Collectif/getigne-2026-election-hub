@@ -60,7 +60,8 @@ const Navbar = () => {
       </li>
       <li className="relative group">
         <div className="flex items-center cursor-pointer">
-          <span
+          <Link
+            to="/objectif-2026"
             className={
               isActive('/objectif-2026') ||
               isActive('/objectif-2026/programme') ||
@@ -70,7 +71,7 @@ const Navbar = () => {
             }
           >
             Objectif 2026
-          </span>
+          </Link>
           <ChevronDown
             size={16}
             className="ml-1 transition-transform group-hover:rotate-180"

@@ -322,11 +322,6 @@ export type Database = {
           comments_enabled: boolean | null
           content: string
           created_at: string
-          news_to_tags: Array<{
-            news_tags: {
-              name: string;
-            };
-          }>;
           date: string
           excerpt: string
           id: string
