@@ -12,7 +12,6 @@ import NewsPage from "./pages/NewsPage";
 import NewsDetailPage from "./pages/NewsDetailPage";
 import AgendaPage from "./pages/AgendaPage";
 import EventDetailPage from "./pages/EventDetailPage";
-import TeamPage from "./pages/TeamPage";
 import CommitteesPage from "./pages/CommitteesPage";
 import CommitteePage from "./pages/CommitteePage";
 import SiteMapPage from "./pages/SiteMapPage";
@@ -28,6 +27,8 @@ import ProfileSetupModal from "@/components/auth/ProfileSetupModal.tsx";
 import AdminNewsEditorPage from './pages/AdminNewsEditorPage';
 import AdminEventsPage from './pages/AdminEventsPage';
 import AdminEventEditorPage from './pages/AdminEventEditorPage';
+import ObjectifPage from './pages/ObjectifPage';
+import AdminSettingsPage from './pages/AdminSettingsPage';
 
 const queryClient = new QueryClient();
 
@@ -42,29 +43,45 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/programme" element={<ProgramPage />} />
+              
+              {/* Objectif 2026 et sous-pages */}
+              <Route path="/objectif-2026" element={<ObjectifPage />} />
+              <Route path="/objectif-2026/programme" element={<ProgramPage />} />
+              <Route path="/objectif-2026/commissions" element={<CommitteesPage />} />
+              <Route path="/objectif-2026/commissions/:id" element={<CommitteePage />} />
+              
+              {/* Route principale pour "Qui sommes-nous" */}
+              <Route path="/qui-sommes-nous" element={<AboutUsPage />} />
+              
+              {/* Routes existantes */}
               <Route path="/actualites" element={<NewsPage />} />
               <Route path="/actualites/:slug" element={<NewsDetailPage />} />
               <Route path="/agenda" element={<AgendaPage />} />
               <Route path="/agenda/:id" element={<EventDetailPage />} />
               <Route path="/agenda/:slug" element={<EventDetailPage />} />
-              <Route path="/equipe" element={<TeamPage />} />
-              <Route path="/commissions" element={<CommitteesPage />} />
-              <Route path="/commissions/:id" element={<CommitteePage />} />
               <Route path="/plan-du-site" element={<SiteMapPage />} />
               <Route path="/adherer" element={<JoinPage />} />
-              <Route path="/qui-sommes-nous" element={<AboutUsPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/mentions-legales" element={<LegalPage />} />
-              <Route path="/admin/users" element={<AdminUsersPage />} />
-              <Route path="/admin/news" element={<AdminNewsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+              
+              {/* Routes d'administration */}
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/news" element={<AdminNewsPage />} />
               <Route path="/admin/news/new" element={<AdminNewsEditorPage />} />
               <Route path="/admin/news/edit/:id" element={<AdminNewsEditorPage />} />
               <Route path="/admin/events" element={<AdminEventsPage />} />
               <Route path="/admin/events/new" element={<AdminEventEditorPage />} />
               <Route path="/admin/events/edit/:id" element={<AdminEventEditorPage />} />
+              <Route path="/admin/settings" element={<AdminSettingsPage />} />
+              
+              {/* Routes de compatibilité (redirections pour les anciens liens) */}
+              <Route path="/programme" element={<ProgramPage />} />
+              <Route path="/equipe" element={<AboutUsPage />} />
+              <Route path="/commissions" element={<CommitteesPage />} />
+              <Route path="/commissions/:id" element={<CommitteePage />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

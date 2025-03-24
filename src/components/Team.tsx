@@ -112,7 +112,7 @@ const Team = () => {
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Les membres du collectif</h2>
           <p className="text-getigne-700 text-lg">
-            Découvrez les personnes engagées qui portent le projet  pour les élections municipales de 2026.
+            Découvrez les personnes engagées qui portent le projet pour les élections municipales de 2026.
           </p>
         </div>
 
@@ -127,8 +127,8 @@ const Team = () => {
             asChild
             className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
           >
-            <Link to="/equipe">
-              L'équipe complète
+            <Link to="/qui-sommes-nous">
+              En savoir plus sur le collectif
             </Link>
           </Button>
         </div>

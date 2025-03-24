@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, Shield } from 'lucide-react';
+import { Menu, ChevronDown, Shield, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from './AuthButton';
@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { isAdmin, user, refreshUserRoles } = useAuth();
+  const { isAdmin, user, refreshUserRoles, userRoles } = useAuth();
   const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
 
   useEffect(() => {
@@ -31,6 +31,8 @@ const Navbar = () => {
       ? 'text-getigne-accent'
       : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200';
   };
+
+  const isProgramManager = userRoles.includes('program_manager') || userRoles.includes('admin');
 
   // Modified useEffect to prevent infinite loop
   useEffect(() => {
@@ -56,10 +58,43 @@ const Navbar = () => {
           Accueil
         </Link>
       </li>
-      <li>
-        <Link to="/programme" className={isActive('/programme')}>
-          Programme
-        </Link>
+      <li className="relative group">
+        <div className="flex items-center cursor-pointer">
+          <span
+            className={
+              isActive('/objectif-2026') ||
+              isActive('/objectif-2026/programme') ||
+              isActive('/objectif-2026/commissions')
+                ? 'text-getigne-accent'
+                : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
+            }
+          >
+            Objectif 2026
+          </span>
+          <ChevronDown
+            size={16}
+            className="ml-1 transition-transform group-hover:rotate-180"
+          />
+        </div>
+        <ul className="absolute left-0 mt-2 bg-white shadow-md rounded-md py-2 w-48 z-10 hidden group-hover:block">
+          <li className="px-4 py-2 hover:bg-getigne-50">
+            <Link to="/objectif-2026" className="block">
+              Notre projet
+            </Link>
+          </li>
+          {(isProgramManager || location.pathname === '/objectif-2026/programme') && (
+            <li className="px-4 py-2 hover:bg-getigne-50">
+              <Link to="/objectif-2026/programme" className="block">
+                Programme
+              </Link>
+            </li>
+          )}
+          <li className="px-4 py-2 hover:bg-getigne-50">
+            <Link to="/objectif-2026/commissions" className="block">
+              Commissions citoyennes
+            </Link>
+          </li>
+        </ul>
       </li>
       <li>
         <Link to="/actualites" className={isActive('/actualites')}>
@@ -71,47 +106,51 @@ const Navbar = () => {
           Agenda
         </Link>
       </li>
-      <li className="relative group">
-        <div className="flex items-center cursor-pointer">
-          <span
-            className={
-              isActive('/equipe') ||
-              isActive('/commissions') ||
-              isActive('/qui-sommes-nous')
-                ? 'text-getigne-accent'
-                : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
-            }
-          >
-            Le collectif
-          </span>
-          <ChevronDown
-            size={16}
-            className="ml-1 transition-transform group-hover:rotate-180"
-          />
-        </div>
-        <ul className="absolute left-0 mt-2 bg-white shadow-md rounded-md py-2 w-48 z-10 hidden group-hover:block">
-          <li className="px-4 py-2 hover:bg-getigne-50">
-            <Link to="/equipe" className="block">
-              Notre équipe
-            </Link>
-          </li>
-          <li className="px-4 py-2 hover:bg-getigne-50">
-            <Link to="/commissions" className="block">
-              Commissions citoyennes
-            </Link>
-          </li>
-          <li className="px-4 py-2 hover:bg-getigne-50">
-            <Link to="/qui-sommes-nous" className="block">
-              Qui sommes-nous ?
-            </Link>
-          </li>
-        </ul>
+      <li>
+        <Link to="/qui-sommes-nous" className={isActive('/qui-sommes-nous')}>
+          Qui sommes-nous ?
+        </Link>
       </li>
       <li>
         <Link to="/adherer" className={isActive('/adherer')}>
           Adhérer
         </Link>
       </li>
+      {isAdmin && (
+        <li className="relative group">
+          <div className="flex items-center cursor-pointer">
+            <span className="text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200">
+              Admin
+            </span>
+            <ChevronDown
+              size={16}
+              className="ml-1 transition-transform group-hover:rotate-180"
+            />
+          </div>
+          <ul className="absolute left-0 mt-2 bg-white shadow-md rounded-md py-2 w-48 z-10 hidden group-hover:block">
+            <li className="px-4 py-2 hover:bg-getigne-50">
+              <Link to="/admin/users" className="block">
+                Utilisateurs
+              </Link>
+            </li>
+            <li className="px-4 py-2 hover:bg-getigne-50">
+              <Link to="/admin/news" className="block">
+                Actualités
+              </Link>
+            </li>
+            <li className="px-4 py-2 hover:bg-getigne-50">
+              <Link to="/admin/events" className="block">
+                Événements
+              </Link>
+            </li>
+            <li className="px-4 py-2 hover:bg-getigne-50">
+              <Link to="/admin/settings" className="block">
+                Paramètres
+              </Link>
+            </li>
+          </ul>
+        </li>
+      )}
     </>
   );
 
@@ -140,6 +179,21 @@ const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             <AuthButton />
+
+            {/* Admin Settings Button for quick access */}
+            {isAdmin && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:flex"
+                aria-label="Paramètres"
+                asChild
+              >
+                <Link to="/admin/settings">
+                  <Settings className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
 
             {/* Mobile Navigation */}
             <Sheet>

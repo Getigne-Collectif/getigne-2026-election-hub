@@ -387,6 +387,19 @@ const UserManagement: React.FC<UserManagementProps> = ({
                   onCheckedChange={() => handleRoleToggle('moderator')}
                 />
               </div>
+
+              {/* Nouveau switch pour le rôle Program Manager */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <PenTool className="h-5 w-5 text-green-500" />
+                  <Label htmlFor="program-manager-role">Équipe Programme</Label>
+                </div>
+                <Switch
+                  id="program-manager-role"
+                  checked={hasRole(selectedUser, 'program_manager')}
+                  onCheckedChange={() => handleRoleToggle('program_manager')}
+                />
+              </div>
             </div>
           )}
 
