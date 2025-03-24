@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -80,7 +81,8 @@ const AdminNewsPage = () => {
 
       if (newsError) throw newsError;
 
-      const transformedData = newsData.map(article => {
+      const transformedData = newsData.map((article: any) => {
+        // Add explicit type for article to include news_to_tags
         const tags = article.news_to_tags 
           ? article.news_to_tags.map((tag: any) => tag.news_tags.name) 
           : [];
@@ -94,10 +96,10 @@ const AdminNewsPage = () => {
           author_id: article.author_id || null,
           publication_date: article.publication_date || null,
           news_to_tags: article.news_to_tags || []
-        };
+        } as NewsArticle; // Explicitly cast to NewsArticle type
       });
 
-      setNewsArticles(transformedData as NewsArticle[]);
+      setNewsArticles(transformedData);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des actualités:', error);
       toast({
