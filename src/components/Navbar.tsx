@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, Shield, Settings } from 'lucide-react';
+import { Menu, ChevronDown, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from './AuthButton';
@@ -145,16 +145,16 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <AuthButton />
 
-            {/* Admin Settings Button for quick access */}
+            {/* Admin Settings Button for quick access - Changed to point to dashboard */}
             {isAdmin && (
               <Button
                 variant="ghost"
                 size="icon"
                 className="hidden md:flex"
-                aria-label="Paramètres"
+                aria-label="Administration"
                 asChild
               >
-                <Link to="/admin/settings">
+                <Link to="/admin">
                   <Settings className="h-5 w-5" />
                 </Link>
               </Button>

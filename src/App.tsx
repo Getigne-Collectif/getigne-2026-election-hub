@@ -29,6 +29,7 @@ import AdminEventsPage from './pages/AdminEventsPage';
 import AdminEventEditorPage from './pages/AdminEventEditorPage';
 import ObjectifPage from './pages/ObjectifPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ function App() {
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
               
               {/* Routes d'administration */}
+              <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/news" element={<AdminNewsPage />} />
               <Route path="/admin/news/new" element={<AdminNewsEditorPage />} />

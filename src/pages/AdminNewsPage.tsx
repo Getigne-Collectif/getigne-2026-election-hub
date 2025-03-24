@@ -81,8 +81,9 @@ const AdminNewsPage = () => {
 
       if (newsError) throw newsError;
 
+      // Utilisez une annotation de type explicite pour article pour résoudre l'erreur TypeScript
       const transformedData = newsData.map((article: any) => {
-        // Add explicit type for article to include news_to_tags
+        // Utilisez any pour le paramètre article pour éviter les problèmes TypeScript
         const tags = article.news_to_tags 
           ? article.news_to_tags.map((tag: any) => tag.news_tags.name) 
           : [];
@@ -96,7 +97,7 @@ const AdminNewsPage = () => {
           author_id: article.author_id || null,
           publication_date: article.publication_date || null,
           news_to_tags: article.news_to_tags || []
-        } as NewsArticle; // Explicitly cast to NewsArticle type
+        } as NewsArticle; // Cast explicite vers NewsArticle
       });
 
       setNewsArticles(transformedData);
