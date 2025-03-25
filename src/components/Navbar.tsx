@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, Settings } from 'lucide-react';
+import { Menu, ChevronDown, Settings, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from './AuthButton';
@@ -34,9 +33,7 @@ const Navbar = () => {
 
   const isProgramManager = userRoles.includes('program_manager') || userRoles.includes('admin');
 
-  // Modified useEffect to prevent infinite loop
   useEffect(() => {
-    // Only refresh roles on initial load or when user changes
     if (user && !hasRefreshedRoles) {
       console.log('Navbar admin status check:', { isAdmin, userId: user.id });
       refreshUserRoles();
@@ -44,7 +41,6 @@ const Navbar = () => {
     }
   }, [user, refreshUserRoles, isAdmin, hasRefreshedRoles]);
 
-  // Reset the refresh flag when user changes
   useEffect(() => {
     if (user === null) {
       setHasRefreshedRoles(false);
@@ -59,18 +55,18 @@ const Navbar = () => {
         </Link>
       </li>
       <li>
-          <Link
-            to="/objectif-2026"
-            className={
-              isActive('/objectif-2026') ||
-              isActive('/objectif-2026/programme') ||
-              isActive('/objectif-2026/commissions')
-                ? 'text-getigne-accent'
-                : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
-            }
-          >
-            Objectif 2026
-          </Link>
+        <Link
+          to="/objectif-2026"
+          className={
+            isActive('/objectif-2026') ||
+            isActive('/objectif-2026/programme') ||
+            isActive('/objectif-2026/commissions')
+              ? 'text-getigne-accent'
+              : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
+          }
+        >
+          Objectif 2026
+        </Link>
       </li>
       <li>
         <Link to="/actualites" className={isActive('/actualites')}>
@@ -95,6 +91,33 @@ const Navbar = () => {
     </>
   );
 
+  const AdminLinks = () => {
+    if (!isAdmin) return null;
+    
+    return (
+      <>
+        <li className="pt-2 pb-2 border-t border-gray-200 mt-4">
+          <span className="text-sm text-muted-foreground">Administration</span>
+        </li>
+        <li>
+          <Link to="/admin" className={isActive('/admin')}>
+            Dashboard
+          </Link>
+        </li>
+        <li>
+          <Link to="/admin/pages" className={isActive('/admin/pages')}>
+            Pages
+          </Link>
+        </li>
+        <li>
+          <Link to="/admin/menu" className={isActive('/admin/menu')}>
+            Menu
+          </Link>
+        </li>
+      </>
+    );
+  };
+
   return (
     <header
       className={`fixed w-full top-0 left-0 z-50 py-3 transition-all duration-300 ${
@@ -111,7 +134,6 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:block">
             <ul className="flex space-x-8 items-center">
               <NavLinks />
@@ -121,7 +143,6 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <AuthButton />
 
-            {/* Admin Settings Button for quick access - Changed to point to dashboard */}
             {isAdmin && (
               <Button
                 variant="ghost"
@@ -136,7 +157,6 @@ const Navbar = () => {
               </Button>
             )}
 
-            {/* Mobile Navigation */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button
@@ -152,6 +172,7 @@ const Navbar = () => {
                 <nav className="mt-8">
                   <ul className="space-y-6 text-lg">
                     <NavLinks />
+                    <AdminLinks />
                   </ul>
                 </nav>
               </SheetContent>

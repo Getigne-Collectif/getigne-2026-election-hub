@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Separator } from "@/components/ui/separator";
 import { cn } from '@/lib/utils';
+import { FileText, Menu as MenuIcon } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -18,8 +19,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { label: 'Utilisateurs', path: '/admin/users' },
     { label: 'Actualités', path: '/admin/news' },
     { label: 'Événements', path: '/admin/events' },
-    { label: 'Pages', path: '/admin/pages' },
-    { label: 'Menu', path: '/admin/menu' },
+    { label: 'Pages', path: '/admin/pages', icon: <FileText className="mr-2 h-4 w-4" /> },
+    { label: 'Menu', path: '/admin/menu', icon: <MenuIcon className="mr-2 h-4 w-4" /> },
     { label: 'Paramètres', path: '/admin/settings' },
   ];
 
@@ -38,12 +39,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                       key={item.path}
                       to={item.path}
                       className={cn(
-                        "block px-3 py-2 rounded-md transition-colors",
+                        "block px-3 py-2 rounded-md transition-colors flex items-center",
                         location.pathname === item.path
                           ? "bg-getigne-100 text-getigne-900 font-medium"
                           : "hover:bg-getigne-50 text-getigne-700"
                       )}
                     >
+                      {item.icon}
                       {item.label}
                     </Link>
                   ))}

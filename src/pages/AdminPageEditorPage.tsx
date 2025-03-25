@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -175,7 +174,6 @@ const AdminPageEditorPage = () => {
     const title = e.target.value;
     form.setValue('title', title);
     
-    // Only auto-generate slug if the slug is empty or hasn't been manually edited
     if (!form.getValues('slug') || form.getValues('slug') === generateSlug(form.getValues('title'))) {
       form.setValue('slug', generateSlug(title));
     }
@@ -184,7 +182,6 @@ const AdminPageEditorPage = () => {
   const handleSubmit = async (values: FormValues, status: 'draft' | 'published') => {
     setIsSubmitting(true);
     try {
-      // Check if the parent ID would create a circular reference
       if (isEditMode && values.parent_id === id) {
         toast({
           title: "Erreur",
@@ -195,12 +192,11 @@ const AdminPageEditorPage = () => {
         return;
       }
 
-      // Check if slug is unique
       const { data: existingPage, error: slugCheckError } = await supabase
         .from('pages')
         .select('id')
         .eq('slug', values.slug)
-        .not('id', 'eq', isEditMode ? id : '');
+        .not('id', 'eq', isEditMode ? id : '0');
 
       if (slugCheckError) throw slugCheckError;
 
