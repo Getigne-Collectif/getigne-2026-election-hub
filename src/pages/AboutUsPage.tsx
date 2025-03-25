@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { 
-  Calendar, 
-  Users, 
-  Lightbulb, 
-  Target, 
-  HandshakeIcon, 
-  Heart 
+import {
+  Calendar,
+  Users,
+  Lightbulb,
+  Target,
+  HandshakeIcon,
+  Heart
 } from 'lucide-react';
 
 const AboutUsPage = () => {
@@ -31,7 +31,7 @@ const AboutUsPage = () => {
 
       <div className="page-content">
         <Navbar />
-        
+
         <div className="pt-24 bg-getigne-50">
           <div className="container mx-auto px-4 py-16">
             <div className="max-w-3xl mx-auto text-center mb-12">
@@ -49,20 +49,20 @@ const AboutUsPage = () => {
                 <div className="p-8 md:p-12 flex flex-col justify-center">
                   <h2 className="text-3xl font-bold mb-6 text-getigne-900">Notre histoire</h2>
                   <p className="text-getigne-700 mb-4">
-                    Le Gétigné Collectif est né en 2020 d'une volonté commune de proposer une alternative 
-                    pour la gestion de notre commune, fondée sur la participation citoyenne, 
+                    Gétigné Collectif est né en 2020 d'une volonté commune de proposer une alternative
+                    pour la gestion de notre commune, fondée sur la participation citoyenne,
                     la transparence et l'intérêt général.
                   </p>
                   <p className="text-getigne-700 mb-4">
-                    Depuis, notre collectif s'est structuré et enrichi de nouvelles compétences. 
-                    Nous sommes aujourd'hui un groupe diversifié de citoyens engagés, aux parcours 
+                    Depuis, notre collectif s'est structuré et enrichi de nouvelles compétences.
+                    Nous sommes aujourd'hui un groupe diversifié de citoyens engagés, aux parcours
                     et expertises variés, unis par la même vision pour Gétigné.
                   </p>
                 </div>
                 <div className="h-64 md:h-auto bg-getigne-100">
-                  <img 
-                    src="/lovable-uploads/07e7372b-7c2e-4584-9a92-9becd5096172.png" 
-                    alt="Réunion du collectif" 
+                  <img
+                    src="/placeholder.svg"
+                    alt="Réunion du collectif"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -85,7 +85,7 @@ const AboutUsPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Innovation</h3>
                   <p className="text-getigne-700">
-                    Nous croyons à l'innovation comme levier de transformation de notre commune, 
+                    Nous croyons à l'innovation comme levier de transformation de notre commune,
                     en explorant de nouvelles idées pour répondre aux défis d'aujourd'hui et de demain.
                   </p>
                 </div>
@@ -96,7 +96,7 @@ const AboutUsPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Inclusion</h3>
                   <p className="text-getigne-700">
-                    Nous sommes attachés à une commune qui n'oublie personne, où chacun peut 
+                    Nous sommes attachés à une commune qui n'oublie personne, où chacun peut
                     trouver sa place et contribuer à la vie locale selon ses moyens et ses capacités.
                   </p>
                 </div>
@@ -107,7 +107,7 @@ const AboutUsPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Transparence</h3>
                   <p className="text-getigne-700">
-                    Nous défendons une gestion transparente des affaires publiques, où les 
+                    Nous défendons une gestion transparente des affaires publiques, où les
                     décisions sont expliquées et où les citoyens ont accès à l'information.
                   </p>
                 </div>
@@ -118,7 +118,7 @@ const AboutUsPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Solidarité</h3>
                   <p className="text-getigne-700">
-                    Nous promouvons l'entraide et le soutien mutuel comme fondements 
+                    Nous promouvons l'entraide et le soutien mutuel comme fondements
                     d'une communauté résiliente face aux défis sociaux et environnementaux.
                   </p>
                 </div>
@@ -129,7 +129,7 @@ const AboutUsPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Coopération</h3>
                   <p className="text-getigne-700">
-                    Nous privilégions la coopération plutôt que la compétition, en favorisant 
+                    Nous privilégions la coopération plutôt que la compétition, en favorisant
                     les partenariats et les projets collectifs pour le bien commun.
                   </p>
                 </div>
@@ -140,7 +140,7 @@ const AboutUsPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-3">Durabilité</h3>
                   <p className="text-getigne-700">
-                    Nous intégrons systématiquement les enjeux environnementaux dans nos réflexions, 
+                    Nous intégrons systématiquement les enjeux environnementaux dans nos réflexions,
                     pour préserver notre cadre de vie et préparer un avenir durable.
                   </p>
                 </div>
@@ -160,36 +160,36 @@ const AboutUsPage = () => {
                 <div className="bg-white p-6 rounded-xl shadow-sm">
                   <h3 className="text-xl font-semibold mb-3">Écologique</h3>
                   <p className="text-getigne-700">
-                    Qui préserve son patrimoine naturel, développe les mobilités douces, 
+                    Qui préserve son patrimoine naturel, développe les mobilités douces,
                     favorise les circuits courts et prépare la transition énergétique.
                   </p>
                 </div>
-                
+
                 <div className="bg-white p-6 rounded-xl shadow-sm">
                   <h3 className="text-xl font-semibold mb-3">Solidaire</h3>
                   <p className="text-getigne-700">
-                    Où l'entraide est valorisée, où les services publics sont accessibles à tous, 
+                    Où l'entraide est valorisée, où les services publics sont accessibles à tous,
                     et où la vie associative est dynamique et soutenue.
                   </p>
                 </div>
-                
+
                 <div className="bg-white p-6 rounded-xl shadow-sm">
                   <h3 className="text-xl font-semibold mb-3">Participative</h3>
                   <p className="text-getigne-700">
-                    Qui implique réellement ses habitants dans les décisions, avec des espaces 
+                    Qui implique réellement ses habitants dans les décisions, avec des espaces
                     de dialogue, des budgets participatifs et des consultations régulières.
                   </p>
                 </div>
-                
+
                 <div className="bg-white p-6 rounded-xl shadow-sm">
                   <h3 className="text-xl font-semibold mb-3">Innovante</h3>
                   <p className="text-getigne-700">
-                    Qui encourage les initiatives locales, soutient l'économie sociale et solidaire, 
+                    Qui encourage les initiatives locales, soutient l'économie sociale et solidaire,
                     et développe des solutions créatives pour répondre aux besoins des habitants.
                   </p>
                 </div>
               </div>
-              
+
               <div className="text-center mt-8">
                 <Button asChild className="bg-getigne-accent hover:bg-getigne-accent/90">
                   <Link to="/objectif-2026">Découvrir notre projet pour 2026</Link>
@@ -201,7 +201,7 @@ const AboutUsPage = () => {
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-6">Rejoignez le collectif</h2>
               <p className="text-getigne-700 mb-8 max-w-2xl mx-auto">
-                Vous partagez nos valeurs et notre vision pour Gétigné ? 
+                Vous partagez nos valeurs et notre vision pour Gétigné ?
                 Rejoignez-nous et participez à la construction d'une commune où il fait bon vivre, ensemble.
               </p>
               <div className="flex justify-center gap-4 flex-wrap">
@@ -215,7 +215,7 @@ const AboutUsPage = () => {
             </div>
           </div>
         </div>
-        
+
         <Footer />
       </div>
     </HelmetProvider>
