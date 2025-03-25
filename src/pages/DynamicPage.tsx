@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
@@ -38,40 +37,35 @@ interface BreadcrumbPageItem {
 
 const DynamicPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbPageItem[]>([]);
+  const [redirecting, setRedirecting] = useState(false);
 
-  // Extract the full path from the location pathname
-  // The format will be /pages/parent-slug/child-slug/etc
   useEffect(() => {
     const fetchPageByPath = async () => {
       setLoading(true);
       try {
-        // Split the path and remove empty segments
         const pathParts = location.pathname.split('/').filter(Boolean);
         
-        // Remove the "pages" part
         if (pathParts[0] === 'pages') {
           pathParts.shift();
         }
         
-        // If there are no remaining parts, show an error
         if (pathParts.length === 0) {
           setError('Page non trouvée');
           setLoading(false);
           return;
         }
         
-        // The last part of the path is the current page slug
         const currentSlug = pathParts[pathParts.length - 1];
         
         console.log('Fetching page with slug:', currentSlug);
         console.log('Full path parts:', pathParts);
         
-        // First, try to fetch the page directly by slug
         const { data: pageData, error: pageError } = await supabase
           .from('pages')
           .select('*')
@@ -85,34 +79,37 @@ const DynamicPage = () => {
           return;
         }
         
-        // If we found the page, now check if its hierarchy matches the URL path
-        if (pathParts.length > 1) {
-          // We need to verify the hierarchy by traversing up the parent chain
-          let currentPage = pageData;
-          let hierarchyPath = [currentSlug];
-          
-          // Build the actual hierarchy of the page
-          while (currentPage.parent_id) {
-            const { data: parentData, error: parentError } = await supabase
-              .from('pages')
-              .select('*')
-              .eq('id', currentPage.parent_id)
-              .single();
-              
-            if (parentError || !parentData) break;
+        let currentPage = pageData;
+        let hierarchyPath = [currentSlug];
+        
+        while (currentPage.parent_id) {
+          const { data: parentData, error: parentError } = await supabase
+            .from('pages')
+            .select('*')
+            .eq('id', currentPage.parent_id)
+            .single();
             
-            hierarchyPath.unshift(parentData.slug);
-            currentPage = parentData;
-          }
+          if (parentError || !parentData) break;
           
-          console.log('Expected path:', pathParts);
-          console.log('Actual hierarchy:', hierarchyPath);
+          hierarchyPath.unshift(parentData.slug);
+          currentPage = parentData;
+        }
+        
+        console.log('Expected path:', hierarchyPath);
+        console.log('Actual path from URL:', pathParts);
+        
+        if (pathParts.length !== hierarchyPath.length || 
+            !pathParts.every((part, index) => part === hierarchyPath[index])) {
           
-          // Check if the URL path matches the actual hierarchy
-          const isValidPath = pathParts.length === hierarchyPath.length && 
-            pathParts.every((part, index) => part === hierarchyPath[index]);
+          if (pathParts.length === 1 && pathParts[0] === currentSlug) {
+            console.log('Redirecting to full path:', hierarchyPath);
+            setRedirecting(true);
             
-          if (!isValidPath) {
+            const fullPath = `/pages/${hierarchyPath.join('/')}`;
+            
+            navigate(fullPath, { replace: true });
+            return;
+          } else {
             setError('Page non trouvée - chemin incorrect');
             setLoading(false);
             return;
@@ -132,7 +129,7 @@ const DynamicPage = () => {
     };
 
     fetchPageByPath();
-  }, [location.pathname]);
+  }, [location.pathname, navigate]);
 
   const fetchBreadcrumbItems = async (currentPageId: string, parentId: string | null) => {
     if (!parentId) {
@@ -168,11 +165,24 @@ const DynamicPage = () => {
     }
   };
 
-  // Helper function to build page URL with full hierarchy
   const getPageUrl = (slug: string, items: BreadcrumbPageItem[]) => {
     const path = items.map(item => item.slug).join('/');
     return path ? `/pages/${path}/${slug}` : `/pages/${slug}`;
   };
+
+  if (redirecting) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 container mx-auto px-4 pt-24 pb-16">
+          <div className="flex justify-center items-center h-64">
+            <p>Redirection en cours...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -91,12 +90,10 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
 
       if (error) throw error;
 
-      // Update the status in the local state
       const updatedPages = pages.map(p => 
         p.id === page.id ? { ...p, status: newStatus } : p
       );
 
-      // This will trigger a refetch in the parent component
       toast({
         title: newStatus === 'published' ? "Page publiée" : "Page dépubliée",
         description: newStatus === 'published' 
@@ -104,7 +101,7 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
           : "La page n'est plus visible sur le site",
       });
       
-      window.location.reload(); // Refresh to update the table
+      window.location.reload();
     } catch (error) {
       console.error("Error toggling page status:", error);
       toast({
@@ -115,14 +112,32 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
     }
   };
 
+  const buildFullPagePath = async (pageId: string): Promise<string> => {
+    const pathSegments: string[] = [];
+    let currentPageId = pageId;
+    const visited = new Set<string>();
+
+    while (currentPageId && !visited.has(currentPageId)) {
+      visited.add(currentPageId);
+      
+      const currentPage = pages.find(p => p.id === currentPageId);
+      
+      if (!currentPage) break;
+      
+      pathSegments.unshift(currentPage.slug);
+      
+      currentPageId = currentPage.parent_id;
+    }
+    
+    return `/pages/${pathSegments.join('/')}`;
+  };
+
   const filteredPages = pages.filter(page => {
     const searchLower = searchTerm.toLowerCase();
     
-    // Filter by search term
     const matchesSearch = page.title.toLowerCase().includes(searchLower) || 
                         page.slug.toLowerCase().includes(searchLower);
     
-    // Filter by status
     const matchesStatus = statusFilter === 'all' || page.status === statusFilter;
     
     return matchesSearch && matchesStatus;
@@ -227,12 +242,13 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      asChild
+                      onClick={async () => {
+                        const fullPath = await buildFullPagePath(page.id);
+                        window.open(fullPath, '_blank');
+                      }}
                       title="Voir la page"
                     >
-                      <Link to={`/pages/${page.slug}`} target="_blank">
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
+                      <ArrowRight className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="outline"
