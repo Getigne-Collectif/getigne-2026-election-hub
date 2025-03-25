@@ -30,6 +30,10 @@ import AdminEventEditorPage from './pages/AdminEventEditorPage';
 import ObjectifPage from './pages/ObjectifPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminPagesPage from './pages/AdminPagesPage';
+import AdminPageEditorPage from './pages/AdminPageEditorPage';
+import AdminMenuPage from './pages/AdminMenuPage';
+import DynamicPage from './pages/DynamicPage';
 
 const queryClient = new QueryClient();
 
@@ -67,6 +71,9 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
               
+              {/* Routes pour les pages dynamiques */}
+              <Route path="/pages/:slug" element={<DynamicPage />} />
+              
               {/* Routes d'administration */}
               <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
@@ -76,6 +83,10 @@ function App() {
               <Route path="/admin/events" element={<AdminEventsPage />} />
               <Route path="/admin/events/new" element={<AdminEventEditorPage />} />
               <Route path="/admin/events/edit/:id" element={<AdminEventEditorPage />} />
+              <Route path="/admin/pages" element={<AdminPagesPage />} />
+              <Route path="/admin/pages/new" element={<AdminPageEditorPage />} />
+              <Route path="/admin/pages/edit/:id" element={<AdminPageEditorPage />} />
+              <Route path="/admin/menu" element={<AdminMenuPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
               
               {/* Routes de compatibilité (redirections pour les anciens liens) */}

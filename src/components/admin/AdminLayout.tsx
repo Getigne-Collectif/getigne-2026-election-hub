@@ -18,6 +18,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { label: 'Utilisateurs', path: '/admin/users' },
     { label: 'Actualités', path: '/admin/news' },
     { label: 'Événements', path: '/admin/events' },
+    { label: 'Pages', path: '/admin/pages' },
+    { label: 'Menu', path: '/admin/menu' },
     { label: 'Paramètres', path: '/admin/settings' },
   ];
 

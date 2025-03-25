@@ -49,7 +49,7 @@ interface NewsArticle {
   category_id: string;
   category: string;
   tags: string;
-  news_to_tags?: { tags: { name: string } }[];
+  news_to_tags?: { news_tags: { name: string } }[];
 }
 
 interface NewsCategory {
@@ -58,7 +58,7 @@ interface NewsCategory {
 }
 
 const AdminNewsPage = () => {
-  const { isAdmin, authChecked } = useAuth();
+  const { isAdmin, loading: authLoading, authChecked } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -112,7 +112,7 @@ const AdminNewsPage = () => {
           .select(`
             *,
             news_to_tags (
-              tags (
+              news_tags (
                 name
               )
             )
@@ -123,8 +123,8 @@ const AdminNewsPage = () => {
 
         const transformedData = data.map((article: any) => ({
           ...article,
-          category: categories.find(cat => cat.id === article.category_id)?.name || 'Non catégorisé',
-          tags: article.news_to_tags ? article.news_to_tags.map(tag => tag.tags.name).join(', ') : '',
+          category: categories.find(cat => cat.id === article.category_id)?.name || article.category || 'Non catégorisé',
+          tags: article.news_to_tags ? article.news_to_tags.map(tag => tag.news_tags.name).join(', ') : '',
         })) as NewsArticle[];
 
         setArticles(transformedData);
@@ -342,7 +342,7 @@ const AdminNewsPage = () => {
       </Helmet>
 
       <AdminLayout>
-        <div className="container mx-auto py-8">
+        <div className="py-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Gestion des actualités</h1>
             <Button asChild>
