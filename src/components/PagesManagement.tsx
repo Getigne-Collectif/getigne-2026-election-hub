@@ -90,18 +90,17 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
 
       if (error) throw error;
 
-      const updatedPages = pages.map(p => 
+      const updatedPages = pages.map(p =>
         p.id === page.id ? { ...p, status: newStatus } : p
       );
 
       toast({
         title: newStatus === 'published' ? "Page publiée" : "Page dépubliée",
-        description: newStatus === 'published' 
-          ? "La page est maintenant visible sur le site" 
+        description: newStatus === 'published'
+          ? "La page est maintenant visible sur le site"
           : "La page n'est plus visible sur le site",
       });
-      
-      window.location.reload();
+
     } catch (error) {
       console.error("Error toggling page status:", error);
       toast({
@@ -119,27 +118,27 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
 
     while (currentPageId && !visited.has(currentPageId)) {
       visited.add(currentPageId);
-      
+
       const currentPage = pages.find(p => p.id === currentPageId);
-      
+
       if (!currentPage) break;
-      
+
       pathSegments.unshift(currentPage.slug);
-      
+
       currentPageId = currentPage.parent_id;
     }
-    
+
     return `/pages/${pathSegments.join('/')}`;
   };
 
   const filteredPages = pages.filter(page => {
     const searchLower = searchTerm.toLowerCase();
-    
-    const matchesSearch = page.title.toLowerCase().includes(searchLower) || 
+
+    const matchesSearch = page.title.toLowerCase().includes(searchLower) ||
                         page.slug.toLowerCase().includes(searchLower);
-    
+
     const matchesStatus = statusFilter === 'all' || page.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 

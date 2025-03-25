@@ -181,6 +181,7 @@ const AdminDashboardPage = () => {
                   <TabsTrigger value="pages">Pages</TabsTrigger>
                   <TabsTrigger value="news">Actualités</TabsTrigger>
                   <TabsTrigger value="events">Événements</TabsTrigger>
+                  <TabsTrigger value="menu">Menu</TabsTrigger>
                   <TabsTrigger value="settings">Paramètres</TabsTrigger>
                 </TabsList>
                 <TabsContent value="users" className="border rounded-lg p-6">
@@ -256,6 +257,18 @@ const AdminDashboardPage = () => {
                   </p>
                   <Button asChild>
                     <Link to="/admin/settings">Gérer les paramètres</Link>
+                  </Button>
+                </TabsContent>
+                <TabsContent value="menu" className="border rounded-lg p-6">
+                  <h3 className="text-xl font-medium mb-4 flex items-center">
+                    <Settings className="h-5 w-5 mr-2" />
+                    Menu
+                  </h3>
+                  <p className="mb-4">
+                    Configurez le menu.
+                  </p>
+                  <Button asChild>
+                    <Link to="/admin/menu">Gérer le menu</Link>
                   </Button>
                 </TabsContent>
               </Tabs>
