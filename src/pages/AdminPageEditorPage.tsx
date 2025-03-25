@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
 import {
   Breadcrumb,
@@ -70,6 +70,7 @@ const AdminPageEditorPage = () => {
   const { id } = useParams();
   const { user, isAdmin, authChecked } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [pages, setPages] = useState<Page[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!id;
