@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -192,6 +193,7 @@ const AdminPageEditorPage = () => {
         return;
       }
 
+      // Fix here: Added column_name parameter to the .not() method
       const { data: existingPage, error: slugCheckError } = await supabase
         .from('pages')
         .select('id')
