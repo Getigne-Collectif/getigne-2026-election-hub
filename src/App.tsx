@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -71,8 +70,12 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
-              {/* Routes pour les pages dynamiques */}
+              {/* Routes pour les pages dynamiques - supporter la hiérarchie de pages */}
               <Route path="/pages/:slug" element={<DynamicPage />} />
+              <Route path="/pages/:parent/:slug" element={<DynamicPage />} />
+              <Route path="/pages/:grandparent/:parent/:slug" element={<DynamicPage />} />
+              <Route path="/pages/:greatgrandparent/:grandparent/:parent/:slug" element={<DynamicPage />} />
+              <Route path="/pages/:level1/:level2/:level3/:level4/:slug" element={<DynamicPage />} />
 
               {/* Routes d'administration */}
               <Route path="/admin" element={<AdminDashboardPage />} />

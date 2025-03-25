@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
@@ -36,34 +37,91 @@ interface BreadcrumbPageItem {
 }
 
 const DynamicPage = () => {
+  const location = useLocation();
   const { slug } = useParams<{ slug: string }>();
   const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbPageItem[]>([]);
 
+  // Extract the full path from the location pathname
+  // The format will be /pages/parent-slug/child-slug/etc
   useEffect(() => {
-    if (!slug) return;
-    
-    const fetchPage = async () => {
+    const fetchPageByPath = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        // Split the path and remove empty segments
+        const pathParts = location.pathname.split('/').filter(Boolean);
+        
+        // Remove the "pages" part
+        if (pathParts[0] === 'pages') {
+          pathParts.shift();
+        }
+        
+        // If there are no remaining parts, show an error
+        if (pathParts.length === 0) {
+          setError('Page non trouvée');
+          setLoading(false);
+          return;
+        }
+        
+        // The last part of the path is the current page slug
+        const currentSlug = pathParts[pathParts.length - 1];
+        
+        console.log('Fetching page with slug:', currentSlug);
+        console.log('Full path parts:', pathParts);
+        
+        // First, try to fetch the page directly by slug
+        const { data: pageData, error: pageError } = await supabase
           .from('pages')
           .select('*')
-          .eq('slug', slug)
+          .eq('slug', currentSlug)
           .eq('status', 'published')
           .single();
-
-        if (error) throw error;
-        if (!data) {
+          
+        if (pageError || !pageData) {
           setError('Page non trouvée');
-          setPage(null);
-        } else {
-          setPage(data);
-          setError(null);
-          fetchBreadcrumbItems(data.id, data.parent_id);
+          setLoading(false);
+          return;
         }
+        
+        // If we found the page, now check if its hierarchy matches the URL path
+        if (pathParts.length > 1) {
+          // We need to verify the hierarchy by traversing up the parent chain
+          let currentPage = pageData;
+          let hierarchyPath = [currentSlug];
+          
+          // Build the actual hierarchy of the page
+          while (currentPage.parent_id) {
+            const { data: parentData, error: parentError } = await supabase
+              .from('pages')
+              .select('*')
+              .eq('id', currentPage.parent_id)
+              .single();
+              
+            if (parentError || !parentData) break;
+            
+            hierarchyPath.unshift(parentData.slug);
+            currentPage = parentData;
+          }
+          
+          console.log('Expected path:', pathParts);
+          console.log('Actual hierarchy:', hierarchyPath);
+          
+          // Check if the URL path matches the actual hierarchy
+          const isValidPath = pathParts.length === hierarchyPath.length && 
+            pathParts.every((part, index) => part === hierarchyPath[index]);
+            
+          if (!isValidPath) {
+            setError('Page non trouvée - chemin incorrect');
+            setLoading(false);
+            return;
+          }
+        }
+        
+        setPage(pageData);
+        setError(null);
+        fetchBreadcrumbItems(pageData.id, pageData.parent_id);
       } catch (error: any) {
         console.error('Error fetching page:', error);
         setError('Impossible de charger la page');
@@ -73,8 +131,8 @@ const DynamicPage = () => {
       }
     };
 
-    fetchPage();
-  }, [slug]);
+    fetchPageByPath();
+  }, [location.pathname]);
 
   const fetchBreadcrumbItems = async (currentPageId: string, parentId: string | null) => {
     if (!parentId) {
@@ -108,6 +166,12 @@ const DynamicPage = () => {
     } catch (error) {
       console.error('Error building breadcrumb:', error);
     }
+  };
+
+  // Helper function to build page URL with full hierarchy
+  const getPageUrl = (slug: string, items: BreadcrumbPageItem[]) => {
+    const path = items.map(item => item.slug).join('/');
+    return path ? `/pages/${path}/${slug}` : `/pages/${slug}`;
   };
 
   if (loading) {
@@ -163,11 +227,13 @@ const DynamicPage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               
-              {breadcrumbItems.map((item) => (
+              {breadcrumbItems.map((item, index) => (
                 <React.Fragment key={item.id}>
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                      <Link to={`/pages/${item.slug}`}>{item.title}</Link>
+                      <Link to={getPageUrl(item.slug, breadcrumbItems.slice(0, index))}>
+                        {item.title}
+                      </Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />

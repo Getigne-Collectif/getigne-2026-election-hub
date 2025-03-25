@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Send } from "lucide-react";
+import { ArrowLeft, Save, Send, RefreshCw } from "lucide-react";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from "@/components/ui/separator";
@@ -36,7 +36,9 @@ const PageEditorForm: React.FC<PageEditorFormProps> = ({ id }) => {
     isSubmitting,
     handleTitleChange,
     handleSaveAsDraft,
-    handlePublish
+    handlePublish,
+    generateSlugFromTitle,
+    fullUrlPath
   } = usePageEditor(id);
 
   return (
@@ -114,14 +116,32 @@ const PageEditorForm: React.FC<PageEditorFormProps> = ({ id }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>URL</FormLabel>
-                      <div className="flex items-center gap-1">
-                        <span className="text-muted-foreground">/</span>
-                        <FormControl>
-                          <Input
-                            placeholder="url-de-la-page"
-                            {...field}
-                          />
-                        </FormControl>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <FormControl>
+                            <Input
+                              placeholder="url-de-la-page"
+                              {...field}
+                            />
+                          </FormControl>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => {
+                              const newSlug = generateSlugFromTitle();
+                              if (newSlug) field.onChange(newSlug);
+                            }}
+                            title="Générer depuis le titre"
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {fullUrlPath && (
+                          <div className="text-sm text-muted-foreground bg-muted p-2 rounded break-all">
+                            {fullUrlPath}
+                          </div>
+                        )}
                       </div>
                       <FormMessage />
                     </FormItem>

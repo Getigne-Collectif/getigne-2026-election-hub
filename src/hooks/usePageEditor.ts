@@ -14,6 +14,7 @@ export interface Page {
   content: string;
   parent_id: string | null;
   status: string;
+  parent?: Page;
 }
 
 export const pageFormSchema = z.object({
@@ -39,7 +40,9 @@ export const generateSlug = (title: string): string => {
 
 export const usePageEditor = (id?: string) => {
   const [pages, setPages] = useState<Page[]>([]);
+  const [pageHierarchy, setPageHierarchy] = useState<Page[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fullUrlPath, setFullUrlPath] = useState<string>('');
   const isEditMode = !!id;
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -53,6 +56,61 @@ export const usePageEditor = (id?: string) => {
       parent_id: null,
     },
   });
+
+  const buildPageHierarchy = async (pageId: string | null) => {
+    if (!pageId) {
+      setPageHierarchy([]);
+      return [];
+    }
+
+    try {
+      const hierarchy: Page[] = [];
+      let currentPageId = pageId;
+
+      while (currentPageId) {
+        // Find page in already loaded pages
+        let parentPage = pages.find(p => p.id === currentPageId);
+
+        // If not found in loaded pages, fetch it
+        if (!parentPage) {
+          const { data, error } = await supabase
+            .from('pages')
+            .select('*')
+            .eq('id', currentPageId)
+            .single();
+
+          if (error) throw error;
+          parentPage = data;
+        }
+
+        if (!parentPage) break;
+
+        hierarchy.unshift(parentPage);
+        currentPageId = parentPage.parent_id;
+      }
+
+      setPageHierarchy(hierarchy);
+      return hierarchy;
+    } catch (error) {
+      console.error('Error building page hierarchy:', error);
+      return [];
+    }
+  };
+
+  const updateFullUrlPath = async (slug: string, parentId: string | null = null) => {
+    if (!slug) {
+      setFullUrlPath('');
+      return;
+    }
+
+    const idToUse = parentId !== undefined ? parentId : form.getValues('parent_id');
+    const hierarchy = await buildPageHierarchy(idToUse);
+    
+    const path = hierarchy.map(page => page.slug).join('/');
+    const fullPath = path ? `/pages/${path}/${slug}` : `/pages/${slug}`;
+    
+    setFullUrlPath(fullPath);
+  };
 
   const fetchPages = async () => {
     try {
@@ -84,6 +142,9 @@ export const usePageEditor = (id?: string) => {
         content: data.content,
         parent_id: data.parent_id,
       });
+
+      // Update URL path with the fetched page data
+      updateFullUrlPath(data.slug, data.parent_id);
     } catch (error) {
       console.error('Erreur lors de la récupération de la page:', error);
       toast({
@@ -106,8 +167,20 @@ export const usePageEditor = (id?: string) => {
         content: "",
         parent_id: null,
       });
+      setFullUrlPath('');
     }
   }, [id, isEditMode]);
+
+  // Effect to update the full URL path when slug or parent changes
+  useEffect(() => {
+    const subscription = form.watch((values, { name }) => {
+      if (name === 'slug' || name === 'parent_id') {
+        updateFullUrlPath(values.slug as string, values.parent_id as string | null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, pages]);
 
   const handleSaveAsDraft = async (values: FormValues) => {
     await handleSubmit(values, 'draft');
@@ -117,12 +190,20 @@ export const usePageEditor = (id?: string) => {
     await handleSubmit(values, 'published');
   };
 
+  const generateSlugFromTitle = () => {
+    const title = form.getValues('title');
+    if (!title) return null;
+    return generateSlug(title);
+  };
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const title = e.target.value;
     form.setValue('title', title);
     
     if (!form.getValues('slug') || form.getValues('slug') === generateSlug(form.getValues('title'))) {
-      form.setValue('slug', generateSlug(title));
+      const newSlug = generateSlug(title);
+      form.setValue('slug', newSlug);
+      updateFullUrlPath(newSlug);
     }
   };
 
@@ -141,6 +222,41 @@ export const usePageEditor = (id?: string) => {
 
       // Convert "none" value to null for parent_id
       const parentId = values.parent_id === "none" ? null : values.parent_id;
+
+      // Check for circular references in page hierarchy
+      if (parentId) {
+        const visited = new Set<string>();
+        let currentParentId = parentId;
+        
+        while (currentParentId) {
+          if (visited.has(currentParentId)) {
+            toast({
+              title: "Erreur",
+              description: "Référence circulaire détectée dans la hiérarchie des pages.",
+              variant: "destructive"
+            });
+            setIsSubmitting(false);
+            return;
+          }
+          
+          visited.add(currentParentId);
+          
+          const parent = pages.find(p => p.id === currentParentId);
+          if (!parent) break;
+          
+          if (isEditMode && parent.id === id) {
+            toast({
+              title: "Erreur",
+              description: "Référence circulaire détectée dans la hiérarchie des pages.",
+              variant: "destructive"
+            });
+            setIsSubmitting(false);
+            return;
+          }
+          
+          currentParentId = parent.parent_id;
+        }
+      }
 
       const { data: existingPages, error: slugCheckError } = await supabase
         .from('pages')
@@ -220,6 +336,9 @@ export const usePageEditor = (id?: string) => {
     isSubmitting,
     handleTitleChange,
     handleSaveAsDraft,
-    handlePublish
+    handlePublish,
+    generateSlugFromTitle,
+    fullUrlPath,
+    pageHierarchy
   };
 };

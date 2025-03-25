@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, FileEdit, Trash2, Plus, ArrowDown, ArrowUp, ArrowRight } from 'lucide-react';
+import { Search, FileEdit, Trash2, Plus, ArrowDown, ArrowUp, ArrowRight, EyeOff, Eye } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { generatePath, Link, useNavigate } from "react-router-dom";
@@ -79,6 +79,40 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
       return page.title;
     }
     return `${getPageHierarchy(page.parent)} > ${page.title}`;
+  };
+
+  const togglePageStatus = async (page: Page) => {
+    const newStatus = page.status === 'published' ? 'draft' : 'published';
+    try {
+      const { error } = await supabase
+        .from('pages')
+        .update({ status: newStatus })
+        .eq('id', page.id);
+
+      if (error) throw error;
+
+      // Update the status in the local state
+      const updatedPages = pages.map(p => 
+        p.id === page.id ? { ...p, status: newStatus } : p
+      );
+
+      // This will trigger a refetch in the parent component
+      toast({
+        title: newStatus === 'published' ? "Page publiée" : "Page dépubliée",
+        description: newStatus === 'published' 
+          ? "La page est maintenant visible sur le site" 
+          : "La page n'est plus visible sur le site",
+      });
+      
+      window.location.reload(); // Refresh to update the table
+    } catch (error) {
+      console.error("Error toggling page status:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du changement de statut de la page",
+        variant: "destructive"
+      });
+    }
   };
 
   const filteredPages = pages.filter(page => {
@@ -186,6 +220,7 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(`/admin/pages/edit/${page.id}`)}
+                      title="Modifier"
                     >
                       <FileEdit className="h-4 w-4" />
                     </Button>
@@ -193,15 +228,29 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
                       variant="outline"
                       size="sm"
                       asChild
+                      title="Voir la page"
                     >
                       <Link to={`/pages/${page.slug}`} target="_blank">
                         <ArrowRight className="h-4 w-4" />
                       </Link>
                     </Button>
                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => togglePageStatus(page)}
+                      title={page.status === 'published' ? 'Dépublier' : 'Publier'}
+                    >
+                      {page.status === 'published' ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
                       variant="destructive"
                       size="sm"
                       onClick={() => openDeleteDialog(page)}
+                      title="Supprimer"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

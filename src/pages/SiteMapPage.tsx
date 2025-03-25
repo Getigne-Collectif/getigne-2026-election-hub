@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -17,17 +16,18 @@ import {
   Utensils,
   Bike,
   Music,
-  Home
+  Home,
+  FileText
 } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbList, 
+  BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 
-// Map for committee icons
 const committeeIconMap = {
   'Lightbulb': Lightbulb,
   'Bicycle': Bike,
@@ -48,13 +48,21 @@ const getIconColor = (icon: string) => {
   return colorMap[icon] || 'bg-getigne-100 text-getigne-700 border-getigne-200';
 };
 
+interface PageWithHierarchy {
+  id: string;
+  title: string;
+  slug: string;
+  parent_id: string | null;
+  fullPath: string;
+  children?: PageWithHierarchy[];
+  level: number;
+}
+
 const SiteMapPage = () => {
-  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Fetch committees for detailed sitemap
   const committeesQuery = useQuery({
     queryKey: ['citizen_committees'],
     queryFn: async () => {
@@ -68,7 +76,6 @@ const SiteMapPage = () => {
     },
   });
 
-  // Fetch news for detailed sitemap
   const newsQuery = useQuery({
     queryKey: ['news'],
     queryFn: async () => {
@@ -83,7 +90,6 @@ const SiteMapPage = () => {
     },
   });
 
-  // Fetch events for detailed sitemap
   const eventsQuery = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
@@ -97,6 +103,84 @@ const SiteMapPage = () => {
       return data;
     },
   });
+
+  const pagesQuery = useQuery({
+    queryKey: ['pages_sitemap'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('status', 'published')
+        .order('title');
+
+      if (error) throw error;
+      
+      return buildPageHierarchy(data);
+    },
+  });
+
+  const buildPageHierarchy = (pages: any[]): PageWithHierarchy[] => {
+    const pagesMap: Record<string, PageWithHierarchy> = {};
+    
+    pages.forEach(page => {
+      pagesMap[page.id] = {
+        ...page,
+        children: [],
+        level: 0,
+        fullPath: `/pages/${page.slug}`
+      };
+    });
+    
+    const rootPages: PageWithHierarchy[] = [];
+    
+    pages.forEach(page => {
+      if (page.parent_id && pagesMap[page.parent_id]) {
+        const parent = pagesMap[page.parent_id];
+        
+        if (!parent.children) {
+          parent.children = [];
+        }
+        
+        pagesMap[page.id].level = parent.level + 1;
+        pagesMap[page.id].fullPath = `${parent.fullPath}/${page.slug}`;
+        
+        parent.children.push(pagesMap[page.id]);
+      } else {
+        rootPages.push(pagesMap[page.id]);
+      }
+    });
+    
+    return rootPages;
+  };
+
+  const renderPage = (page: PageWithHierarchy) => {
+    return (
+      <React.Fragment key={page.id}>
+        <Link
+          to={page.fullPath}
+          className="p-6 bg-white rounded-lg border border-getigne-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4"
+        >
+          <div className="mt-1 bg-getigne-50 p-2 rounded-full">
+            <FileText className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-getigne-900 mb-2">{page.title}</h3>
+            <p className="text-getigne-700">
+              {page.children && page.children.length > 0 
+                ? `Page contenant ${page.children.length} sous-page${page.children.length > 1 ? 's' : ''}`
+                : 'Page simple'}
+            </p>
+          </div>
+        </Link>
+        
+        {page.children && page.children.length > 0 && (
+          <div className="ml-8 mt-4 grid gap-4">
+            {page.children.map(childPage => renderPage(childPage))}
+          </div>
+        )}
+      </React.Fragment>
+    );
+  };
 
   const mainPages = [
     {
@@ -149,28 +233,54 @@ const SiteMapPage = () => {
     }
   ];
 
+  const dynamicPagesSection = (
+    <section>
+      <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-getigne-100">
+        Pages du site
+      </h2>
+      <div className="space-y-6">
+        {pagesQuery.isLoading ? (
+          <div className="text-center py-6">Chargement des pages...</div>
+        ) : pagesQuery.error ? (
+          <div className="text-center py-6 text-red-500">
+            Erreur lors du chargement des pages
+          </div>
+        ) : pagesQuery.data?.length === 0 ? (
+          <div className="text-center py-6 text-getigne-700">
+            Aucune page disponible pour le moment
+          </div>
+        ) : (
+          <div className="grid gap-6">
+            {pagesQuery.data?.map(page => renderPage(page))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
   return (
     <div className="page-content">
       <Navbar />
       <div className="pt-20">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">
-                <Home className="h-4 w-4 mr-1" />
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Plan du site</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <div className="container mx-auto px-4 pt-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">
+                  <Home className="h-4 w-4 mr-1" />
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Plan du site</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-3xl font-bold mb-8">Plan du site</h1>
 
           <div className="space-y-12">
-            {/* Main Pages */}
             <section>
               <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-getigne-100">
                 Pages principales
@@ -194,7 +304,8 @@ const SiteMapPage = () => {
               </div>
             </section>
 
-            {/* Commissions */}
+            {dynamicPagesSection}
+
             <section>
               <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-getigne-100">
                 Commissions citoyennes
@@ -231,7 +342,6 @@ const SiteMapPage = () => {
               </div>
             </section>
 
-            {/* Latest News */}
             <section>
               <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-getigne-100">
                 Dernières actualités
@@ -286,7 +396,6 @@ const SiteMapPage = () => {
               </div>
             </section>
 
-            {/* Upcoming Events */}
             <section>
               <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-getigne-100">
                 Événements à venir
