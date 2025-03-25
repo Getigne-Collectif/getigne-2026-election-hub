@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -193,16 +192,17 @@ const AdminPageEditorPage = () => {
         return;
       }
 
-      // Fix here: Added column_name parameter to the .not() method
-      const { data: existingPage, error: slugCheckError } = await supabase
+      const { data: existingPages, error: slugCheckError } = await supabase
         .from('pages')
-        .select('id')
-        .eq('slug', values.slug)
-        .not('id', 'eq', isEditMode ? id : '0');
+        .select('id, slug')
+        .eq('slug', values.slug);
 
       if (slugCheckError) throw slugCheckError;
 
-      if (existingPage && existingPage.length > 0) {
+      const slugExists = existingPages && existingPages.length > 0 && 
+        (!isEditMode || existingPages.some(page => page.id !== id));
+
+      if (slugExists) {
         form.setError('slug', { message: 'Cette URL est déjà utilisée par une autre page' });
         setIsSubmitting(false);
         return;
@@ -215,6 +215,8 @@ const AdminPageEditorPage = () => {
         parent_id: values.parent_id || null,
         status
       };
+
+      console.log('Saving page with data:', formData);
 
       if (isEditMode && id) {
         const { error } = await supabase
@@ -231,11 +233,14 @@ const AdminPageEditorPage = () => {
             : "La page a été enregistrée comme brouillon",
         });
       } else {
-        const { error } = await supabase
+        const { error, data } = await supabase
           .from('pages')
-          .insert([formData]);
+          .insert([formData])
+          .select();
 
         if (error) throw error;
+
+        console.log('Page created successfully:', data);
 
         toast({
           title: "Page créée",
