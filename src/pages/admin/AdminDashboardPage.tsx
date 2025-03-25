@@ -1,17 +1,18 @@
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, Users, Newspaper, Calendar, Settings, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext.tsx';
+import { useToast } from '@/components/ui/use-toast.ts';
+import { supabase } from '@/integrations/supabase/client.ts';
+import Navbar from '@/components/Navbar.tsx';
+import Footer from '@/components/Footer.tsx';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
+import {Home, Users, Newspaper, Calendar, Settings, MessageSquare, EditIcon} from 'lucide-react';
+import { Button } from '@/components/ui/button.tsx';
+import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
 const AdminDashboardPage = () => {
   const { user, isAdmin, authChecked } = useAuth();
@@ -105,57 +106,18 @@ const AdminDashboardPage = () => {
     return null;
   }
 
-  const adminLinks = [
-    { title: "Utilisateurs", icon: <Users className="h-5 w-5" />, url: "/admin/users" },
-    { title: "Actualités", icon: <Newspaper className="h-5 w-5" />, url: "/admin/news" },
-    { title: "Événements", icon: <Calendar className="h-5 w-5" />, url: "/admin/events" },
-    { title: "Paramètres", icon: <Settings className="h-5 w-5" />, url: "/admin/settings" }
-  ];
-
   return (
-    <HelmetProvider>
-      <Helmet>
-        <title>Tableau de bord | Administration | Gétigné Collectif</title>
-        <meta
-          name="description"
-          content="Tableau de bord d'administration du site Gétigné Collectif."
-        />
-      </Helmet>
+      <HelmetProvider>
+        <Helmet>
+          <title>Tableau de bord | Administration | Gétigné Collectif</title>
+          <meta
+              name="description"
+              content="Tableau de bord d'administration du site Gétigné Collectif."
+          />
+        </Helmet>
 
-      <div className="page-content">
-        <Navbar />
-
-        <div className="pt-24 pb-12 bg-getigne-50">
-          <div className="container mx-auto px-4">
-            <Breadcrumb className="mb-6">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">
-                    <Home className="h-4 w-4 mr-1" />
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <Link to="/admin">
-                    <BreadcrumbPage>Administration</BreadcrumbPage>
-                  </Link>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            <div className="max-w-3xl mx-auto text-center">
-              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-                Administration
-              </span>
-              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Tableau de bord</h1>
-              <p className="text-getigne-700 text-lg mb-6">
-                Bienvenue dans l'espace d'administration du site Gétigné Collectif.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="py-16">
+        <AdminLayout title="Tableau de bord" description="Bienvenue dans l'espace d'administration du site Gétigné Collectif.">
+          <div className="py-16">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               <Card>
@@ -216,6 +178,7 @@ const AdminDashboardPage = () => {
               <Tabs defaultValue="users">
                 <TabsList className="mb-6">
                   <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+                  <TabsTrigger value="pages">Pages</TabsTrigger>
                   <TabsTrigger value="news">Actualités</TabsTrigger>
                   <TabsTrigger value="events">Événements</TabsTrigger>
                   <TabsTrigger value="settings">Paramètres</TabsTrigger>
@@ -231,6 +194,23 @@ const AdminDashboardPage = () => {
                   <Button asChild>
                     <Link to="/admin/users">Gérer les utilisateurs</Link>
                   </Button>
+                </TabsContent>
+                <TabsContent value="pages" className="border rounded-lg p-6">
+                  <h3 className="text-xl font-medium mb-4 flex items-center">
+                    <EditIcon className="h-5 w-5 mr-2" />
+                    Gestion des pages
+                  </h3>
+                  <p className="mb-4">
+                    Créez, modifiez et supprimez des pages de contenu.
+                  </p>
+                  <div className="flex space-x-4">
+                    <Button asChild>
+                      <Link to="/admin/pages">Gérer les pages</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link to="/admin/pages/new">Créer une nouvelle page</Link>
+                    </Button>
+                  </div>
                 </TabsContent>
                 <TabsContent value="news" className="border rounded-lg p-6">
                   <h3 className="text-xl font-medium mb-4 flex items-center">
@@ -282,9 +262,7 @@ const AdminDashboardPage = () => {
             </div>
           </div>
         </div>
-
-        <Footer />
-      </div>
+        </AdminLayout>
     </HelmetProvider>
   );
 };

@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { useToast } from '@/components/ui/use-toast.ts';
+import Navbar from '@/components/Navbar.tsx';
+import Footer from '@/components/Footer.tsx';
+import { Button } from '@/components/ui/button.tsx';
 import {Loader2, Save, Eye, ArrowLeft, Home, Upload, ImageIcon} from 'lucide-react';
-import EventRegistrationAdmin from '@/components/events/EventRegistrationAdmin';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import EventRegistrationAdmin from '@/components/events/EventRegistrationAdmin.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
 import { useAuth } from '@/context/auth';
 import MarkdownEditor from "@/components/MarkdownEditor.tsx";
 import {
@@ -22,6 +22,8 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import { v4 as uuidv4 } from 'uuid';
+import {Helmet, HelmetProvider} from "react-helmet-async";
+import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -83,7 +85,7 @@ const AdminEventEditorPage = () => {
         .maybeSingle();
 
       if (error) throw error;
-      
+
       if (!data) {
         toast({
           title: "Événement non trouvé",
@@ -93,7 +95,7 @@ const AdminEventEditorPage = () => {
         navigate('/admin/events');
         return null;
       }
-      
+
       return data;
     },
     enabled: isEditMode,
@@ -132,24 +134,24 @@ const AdminEventEditorPage = () => {
 
   const uploadImage = async (): Promise<string> => {
     if (!uploadedImage) return image;
-    
+
     try {
       const fileExt = uploadedImage.name.split('.').pop();
       const fileName = `${uuidv4()}.${fileExt}`;
       const filePath = `event-images/${fileName}`;
-      
+
       const { error } = await supabase.storage
         .from('public')
         .upload(filePath, uploadedImage);
-        
+
       if (error) throw error;
-      
+
       const { data } = supabase.storage
         .from('public')
         .getPublicUrl(filePath);
-        
+
       return data.publicUrl;
-      
+
     } catch (error: any) {
       console.error('Error uploading image:', error);
       toast({
@@ -178,7 +180,7 @@ const AdminEventEditorPage = () => {
     try {
       // Générer le slug si nécessaire
       const eventSlug = slug || generateSlug(title);
-      
+
       // Upload de l'image si une nouvelle a été sélectionnée
       let imageUrl = image;
       if (uploadedImage) {
@@ -221,7 +223,7 @@ const AdminEventEditorPage = () => {
           .eq('id', id);
 
         if (error) throw error;
-        
+
         result = { id, ...eventData };
 
         toast({
@@ -236,11 +238,11 @@ const AdminEventEditorPage = () => {
           .select();
 
         if (error) throw error;
-        
+
         if (!data || data.length === 0) {
           throw new Error("Erreur lors de la création de l'événement");
         }
-        
+
         result = data[0];
 
         toast({
@@ -292,52 +294,39 @@ const AdminEventEditorPage = () => {
       </div>
     );
   }
+  const breadcrumb = <>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <Link to="/admin/events">
+        <BreadcrumbPage>Agenda</BreadcrumbPage>
+      </Link>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>{isEditMode ? "Modifier l'événement" : "Nouvel événement"}</BreadcrumbPage>
+    </BreadcrumbItem>
+  </>
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <HelmetProvider>
+        <Helmet>
+          <title>{isEditMode ? "Modifier l'article" : "Créer un article"} | Admin | Gétigné Collectif</title>
+        </Helmet>
+
+        <AdminLayout breadcrumb={breadcrumb} backLink={<div className="flex items-center gap-4 my-4">
+          <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin/events')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour
+          </Button>
+          <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'événement" : "Créer un événement"}</h1>
+        </div>}>
 
 
-      <div className="pt-24 pb-8 bg-getigne-50">
-        <div className="container mx-auto px-4">
-          <Breadcrumb className="mb-6">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">
-                  <Home className="h-4 w-4 mr-1" />
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/admin">Administration</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/events">Agenda</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{isEditMode ? "Modifier l'événement" : "Nouvel article"}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          <div className="flex items-center gap-4">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/admin/events')}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
-            </Button>
-            <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'événement" : "Créer un événement"}</h1>
-          </div>
-        </div>
-      </div>
-
-
-      <div className="flex-grow container mx-auto px-4 py-8">
+          <div className="flex-grow container mx-auto px-4 py-8">
         {isLoadingEvent ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -422,19 +411,19 @@ const AdminEventEditorPage = () => {
                         accept="image/*"
                         className="hidden"
                       />
-                      
+
                       {image ? (
                         <div className="space-y-3">
                           <div className="relative w-full h-48 rounded-md overflow-hidden">
-                            <img 
-                              src={image} 
-                              alt="Aperçu" 
+                            <img
+                              src={image}
+                              alt="Aperçu"
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <Button 
-                            type="button" 
-                            variant="outline" 
+                          <Button
+                            type="button"
+                            variant="outline"
                             onClick={triggerFileInput}
                           >
                             <Upload className="h-4 w-4 mr-2" />
@@ -572,8 +561,8 @@ const AdminEventEditorPage = () => {
           </div>
         )}
       </div>
-      <Footer />
-    </div>
+      </AdminLayout>
+    </HelmetProvider>
   );
 };
 

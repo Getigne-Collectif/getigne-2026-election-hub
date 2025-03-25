@@ -31,8 +31,6 @@ const Navbar = () => {
       : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200';
   };
 
-  const isProgramManager = userRoles.includes('program_manager') || userRoles.includes('admin');
-
   useEffect(() => {
     if (user && !hasRefreshedRoles) {
       console.log('Navbar admin status check:', { isAdmin, userId: user.id });
@@ -93,7 +91,7 @@ const Navbar = () => {
 
   const AdminLinks = () => {
     if (!isAdmin) return null;
-    
+
     return (
       <>
         <li className="pt-2 pb-2 border-t border-gray-200 mt-4">

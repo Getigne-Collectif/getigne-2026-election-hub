@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import UserManagement from '@/components/UserManagement';
-import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/context/AuthContext.tsx';
+import { supabase } from '@/integrations/supabase/client.ts';
+import Navbar from '@/components/Navbar.tsx';
+import Footer from '@/components/Footer.tsx';
+import UserManagement from '@/components/UserManagement.tsx';
+import { toast } from '@/components/ui/use-toast.ts';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,6 +14,8 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import {Home} from "lucide-react";
+import {Helmet, HelmetProvider} from "react-helmet-async";
+import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
 interface Profile {
   id: string;
@@ -263,45 +265,23 @@ const AdminUsersPage = () => {
   }, [user, isAdmin, authChecked, navigate, refreshUserRoles]);
 
   return (
-    <div>
-      <div className="min-h-screen">
-        <Navbar />
+      <HelmetProvider>
+        <Helmet>
+          <title>Utilisateurs | Administration | Gétigné Collectif</title>
+          <meta
+              name="description"
+              content="Administration des utilisateurs de Gétigné Collectif."
+          />
+        </Helmet>
 
-        <div className="pt-24 pb-12 bg-getigne-50">
-          <div className="container mx-auto px-4">
-            <Breadcrumb className="mb-6">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">
-                    <Home className="h-4 w-4 mr-1" />
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <Link to="/admin">
-                    <BreadcrumbPage>Administration</BreadcrumbPage>
-                  </Link>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Utilisateurs</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+        <AdminLayout title="Utilisateurs" description="Gérez les utilisateurs et leurs rôles." breadcrumb={<>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Utilisateurs</BreadcrumbPage>
+          </BreadcrumbItem>
+        </>}>
 
-            <div className="max-w-3xl mx-auto text-center">
-              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-                Administration
-              </span>
-              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Utilisateurs</h1>
-              <p className="text-getigne-700 text-lg mb-6">
-                Gérez les utilisateurs et leurs rôles.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <section className="py-16">
+          <section className="py-16">
           <div className="container mx-auto px-4">
             {!authChecked || loading ? (
               <div className="text-center py-10">
@@ -327,9 +307,8 @@ const AdminUsersPage = () => {
             )}
           </div>
         </section>
-      </div>
-      <Footer />
-    </div>
+        </AdminLayout>
+    </HelmetProvider>
   );
 };
 

@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/context/AuthContext';
-import AdminLayout from '@/components/admin/AdminLayout';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { useToast } from '@/components/ui/use-toast.ts';
+import { useAuth } from '@/context/AuthContext.tsx';
+import AdminLayout from '@/components/admin/AdminLayout.tsx';
 import { Loader2 } from 'lucide-react';
-import MenuManagement from '@/components/MenuManagement';
+import MenuManagement from '@/components/MenuManagement.tsx';
 
 interface MenuItem {
   id: string;
@@ -78,7 +78,7 @@ const AdminMenuPage = () => {
     try {
       // Check if the item has children
       const childrenItems = menuItems.filter(item => item.parent_id === id);
-      
+
       if (childrenItems.length > 0) {
         // Recursively delete all children
         for (const child of childrenItems) {
@@ -114,7 +114,7 @@ const AdminMenuPage = () => {
       if (itemIndex === -1) return;
 
       const item = menuItems[itemIndex];
-      
+
       // Find the adjacent item to swap positions with
       let adjacentIndex;
       if (direction === 'up' && itemIndex > 0) {
@@ -126,7 +126,7 @@ const AdminMenuPage = () => {
       }
 
       const adjacentItem = menuItems[adjacentIndex];
-      
+
       // Swap positions
       const { error: error1 } = await supabase
         .from('menu_items')
@@ -146,10 +146,10 @@ const AdminMenuPage = () => {
       const updatedItems = [...menuItems];
       updatedItems[itemIndex] = { ...item, position: adjacentItem.position };
       updatedItems[adjacentIndex] = { ...adjacentItem, position: item.position };
-      
+
       // Sort by position
       updatedItems.sort((a, b) => a.position - b.position);
-      
+
       setMenuItems(updatedItems);
     } catch (error) {
       console.error('Error reordering menu item:', error);
@@ -238,7 +238,7 @@ const AdminMenuPage = () => {
             <h1 className="text-2xl font-bold">Gestion du menu</h1>
           </div>
 
-          <MenuManagement 
+          <MenuManagement
             menuItems={menuItems}
             loading={loading}
             onDeleteMenuItem={handleDeleteMenuItem}

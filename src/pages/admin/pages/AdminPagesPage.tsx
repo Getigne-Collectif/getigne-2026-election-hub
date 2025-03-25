@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/context/AuthContext';
-import AdminLayout from '@/components/admin/AdminLayout';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { useToast } from '@/components/ui/use-toast.ts';
+import { useAuth } from '@/context/AuthContext.tsx';
+import AdminLayout from '@/components/admin/AdminLayout.tsx';
 import { Loader2 } from 'lucide-react';
-import PagesManagement from '@/components/PagesManagement';
+import PagesManagement from '@/components/PagesManagement.tsx';
+import {BreadcrumbItem, BreadcrumbPage, BreadcrumbSeparator} from "@/components/ui/breadcrumb.tsx";
 
 interface Page {
   id: string;
@@ -156,13 +157,18 @@ const AdminPagesPage = () => {
         <title>Gestion des pages | Admin</title>
       </Helmet>
 
-      <AdminLayout>
+      <AdminLayout title={"Gestion des pages" } description={"Créez, modifiez et supprimer les pages du site."} breadcrumb={<>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Pages</BreadcrumbPage>
+        </BreadcrumbItem>
+      </>}>
         <div className="py-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Gestion des pages</h1>
           </div>
 
-          <PagesManagement 
+          <PagesManagement
             pages={pages}
             loading={loading}
             onDeletePage={handleDeletePage}

@@ -1,10 +1,10 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
 import {
   Table,
   TableBody,
@@ -12,31 +12,39 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu.tsx';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/context/AuthContext';
-import AdminLayout from '@/components/admin/AdminLayout';
-import { Loader2, MoreHorizontal, Plus, Search } from 'lucide-react';
+} from '@/components/ui/select.tsx';
+import { useToast } from '@/components/ui/use-toast.ts';
+import { useAuth } from '@/context/AuthContext.tsx';
+import AdminLayout from '@/components/admin/AdminLayout.tsx';
+import {Home, Loader2, MoreHorizontal, Plus, Search} from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
+import { Label } from '@/components/ui/label.tsx';
 import { toast as sonnerToast } from 'sonner';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
 
 interface NewsArticle {
   id: string;
@@ -341,10 +349,21 @@ const AdminNewsPage = () => {
         <title>Gestion des actualités | Admin</title>
       </Helmet>
 
-      <AdminLayout>
+      <AdminLayout title="Gestion des actualités" description="Tenez au courant les citoyens et sympathisans de Gétigné Collectif." breadcrumb={<>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Actualités</BreadcrumbPage>
+          </BreadcrumbItem>
+      </>}>
         <div className="py-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Gestion des actualités</h1>
+            <Tabs defaultValue="all" className="mb-6" onValueChange={setActiveTab}>
+              <TabsList>
+                <TabsTrigger value="all">Tous</TabsTrigger>
+                <TabsTrigger value="published">Publiés</TabsTrigger>
+                <TabsTrigger value="draft">Brouillons</TabsTrigger>
+              </TabsList>
+            </Tabs>
             <Button asChild>
               <Link to="/admin/news/new">
                 <Plus className="mr-2 h-4 w-4" /> Nouvel article
@@ -352,13 +371,7 @@ const AdminNewsPage = () => {
             </Button>
           </div>
 
-          <Tabs defaultValue="all" className="mb-6" onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="all">Tous</TabsTrigger>
-              <TabsTrigger value="published">Publiés</TabsTrigger>
-              <TabsTrigger value="draft">Brouillons</TabsTrigger>
-            </TabsList>
-          </Tabs>
+
 
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">

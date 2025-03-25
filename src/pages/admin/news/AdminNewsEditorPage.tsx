@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { toast } from '@/components/ui/use-toast';
-import { setupNewsImagesBucket } from '@/utils/setupNewsImages';
+import { useAuth } from '@/context/AuthContext.tsx';
+import { supabase } from '@/integrations/supabase/client.ts';
+import Navbar from '@/components/Navbar.tsx';
+import Footer from '@/components/Footer.tsx';
+import { toast } from '@/components/ui/use-toast.ts';
+import { setupNewsImagesBucket } from '@/utils/setupNewsImages.ts';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,14 +13,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator
-} from "@/components/ui/breadcrumb";
+} from "@/components/ui/breadcrumb.tsx";
 import { Home, ArrowLeft, Save, Send, Image, Calendar, Tag, MessageSquare, X } from "lucide-react";
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import MarkdownEditor from '@/components/MarkdownEditor';
+import { Input } from '@/components/ui/input.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Badge } from "@/components/ui/badge.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
+import MarkdownEditor from '@/components/MarkdownEditor.tsx';
 import {
   Form,
   FormControl,
@@ -28,23 +28,25 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/ui/form.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Switch } from "@/components/ui/switch";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar.tsx";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { Switch } from "@/components/ui/switch.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select.tsx";
+import { cn } from '@/lib/utils.ts';
+import {Helmet, HelmetProvider} from "react-helmet-async";
+import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
 interface NewsFormValues {
   title: string;
@@ -171,7 +173,7 @@ const AdminNewsEditorPage = () => {
       if (tagError) throw tagError;
 
       const articleTags = tagData.map(item => item.news_tags.name);
-      
+
       setImagePreview(data.image);
       setSelectedTags(articleTags);
 
@@ -486,49 +488,38 @@ const AdminNewsEditorPage = () => {
       setIsSubmitting(false);
     }
   };
+  const breadcrumb = <>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <Link to="/admin/news">
+        <BreadcrumbPage>Actualités</BreadcrumbPage>
+      </Link>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>{isEditMode ? "Modifier l'article" : "Nouvel article"}</BreadcrumbPage>
+    </BreadcrumbItem>
+  </>
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <div className="pt-24 pb-8 bg-getigne-50">
-        <div className="container mx-auto px-4">
-          <Breadcrumb className="mb-6">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">
-                  <Home className="h-4 w-4 mr-1" />
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/admin">Administration</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/admin/news">Actualités</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{isEditMode ? "Modifier l'article" : "Nouvel article"}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+      <HelmetProvider>
+        <Helmet>
+          <title>{isEditMode ? "Modifier l'article" : "Créer un article"} | Admin | Gétigné Collectif</title>
+        </Helmet>
 
-          <div className="flex items-center gap-4">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/admin/news')}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
-            </Button>
-            <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'article" : "Créer un article"}</h1>
-          </div>
-        </div>
-      </div>
+        <AdminLayout breadcrumb={breadcrumb} backLink={<div className="flex items-center gap-4 my-4">
+          <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin/news')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour
+          </Button>
+          <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'article" : "Créer un article"}</h1>
+        </div>}>
 
-      <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-4 py-8">
         <Form {...form}>
           <form>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -726,7 +717,7 @@ const AdminNewsEditorPage = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="flex items-center mt-2">
                       <Input
                         value={newTag}
@@ -820,9 +811,8 @@ const AdminNewsEditorPage = () => {
           </form>
         </Form>
       </div>
-
-      <Footer />
-    </div>
+        </AdminLayout>
+      </HelmetProvider>
   );
 };
 
