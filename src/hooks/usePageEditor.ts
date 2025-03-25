@@ -139,6 +139,9 @@ export const usePageEditor = (id?: string) => {
         return;
       }
 
+      // Convert "none" value to null for parent_id
+      const parentId = values.parent_id === "none" ? null : values.parent_id;
+
       const { data: existingPages, error: slugCheckError } = await supabase
         .from('pages')
         .select('id, slug')
@@ -159,7 +162,7 @@ export const usePageEditor = (id?: string) => {
         title: values.title,
         slug: values.slug,
         content: values.content,
-        parent_id: values.parent_id || null,
+        parent_id: parentId,
         status
       };
 

@@ -137,13 +137,14 @@ const PageEditorForm: React.FC<PageEditorFormProps> = ({ id }) => {
                       <FormControl>
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value || ""}
+                          value={field.value || "none"}
+                          defaultValue="none"
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Aucun parent" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Aucun parent</SelectItem>
+                            <SelectItem value="none">Aucun parent</SelectItem>
                             {pages
                               .filter(page => isEditMode ? page.id !== id : true)
                               .map(page => (
