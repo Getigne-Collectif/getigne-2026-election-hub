@@ -200,7 +200,7 @@ const AdminPageEditorPage = () => {
         .from('pages')
         .select('id')
         .eq('slug', values.slug)
-        .not('id', isEditMode ? id : '');
+        .not('id', 'eq', isEditMode ? id : '');
 
       if (slugCheckError) throw slugCheckError;
 
