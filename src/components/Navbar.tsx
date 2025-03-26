@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, ChevronDown, Settings, FileText } from 'lucide-react';
@@ -141,7 +142,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <AuthButton />
 
-            {isAdmin && (
+            {userRoles.includes('admin') && (
               <Button
                 variant="ghost"
                 size="icon"

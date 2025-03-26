@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -45,7 +46,12 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [localPages, setLocalPages] = useState<Page[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setLocalPages(pages);
+  }, [pages]);
 
   const handleConfirmDelete = async () => {
     if (!selectedPage) return;
@@ -90,8 +96,9 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
 
       if (error) throw error;
 
-      const updatedPages = pages.map(p =>
-        p.id === page.id ? { ...p, status: newStatus } : p
+      // Update local state
+      setLocalPages(prevPages => 
+        prevPages.map(p => p.id === page.id ? { ...p, status: newStatus } : p)
       );
 
       toast({
@@ -119,7 +126,7 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
     while (currentPageId && !visited.has(currentPageId)) {
       visited.add(currentPageId);
 
-      const currentPage = pages.find(p => p.id === currentPageId);
+      const currentPage = localPages.find(p => p.id === currentPageId);
 
       if (!currentPage) break;
 
@@ -131,7 +138,7 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
     return `/pages/${pathSegments.join('/')}`;
   };
 
-  const filteredPages = pages.filter(page => {
+  const filteredPages = localPages.filter(page => {
     const searchLower = searchTerm.toLowerCase();
 
     const matchesSearch = page.title.toLowerCase().includes(searchLower) ||

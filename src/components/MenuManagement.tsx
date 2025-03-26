@@ -497,7 +497,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({
                           <SelectValue placeholder="Aucun parent (élément racine)" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Aucun parent (élément racine)</SelectItem>
+                          <SelectItem value="none">Aucun parent (élément racine)</SelectItem>
                           {menuItems.map(item => (
                             <SelectItem key={item.id} value={item.id}>
                               {item.label}
@@ -632,7 +632,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({
                           <SelectValue placeholder="Aucun parent (élément racine)" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Aucun parent (élément racine)</SelectItem>
+                          <SelectItem value="none">Aucun parent (élément racine)</SelectItem>
                           {menuItems
                             .filter(item => item.id !== selectedMenuItem?.id)
                             .map(item => (
