@@ -27,7 +27,7 @@ export interface IAuthContext {
   isInvitedUser: boolean;
   setUser: (user: User) => void;
   signInWithProvider: (provider: 'discord' | 'facebook' | 'google') => Promise<void>;
-  refreshUserRoles: () => Promise<[]>;
+  refreshUserRoles: () => Promise<string[]>;
   updatePassword: (password: string) => Promise<boolean>;
   resetPassword: (email: string) => Promise<boolean>;
   updateProfile: (profile: Partial<Profile>) => Promise<boolean>;
