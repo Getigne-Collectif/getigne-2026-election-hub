@@ -18,7 +18,7 @@ const defaultAuthContext: IAuthContext = {
   isInvitedUser: false,
   setUser: () => {},
   signInWithProvider: async () => {},
-  refreshUserRoles: async () => {},
+  refreshUserRoles: async () => [],
   updatePassword: async () => false,
   resetPassword: async () => false,
   updateProfile: async () => false,
