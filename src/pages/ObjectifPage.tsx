@@ -166,7 +166,7 @@ const ObjectifPage = () => {
               </div>
             </div>
 
-            {/* Méthodologie - Version révisée sans référence à Rob Hopkins jusqu'à la fin */}
+            {/* Méthodologie - Version révisée */}
             <div className="bg-white rounded-xl shadow-md p-8 md:p-12 mb-16">
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center mb-6">
@@ -178,7 +178,8 @@ const ObjectifPage = () => {
 
                 <p className="text-getigne-700 mb-8">
                   Notre collectif s'est doté d'une méthode concrète pour répondre aux défis contemporains de notre commune. 
-                  Nous avons développé une approche propre, axée sur la participation citoyenne et l'anticipation des enjeux futurs.
+                  Une approche propre fondée sur la participation citoyenne et l'anticipation des enjeux de demain, 
+                  avec des principes clairs qui guident notre action.
                 </p>
 
                 <div className="space-y-6">
@@ -248,8 +249,8 @@ const ObjectifPage = () => {
               </div>
             </div>
 
-            {/* Notre gouvernance - Version révisée avec une section pleine largeur */}
-            <div className="w-full bg-getigne-50 py-16 mb-16">
+            {/* Notre gouvernance - Version remaniée avec section pleine largeur */}
+            <section className="w-full bg-getigne-50 py-16 mb-16">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto mb-12">
                   <div className="flex items-center mb-6">
@@ -270,6 +271,12 @@ const ObjectifPage = () => {
                     aux élections locales traduisent davantage une défiance envers un système vertical où les décisions sont prises par quelques-uns,
                     plutôt qu'un désintérêt pour la chose publique. Notre conviction est simple : redonner aux citoyens un véritable 
                     pouvoir d'agir, c'est raviver l'engagement collectif.
+                  </p>
+                  
+                  <p className="text-getigne-700 mb-6">
+                    Les citoyens ne se contentent plus d'être consultés tous les six ans. Ils aspirent à participer activement 
+                    aux décisions qui les concernent au quotidien. Une gouvernance horizontale et transparente est donc devenue 
+                    non seulement souhaitable mais indispensable pour répondre aux attentes démocratiques contemporaines.
                   </p>
                   
                   <p className="text-getigne-700 mb-8">
@@ -298,21 +305,21 @@ const ObjectifPage = () => {
                     </div>
                     
                     <div className="order-2 md:order-2 flex items-center justify-center">
-                      <div className="overflow-hidden rounded-lg shadow-md aspect-video w-full">
+                      <div className="overflow-hidden rounded-lg shadow-md h-full w-full">
                         <img
                           src="/placeholder.svg"
                           alt="Réunion en cercles thématiques"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover aspect-video"
                         />
                       </div>
                     </div>
 
                     <div className="order-4 md:order-3 flex items-center justify-center">
-                      <div className="overflow-hidden rounded-lg shadow-md aspect-video w-full">
+                      <div className="overflow-hidden rounded-lg shadow-md h-full w-full">
                         <img
                           src="/placeholder.svg"
                           alt="Prise de décision par consentement"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover aspect-video"
                         />
                       </div>
                     </div>
@@ -465,7 +472,7 @@ const ObjectifPage = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Section Commissions Citoyennes */}
             <CitizenCommittees />
