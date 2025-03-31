@@ -38,6 +38,7 @@ import DynamicPage from './pages/DynamicPage';
 import ContactPage from './pages/ContactPage';
 import AdminProjectsPage from "@/pages/admin/projects/AdminProjectsPage";
 import AdminProjectEditorPage from "@/pages/admin/projects/AdminProjectEditorPage";
+import AddGroceryProjectPage from "@/pages/admin/projects/AddGroceryProject";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,7 @@ function App() {
               <Route path="/admin/projects" element={<AdminProjectsPage />} />
               <Route path="/admin/projects/new" element={<AdminProjectEditorPage />} />
               <Route path="/admin/projects/edit/:id" element={<AdminProjectEditorPage />} />
+              <Route path="/admin/projects/add-grocery" element={<AddGroceryProjectPage />} />
               <Route path="/admin/pages" element={<AdminPagesPage />} />
               <Route path="/admin/pages/new" element={<AdminPageEditorPage />} />
               <Route path="/admin/pages/edit/:id" element={<AdminPageEditorPage />} />
