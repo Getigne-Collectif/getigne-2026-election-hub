@@ -39,6 +39,7 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Project } from '@/types/projects.types';
 
 // Form schema
 const projectSchema = z.object({
@@ -95,25 +96,26 @@ export default function AdminProjectEditorPage() {
       }
       
       if (data) {
+        const project = data as unknown as Project;
         // Set form values
         form.reset({
-          title: data.title,
-          description: data.description,
-          image: data.image || '',
-          contact_info: data.contact_info || '',
-          contact_email: data.contact_email || '',
-          status: data.status || 'active',
-          is_featured: data.is_featured || false,
-          url: data.url || ''
+          title: project.title,
+          description: project.description,
+          image: project.image || '',
+          contact_info: project.contact_info || '',
+          contact_email: project.contact_email || '',
+          status: project.status as "active" | "draft",
+          is_featured: project.is_featured || false,
+          url: project.url || ''
         });
         
         // Set image preview if exists
-        if (data.image) {
-          setImagePreview(data.image);
+        if (project.image) {
+          setImagePreview(project.image);
         }
       }
       
-      return data;
+      return data as unknown as Project;
     },
     enabled: isEditing
   });

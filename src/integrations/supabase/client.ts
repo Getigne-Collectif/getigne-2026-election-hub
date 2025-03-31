@@ -17,3 +17,11 @@ export type NewsCategory = {
   name: string;
   created_at?: string;
 };
+
+// Helper type for projects
+export { Project } from '@/types/projects.types';
+
+// Type assertion helper for Supabase queries
+export function asTable<T>(tableName: string): string {
+  return tableName;
+}

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
@@ -33,17 +32,7 @@ import {
 } from '@/components/ui/dialog';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  image: string | null;
-  contact_email: string | null;
-  is_featured: boolean;
-  created_at: string;
-  status: string;
-}
+import { Project } from '@/types/projects.types';
 
 export default function AdminProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,7 +52,7 @@ export default function AdminProjectsPage() {
         toast.error("Erreur lors du chargement des projets");
         throw error;
       }
-      return data as Project[];
+      return (data as any) as Project[];
     }
   });
 

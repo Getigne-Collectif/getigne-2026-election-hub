@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
@@ -7,20 +6,9 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Mail, Calendar, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import ProjectProposalModal from '@/components/ProjectProposalModal';
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  image: string | null;
-  contact_info: string | null;
-  contact_email: string | null;
-  status: string;
-  url: string | null;
-}
+import { Project } from '@/types/projects.types';
 
 const ProjectsPage = () => {
   useEffect(() => {
@@ -45,13 +33,13 @@ const ProjectsPage = () => {
         return [];
       }
       
-      return data as Project[];
+      return (data as any) as Project[];
     }
   });
 
   // Filter active projects
   const activeProjects = projects.filter(p => p.status === 'active');
-  const featuredProjects = activeProjects.filter(p => p.is_featured);
+  const featuredProjects = projects.filter(p => p.is_featured === true);
 
   return (
     <HelmetProvider>
