@@ -39,7 +39,7 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Project } from '@/types/projects.types';
+import type { Project } from '@/types/projects.types';
 
 // Form schema
 const projectSchema = z.object({
@@ -62,6 +62,7 @@ export default function AdminProjectEditorPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Form setup
   const form = useForm<ProjectFormValues>({
@@ -96,7 +97,9 @@ export default function AdminProjectEditorPage() {
       }
       
       if (data) {
-        const project = data as unknown as Project;
+        // Type cast to Project
+        const project = data as Project;
+        
         // Set form values
         form.reset({
           title: project.title,
@@ -115,7 +118,7 @@ export default function AdminProjectEditorPage() {
         }
       }
       
-      return data as unknown as Project;
+      return data as Project;
     },
     enabled: isEditing
   });
@@ -129,26 +132,37 @@ export default function AdminProjectEditorPage() {
       let imagePath = values.image;
       
       if (imageFile) {
+        setIsUploading(true);
         const fileExt = imageFile.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExt}`;
         const filePath = `projects/${fileName}`;
         
-        const { error: uploadError } = await supabase.storage
+        console.log("Uploading file to:", filePath);
+        
+        const { error: uploadError, data: uploadData } = await supabase.storage
           .from('cms_assets')
-          .upload(filePath, imageFile);
+          .upload(filePath, imageFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
           
         if (uploadError) {
           toast.error("Erreur lors de l'upload de l'image");
           console.error("Upload error:", uploadError);
           setIsSubmitting(false);
+          setIsUploading(false);
           return;
         }
+        
+        console.log("Upload successful, data:", uploadData);
         
         const { data: publicUrl } = supabase.storage
           .from('cms_assets')
           .getPublicUrl(filePath);
           
         imagePath = publicUrl.publicUrl;
+        console.log("Public URL:", imagePath);
+        setIsUploading(false);
       }
       
       // Save project data
@@ -166,15 +180,24 @@ export default function AdminProjectEditorPage() {
       
       let error;
       
-      if (isEditing) {
+      if (isEditing && id) {
+        console.log("Updating project with ID:", id);
+        console.log("Project data:", projectData);
+        
         ({ error } = await supabase
           .from('projects')
           .update(projectData)
           .eq('id', id));
       } else {
+        console.log("Creating new project");
+        console.log("Project data:", projectData);
+        
         ({ error } = await supabase
           .from('projects')
-          .insert([projectData]));
+          .insert([{
+            ...projectData,
+            created_at: new Date().toISOString()
+          }]));
       }
       
       if (error) {
@@ -462,12 +485,16 @@ export default function AdminProjectEditorPage() {
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUploading}
                 >
-                  {isSubmitting ? (
+                  {(isSubmitting || isUploading) ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {isEditing ? 'Mise à jour...' : 'Création...'}
+                      {isUploading 
+                        ? "Upload en cours..."
+                        : isEditing 
+                          ? "Mise à jour..." 
+                          : "Création..."}
                     </>
                   ) : (
                     isEditing ? 'Mettre à jour' : 'Créer le projet'

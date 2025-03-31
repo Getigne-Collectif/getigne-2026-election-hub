@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
@@ -6,9 +7,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Mail, Calendar, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 import ProjectProposalModal from '@/components/ProjectProposalModal';
-import { Project } from '@/types/projects.types';
+import type { Project } from '@/types/projects.types';
 
 const ProjectsPage = () => {
   useEffect(() => {
@@ -33,7 +33,7 @@ const ProjectsPage = () => {
         return [];
       }
       
-      return (data as any) as Project[];
+      return (data || []) as Project[];
     }
   });
 

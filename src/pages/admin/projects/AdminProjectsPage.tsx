@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
@@ -32,7 +33,7 @@ import {
 } from '@/components/ui/dialog';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Project } from '@/types/projects.types';
+import type { Project } from '@/types/projects.types';
 
 export default function AdminProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +53,7 @@ export default function AdminProjectsPage() {
         toast.error("Erreur lors du chargement des projets");
         throw error;
       }
-      return (data as any) as Project[];
+      return (data || []) as Project[];
     }
   });
 
@@ -171,13 +172,13 @@ export default function AdminProjectsPage() {
                       </span>
                     </TableCell>
                     <TableCell>{project.contact_email || '-'}</TableCell>
-                    <TableCell>{new Date(project.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>{new Date(project.created_at || '').toLocaleDateString('fr-FR')}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end items-center gap-2">
                         <Button
                           variant="outline"
                           size="icon"
-                          onClick={() => toggleFeatured(project.id, project.is_featured)}
+                          onClick={() => toggleFeatured(project.id, project.is_featured || false)}
                           title={project.is_featured ? "Retirer des favoris" : "Mettre en avant"}
                         >
                           {project.is_featured ? 
