@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Navbar from '@/components/Navbar';
@@ -16,7 +15,11 @@ import {
   BookOpen,
   UserCheck,
   Vote,
-  GitBranch
+  GitBranch,
+  Lightbulb,
+  Sprout,
+  UsersRound,
+  Hammer
 } from 'lucide-react';
 import CitizenCommittees from '@/components/CitizenCommittees';
 import {
@@ -80,10 +83,13 @@ const ObjectifPage = () => {
                 </div>
                 <div className="h-64 md:h-auto bg-getigne-100">
                   <img
-                    src="/placeholder.svg"
+                    src="/lovable-uploads/team-meeting.jpg"
                     alt="Réunion du collectif"
                     className="w-full h-full object-cover"
                   />
+                  <p className="text-xs text-getigne-500 italic p-2 text-right">
+                    Photo: Christina Morillo via Pexels
+                  </p>
                 </div>
               </div>
             </div>
@@ -166,7 +172,7 @@ const ObjectifPage = () => {
               </div>
             </div>
 
-            {/* Méthodologie - Version révisée */}
+            {/* Méthodologie - Version améliorée avec icônes et mise en forme */}
             <div className="bg-white rounded-xl shadow-md p-8 md:p-12 mb-16">
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center mb-6">
@@ -177,54 +183,66 @@ const ObjectifPage = () => {
                 </div>
 
                 <p className="text-getigne-700 mb-8">
-                  Notre collectif s'est doté d'une méthode concrète pour répondre aux défis contemporains de notre commune. 
-                  Une approche propre fondée sur la participation citoyenne et l'anticipation des enjeux de demain, 
-                  avec des principes clairs qui guident notre action.
+                  Notre collectif s'est doté d'une méthode concrète pour répondre aux défis contemporains de notre commune,
+                  fondée sur la participation citoyenne et l'anticipation des enjeux de demain.
                 </p>
 
-                <div className="space-y-6">
-                  <div className="border-l-4 border-getigne-accent pl-6 py-2">
-                    <h3 className="font-semibold text-xl mb-2">Cultiver un imaginaire positif</h3>
+                <div className="grid md:grid-cols-2 gap-x-8 gap-y-12">
+                  <div className="bg-getigne-50 rounded-lg p-6 relative">
+                    <div className="absolute -top-5 left-5 bg-getigne-accent/10 p-3 rounded-full">
+                      <Lightbulb className="text-getigne-accent h-5 w-5" />
+                    </div>
+                    <h3 className="font-semibold text-xl mb-4 mt-3">Cultiver un imaginaire positif</h3>
                     <p className="text-getigne-700">
-                      Notre démarche repose d'abord sur notre capacité collective à nous projeter dans un avenir désirable.
-                      À contre-courant des discours anxiogènes, nous sommes convaincus que c'est en imaginant positivement
-                      la Gétigné de demain que nous pourrons la construire ensemble. Nos ateliers participatifs
+                      Notre démarche repose sur notre <strong>capacité collective à nous projeter dans un avenir désirable</strong>.
+                      À contre-courant des discours anxiogènes, nous sommes convaincus que c'est en <strong>imaginant positivement
+                      le Gétigné de demain</strong> que nous pourrons le construire ensemble. Nos ateliers participatifs
                       permettent de libérer la créativité des habitants et de faire émerger une vision partagée.
                     </p>
                   </div>
 
-                  <div className="border-l-4 border-getigne-accent pl-6 py-2">
-                    <h3 className="font-semibold text-xl mb-2">Développer la résilience locale</h3>
+                  <div className="bg-getigne-50 rounded-lg p-6 relative">
+                    <div className="absolute -top-5 left-5 bg-getigne-accent/10 p-3 rounded-full">
+                      <Sprout className="text-getigne-accent h-5 w-5" />
+                    </div>
+                    <h3 className="font-semibold text-xl mb-4 mt-3">Développer la résilience locale</h3>
                     <p className="text-getigne-700">
-                      Face aux incertitudes économiques, écologiques et sociales, nous développons la résilience
-                      de notre territoire. Cela passe par l'autonomie alimentaire, la réduction de notre dépendance
-                      aux énergies fossiles, la préservation de notre environnement, et le renforcement des solidarités
+                      Face aux incertitudes économiques et écologiques, nous développons la <strong>résilience
+                      de notre territoire</strong>. Cela passe par l'autonomie alimentaire, la <strong>réduction de notre dépendance
+                      aux énergies fossiles</strong>, la préservation de notre environnement, et le renforcement des solidarités
                       de proximité. Notre démarche vise à identifier et valoriser les ressources locales souvent négligées.
                     </p>
                   </div>
 
-                  <div className="border-l-4 border-getigne-accent pl-6 py-2">
-                    <h3 className="font-semibold text-xl mb-2">Favoriser l'inclusion et la diversité</h3>
+                  <div className="bg-getigne-50 rounded-lg p-6 relative">
+                    <div className="absolute -top-5 left-5 bg-getigne-accent/10 p-3 rounded-full">
+                      <UsersRound className="text-getigne-accent h-5 w-5" />
+                    </div>
+                    <h3 className="font-semibold text-xl mb-4 mt-3">Favoriser l'inclusion et la diversité</h3>
                     <p className="text-getigne-700">
-                      Notre projet place l'humain au centre et s'enrichit de la diversité des parcours et des perspectives.
-                      Nous sommes particulièrement attentifs à inclure les personnes habituellement éloignées des processus
-                      de décision. Chaque voix compte et contribue à la richesse de notre démarche collective.
-                      Les différences d'âge, d'origine, de situation ou d'opinion sont considérées comme des atouts.
+                      Notre projet place <strong>l'humain au centre</strong> et s'enrichit de la diversité des parcours et des perspectives.
+                      Nous sommes particulièrement attentifs à <strong>inclure les personnes habituellement éloignées des processus
+                      de décision</strong>. Chaque voix compte et contribue à la richesse de notre démarche collective.
                     </p>
                   </div>
 
-                  <div className="border-l-4 border-getigne-accent pl-6 py-2">
-                    <h3 className="font-semibold text-xl mb-2">Multiplier les initiatives concrètes</h3>
+                  <div className="bg-getigne-50 rounded-lg p-6 relative">
+                    <div className="absolute -top-5 left-5 bg-getigne-accent/10 p-3 rounded-full">
+                      <Hammer className="text-getigne-accent h-5 w-5" />
+                    </div>
+                    <h3 className="font-semibold text-xl mb-4 mt-3">Multiplier les initiatives concrètes</h3>
                     <p className="text-getigne-700">
-                      Nous privilégions l'action concrète à petite échelle plutôt que les grands projets descendants.
-                      Chaque initiative locale, même modeste, est un laboratoire d'innovation et un levier de transformation.
-                      Nous encourageons l'expérimentation et l'apprentissage collectif par l'action.
-                      Ces réalisations tangibles démontrent que le changement est possible ici et maintenant.
+                      Nous privilégions <strong>l'action concrète à petite échelle</strong> plutôt que les grands projets descendants.
+                      Chaque initiative locale est un laboratoire d'innovation et un levier de transformation.
+                      Nous encourageons <strong>l'expérimentation et l'apprentissage collectif par l'action</strong>.
+                      <Link to="/nos-projets" className="ml-1 text-getigne-accent hover:underline">
+                        Découvrez nos projets en cours.
+                      </Link>
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-8 border rounded-lg p-6 bg-getigne-50 flex items-center">
+                <div className="mt-12 border rounded-lg p-6 bg-getigne-50 flex items-center">
                   <div className="flex-1">
                     <h3 className="font-semibold text-xl mb-3">Une inspiration : le mouvement des villes en transition</h3>
                     <p className="mb-3">
@@ -265,20 +283,20 @@ const ObjectifPage = () => {
                     Face à une démocratie représentative à bout de souffle, nous proposons un modèle alternatif qui redistribue le pouvoir
                     et revitalise la participation citoyenne.
                   </p>
-                  
+
                   <p className="text-getigne-700 mb-6">
                     Le désengagement politique observé dans nos communes n'est pas une fatalité. Les taux d'abstention record
                     aux élections locales traduisent davantage une défiance envers un système vertical où les décisions sont prises par quelques-uns,
-                    plutôt qu'un désintérêt pour la chose publique. Notre conviction est simple : redonner aux citoyens un véritable 
+                    plutôt qu'un désintérêt pour la chose publique. Notre conviction est simple : redonner aux citoyens un véritable
                     pouvoir d'agir, c'est raviver l'engagement collectif.
                   </p>
-                  
+
                   <p className="text-getigne-700 mb-6">
-                    Les citoyens ne se contentent plus d'être consultés tous les six ans. Ils aspirent à participer activement 
-                    aux décisions qui les concernent au quotidien. Une gouvernance horizontale et transparente est donc devenue 
+                    Les citoyens ne se contentent plus d'être consultés tous les six ans. Ils aspirent à participer activement
+                    aux décisions qui les concernent au quotidien. Une gouvernance horizontale et transparente est donc devenue
                     non seulement souhaitable mais indispensable pour répondre aux attentes démocratiques contemporaines.
                   </p>
-                  
+
                   <p className="text-getigne-700 mb-8">
                     Notre approche horizontale valorise les compétences de chacun selon ses disponibilités, ses envies et ses savoir-faire.
                     Elle crée les conditions d'une intelligence collective bien supérieure à la somme des intelligences individuelles.
@@ -303,24 +321,30 @@ const ObjectifPage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="order-2 md:order-2 flex items-center justify-center">
                       <div className="overflow-hidden rounded-lg shadow-md h-full w-full">
                         <img
-                          src="/placeholder.svg"
+                          src="/lovable-uploads/circles-meeting.jpg"
                           alt="Réunion en cercles thématiques"
                           className="w-full h-full object-cover aspect-video"
                         />
+                        <p className="text-xs text-getigne-500 italic p-2 text-right">
+                          Photo: Cookie the Pom via Unsplash
+                        </p>
                       </div>
                     </div>
 
                     <div className="order-4 md:order-3 flex items-center justify-center">
                       <div className="overflow-hidden rounded-lg shadow-md h-full w-full">
                         <img
-                          src="/placeholder.svg"
+                          src="/lovable-uploads/consent-decision.jpg"
                           alt="Prise de décision par consentement"
                           className="w-full h-full object-cover aspect-video"
                         />
+                        <p className="text-xs text-getigne-500 italic p-2 text-right">
+                          Photo: Jason Goodman via Unsplash
+                        </p>
                       </div>
                     </div>
 
@@ -538,35 +562,38 @@ const ObjectifPage = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="relative rounded-lg overflow-hidden h-48 col-span-2">
                   <img
-                    src="/placeholder.svg"
+                    src="/lovable-uploads/team-meeting.jpg"
                     alt="Réunion du collectif"
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
+                  <p className="text-xs text-getigne-500 italic p-2 text-right">
+                    Photo: Christina Morillo via Pexels
+                  </p>
                 </div>
                 <div className="relative rounded-lg overflow-hidden h-48">
                   <img
-                    src="/placeholder.svg"
+                    src="/lovable-uploads/atelier-participatif.jpg"
                     alt="Atelier participatif"
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </div>
                 <div className="relative rounded-lg overflow-hidden h-48">
                   <img
-                    src="/placeholder.svg"
+                    src="/lovable-uploads/reunion-public.jpg"
                     alt="Réunion publique"
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </div>
                 <div className="relative rounded-lg overflow-hidden h-48">
                   <img
-                    src="/placeholder.svg"
+                    src="/lovable-uploads/visite-terrain.jpg"
                     alt="Visite de terrain"
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </div>
                 <div className="relative rounded-lg overflow-hidden h-48 col-span-2">
                   <img
-                    src="/placeholder.svg"
+                    src="/lovable-uploads/stand-marche.jpg"
                     alt="Stand marché"
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />

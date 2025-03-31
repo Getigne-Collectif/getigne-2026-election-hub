@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +28,7 @@ import AdminNewsEditorPage from '@/pages/admin/news/AdminNewsEditorPage.tsx';
 import AdminEventsPage from '@/pages/admin/events/AdminEventsPage.tsx';
 import AdminEventEditorPage from '@/pages/admin/events/AdminEventEditorPage.tsx';
 import ObjectifPage from './pages/ObjectifPage';
+import ProjectsPage from './pages/ProjectsPage';
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage.tsx';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage.tsx';
 import AdminPagesPage from '@/pages/admin/pages/AdminPagesPage.tsx';
@@ -53,6 +55,9 @@ function App() {
               <Route path="/objectif-2026/programme" element={<ProgramPage />} />
               <Route path="/objectif-2026/commissions" element={<CommitteesPage />} />
               <Route path="/objectif-2026/commissions/:id" element={<CommitteePage />} />
+
+              {/* Nos projets */}
+              <Route path="/nos-projets" element={<ProjectsPage />} />
 
               {/* Route principale pour "Qui sommes-nous" */}
               <Route path="/qui-sommes-nous" element={<AboutUsPage />} />

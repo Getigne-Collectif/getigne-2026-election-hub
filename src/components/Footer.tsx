@@ -71,8 +71,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/programme" className="text-getigne-100 hover:text-white transition-colors">
-                  Programme
+                <Link to="/objectif-2026" className="text-getigne-100 hover:text-white transition-colors">
+                  Objectif 2026
+                </Link>
+              </li>
+              <li>
+                <Link to="/nos-projets" className="text-getigne-100 hover:text-white transition-colors">
+                  Nos projets
                 </Link>
               </li>
               <li>
@@ -81,18 +86,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/agenda/evenement" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to="/agenda" className="text-getigne-100 hover:text-white transition-colors">
                   Événements
                 </Link>
               </li>
               <li>
-                <Link to="/equipe" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to="/qui-sommes-nous" className="text-getigne-100 hover:text-white transition-colors">
                   Notre équipe
-                </Link>
-              </li>
-              <li>
-                <Link to="/commissions" className="text-getigne-100 hover:text-white transition-colors">
-                  Commissions
                 </Link>
               </li>
               <li>
