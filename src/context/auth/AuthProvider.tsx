@@ -18,7 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshUserRoles = async () => {
     if (!user) {
-      return;
+      return [];
     }
     
     try {
@@ -30,8 +30,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(profileData);
         setIsMember(profileData.is_member === true);
       }
+      
+      return roles;
     } catch (error) {
       console.error('[AUTH] Error refreshing roles:', error);
+      return [];
     }
   };
 
