@@ -35,6 +35,9 @@ import AdminPagesPage from '@/pages/admin/pages/AdminPagesPage.tsx';
 import AdminPageEditorPage from '@/pages/admin/pages/AdminPageEditorPage.tsx';
 import AdminMenuPage from '@/pages/admin/AdminMenuPage.tsx';
 import DynamicPage from './pages/DynamicPage';
+import ContactPage from './pages/ContactPage';
+import AdminProjectsPage from "@/pages/admin/projects/AdminProjectsPage";
+import AdminProjectEditorPage from "@/pages/admin/projects/AdminProjectEditorPage";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +61,9 @@ function App() {
 
               {/* Nos projets */}
               <Route path="/nos-projets" element={<ProjectsPage />} />
+              
+              {/* Contact */}
+              <Route path="/contact" element={<ContactPage />} />
 
               {/* Route principale pour "Qui sommes-nous" */}
               <Route path="/qui-sommes-nous" element={<AboutUsPage />} />
@@ -81,7 +87,6 @@ function App() {
               <Route path="/pages/:grandparent/:parent/:slug" element={<DynamicPage />} />
               <Route path="/pages/:greatgrandparent/:grandparent/:parent/:slug" element={<DynamicPage />} />
               <Route path="/pages/:level1/:level2/:level3/:level4/:slug" element={<DynamicPage />} />
-              
               <Route path="/pages/:level1/:level2/:level3/:level4/:level5/:slug" element={<DynamicPage />} />
 
               {/* Routes d'administration */}
@@ -93,6 +98,9 @@ function App() {
               <Route path="/admin/events" element={<AdminEventsPage />} />
               <Route path="/admin/events/new" element={<AdminEventEditorPage />} />
               <Route path="/admin/events/edit/:id" element={<AdminEventEditorPage />} />
+              <Route path="/admin/projects" element={<AdminProjectsPage />} />
+              <Route path="/admin/projects/new" element={<AdminProjectEditorPage />} />
+              <Route path="/admin/projects/edit/:id" element={<AdminProjectEditorPage />} />
               <Route path="/admin/pages" element={<AdminPagesPage />} />
               <Route path="/admin/pages/new" element={<AdminPageEditorPage />} />
               <Route path="/admin/pages/edit/:id" element={<AdminPageEditorPage />} />

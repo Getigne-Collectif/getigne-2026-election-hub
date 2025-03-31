@@ -74,6 +74,11 @@ const SiteMapPage = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link to="/contact" className="text-getigne-accent hover:underline">
+                      Contact
+                    </Link>
+                  </li>
+                  <li>
                     <Link to="/adherer" className="text-getigne-accent hover:underline">
                       Adhérer
                     </Link>

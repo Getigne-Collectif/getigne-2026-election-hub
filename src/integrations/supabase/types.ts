@@ -642,6 +642,51 @@ export type Database = {
           },
         ]
       }
+      projects: {
+        Row: {
+          contact_email: string | null
+          contact_info: string | null
+          created_at: string | null
+          description: string
+          id: string
+          image: string | null
+          is_featured: boolean | null
+          sort_order: number | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          image?: string | null
+          is_featured?: boolean | null
+          sort_order?: number | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          image?: string | null
+          is_featured?: boolean | null
+          sort_order?: number | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
           bio: string

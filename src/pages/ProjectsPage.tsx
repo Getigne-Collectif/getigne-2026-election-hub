@@ -1,17 +1,57 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Mail, Calendar, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
+import ProjectProposalModal from '@/components/ProjectProposalModal';
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  image: string | null;
+  contact_info: string | null;
+  contact_email: string | null;
+  status: string;
+  url: string | null;
+}
 
 const ProjectsPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
+  const [proposalModalOpen, setProposalModalOpen] = useState(false);
+  
+  // Fetch projects from Supabase
+  const { data: projects = [], isLoading } = useQuery({
+    queryKey: ['projects-page'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('status', 'active')
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error("Error fetching projects:", error);
+        return [];
+      }
+      
+      return data as Project[];
+    }
+  });
+
+  // Filter active projects
+  const activeProjects = projects.filter(p => p.status === 'active');
+  const featuredProjects = activeProjects.filter(p => p.is_featured);
 
   return (
     <HelmetProvider>
@@ -41,74 +81,127 @@ const ProjectsPage = () => {
 
             {/* Projets actuels */}
             <div className="space-y-16 mb-16">
-              {/* Potager collectif */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                <div className="grid md:grid-cols-2">
-                  <div className="order-2 md:order-1 p-8 md:p-12 flex flex-col justify-center">
-                    <h2 className="text-3xl font-bold mb-6 text-getigne-900">Potager collectif</h2>
-                    <p className="text-getigne-700 mb-6">
-                      Un projet lancé en 2023 en lien avec l'association du Moulin Neuf, La Solid' et Ok Compost'. 
-                      L'objectif est de créer un potager collectif sur une parcelle mise à disposition par le Moulin Neuf.
-                    </p>
-                    <p className="text-getigne-700 mb-6">
-                      C'est l'opportunité pour la quinzaine de membres qui s'y retrouvent régulièrement d'apprendre 
-                      ensemble des concepts de permaculture dans une ambiance conviviale et très agréable.
-                    </p>
-                    <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <div className="flex items-center gap-2 text-getigne-700">
-                        <Mail className="h-5 w-5 text-getigne-accent" />
-                        <span>Contact : leny.bernard@getigne-collectif.fr</span>
+              {isLoading ? (
+                <div className="text-center py-12">Chargement des projets...</div>
+              ) : activeProjects.length === 0 ? (
+                <div className="text-center py-12 text-getigne-700">Aucun projet actif pour le moment.</div>
+              ) : (
+                activeProjects.map((project, index) => (
+                  <div key={project.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="grid md:grid-cols-2">
+                      <div className={`order-2 md:order-${index % 2 === 0 ? '1' : '2'} p-8 md:p-12 flex flex-col justify-center`}>
+                        <h2 className="text-3xl font-bold mb-6 text-getigne-900">{project.title}</h2>
+                        <p className="text-getigne-700 mb-6">
+                          {project.description}
+                        </p>
+                        <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                          {project.contact_email && (
+                            <div className="flex items-center gap-2 text-getigne-700">
+                              <Mail className="h-5 w-5 text-getigne-accent" />
+                              <span>Contact : {project.contact_email}</span>
+                            </div>
+                          )}
+                          
+                          {project.url && (
+                            <Button className="bg-getigne-accent hover:bg-getigne-accent/90" asChild>
+                              <a href={project.url} target="_blank" rel="noopener noreferrer">
+                                En savoir plus
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <div className={`order-1 md:order-${index % 2 === 0 ? '2' : '1'} h-64 md:h-auto bg-getigne-100`}>
+                        {project.image ? (
+                          <img
+                            src={project.image}
+                            alt={project.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full bg-getigne-100">
+                            <span className="text-getigne-400">Image non disponible</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                  <div className="order-1 md:order-2 h-64 md:h-auto bg-getigne-100">
-                    <img
-                      src="/lovable-uploads/potager-collectif.jpg"
-                      alt="Potager collectif du Moulin Neuf"
-                      className="w-full h-full object-cover"
-                    />
-                    <p className="text-xs text-getigne-500 italic p-2 text-right">
-                      Photo: Annie Spratt via Unsplash
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Communo */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                <div className="grid md:grid-cols-2">
-                  <div className="order-1 h-64 md:h-auto bg-getigne-100">
-                    <img
-                      src="/lovable-uploads/communo.jpg"
-                      alt="Plateforme d'entraide Communo"
-                      className="w-full h-full object-cover"
-                    />
-                    <p className="text-xs text-getigne-500 italic p-2">
-                      Photo: Brooke Cagle via Unsplash
-                    </p>
-                  </div>
-                  <div className="order-2 p-8 md:p-12 flex flex-col justify-center">
-                    <h2 className="text-3xl font-bold mb-6 text-getigne-900">Communo</h2>
-                    <p className="text-getigne-700 mb-6">
-                      Une plateforme numérique de mutualisation de matériel et d'entraide. 
-                      Le but est double : créer du lien social autour des valeurs d'entraide et de solidarité 
-                      tout en réduisant notre pression sur l'environnement.
-                    </p>
-                    <p className="text-getigne-700 mb-6">
-                      En évitant les achats inutiles grâce au prêt ou à la location de matériel au sein 
-                      de nos communautés, nous agissons concrètement. C'est un projet open source, 
-                      ouvert à tous, et qui a vocation à s'étendre au-delà de Gétigné.
-                    </p>
-                    <div className="mt-6">
-                      <Button className="bg-getigne-accent hover:bg-getigne-accent/90" asChild>
-                        <a href="https://communo.app" target="_blank" rel="noopener noreferrer">
-                          Découvrir Communo
-                        </a>
-                      </Button>
+                ))
+              )}
+              
+              {/* Fallback for when Supabase doesn't have data yet */}
+              {!isLoading && activeProjects.length === 0 && (
+                <>
+                  {/* Potager collectif */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="grid md:grid-cols-2">
+                      <div className="order-2 md:order-1 p-8 md:p-12 flex flex-col justify-center">
+                        <h2 className="text-3xl font-bold mb-6 text-getigne-900">Potager collectif</h2>
+                        <p className="text-getigne-700 mb-6">
+                          Un projet lancé en 2023 en lien avec l'association du Moulin Neuf, La Solid' et Ok Compost'. 
+                          L'objectif est de créer un potager collectif sur une parcelle mise à disposition par le Moulin Neuf.
+                        </p>
+                        <p className="text-getigne-700 mb-6">
+                          C'est l'opportunité pour la quinzaine de membres qui s'y retrouvent régulièrement d'apprendre 
+                          ensemble des concepts de permaculture dans une ambiance conviviale et très agréable.
+                        </p>
+                        <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                          <div className="flex items-center gap-2 text-getigne-700">
+                            <Mail className="h-5 w-5 text-getigne-accent" />
+                            <span>Contact : leny.bernard@getigne-collectif.fr</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="order-1 md:order-2 h-64 md:h-auto bg-getigne-100">
+                        <img
+                          src="/lovable-uploads/potager-collectif.jpg"
+                          alt="Potager collectif du Moulin Neuf"
+                          className="w-full h-full object-cover"
+                        />
+                        <p className="text-xs text-getigne-500 italic p-2 text-right">
+                          Photo: Annie Spratt via Unsplash
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+
+                  {/* Communo */}
+                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div className="grid md:grid-cols-2">
+                      <div className="order-1 h-64 md:h-auto bg-getigne-100">
+                        <img
+                          src="/lovable-uploads/communo.jpg"
+                          alt="Plateforme d'entraide Communo"
+                          className="w-full h-full object-cover"
+                        />
+                        <p className="text-xs text-getigne-500 italic p-2">
+                          Photo: Brooke Cagle via Unsplash
+                        </p>
+                      </div>
+                      <div className="order-2 p-8 md:p-12 flex flex-col justify-center">
+                        <h2 className="text-3xl font-bold mb-6 text-getigne-900">Communo</h2>
+                        <p className="text-getigne-700 mb-6">
+                          Une plateforme numérique de mutualisation de matériel et d'entraide. 
+                          Le but est double : créer du lien social autour des valeurs d'entraide et de solidarité 
+                          tout en réduisant notre pression sur l'environnement.
+                        </p>
+                        <p className="text-getigne-700 mb-6">
+                          En évitant les achats inutiles grâce au prêt ou à la location de matériel au sein 
+                          de nos communautés, nous agissons concrètement. C'est un projet open source, 
+                          ouvert à tous, et qui a vocation à s'étendre au-delà de Gétigné.
+                        </p>
+                        <div className="mt-6">
+                          <Button className="bg-getigne-accent hover:bg-getigne-accent/90" asChild>
+                            <a href="https://communo.app" target="_blank" rel="noopener noreferrer">
+                              Découvrir Communo
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Projets en cours de développement */}
@@ -188,14 +281,20 @@ const ProjectsPage = () => {
                 Nous sommes ouverts à toutes les initiatives qui contribuent à rendre notre commune 
                 plus vivante, plus solidaire et plus durable. Partagez vos idées avec nous !
               </p>
-              <Button asChild>
-                <Link to="/contact">Proposer un projet</Link>
+              <Button onClick={() => setProposalModalOpen(true)}>
+                Proposer un projet
               </Button>
             </div>
           </div>
         </div>
 
         <Footer />
+        
+        {/* Project proposal modal */}
+        <ProjectProposalModal 
+          open={proposalModalOpen}
+          onOpenChange={setProposalModalOpen}
+        />
       </div>
     </HelmetProvider>
   );
