@@ -153,8 +153,14 @@ export default function AdminProjectEditorPage() {
       
       // Save project data
       const projectData = {
-        ...values,
+        title: values.title,
+        description: values.description,
         image: imagePath,
+        contact_info: values.contact_info,
+        contact_email: values.contact_email,
+        status: values.status,
+        is_featured: values.is_featured,
+        url: values.url,
         updated_at: new Date().toISOString()
       };
       

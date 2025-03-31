@@ -19,7 +19,7 @@ export type NewsCategory = {
 };
 
 // Helper type for projects
-export { Project } from '@/types/projects.types';
+export type { Project } from '@/types/projects.types';
 
 // Type assertion helper for Supabase queries
 export function asTable<T>(tableName: string): string {
