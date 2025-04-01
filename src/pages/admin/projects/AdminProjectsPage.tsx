@@ -2,11 +2,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { 
-  ChevronRight, 
-  Edit, 
-  Trash2, 
-  Plus, 
+import {
+  ChevronRight,
+  Edit,
+  Trash2,
+  Plus,
   Search,
   Star,
   StarOff,
@@ -16,13 +16,13 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
+import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow 
+  TableRow
 } from '@/components/ui/table';
 import {
   Dialog,
@@ -43,7 +43,7 @@ interface ProjectWithLikes extends Project {
 export default function AdminProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [projectToDelete, setProjectToDelete] = useState<ProjectWithLikes | null>(null);
-  
+
   // Fetch projects
   const { data: projects = [], refetch, isLoading } = useQuery({
     queryKey: ['admin-projects'],
@@ -56,7 +56,7 @@ export default function AdminProjectsPage() {
         `)
         .order('is_featured', { ascending: false })
         .order('title', { ascending: true });
-        
+
       if (error) {
         toast.error("Erreur lors du chargement des projets");
         throw error;
@@ -66,7 +66,7 @@ export default function AdminProjectsPage() {
   });
 
   // Filter projects based on search query
-  const filteredProjects = projects.filter(project => 
+  const filteredProjects = projects.filter(project =>
     project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -77,12 +77,12 @@ export default function AdminProjectsPage() {
       .from('projects')
       .update({ is_featured: !currentStatus })
       .eq('id', id);
-      
+
     if (error) {
       toast.error("Erreur lors de la mise à jour du statut");
       return;
     }
-    
+
     toast.success("Projet mis en avant avec succès");
     refetch();
   };
@@ -90,17 +90,17 @@ export default function AdminProjectsPage() {
   // Toggle development status
   const toggleDevelopmentStatus = async (id: string, currentStatus: 'active' | 'development') => {
     const newStatus = currentStatus === 'active' ? 'development' : 'active';
-    
+
     const { error } = await supabase
       .from('projects')
       .update({ development_status: newStatus })
       .eq('id', id);
-      
+
     if (error) {
       toast.error("Erreur lors de la mise à jour du statut de développement");
       return;
     }
-    
+
     const statusLabel = newStatus === 'active' ? 'actif' : 'en développement';
     toast.success(`Projet défini comme ${statusLabel}`);
     refetch();
@@ -109,22 +109,22 @@ export default function AdminProjectsPage() {
   // Delete project
   const confirmDelete = async () => {
     if (!projectToDelete) return;
-    
+
     const { error } = await supabase
       .from('projects')
       .delete()
       .eq('id', projectToDelete.id);
-      
+
     if (error) {
       toast.error("Erreur lors de la suppression du projet");
       return;
     }
-    
+
     toast.success("Projet supprimé avec succès");
     setProjectToDelete(null);
     refetch();
   };
-  
+
   return (
     <AdminLayout
       breadcrumb={
@@ -149,7 +149,7 @@ export default function AdminProjectsPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
+
           <div className="flex gap-2">
             <Button asChild>
               <Link to="/admin/projects/new">
@@ -157,14 +157,9 @@ export default function AdminProjectsPage() {
                 Nouveau projet
               </Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link to="/admin/projects/add-grocery">
-                Ajouter l'épicerie participative
-              </Link>
-            </Button>
           </div>
         </div>
-        
+
         <div className="rounded-md border shadow">
           <Table>
             <TableHeader>
@@ -205,7 +200,7 @@ export default function AdminProjectsPage() {
                         }`}>
                           {project.status === 'active' ? 'Actif' : 'Brouillon'}
                         </span>
-                        
+
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           project.development_status === 'active' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
                         }`}>
@@ -223,8 +218,8 @@ export default function AdminProjectsPage() {
                           onClick={() => toggleFeatured(project.id, project.is_featured || false)}
                           title={project.is_featured ? "Retirer des favoris" : "Mettre en avant"}
                         >
-                          {project.is_featured ? 
-                            <StarOff className="h-4 w-4" /> : 
+                          {project.is_featured ?
+                            <StarOff className="h-4 w-4" /> :
                             <Star className="h-4 w-4" />
                           }
                         </Button>
@@ -242,9 +237,9 @@ export default function AdminProjectsPage() {
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
+                        <Button
+                          variant="outline"
+                          size="icon"
                           onClick={() => setProjectToDelete(project)}
                           className="text-destructive hover:text-destructive"
                         >
@@ -259,7 +254,7 @@ export default function AdminProjectsPage() {
           </Table>
         </div>
       </div>
-      
+
       {/* Delete confirmation dialog */}
       <Dialog open={!!projectToDelete} onOpenChange={(open) => !open && setProjectToDelete(null)}>
         <DialogContent>

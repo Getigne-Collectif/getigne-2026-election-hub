@@ -179,6 +179,7 @@ const AdminDashboardPage = () => {
                 <TabsList className="mb-6">
                   <TabsTrigger value="users">Utilisateurs</TabsTrigger>
                   <TabsTrigger value="pages">Pages</TabsTrigger>
+                  <TabsTrigger value="projects">Projets</TabsTrigger>
                   <TabsTrigger value="news">Actualités</TabsTrigger>
                   <TabsTrigger value="events">Événements</TabsTrigger>
                   <TabsTrigger value="menu">Menu</TabsTrigger>
@@ -194,6 +195,18 @@ const AdminDashboardPage = () => {
                   </p>
                   <Button asChild>
                     <Link to="/admin/users">Gérer les utilisateurs</Link>
+                  </Button>
+                </TabsContent>
+                <TabsContent value="projects" className="border rounded-lg p-6">
+                  <h3 className="text-xl font-medium mb-4 flex items-center">
+                    <Users className="h-5 w-5 mr-2" />
+                    Gestion des projets
+                  </h3>
+                  <p className="mb-4">
+                    Créez, modifiez et supprimez des projets.
+                  </p>
+                  <Button asChild>
+                    <Link to="/admin/projects">Gérer les projets</Link>
                   </Button>
                 </TabsContent>
                 <TabsContent value="pages" className="border rounded-lg p-6">

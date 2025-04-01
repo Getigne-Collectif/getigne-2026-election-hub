@@ -18,9 +18,9 @@ const ProjectsPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
+
   const [proposalModalOpen, setProposalModalOpen] = useState(false);
-  
+
   // Fetch projects from Supabase
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects-page'],
@@ -59,7 +59,7 @@ const ProjectsPage = () => {
 
       <div className="page-content">
         <Navbar />
-        
+
         <div className="pt-24 bg-getigne-50">
           <div className="container mx-auto px-4 py-16">
             <div className="max-w-3xl mx-auto text-center mb-12">
@@ -68,7 +68,7 @@ const ProjectsPage = () => {
               </span>
               <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos projets</h1>
               <p className="text-getigne-700 text-lg">
-                Des initiatives concrètes pour une commune plus solidaire, écologique et participative. 
+                Des initiatives concrètes pour une commune plus solidaire, écologique et participative.
                 Découvrez nos projets et rejoignez-nous !
               </p>
             </div>
@@ -119,7 +119,7 @@ const ProjectsPage = () => {
             <div className="bg-getigne-accent/5 rounded-xl p-8 text-center">
               <h2 className="text-2xl font-bold mb-4">Vous avez une idée de projet pour Gétigné ?</h2>
               <p className="text-getigne-700 mb-6 max-w-2xl mx-auto">
-                Nous sommes ouverts à toutes les initiatives qui contribuent à rendre notre commune 
+                Nous sommes ouverts à toutes les initiatives qui contribuent à rendre notre commune
                 plus vivante, plus solidaire et plus durable. Partagez vos idées avec nous !
               </p>
               <Button onClick={() => setProposalModalOpen(true)}>
@@ -130,9 +130,9 @@ const ProjectsPage = () => {
         </div>
 
         <Footer />
-        
+
         {/* Project proposal modal */}
-        <ProjectProposalModal 
+        <ProjectProposalModal
           open={proposalModalOpen}
           onOpenChange={setProposalModalOpen}
         />
