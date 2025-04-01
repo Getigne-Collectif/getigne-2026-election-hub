@@ -642,12 +642,42 @@ export type Database = {
           },
         ]
       }
+      project_likes: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_likes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           contact_email: string | null
           contact_info: string | null
           created_at: string | null
           description: string
+          development_status: string
           id: string
           image: string | null
           is_featured: boolean | null
@@ -662,6 +692,7 @@ export type Database = {
           contact_info?: string | null
           created_at?: string | null
           description: string
+          development_status?: string
           id?: string
           image?: string | null
           is_featured?: boolean | null
@@ -676,6 +707,7 @@ export type Database = {
           contact_info?: string | null
           created_at?: string | null
           description?: string
+          development_status?: string
           id?: string
           image?: string | null
           is_featured?: boolean | null
@@ -749,11 +781,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_project_likes: {
+        Args: {
+          project_id: string
+        }
+        Returns: number
+      }
       get_user_roles: {
         Args: {
           uid: string
         }
         Returns: Database["public"]["Enums"]["app_role"][]
+      }
+      user_has_liked_project: {
+        Args: {
+          project_id: string
+          user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

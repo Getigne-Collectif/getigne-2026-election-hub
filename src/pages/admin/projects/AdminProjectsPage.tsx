@@ -9,7 +9,8 @@ import {
   Plus, 
   Search,
   Star,
-  StarOff
+  StarOff,
+  Construction
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,9 +36,13 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import type { Project } from '@/types/projects.types';
 
+interface ProjectWithLikes extends Project {
+  likes_count: number;
+}
+
 export default function AdminProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<ProjectWithLikes | null>(null);
   
   // Fetch projects
   const { data: projects = [], refetch, isLoading } = useQuery({
@@ -45,15 +50,18 @@ export default function AdminProjectsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: false });
+        .select(`
+          *,
+          likes_count:count_project_likes(id)
+        `)
+        .order('is_featured', { ascending: false })
+        .order('title', { ascending: true });
         
       if (error) {
         toast.error("Erreur lors du chargement des projets");
         throw error;
       }
-      return (data || []) as Project[];
+      return (data || []) as ProjectWithLikes[];
     }
   });
 
@@ -75,7 +83,26 @@ export default function AdminProjectsPage() {
       return;
     }
     
-    toast.success("Statut mis à jour avec succès");
+    toast.success("Projet mis en avant avec succès");
+    refetch();
+  };
+
+  // Toggle development status
+  const toggleDevelopmentStatus = async (id: string, currentStatus: 'active' | 'development') => {
+    const newStatus = currentStatus === 'active' ? 'development' : 'active';
+    
+    const { error } = await supabase
+      .from('projects')
+      .update({ development_status: newStatus })
+      .eq('id', id);
+      
+    if (error) {
+      toast.error("Erreur lors de la mise à jour du statut de développement");
+      return;
+    }
+    
+    const statusLabel = newStatus === 'active' ? 'actif' : 'en développement';
+    toast.success(`Projet défini comme ${statusLabel}`);
     refetch();
   };
 
@@ -123,12 +150,19 @@ export default function AdminProjectsPage() {
             />
           </div>
           
-          <Button asChild>
-            <Link to="/admin/projects/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Nouveau projet
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild>
+              <Link to="/admin/projects/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Nouveau projet
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/admin/projects/add-grocery">
+                Ajouter l'épicerie participative
+              </Link>
+            </Button>
+          </div>
         </div>
         
         <div className="rounded-md border shadow">
@@ -138,7 +172,7 @@ export default function AdminProjectsPage() {
                 <TableHead className="w-[300px]">Titre</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead>Contact</TableHead>
-                <TableHead>Date de création</TableHead>
+                <TableHead>Likes</TableHead>
                 <TableHead className="w-[180px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -165,14 +199,22 @@ export default function AdminProjectsPage() {
                       {project.title}
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {project.status === 'active' ? 'Actif' : 'Brouillon'}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {project.status === 'active' ? 'Actif' : 'Brouillon'}
+                        </span>
+                        
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          project.development_status === 'active' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {project.development_status === 'active' ? 'En production' : 'En développement'}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell>{project.contact_email || '-'}</TableCell>
-                    <TableCell>{new Date(project.created_at || '').toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>{project.likes_count || 0}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end items-center gap-2">
                         <Button
@@ -185,6 +227,15 @@ export default function AdminProjectsPage() {
                             <StarOff className="h-4 w-4" /> : 
                             <Star className="h-4 w-4" />
                           }
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => toggleDevelopmentStatus(project.id, project.development_status || 'active')}
+                          title={project.development_status === 'development' ? "Définir comme actif" : "Définir comme en développement"}
+                          className={project.development_status === 'development' ? "text-amber-600" : ""}
+                        >
+                          <Construction className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="icon" asChild>
                           <Link to={`/admin/projects/edit/${project.id}`}>

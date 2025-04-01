@@ -3,13 +3,14 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  image: string | null;
-  contact_info: string | null;
-  contact_email: string | null;
-  status: string;
-  is_featured: boolean | null;
-  created_at: string | null;
-  updated_at: string | null;
-  sort_order: number | null;
-  url: string | null;
+  image?: string | null;
+  contact_email?: string | null;
+  contact_info?: string | null;
+  status?: string;
+  development_status?: 'active' | 'development';
+  is_featured?: boolean;
+  url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  sort_order?: number;
 }

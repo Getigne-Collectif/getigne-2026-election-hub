@@ -44,6 +44,7 @@ export const addParticipativeGroceryProject = async () => {
       image: imagePublicUrl,
       contact_email: "epicerie@getigne-collectif.fr",
       status: "active",
+      development_status: "development", // Ce projet est en développement
       is_featured: true,
       url: "https://www.monepi.fr",
       created_at: new Date().toISOString(),
