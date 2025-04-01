@@ -14,3 +14,7 @@ export interface Project {
   updated_at?: string;
   sort_order?: number;
 }
+
+export interface ProjectWithLikes extends Project {
+  likes_count: number;
+}

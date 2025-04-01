@@ -34,11 +34,7 @@ import {
 } from '@/components/ui/dialog';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import type { Project } from '@/types/projects.types';
-
-interface ProjectWithLikes extends Project {
-  likes_count: number;
-}
+import type { Project, ProjectWithLikes } from '@/types/projects.types';
 
 export default function AdminProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,12 +44,10 @@ export default function AdminProjectsPage() {
   const { data: projects = [], refetch, isLoading } = useQuery({
     queryKey: ['admin-projects'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // D'abord, récupérer tous les projets
+      const { data: projectsData, error } = await supabase
         .from('projects')
-        .select(`
-          *,
-          likes_count:count_project_likes(id)
-        `)
+        .select('*')
         .order('is_featured', { ascending: false })
         .order('title', { ascending: true });
 
@@ -61,7 +55,25 @@ export default function AdminProjectsPage() {
         toast.error("Erreur lors du chargement des projets");
         throw error;
       }
-      return (data || []) as ProjectWithLikes[];
+      
+      // Ensuite, récupérer le nombre de likes pour chaque projet
+      const projectsWithLikes: ProjectWithLikes[] = [];
+      
+      for (const project of projectsData || []) {
+        const { data: likesCount, error: likesError } = await supabase
+          .rpc('count_project_likes', { project_id: project.id });
+          
+        if (likesError) {
+          console.error("Error fetching likes count:", likesError);
+        }
+        
+        projectsWithLikes.push({
+          ...project,
+          likes_count: likesCount || 0
+        });
+      }
+      
+      return projectsWithLikes;
     }
   });
 
