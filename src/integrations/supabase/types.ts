@@ -677,7 +677,7 @@ export type Database = {
           contact_info: string | null
           created_at: string | null
           description: string
-          development_status: string
+          development_status: "active" | "development"
           id: string
           image: string | null
           is_featured: boolean | null

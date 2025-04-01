@@ -27,29 +27,29 @@ const ProjectsPage = () => {
         .select('*')
         .order('is_featured', { ascending: false })
         .order('title', { ascending: true });
-        
+
       if (error) {
         console.error("Error fetching projects:", error);
         return [];
       }
-      
+
       // Ensuite, récupérer le nombre de likes pour chaque projet
       const projectsWithLikes: ProjectWithLikes[] = [];
-      
+
       for (const project of projectsData || []) {
         const { data: likesCount, error: likesError } = await supabase
           .rpc('count_project_likes', { project_id: project.id });
-          
+
         if (likesError) {
           console.error("Error fetching likes count:", likesError);
         }
-        
+
         projectsWithLikes.push({
           ...project,
           likes_count: likesCount || 0
         });
       }
-      
+
       return projectsWithLikes;
     }
   });
@@ -87,16 +87,16 @@ const ProjectsPage = () => {
             {/* Projets actuels */}
             <div className="space-y-16 mb-16">
               <h2 className="text-3xl font-bold text-center mb-10">Projets actifs</h2>
-              
+
               {isLoading ? (
                 <div className="text-center py-12">Chargement des projets...</div>
               ) : activeProjects.length === 0 ? (
                 <div className="text-center py-12 text-getigne-700">Aucun projet actif pour le moment.</div>
               ) : (
                 activeProjects.map((project, index) => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
                     index={index}
                     initialLikesCount={project.likes_count}
                   />
@@ -107,7 +107,7 @@ const ProjectsPage = () => {
             {/* Projets en cours de développement */}
             <div className="mb-16">
               <h2 className="text-3xl font-bold text-center mb-10">Projets en développement</h2>
-              
+
               {isLoading ? (
                 <div className="text-center py-12">Chargement des projets...</div>
               ) : developmentProjects.length === 0 ? (
@@ -115,9 +115,9 @@ const ProjectsPage = () => {
               ) : (
                 <div className="space-y-16">
                   {developmentProjects.map((project, index) => (
-                    <ProjectCard 
-                      key={project.id} 
-                      project={project} 
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
                       index={index}
                       initialLikesCount={project.likes_count}
                     />
@@ -131,7 +131,7 @@ const ProjectsPage = () => {
               <h2 className="text-2xl font-bold mb-4">Vous avez une idée de projet pour Gétigné ?</h2>
               <p className="text-getigne-700 mb-6 max-w-2xl mx-auto">
                 Nous sommes ouverts à toutes les initiatives qui contribuent à rendre notre commune
-                plus vivante, plus solidaire et plus durable. Partagez vos idées avec nous !
+                plus vivante, forte, solidaire, durable... Partagez vos idées avec nous !
               </p>
               <Button onClick={() => setProposalModalOpen(true)}>
                 Proposer un projet
