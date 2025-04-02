@@ -32,12 +32,43 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Vérifier si l'utilisateur existe déjà
+    const { data: existingUsers, error: userCheckError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, email')
+      .eq('email', email);
+
+    if (userCheckError) {
+      console.error("Error checking existing users:", userCheckError);
+      return new Response(
+        JSON.stringify({ error: userCheckError.message }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Si l'utilisateur existe déjà, retourner une erreur appropriée
+    if (existingUsers && existingUsers.length > 0) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Cet email est déjà associé à un compte existant."
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Générer le lien d'invitation
     const { data, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
       data: {
         first_name,
         last_name,
       },
+      redirectTo: `${Deno.env.get("PUBLIC_URL") ?? "http://localhost:3000"}/auth/callback`
     });
 
     if (inviteError) {
@@ -52,6 +83,30 @@ serve(async (req) => {
     }
 
     console.log("Invitation sent successfully:", data);
+
+    // Mettre à jour le statut de l'invitation si elle existe déjà
+    const { data: existingInvite, error: inviteCheckError } = await supabaseAdmin
+      .from('invited_users')
+      .select('id')
+      .eq('email', email);
+
+    if (!inviteCheckError && existingInvite && existingInvite.length > 0) {
+      // Mettre à jour l'invitation existante
+      await supabaseAdmin
+        .from('invited_users')
+        .update({ status: 'invited' })
+        .eq('email', email);
+    } else {
+      // Créer une nouvelle entrée d'invitation
+      await supabaseAdmin
+        .from('invited_users')
+        .insert({
+          email,
+          first_name,
+          last_name,
+          status: 'invited'
+        });
+    }
     
     return new Response(
       JSON.stringify({ 

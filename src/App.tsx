@@ -38,6 +38,7 @@ import DynamicPage from './pages/DynamicPage';
 import ContactPage from './pages/ContactPage';
 import AdminProjectsPage from "@/pages/admin/projects/AdminProjectsPage";
 import AdminProjectEditorPage from "@/pages/admin/projects/AdminProjectEditorPage";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ function App() {
               <Route path="/mentions-legales" element={<LegalPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
               {/* Routes pour les pages dynamiques - supporter la hiérarchie de pages */}
               <Route path="/pages/:slug" element={<DynamicPage />} />

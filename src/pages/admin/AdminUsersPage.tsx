@@ -1,21 +1,22 @@
+
 import React, { useState, useEffect } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext.tsx';
-import { supabase } from '@/integrations/supabase/client.ts';
-import Navbar from '@/components/Navbar.tsx';
-import Footer from '@/components/Footer.tsx';
-import UserManagement from '@/components/UserManagement.tsx';
-import { toast } from '@/components/ui/use-toast.ts';
+import { useAuth } from '@/context/auth';
+import { supabase } from '@/integrations/supabase/client';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import UserManagement from '@/components/UserManagement';
+import { toast } from '@/components/ui/use-toast';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList, BreadcrumbPage,
   BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.tsx";
+} from "@/components/ui/breadcrumb";
 import {Home} from "lucide-react";
 import {Helmet, HelmetProvider} from "react-helmet-async";
-import AdminLayout from "@/components/admin/AdminLayout.tsx";
+import AdminLayout from "@/components/admin/AdminLayout";
 
 interface Profile {
   id: string;
@@ -82,10 +83,20 @@ const AdminUsersPage = () => {
           const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
 
           let email = profile.email;
+          
+          // Si on n'a pas d'email dans le profil, chercher dans les invitations
           if (!email && invitedUsersData) {
             const matchingInvite = invitedUsersData.find((invited: InvitedUser) => invited.id === profile.id);
             if (matchingInvite) {
               email = matchingInvite.email;
+              
+              // Mettre à jour le statut de l'invitation pour indiquer que l'utilisateur a rejoint
+              const { error: updateError } = await supabase
+                .from('invited_users')
+                .update({ status: 'joined' })
+                .eq('id', profile.id);
+              
+              if (updateError) console.error("Erreur lors de la mise à jour du statut de l'invitation:", updateError);
             }
           }
 
@@ -103,11 +114,13 @@ const AdminUsersPage = () => {
         })
       );
 
+      // Filtrer les invitations pour ne montrer que celles qui n'ont pas encore été acceptées
       const existingProfileIds = profiles.map((profile: Profile) => profile.id);
-
+      
       const pendingInvitationsData = invitedUsersData
         ? invitedUsersData
-            .filter((invited: InvitedUser) => !existingProfileIds.includes(invited.id))
+            .filter((invited: InvitedUser) => 
+              !existingProfileIds.includes(invited.id) && invited.status === 'invited')
             .map((invited: InvitedUser) => ({
               id: invited.id,
               email: invited.email,
@@ -190,7 +203,8 @@ const AdminUsersPage = () => {
         .insert({
           email: userData.email,
           first_name: userData.first_name,
-          last_name: userData.last_name
+          last_name: userData.last_name,
+          status: 'invited'
         });
 
       if (insertError) throw insertError;

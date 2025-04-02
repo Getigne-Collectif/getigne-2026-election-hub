@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -20,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool } from 'lucide-react';
+import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool, RefreshCcw } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -37,6 +38,7 @@ import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
 import UserMembershipStatus from '@/components/admin/UserMembershipStatus';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserManagementProps {
   users: any[];
@@ -68,6 +70,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
+  const [resendingInvitation, setResendingInvitation] = useState<string | null>(null);
 
   const form = useForm<InviteUserFormValues>({
     resolver: zodResolver(inviteUserSchema),
@@ -112,6 +115,39 @@ const UserManagement: React.FC<UserManagementProps> = ({
     }
   };
 
+  const resendInvitation = async (invitedUser: any) => {
+    setResendingInvitation(invitedUser.id);
+    try {
+      // Appel à la fonction d'invitation
+      const { error } = await supabase.functions.invoke('invite-user', {
+        body: {
+          email: invitedUser.email,
+          first_name: invitedUser.first_name,
+          last_name: invitedUser.last_name
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Invitation renvoyée",
+        description: `Une nouvelle invitation a été envoyée à ${invitedUser.email}`,
+      });
+    } catch (error: any) {
+      console.error('Erreur lors du renvoi de l\'invitation:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors du renvoi de l'invitation",
+        variant: "destructive",
+      });
+    } finally {
+      setResendingInvitation(null);
+    }
+  };
+
+  // On ne montre que les invitations en attente dans l'onglet "Invitations"
+  const pendingInvitedUsers = invitedUsers.filter(user => user.status === 'invited');
+
   const filteredUsers = users.filter(user => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -121,7 +157,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
     );
   });
 
-  const filteredInvitedUsers = invitedUsers.filter(user => {
+  const filteredInvitedUsers = pendingInvitedUsers.filter(user => {
     const searchLower = searchTerm.toLowerCase();
     return (
       user.email?.toLowerCase().includes(searchLower) ||
@@ -308,6 +344,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
                     <TableHead>Email</TableHead>
                     <TableHead>Date d'invitation</TableHead>
                     <TableHead>Statut</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -326,6 +363,24 @@ const UserManagement: React.FC<UserManagementProps> = ({
                         <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
                           En attente
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          disabled={resendingInvitation === invited.id}
+                          onClick={() => resendInvitation(invited)}
+                          className="flex items-center gap-1"
+                        >
+                          {resendingInvitation === invited.id ? (
+                            <>Envoi en cours...</>
+                          ) : (
+                            <>
+                              <RefreshCcw className="h-3 w-3" /> 
+                              Renvoyer l'invitation
+                            </>
+                          )}
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
