@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -87,18 +86,16 @@ export default function AdminCommitteeEditorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState('users'); // Default icon
+  const [icon, setIcon] = useState('users');
   const [teamPhotoUrl, setTeamPhotoUrl] = useState('');
   const [color, setColor] = useState(AVAILABLE_COLORS[0].value);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // État pour les membres de la commission
   const [members, setMembers] = useState<Member[]>([]);
   const [userProfiles, setUserProfiles] = useState<Profile[]>([]);
   
-  // État pour le modal d'ajout de membre
   const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = useState(false);
   const [memberName, setMemberName] = useState('');
   const [memberRole, setMemberRole] = useState('membre');
@@ -107,7 +104,6 @@ export default function AdminCommitteeEditorPage() {
   const [linkToUser, setLinkToUser] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
-  // Fetch committee data if in edit mode
   useEffect(() => {
     const fetchCommittee = async () => {
       if (!isEditMode) return;
@@ -125,14 +121,18 @@ export default function AdminCommitteeEditorPage() {
         setTitle(data.title);
         setDescription(data.description);
         setIcon(data.icon);
-        setColor(data.color || AVAILABLE_COLORS[0].value);
+        
+        if (data.color) {
+          setColor(data.color);
+        } else {
+          setColor(AVAILABLE_COLORS[0].value);
+        }
         
         if (data.team_photo_url) {
           setTeamPhotoUrl(data.team_photo_url);
           setPhotoPreview(data.team_photo_url);
         }
         
-        // Charger les membres de la commission
         await fetchCommitteeMembers();
         
       } catch (error) {
@@ -161,7 +161,6 @@ export default function AdminCommitteeEditorPage() {
     fetchProfiles();
   }, [id, isEditMode]);
 
-  // Charger les membres de la commission
   const fetchCommitteeMembers = async () => {
     if (!id) return;
 
@@ -179,7 +178,6 @@ export default function AdminCommitteeEditorPage() {
     }
   };
 
-  // Gérer l'upload d'image
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
       setPhotoFile(null);
@@ -190,12 +188,10 @@ export default function AdminCommitteeEditorPage() {
     const file = e.target.files[0];
     setPhotoFile(file);
     
-    // Créer une URL pour l'aperçu
     const objectUrl = URL.createObjectURL(file);
     setPhotoPreview(objectUrl);
   };
 
-  // Upload de la photo vers Supabase Storage
   const uploadPhoto = async () => {
     if (!photoFile) return null;
 
@@ -225,14 +221,12 @@ export default function AdminCommitteeEditorPage() {
     }
   };
 
-  // Save committee
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       setIsLoading(true);
       
-      // Upload de l'image si une nouvelle a été sélectionnée
       let photoUrl = teamPhotoUrl;
       if (photoFile) {
         const uploadedUrl = await uploadPhoto();
@@ -252,7 +246,6 @@ export default function AdminCommitteeEditorPage() {
       let committeeId = id;
       
       if (isEditMode) {
-        // Update existing committee
         const { error } = await supabase
           .from('citizen_committees')
           .update(committeeData)
@@ -260,7 +253,6 @@ export default function AdminCommitteeEditorPage() {
           
         if (error) throw error;
       } else {
-        // Create new committee
         committeeId = uuidv4();
         const { error } = await supabase
           .from('citizen_committees')
@@ -283,7 +275,6 @@ export default function AdminCommitteeEditorPage() {
     }
   };
 
-  // Ajouter un membre
   const handleAddMember = async () => {
     if (!id) {
       toast.error("Veuillez d'abord enregistrer la commission pour pouvoir ajouter des membres");
@@ -295,7 +286,7 @@ export default function AdminCommitteeEditorPage() {
         committee_id: id,
         name: memberName,
         role: memberRole,
-        photo: memberPhoto || 'placeholder.svg', // Use placeholder if no photo URL
+        photo: memberPhoto || 'placeholder.svg',
         user_id: linkToUser ? selectedUserId : null
       };
 
@@ -308,14 +299,12 @@ export default function AdminCommitteeEditorPage() {
       toast.success("Membre ajouté avec succès");
       setIsAddMemberDialogOpen(false);
       
-      // Reset form
       setMemberName('');
       setMemberRole('membre');
       setMemberPhoto('');
       setSelectedUserId('');
       setLinkToUser(false);
       
-      // Recharger les membres
       await fetchCommitteeMembers();
     } catch (error) {
       console.error('Erreur lors de l\'ajout du membre:', error);
@@ -323,7 +312,6 @@ export default function AdminCommitteeEditorPage() {
     }
   };
 
-  // Supprimer un membre
   const handleDeleteMember = async () => {
     if (!memberToDelete) return;
 
@@ -344,11 +332,9 @@ export default function AdminCommitteeEditorPage() {
     }
   };
 
-  // Handle user selection
   const handleUserSelect = (userId: string) => {
     setSelectedUserId(userId);
     
-    // Automatically fill name from selected user
     const selectedUser = userProfiles.find(profile => profile.id === userId);
     if (selectedUser) {
       setMemberName(`${selectedUser.first_name} ${selectedUser.last_name}`);
@@ -572,7 +558,6 @@ export default function AdminCommitteeEditorPage() {
         </Tabs>
       </div>
       
-      {/* Alert Dialog pour confirmer la suppression d'un membre */}
       <AlertDialog open={!!memberToDelete} onOpenChange={(open) => !open && setMemberToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -590,7 +575,6 @@ export default function AdminCommitteeEditorPage() {
         </AlertDialogContent>
       </AlertDialog>
       
-      {/* Dialog pour ajouter un membre */}
       <AlertDialog open={isAddMemberDialogOpen} onOpenChange={setIsAddMemberDialogOpen}>
         <AlertDialogContent className="sm:max-w-md">
           <AlertDialogHeader>
