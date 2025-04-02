@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -117,6 +118,8 @@ export default function AdminCommitteeEditorPage() {
           .single();
         
         if (error) throw error;
+        
+        console.log("Fetched committee data:", data);
         
         setTitle(data.title);
         setDescription(data.description);
@@ -247,7 +250,10 @@ export default function AdminCommitteeEditorPage() {
       
       let committeeId = id;
       
-      if (isEditMode) {
+      if (isEditMode && id) {
+        console.log("Updating committee with ID:", id);
+        
+        // Attempt with patch instead of update
         const { error, data } = await supabase
           .from('citizen_committees')
           .update(committeeData)
@@ -260,11 +266,36 @@ export default function AdminCommitteeEditorPage() {
         }
         
         console.log("Update response:", data);
+        
+        if (!data || data.length === 0) {
+          // If the update didn't work, try a direct upsert
+          console.log("No update results, trying upsert...");
+          
+          const { error: upsertError, data: upsertData } = await supabase
+            .from('citizen_committees')
+            .upsert({ 
+              id,
+              ...committeeData
+            })
+            .select();
+            
+          if (upsertError) {
+            console.error("Upsert error:", upsertError);
+            throw upsertError;
+          }
+          
+          console.log("Upsert response:", upsertData);
+        }
       } else {
         committeeId = uuidv4();
+        console.log("Creating new committee with ID:", committeeId);
+        
         const { error, data } = await supabase
           .from('citizen_committees')
-          .insert({ ...committeeData, id: committeeId })
+          .insert({ 
+            ...committeeData, 
+            id: committeeId 
+          })
           .select();
           
         if (error) {
