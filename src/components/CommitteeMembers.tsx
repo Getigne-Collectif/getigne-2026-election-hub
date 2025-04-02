@@ -3,13 +3,18 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User } from 'lucide-react';
+import { User, Edit, Trash2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
 
 type CommitteeMember = {
   id: string;
   name: string;
   role: string;
   photo: string;
+  user_id?: string | null;
 };
 
 interface CommitteeMembersProps {
@@ -21,6 +26,7 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
   const [members, setMembers] = useState<CommitteeMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingMember, setEditingMember] = useState<CommitteeMember | null>(null);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -45,6 +51,65 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
     fetchMembers();
   }, [committeeId]);
 
+  const handleEditMember = async () => {
+    if (!editingMember) return;
+
+    try {
+      const { error } = await supabase
+        .from('committee_members')
+        .update({ 
+          name: editingMember.name, 
+          role: editingMember.role 
+        })
+        .eq('id', editingMember.id);
+
+      if (error) throw error;
+
+      setMembers(members.map(m => 
+        m.id === editingMember.id ? editingMember : m
+      ));
+
+      toast({
+        title: 'Membre mis à jour',
+        description: 'Les informations du membre ont été modifiées avec succès.',
+      });
+
+      setEditingMember(null);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du membre:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le membre.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDeleteMember = async (memberId: string) => {
+    try {
+      const { error } = await supabase
+        .from('committee_members')
+        .delete()
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      setMembers(members.filter(m => m.id !== memberId));
+
+      toast({
+        title: 'Membre supprimé',
+        description: 'Le membre a été retiré de la commission.',
+      });
+    } catch (error) {
+      console.error('Erreur lors de la suppression du membre:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer le membre.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   if (loading) {
     return <div className="py-2">Chargement des membres...</div>;
   }
@@ -54,7 +119,6 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
   }
 
   if (simplified) {
-    // Version simplifiée pour le résumé
     const pilots = members.filter(member => member.role === 'pilote');
     const memberCount = members.length - pilots.length;
     
@@ -91,21 +155,21 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
     );
   }
 
-  // Version complète - affichée uniquement lorsque nécessaire
   const pilots = members.filter(member => member.role === 'pilote');
   const regularMembers = members.filter(member => member.role !== 'pilote');
 
   return (
     <div className="space-y-8">
-      {/* Section des pilotes */}
       {pilots.length > 0 && (
         <div>
-          <h3 className="text-xl font-medium mb-4">
-            {pilots.length > 1 ? 'Pilotes de la commission' : 'Pilote de la commission'}
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-medium">
+              {pilots.length > 1 ? 'Pilotes de la commission' : 'Pilote de la commission'}
+            </h3>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {pilots.map(pilot => (
-              <div key={pilot.id} className="flex flex-col items-center text-center">
+              <div key={pilot.id} className="flex flex-col items-center text-center relative">
                 <Avatar className="w-24 h-24 mb-3 border-2 border-getigne-accent">
                   {pilot.photo ? (
                     <AvatarImage src={pilot.photo} alt={pilot.name} className="object-cover" />
@@ -119,21 +183,40 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
                   <h4 className="font-medium">{pilot.name}</h4>
                   <Badge className="bg-getigne-accent">Pilote</Badge>
                 </div>
+                <div className="absolute top-0 right-0 flex space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="w-8 h-8"
+                    onClick={() => setEditingMember(pilot)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="w-8 h-8 text-red-500 hover:bg-red-50"
+                    onClick={() => handleDeleteMember(pilot.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Section des membres */}
       {regularMembers.length > 0 && (
         <div>
-          <h3 className="text-xl font-medium mb-4">
-            {regularMembers.length > 1 ? 'Membres de la commission' : 'Membre de la commission'}
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-medium">
+              {regularMembers.length > 1 ? 'Membres de la commission' : 'Membre de la commission'}
+            </h3>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {regularMembers.map(member => (
-              <div key={member.id} className="flex flex-col items-center text-center">
+              <div key={member.id} className="flex flex-col items-center text-center relative">
                 <Avatar className="w-20 h-20 mb-3 border border-getigne-200">
                   {member.photo ? (
                     <AvatarImage src={member.photo} alt={member.name} className="object-cover" />
@@ -147,6 +230,24 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
                   <h4 className="font-medium">{member.name}</h4>
                   <Badge variant="outline" className="bg-white">Membre</Badge>
                 </div>
+                <div className="absolute top-0 right-0 flex space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="w-8 h-8"
+                    onClick={() => setEditingMember(member)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="w-8 h-8 text-red-500 hover:bg-red-50"
+                    onClick={() => handleDeleteMember(member.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -157,6 +258,32 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
         <div className="py-4 text-getigne-700">
           Aucun membre n'est encore associé à cette commission.
         </div>
+      )}
+
+      {editingMember && (
+        <Dialog open={!!editingMember} onOpenChange={() => setEditingMember(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Modifier le membre</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <Input 
+                placeholder="Nom" 
+                value={editingMember.name}
+                onChange={(e) => setEditingMember({...editingMember, name: e.target.value})}
+              />
+              <Input 
+                placeholder="Rôle" 
+                value={editingMember.role}
+                onChange={(e) => setEditingMember({...editingMember, role: e.target.value})}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditingMember(null)}>Annuler</Button>
+              <Button onClick={handleEditMember}>Enregistrer</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

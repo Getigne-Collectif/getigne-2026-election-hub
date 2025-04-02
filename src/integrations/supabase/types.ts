@@ -113,6 +113,7 @@ export type Database = {
           photo: string
           role: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           committee_id: string
@@ -122,6 +123,7 @@ export type Database = {
           photo: string
           role: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           committee_id?: string
@@ -131,6 +133,7 @@ export type Database = {
           photo?: string
           role?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -792,6 +795,13 @@ export type Database = {
           uid: string
         }
         Returns: Database["public"]["Enums"]["app_role"][]
+      }
+      is_committee_member: {
+        Args: {
+          user_id: string
+          committee_id: string
+        }
+        Returns: boolean
       }
       user_has_liked_project: {
         Args: {
