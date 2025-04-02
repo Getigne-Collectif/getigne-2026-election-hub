@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const setupNewsImagesBucket = async () => {
   try {
-    // Vérifie si le bucket existe déjà
+    // Vérifie si les buckets existent déjà
     const { data: buckets, error: bucketError } = await supabase
       .storage
       .listBuckets();

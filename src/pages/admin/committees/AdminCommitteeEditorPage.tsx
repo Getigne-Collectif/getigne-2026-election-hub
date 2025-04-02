@@ -243,22 +243,36 @@ export default function AdminCommitteeEditorPage() {
         color
       };
       
+      console.log("Saving committee data:", committeeData);
+      
       let committeeId = id;
       
       if (isEditMode) {
-        const { error } = await supabase
+        const { error, data } = await supabase
           .from('citizen_committees')
           .update(committeeData)
-          .eq('id', id);
+          .eq('id', id)
+          .select();
           
-        if (error) throw error;
+        if (error) {
+          console.error("Update error:", error);
+          throw error;
+        }
+        
+        console.log("Update response:", data);
       } else {
         committeeId = uuidv4();
-        const { error } = await supabase
+        const { error, data } = await supabase
           .from('citizen_committees')
-          .insert({ ...committeeData, id: committeeId });
+          .insert({ ...committeeData, id: committeeId })
+          .select();
           
-        if (error) throw error;
+        if (error) {
+          console.error("Insert error:", error);
+          throw error;
+        }
+        
+        console.log("Insert response:", data);
       }
       
       toast.success(isEditMode 
