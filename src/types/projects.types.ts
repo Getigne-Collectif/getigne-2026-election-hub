@@ -7,7 +7,7 @@ export interface Project {
   contact_email?: string | null;
   contact_info?: string | null;
   status?: string;
-  development_status?: 'active' | 'development';
+  development_status: string; // Changed from union type to string to match database return type
   is_featured?: boolean;
   url?: string | null;
   created_at?: string;
