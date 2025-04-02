@@ -9,7 +9,7 @@ import Footer from '@/components/Footer.tsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
-import {Home, Users, Newspaper, Calendar, Settings, MessageSquare, EditIcon, UsersIcon} from 'lucide-react';
+import {Home, Users, Newspaper, Calendar, Settings, MessageSquare, EditIcon, UsersIcon, Component} from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
@@ -211,7 +211,7 @@ const AdminDashboardPage = () => {
                 </TabsContent>
                 <TabsContent value="committees" className="border rounded-lg p-6">
                   <h3 className="text-xl font-medium mb-4 flex items-center">
-                    <UserGroup className="h-5 w-5 mr-2" />
+                    <Component className="h-5 w-5 mr-2" />
                     Gestion des commissions
                   </h3>
                   <p className="mb-4">
