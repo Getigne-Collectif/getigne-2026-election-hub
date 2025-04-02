@@ -10,7 +10,7 @@ import Footer from '@/components/Footer.tsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
-import {Home, Users, Newspaper, Calendar, Settings, MessageSquare, EditIcon} from 'lucide-react';
+import {Home, Users, Newspaper, Calendar, Settings, MessageSquare, EditIcon, UserGroup} from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
@@ -180,6 +180,7 @@ const AdminDashboardPage = () => {
                   <TabsTrigger value="users">Utilisateurs</TabsTrigger>
                   <TabsTrigger value="pages">Pages</TabsTrigger>
                   <TabsTrigger value="projects">Projets</TabsTrigger>
+                  <TabsTrigger value="committees">Commissions</TabsTrigger>
                   <TabsTrigger value="news">Actualités</TabsTrigger>
                   <TabsTrigger value="events">Événements</TabsTrigger>
                   <TabsTrigger value="menu">Menu</TabsTrigger>
@@ -207,6 +208,18 @@ const AdminDashboardPage = () => {
                   </p>
                   <Button asChild>
                     <Link to="/admin/projects">Gérer les projets</Link>
+                  </Button>
+                </TabsContent>
+                <TabsContent value="committees" className="border rounded-lg p-6">
+                  <h3 className="text-xl font-medium mb-4 flex items-center">
+                    <UserGroup className="h-5 w-5 mr-2" />
+                    Gestion des commissions
+                  </h3>
+                  <p className="mb-4">
+                    Créez, modifiez et gérez les commissions citoyennes et leurs membres.
+                  </p>
+                  <Button asChild>
+                    <Link to="/admin/committees">Gérer les commissions</Link>
                   </Button>
                 </TabsContent>
                 <TabsContent value="pages" className="border rounded-lg p-6">
