@@ -99,8 +99,8 @@ export default function AdminProjectsPage() {
     refetch();
   };
 
-  // Toggle development status
-  const toggleDevelopmentStatus = async (id: string, currentStatus: 'active' | 'development') => {
+  // Toggle development status - updated the parameter type to string
+  const toggleDevelopmentStatus = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'development' : 'active';
 
     const { error } = await supabase
