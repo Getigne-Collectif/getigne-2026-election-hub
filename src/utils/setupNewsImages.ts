@@ -1,6 +1,5 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
 
 /**
  * Cette fonction vérifie si le bucket news_images existe et le crée si nécessaire.
@@ -19,18 +18,22 @@ export const setupNewsImagesBucket = async () => {
     }
     
     const newsImagesBucketExists = buckets.some(bucket => bucket.name === 'news_images');
+    const publicBucketExists = buckets.some(bucket => bucket.name === 'public');
     
     if (!newsImagesBucketExists) {
       console.log('Le bucket news_images n\'existe pas, une action SQL est nécessaire');
-      // Nous supprimons le toast d'erreur car le bucket existe maintenant
-      // Il était seulement utile pendant le développement initial
       return false;
     }
     
-    console.log('Bucket news_images trouvé avec succès');
+    if (!publicBucketExists) {
+      console.log('Le bucket public n\'existe pas, une action SQL est nécessaire');
+      return false;
+    }
+    
+    console.log('Les buckets nécessaires ont été trouvés avec succès');
     return true;
   } catch (error) {
-    console.error('Erreur lors de la configuration du bucket news_images:', error);
+    console.error('Erreur lors de la configuration des buckets:', error);
     return false;
   }
 };
