@@ -44,7 +44,7 @@ type Committee = {
   description: string;
   icon: string;
   team_photo_url?: string | null;
-  color?: string | null;
+  color: string | null;
   created_at: string;
   updated_at: string;
 }
