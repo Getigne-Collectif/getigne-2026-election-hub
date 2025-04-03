@@ -10,6 +10,14 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import CommitteeWorkModal from '@/components/CommitteeWorkModal';
+import { 
+  Dialog,
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
 
 type CommitteeData = {
   id: string;
@@ -24,8 +32,8 @@ type CommitteeWork = {
   date: string;
   committee_id: string;
   created_at: string;
-  images?: any[];
-  files?: any[];
+  images: any; // Changed from any[] to any to accommodate Json type from Supabase
+  files: any; // Changed from any[] to any to accommodate Json type from Supabase
 }
 
 export default function AdminCommitteeWorksPage() {
@@ -38,6 +46,7 @@ export default function AdminCommitteeWorksPage() {
   const [selectedWork, setSelectedWork] = useState<CommitteeWork | null>(null);
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('view');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   // Fetch committee data
   useEffect(() => {
@@ -94,6 +103,31 @@ export default function AdminCommitteeWorksPage() {
     setSelectedWork(work);
     setModalMode(mode);
     setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (work: CommitteeWork) => {
+    setSelectedWork(work);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedWork) return;
+    
+    try {
+      const { error } = await supabase
+        .from('committee_works')
+        .delete()
+        .eq('id', selectedWork.id);
+      
+      if (error) throw error;
+      
+      toast.success("Le compte-rendu a été supprimé avec succès");
+      fetchCommitteeWorks(); // Refresh the list
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      console.error('Erreur lors de la suppression du compte-rendu:', error);
+      toast.error("Impossible de supprimer le compte-rendu");
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -203,6 +237,13 @@ export default function AdminCommitteeWorksPage() {
                       >
                         <Pencil className="h-4 w-4 mr-1" /> Modifier
                       </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDeleteClick(work)}
+                      >
+                        <Trash className="h-4 w-4 mr-1" /> Supprimer
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -212,7 +253,7 @@ export default function AdminCommitteeWorksPage() {
           
           {isModalOpen && (
             <CommitteeWorkModal 
-              committeeId={id} 
+              committeeId={id!} 
               work={selectedWork} 
               open={isModalOpen} 
               onOpenChange={setIsModalOpen}
@@ -220,6 +261,25 @@ export default function AdminCommitteeWorksPage() {
               mode={modalMode}
             />
           )}
+
+          <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirmer la suppression</DialogTitle>
+                <DialogDescription>
+                  Êtes-vous sûr de vouloir supprimer ce compte-rendu ? Cette action est irréversible.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="flex justify-end space-x-2 mt-4">
+                <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                  Annuler
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteConfirm}>
+                  Supprimer
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </AdminLayout>
