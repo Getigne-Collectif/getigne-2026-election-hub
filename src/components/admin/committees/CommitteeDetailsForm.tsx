@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
@@ -74,6 +73,13 @@ export default function CommitteeDetailsForm({
   
   const [isUploading, setIsUploading] = useState(false);
 
+  useEffect(() => {
+    if (initialData) {
+      setTeamPhotoPreview(initialData.team_photo_url || null);
+      setCoverPhotoPreview(initialData.cover_photo_url || null);
+    }
+  }, [initialData]);
+
   const handleTeamPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
       setTeamPhotoFile(null);
@@ -102,28 +108,39 @@ export default function CommitteeDetailsForm({
     setCoverPhotoPreview(objectUrl);
   };
 
-  const uploadPhoto = async (file: File, bucketName: string): Promise<string | null> => {
+  const uploadPhoto = async (file: File, bucketFolder: string): Promise<string | null> => {
     if (!file) return null;
 
     setIsUploading(true);
+    
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `${bucketName === 'committee_covers' ? 'covers' : 'teams'}/${fileName}`;
+      const filePath = `${bucketFolder}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const bucketName = 'public';
+      
+      console.log(`Uploading to ${bucketName}/${filePath}`);
+      const { error: uploadError, data } = await supabase.storage
         .from(bucketName)
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
-      const { data } = supabase.storage
+      const { data: publicUrlData } = supabase.storage
         .from(bucketName)
         .getPublicUrl(filePath);
 
-      return data.publicUrl;
+      console.log('Upload successful, public URL:', publicUrlData.publicUrl);
+      return publicUrlData.publicUrl;
     } catch (error) {
-      console.error(`Erreur lors de l'upload de l'image dans ${bucketName}:`, error);
+      console.error(`Erreur lors de l'upload de l'image:`, error);
       toast.error("Erreur lors de l'upload de l'image");
       return null;
     } finally {
@@ -141,16 +158,18 @@ export default function CommitteeDetailsForm({
       let coverPhotoUrlFinal = coverPhotoUrl;
       
       if (teamPhotoFile) {
-        const uploadedUrl = await uploadPhoto(teamPhotoFile, 'public');
-        if (uploadedUrl) {
-          teamPhotoUrlFinal = uploadedUrl;
+        const uploadedTeamUrl = await uploadPhoto(teamPhotoFile, 'teams');
+        if (uploadedTeamUrl) {
+          teamPhotoUrlFinal = uploadedTeamUrl;
+          console.log('Team photo updated to:', teamPhotoUrlFinal);
         }
       }
       
       if (coverPhotoFile) {
-        const uploadedUrl = await uploadPhoto(coverPhotoFile, 'committee_covers');
-        if (uploadedUrl) {
-          coverPhotoUrlFinal = uploadedUrl;
+        const uploadedCoverUrl = await uploadPhoto(coverPhotoFile, 'covers');
+        if (uploadedCoverUrl) {
+          coverPhotoUrlFinal = uploadedCoverUrl;
+          console.log('Cover photo updated to:', coverPhotoUrlFinal);
         }
       }
       
@@ -170,7 +189,6 @@ export default function CommitteeDetailsForm({
       if (isEditMode && committeeId) {
         console.log("Updating committee with ID:", committeeId);
         
-        // Attempt with patch instead of update
         const { error, data } = await supabase
           .from('citizen_committees')
           .update(committeeData)
@@ -183,26 +201,6 @@ export default function CommitteeDetailsForm({
         }
         
         console.log("Update response:", data);
-        
-        if (!data || data.length === 0) {
-          // If the update didn't work, try a direct upsert
-          console.log("No update results, trying upsert...");
-          
-          const { error: upsertError, data: upsertData } = await supabase
-            .from('citizen_committees')
-            .upsert({ 
-              id: committeeId,
-              ...committeeData
-            })
-            .select();
-            
-          if (upsertError) {
-            console.error("Upsert error:", upsertError);
-            throw upsertError;
-          }
-          
-          console.log("Upsert response:", upsertData);
-        }
       } else {
         finalCommitteeId = uuidv4();
         console.log("Creating new committee with ID:", finalCommitteeId);

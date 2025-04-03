@@ -27,6 +27,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import CommitteeMembers, { getMemberCount } from '@/components/CommitteeMembers';
 import { Badge } from '@/components/ui/badge';
+import { getColorTheme } from '@/components/CitizenCommittees';
 
 // Type pour les commissions
 type Committee = {
@@ -34,6 +35,7 @@ type Committee = {
   title: string;
   description: string;
   icon: string;
+  color: string | null;
   memberCount?: number;
   team_photo_url?: string | null;
   created_at: string;
@@ -168,63 +170,69 @@ export default function AdminCommitteesPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredCommittees.map((committee) => (
-                  <>
-                    <TableRow
-                      key={committee.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => toggleExpanded(committee.id)}
-                    >
-                      <TableCell className="font-medium flex items-center">
-                        <span className="flex-1">{committee.title}</span>
-                        <ChevronRight className={`h-5 w-5 transition-transform ${expandedCommittee === committee.id ? 'rotate-90' : ''}`} />
-                      </TableCell>
-                      <TableCell className="max-w-[400px] truncate">
-                        {committee.description}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-white">
-                          {committee.memberCount || 0} membres
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-end items-center gap-2">
-                          <Button variant="outline" size="icon" asChild>
-                            <Link to={`/admin/committees/edit/${committee.id}`}>
-                              <Edit className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setCommitteeToDelete(committee)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                    {expandedCommittee === committee.id && (
-                      <TableRow>
-                        <TableCell colSpan={4} className="bg-muted/20 px-6 py-4">
-                          <div className="text-sm">
-                            <h4 className="text-base font-medium mb-4">Membres de la commission</h4>
-                            <CommitteeMembers committeeId={committee.id} simplified />
-                            <div className="mt-4">
-                              <Button variant="outline" size="sm" asChild>
-                                <Link to={`/admin/committees/members/${committee.id}`}>
-                                  <Users className="h-4 w-4 mr-2" />
-                                  Gérer les membres
-                                </Link>
-                              </Button>
-                            </div>
+                filteredCommittees.map((committee) => {
+                  const themeColor = getColorTheme(committee.color);
+                  return (
+                    <>
+                      <TableRow
+                        key={committee.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => toggleExpanded(committee.id)}
+                      >
+                        <TableCell className="font-medium flex items-center">
+                          <div className={`w-6 h-6 ${themeColor.accent} rounded-full mr-2 flex items-center justify-center`}>
+                            <span className={themeColor.text} style={{fontSize: '10px'}}>{committee.icon.substring(0, 1).toUpperCase()}</span>
+                          </div>
+                          <span className="flex-1">{committee.title}</span>
+                          <ChevronRight className={`h-5 w-5 transition-transform ${expandedCommittee === committee.id ? 'rotate-90' : ''}`} />
+                        </TableCell>
+                        <TableCell className="max-w-[400px] truncate">
+                          {committee.description}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={`${themeColor.bg} border-${themeColor.border}`}>
+                            <span className={themeColor.text}>{committee.memberCount || 0} membres</span>
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex justify-end items-center gap-2">
+                            <Button variant="outline" size="icon" asChild>
+                              <Link to={`/admin/committees/edit/${committee.id}`}>
+                                <Edit className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setCommitteeToDelete(committee)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </>
-                ))
+                      {expandedCommittee === committee.id && (
+                        <TableRow>
+                          <TableCell colSpan={4} className={`${themeColor.bg} border-${themeColor.border} px-6 py-4`}>
+                            <div className="text-sm">
+                              <h4 className={`text-base font-medium mb-4 ${themeColor.text}`}>Membres de la commission</h4>
+                              <CommitteeMembers committeeId={committee.id} simplified />
+                              <div className="mt-4">
+                                <Button variant="outline" size="sm" asChild className={`border-${themeColor.border} ${themeColor.text}`}>
+                                  <Link to={`/admin/committees/members/${committee.id}`}>
+                                    <Users className="h-4 w-4 mr-2" />
+                                    Gérer les membres
+                                  </Link>
+                                </Button>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
+                  );
+                })
               )}
             </TableBody>
           </Table>

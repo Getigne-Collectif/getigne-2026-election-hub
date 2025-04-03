@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Home } from 'lucide-react';
 import {toast} from "sonner";
+import { getColorTheme } from '@/components/CitizenCommittees';
 
 interface Member {
   id: string;
@@ -51,139 +52,10 @@ const iconMap = {
   'leaf': Leaf
 };
 
-// Fonctions utilitaires pour les couleurs
+// Fonctions utilitaires pour les icônes
 const getIconComponent = (iconName: string) => {
   const key = iconName ? iconName.toLowerCase() : 'users';
   return iconMap[key] || Users;
-};
-
-const getColorTheme = (colorClass: string | null) => {
-  // Valeurs par défaut au cas où la couleur n'est pas définie
-  const defaultTheme = {
-    bg: 'bg-getigne-50',
-    text: 'text-getigne-accent',
-    border: 'border-getigne-100',
-    hover: 'hover:bg-getigne-100/50',
-    accent: 'bg-getigne-accent/10',
-    theme: 'Thématique',
-    defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
-    defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
-  };
-
-  // Si pas de couleur spécifiée, retourner les valeurs par défaut
-  if (!colorClass) return defaultTheme;
-
-  // Extraire la couleur de base de la classe Tailwind (bg-COLOR-500)
-  const colorMatch = colorClass.match(/bg-([a-z]+)-\d+/);
-  if (!colorMatch || !colorMatch[1]) return defaultTheme;
-
-  const color = colorMatch[1];
-
-  // Mapper les couleurs avec leurs thèmes
-  const mapping = {
-    'green': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Environnement',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
-    },
-    'blue': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Général',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
-    },
-    'yellow': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Énergie',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=2970&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=2970&q=80'
-    },
-    'purple': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Mobilité',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1519583272095-6433daf26b6e?auto=format&fit=crop&w=2796&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
-    },
-    'red': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Urgence',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
-    },
-    'orange': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Alimentation',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=2974&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=2970&q=80'
-    },
-    'indigo': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Culture',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
-    },
-    'pink': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Social',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
-    },
-    'cyan': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Eau',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
-    },
-    'teal': {
-      bg: `bg-${color}-50`,
-      text: `text-${color}-600`,
-      border: `border-${color}-200`,
-      hover: `hover:bg-${color}-100/50`,
-      accent: `bg-${color}-400/10`,
-      theme: 'Biodiversité',
-      defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
-      defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
-    }
-  };
-
-  return mapping[color] || defaultTheme;
 };
 
 const CommitteePage = () => {
@@ -316,14 +188,18 @@ const CommitteePage = () => {
 
           // Safely check and set the image URLs
           if (committeeData) {
+            console.log("Committee images retrieved:", committeeData);
+            
             // Set team photo if available
             if (committeeData.team_photo_url) {
               setTeamPhotoUrl(committeeData.team_photo_url);
+              console.log("Set team photo URL to:", committeeData.team_photo_url);
             }
 
             // Set cover photo if available
             if (committeeData.cover_photo_url) {
               setCoverPhotoUrl(committeeData.cover_photo_url);
+              console.log("Set cover photo URL to:", committeeData.cover_photo_url);
             }
           }
         }
@@ -400,19 +276,27 @@ const CommitteePage = () => {
   const themeColor = getColorTheme(committee.color);
   const IconComponent = getIconComponent(committee.icon);
 
-  // Utiliser la photo de couverture depuis la DB ou la valeur par défaut
-  const coverImage = coverPhotoUrl || themeColor.defaultCoverImage;
+  // Utiliser la photo de couverture depuis la DB et faire un logging pour debug
+  console.log("Cover photo URL from DB:", committee.cover_photo_url);
+  console.log("Cover photo URL from state:", coverPhotoUrl);
+  console.log("Theme default cover image:", themeColor.defaultCoverImage);
+  
+  const coverImage = committee.cover_photo_url || themeColor.defaultCoverImage;
+  console.log("Final cover image used:", coverImage);
 
   // Utiliser la photo d'équipe depuis la DB ou la valeur par défaut
-  const teamImage = teamPhotoUrl || themeColor.defaultTeamImage;
+  const teamImage = committee.team_photo_url || themeColor.defaultTeamImage;
+  
   const handleOpenShowModal = (work: Tables<'committee_works'> | null) => {
     setSelectedWork(work);
     setMode('view');
   };
+  
   const handleOpenNewModal = () => {
     setSelectedWork(null);
     setMode('create');
   };
+  
   const handleOpenEditModal = (work: Tables<'committee_works'> | null) => {
     setSelectedWork(work);
     setMode('edit');
@@ -470,8 +354,11 @@ const CommitteePage = () => {
           </span>
         </div>
 
-        <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
-          <h2 className="text-2xl font-bold mb-4">À propos de cette commission</h2>
+        <div className={`bg-white shadow-sm rounded-xl p-6 border ${themeColor.border}`}>
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <IconComponent className={`${themeColor.text} mr-2`} size={22} />
+            <span>À propos de cette commission</span>
+          </h2>
           <div className="flex flex-col md:flex-row md:gap-8">
             <div className="md:flex-1">
               <p className="text-getigne-700 whitespace-pre-line mb-6">
@@ -479,13 +366,15 @@ const CommitteePage = () => {
               </p>
 
               <div className="mt-4">
-                <h3 className="text-lg font-medium mb-3">Pilote de la commission</h3>
+                <h3 className={`text-lg font-medium mb-3 ${themeColor.text}`}>
+                  Pilote de la commission
+                </h3>
                 {id && <CommitteeMembers committeeId={id} simplified={true} />}
               </div>
             </div>
 
             <div className="mt-6 md:mt-0 md:w-1/3">
-              <div className="rounded-xl overflow-hidden shadow-md">
+              <div className={`rounded-xl overflow-hidden shadow-md border ${themeColor.border}`}>
                 <img
                   src={teamImage}
                   alt="Équipe de la commission"
@@ -499,10 +388,13 @@ const CommitteePage = () => {
           </div>
         </div>
 
-        <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
+        <div className={`bg-white shadow-sm rounded-xl p-6 border ${themeColor.border}`}>
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Travaux de la commission</h2>
+              <h2 className="text-2xl font-bold mb-2 flex items-center">
+                <FileText className={`${themeColor.text} mr-2`} size={22} />
+                <span>Travaux de la commission</span>
+              </h2>
               <p className="text-getigne-700">
                 Retrouvez ci-dessous les comptes-rendus, études et propositions réalisés par la commission {committee.title}.
                 Ces travaux constituent la base de notre réflexion pour élaborer des propositions concrètes pour Gétigné.
@@ -510,8 +402,9 @@ const CommitteePage = () => {
             </div>
 
             {isCommitteeMember && (
-              <Button variant="outline" onClick={() => handleOpenNewModal()}>
-                <Plus />
+              <Button variant="outline" onClick={() => handleOpenNewModal()} className={`border-${themeColor.border} ${themeColor.text}`}>
+                <Plus className="mr-1" />
+                <span>Nouveau</span>
               </Button>
             )}
           </div>
@@ -539,16 +432,20 @@ const CommitteePage = () => {
                       <h3 className="text-lg font-semibold">{work.title}</h3>
                     </span>
                     <div>
-                      <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenEditModal(work);
-                          }}
-                      >
-                        <Pencil className="h-4 w-4 mr-1" />
-                      </Button>
+                      {isCommitteeMember && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className={`border-${themeColor.border}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenEditModal(work);
+                            }}
+                        >
+                          <Pencil className={`h-4 w-4 mr-1 ${themeColor.text}`} />
+                          <span>Modifier</span>
+                        </Button>
+                      )}
                     </div>
                   </div>
 
@@ -583,7 +480,7 @@ const CommitteePage = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className={`ml-auto border-${themeColor.border}`}
+                      className={`ml-auto border-${themeColor.border} ${themeColor.text}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenShowModal(work);
@@ -615,7 +512,7 @@ const CommitteePage = () => {
               {prevCommittee ? (
                 <Link
                   to={`/commissions/${prevCommittee.id}`}
-                  className="flex items-center hover:underline"
+                  className={`flex items-center hover:underline ${themeColor.text}`}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   <span>Commission {prevCommittee.title}</span>
@@ -628,13 +525,11 @@ const CommitteePage = () => {
               )}
             </div>
 
-
-
             <div className="w-full md:w-auto text-right">
               {nextCommittee ? (
                 <Link
                   to={`/commissions/${nextCommittee.id}`}
-                  className="flex items-center justify-end hover:underline"
+                  className={`flex items-center justify-end hover:underline ${themeColor.text}`}
                 >
                   <span>Commission {nextCommittee.title}</span>
                   <ArrowRight className="h-4 w-4 ml-2" />

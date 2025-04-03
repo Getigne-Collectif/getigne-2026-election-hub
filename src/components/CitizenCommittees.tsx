@@ -19,14 +19,17 @@ const iconMap = {
 };
 
 // Fonction pour calculer les classes de couleur basées sur la classe stockée
-const getColorTheme = (colorClass: string | null) => {
+export const getColorTheme = (colorClass: string | null) => {
   // Valeurs par défaut
   const defaultTheme = {
     bg: 'bg-getigne-50',
     text: 'text-getigne-accent',
     border: 'border-getigne-100',
+    hover: 'hover:bg-getigne-100/50',
     accent: 'bg-getigne-accent/10',
-    theme: 'Thématique'
+    theme: 'Thématique',
+    defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+    defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
   };
 
   // Si pas de couleur spécifiée, retourner les valeurs par défaut
@@ -44,71 +47,101 @@ const getColorTheme = (colorClass: string | null) => {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Environnement'
+      theme: 'Environnement',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
     },
     'blue': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Général'
+      theme: 'Général',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
     },
     'yellow': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Énergie'
+      theme: 'Énergie',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=2970&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=2970&q=80'
     },
     'purple': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Mobilité'
+      theme: 'Mobilité',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1519583272095-6433daf26b6e?auto=format&fit=crop&w=2796&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
     'red': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Urgence'
+      theme: 'Urgence',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
     'orange': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Alimentation'
+      theme: 'Alimentation',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=2974&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=2970&q=80'
     },
     'indigo': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Culture'
+      theme: 'Culture',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
     },
     'pink': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Social'
+      theme: 'Social',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
     'cyan': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Eau'
+      theme: 'Eau',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
     'teal': {
       bg: `bg-${color}-50`,
       text: `text-${color}-600`,
       border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
       accent: `bg-${color}-400/10`,
-      theme: 'Biodiversité'
+      theme: 'Biodiversité',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
     }
   };
 
@@ -162,7 +195,7 @@ const CommitteeItem = ({ committee, index }) => {
     <Link to={`/commissions/${committee.id}`} className="block">
       <div 
         ref={ref}
-        className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift ${
+        className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift transition-all duration-200 ${
           isVisible 
             ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
             : 'opacity-0 translate-y-10'
@@ -176,7 +209,7 @@ const CommitteeItem = ({ committee, index }) => {
           {themeColor.theme}
         </span>
         <h3 className="text-lg font-medium mb-2">{committee.title}</h3>
-        <p className="text-getigne-700 mb-2">{committee.description}</p>
+        <p className="text-getigne-700 mb-2 line-clamp-2">{committee.description}</p>
         
         <div className="flex items-center text-getigne-500 text-sm mb-3">
           <Users size={16} className="mr-1" />
