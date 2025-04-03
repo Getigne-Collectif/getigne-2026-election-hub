@@ -1,18 +1,24 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { type Tables } from '@/integrations/supabase/types';
+import { supabase } from '@/integrations/supabase/client';
 import { Calendar } from 'lucide-react';
 
 interface CommitteeWorkModalProps {
-  work: Tables<'committee_works'> | null;
+  committeeId?: string; // Made optional, but added this prop
+  work?: any | null; // Changed to optional
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const CommitteeWorkModal = ({ work, open, onOpenChange }: CommitteeWorkModalProps) => {
-  if (!work) return null;
-
+const CommitteeWorkModal = ({ committeeId, work, open, onOpenChange }: CommitteeWorkModalProps) => {
+  const [isNew, setIsNew] = useState(!work);
+  
+  useEffect(() => {
+    // If we don't have a work object, this is a new work entry
+    setIsNew(!work);
+  }, [work]);
+  
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -20,6 +26,29 @@ const CommitteeWorkModal = ({ work, open, onOpenChange }: CommitteeWorkModalProp
       year: 'numeric'
     });
   };
+
+  // If in creation mode and no existing work data
+  if (isNew) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Ajouter un nouveau travail</DialogTitle>
+            <DialogDescription>
+              Créez un nouveau document ou rapport pour cette commission
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-6">
+            <p>Formulaire de création à implémenter</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Display mode for existing work
+  if (!work) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

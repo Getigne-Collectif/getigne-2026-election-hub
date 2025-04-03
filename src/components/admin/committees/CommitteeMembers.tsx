@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
@@ -62,8 +62,8 @@ export default function CommitteeMembersManagement({ committeeId, defaultMembers
   const [linkToUser, setLinkToUser] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
-  // Fetch committee members and profiles
-  useState(() => {
+  // Fix: Changed useState() to useEffect()
+  useEffect(() => {
     const fetchCommitteeMembers = async () => {
       if (!committeeId) return;
 

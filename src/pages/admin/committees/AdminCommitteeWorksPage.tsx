@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -105,17 +105,19 @@ export default function AdminCommitteeWorksPage() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Liste des travaux</h2>
         <Button onClick={() => setIsModalOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
           Ajouter un travail
         </Button>
       </div>
 
       <Card>
         <CardContent className="pt-6">
+          {/* Updated modal props to match the new interface */}
           {isModalOpen && (
             <CommitteeWorkModal 
-              committeeId={id || ''} 
-              isOpen={isModalOpen} 
-              onClose={() => setIsModalOpen(false)} 
+              committeeId={id} 
+              open={isModalOpen} 
+              onOpenChange={() => setIsModalOpen(false)} 
             />
           )}
         </CardContent>
