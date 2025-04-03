@@ -61,16 +61,16 @@ export default function AdminCommitteesPage() {
 
       // Get member count for each committee
       const committeesWithMembers: Committee[] = [];
-      
+
       for (const committee of data || []) {
         const memberCount = await getMemberCount(committee.id);
-        
+
         committeesWithMembers.push({
           ...committee,
           memberCount
         });
       }
-      
+
       return committeesWithMembers;
     }
   });
@@ -170,7 +170,7 @@ export default function AdminCommitteesPage() {
               ) : (
                 filteredCommittees.map((committee) => (
                   <>
-                    <TableRow 
+                    <TableRow
                       key={committee.id}
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => toggleExpanded(committee.id)}
@@ -189,11 +189,6 @@ export default function AdminCommitteesPage() {
                       </TableCell>
                       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-end items-center gap-2">
-                          <Button variant="outline" size="icon" asChild>
-                            <Link to={`/admin/committees/members/${committee.id}`}>
-                              <Users className="h-4 w-4" />
-                            </Link>
-                          </Button>
                           <Button variant="outline" size="icon" asChild>
                             <Link to={`/admin/committees/edit/${committee.id}`}>
                               <Edit className="h-4 w-4" />

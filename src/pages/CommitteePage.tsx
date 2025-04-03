@@ -9,7 +9,19 @@ import CommitteeContactForm from '@/components/CommitteeContactForm';
 import { type Tables } from '@/integrations/supabase/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Lightbulb, Bike, Utensils, Music, Leaf, Users, FileText, Calendar, Clock, ArrowLeft, ArrowRight } from 'lucide-react';
+import {
+  Lightbulb,
+  Bike,
+  Utensils,
+  Music,
+  Leaf,
+  Users,
+  FileText,
+  Calendar,
+  ArrowLeft,
+  ArrowRight,
+  Pencil, Trash, Plus
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Breadcrumb,
@@ -20,14 +32,7 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
 import { Home } from 'lucide-react';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import {toast} from "sonner";
 
 interface Member {
   id: string;
@@ -73,7 +78,7 @@ const getColorTheme = (colorClass: string | null) => {
   if (!colorMatch || !colorMatch[1]) return defaultTheme;
 
   const color = colorMatch[1];
-  
+
   // Mapper les couleurs avec leurs thèmes
   const mapping = {
     'green': {
@@ -183,14 +188,15 @@ const getColorTheme = (colorClass: string | null) => {
 
 const CommitteePage = () => {
   const { id } = useParams();
-  const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'> | null>(null);
+  const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'>>(undefined);
   const [teamPhotoUrl, setTeamPhotoUrl] = useState<string | null>(null);
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [otherCommittees, setOtherCommittees] = useState<any[]>([]);
   const [currentCommitteeIndex, setCurrentCommitteeIndex] = useState<number>(-1);
   const [isCommitteeMember, setIsCommitteeMember] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [mode, setMode] = useState<'view' | 'edit' | 'create'>('view');
+  const [works, setWorks] = useState<Tables<'committee_works'>[]>([]);
 
   // Vérifier si l'utilisateur actuel est membre de la commission
   useEffect(() => {
@@ -198,23 +204,21 @@ const CommitteePage = () => {
       try {
         // Récupérer l'utilisateur actuel
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (!user) {
           setIsCommitteeMember(false);
           return;
         }
-        
-        setCurrentUserId(user.id);
-        
+
         // Vérifier s'il est membre de la commission
         if (id && user) {
           const { data, error } = await supabase.rpc(
-            'is_committee_member', 
+            'is_committee_member',
             { user_id: user.id, committee_id: id }
           );
-          
+
           if (error) throw error;
-          
+
           setIsCommitteeMember(!!data);
         }
       } catch (error) {
@@ -222,7 +226,7 @@ const CommitteePage = () => {
         setIsCommitteeMember(false);
       }
     };
-    
+
     checkCommitteeMembership();
   }, [id]);
 
@@ -242,22 +246,24 @@ const CommitteePage = () => {
     },
   });
 
-  const worksQuery = useQuery({
-    queryKey: ['committee', id, 'works'],
-    queryFn: async () => {
+  // Fetch committee works
+  const fetchCommitteeWorks = async () => {
+    if (!id) return;
+
+    try {
       const { data, error } = await supabase
-        .from('committee_works')
-        .select('*')
-        .eq('committee_id', id)
-        .order('date', { ascending: false });
+          .from('committee_works')
+          .select('*')
+          .eq('committee_id', id)
+          .order('date', { ascending: false });
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return data as Tables<'committee_works'>[];
-    },
-  });
+      if (error) throw error;
+      setWorks(data || []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des comptes-rendus:', error);
+      toast.error("Impossible de charger les comptes-rendus");
+    }
+  };
 
   const committeeQuery = useQuery({
     queryKey: ['committee', id],
@@ -291,7 +297,7 @@ const CommitteePage = () => {
     },
   });
 
-  const isLoading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading || allCommitteesQuery.isLoading;
+  const isLoading = membersQuery.isLoading || committeeQuery.isLoading || allCommitteesQuery.isLoading;
 
   useEffect(() => {
     const fetchCommitteeImages = async () => {
@@ -314,7 +320,7 @@ const CommitteePage = () => {
             if (committeeData.team_photo_url) {
               setTeamPhotoUrl(committeeData.team_photo_url);
             }
-            
+
             // Set cover photo if available
             if (committeeData.cover_photo_url) {
               setCoverPhotoUrl(committeeData.cover_photo_url);
@@ -343,8 +349,12 @@ const CommitteePage = () => {
     }
   }, [allCommitteesQuery.data, id]);
 
-  const works = worksQuery.data || [];
   const committee = committeeQuery.data?.[0];
+  useEffect(() => {
+    if (committee) {
+      fetchCommitteeWorks();
+    }
+  }, [committee, id]);
 
   const getPrevCommittee = () => {
     if (currentCommitteeIndex <= 0 || otherCommittees.length === 0) return null;
@@ -392,9 +402,21 @@ const CommitteePage = () => {
 
   // Utiliser la photo de couverture depuis la DB ou la valeur par défaut
   const coverImage = coverPhotoUrl || themeColor.defaultCoverImage;
-  
+
   // Utiliser la photo d'équipe depuis la DB ou la valeur par défaut
   const teamImage = teamPhotoUrl || themeColor.defaultTeamImage;
+  const handleOpenShowModal = (work: Tables<'committee_works'> | null) => {
+    setSelectedWork(work);
+    setMode('view');
+  };
+  const handleOpenNewModal = () => {
+    setSelectedWork(null);
+    setMode('create');
+  };
+  const handleOpenEditModal = (work: Tables<'committee_works'> | null) => {
+    setSelectedWork(work);
+    setMode('edit');
+  };
 
   return (
     <>
@@ -486,15 +508,10 @@ const CommitteePage = () => {
                 Ces travaux constituent la base de notre réflexion pour élaborer des propositions concrètes pour Gétigné.
               </p>
             </div>
-            
+
             {isCommitteeMember && (
-              <Button 
-                className={`${themeColor.bg} ${themeColor.text} border ${themeColor.border} hover:${themeColor.hover}`}
-                asChild
-              >
-                <Link to={`/admin/committees/works/${committee.id}`}>
-                  Gérer les travaux
-                </Link>
+              <Button variant="outline" onClick={() => handleOpenNewModal()}>
+                <Plus />
               </Button>
             )}
           </div>
@@ -514,11 +531,25 @@ const CommitteePage = () => {
                 <div
                   key={work.id}
                   className={`p-6 rounded-lg border ${themeColor.border} cursor-pointer ${themeColor.hover} transition-colors`}
-                  onClick={() => setSelectedWork(work)}
+                  onClick={() => handleOpenShowModal(work)}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <FileText className={`${themeColor.text}`} size={20} />
-                    <h3 className="text-lg font-semibold">{work.title}</h3>
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <span className="flex items-center gap-2">
+                      <FileText className={`${themeColor.text}`} size={20} />
+                      <h3 className="text-lg font-semibold">{work.title}</h3>
+                    </span>
+                    <div>
+                      <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEditModal(work);
+                          }}
+                      >
+                        <Pencil className="h-4 w-4 mr-1" />
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-4 mb-3 text-sm text-getigne-500">
@@ -529,15 +560,6 @@ const CommitteePage = () => {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <Clock size={14} className="mr-1" />
-                      <span>
-                        {new Date(work.date).toLocaleTimeString('fr-FR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
                         })}
                       </span>
                     </div>
@@ -564,7 +586,7 @@ const CommitteePage = () => {
                       className={`ml-auto border-${themeColor.border}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedWork(work);
+                        handleOpenShowModal(work);
                       }}
                     >
                       Voir les détails
@@ -628,9 +650,12 @@ const CommitteePage = () => {
         </div>
 
         <CommitteeWorkModal
+          committeeId={id!}
           work={selectedWork}
-          open={!!selectedWork}
-          onOpenChange={(open) => !open && setSelectedWork(null)}
+          open={selectedWork !== undefined}
+          onOpenChange={(open) => !open && setSelectedWork(undefined)}
+          onSuccess={fetchCommitteeWorks}
+          mode={mode}
         />
       </div>
       <Footer />

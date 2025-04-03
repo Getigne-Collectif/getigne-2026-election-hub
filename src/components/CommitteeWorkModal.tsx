@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Loader2 } from 'lucide-react';
+import {Calendar, Loader2, Trash, Trash2} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -19,20 +19,20 @@ interface CommitteeWorkModalProps {
   mode?: 'view' | 'edit' | 'create';
 }
 
-const CommitteeWorkModal = ({ 
-  committeeId, 
-  work, 
-  open, 
-  onOpenChange, 
+const CommitteeWorkModal = ({
+  committeeId,
+  work,
+  open,
+  onOpenChange,
   onSuccess,
-  mode = 'view' 
+  mode = 'view'
 }: CommitteeWorkModalProps) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [date, setDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
+
   useEffect(() => {
     if (work) {
       setTitle(work.title || '');
@@ -45,7 +45,7 @@ const CommitteeWorkModal = ({
       setDate(new Date().toISOString().split('T')[0]);
     }
   }, [work]);
-  
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -56,7 +56,7 @@ const CommitteeWorkModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!title.trim() || !content.trim() || !date) {
       toast.error("Veuillez remplir tous les champs obligatoires");
       return;
@@ -77,7 +77,7 @@ const CommitteeWorkModal = ({
           .eq('id', work.id);
 
         if (error) throw error;
-        toast.success("Compte-rendu mis à jour avec succès");
+        toast.success("Contenu mis à jour avec succès");
       } else {
         // Create new work
         const { error } = await supabase
@@ -90,7 +90,7 @@ const CommitteeWorkModal = ({
           });
 
         if (error) throw error;
-        toast.success("Compte-rendu créé avec succès");
+        toast.success("Contenu créé avec succès");
       }
 
       if (onSuccess) onSuccess();
@@ -105,7 +105,7 @@ const CommitteeWorkModal = ({
 
   const handleDelete = async () => {
     if (!work?.id) return;
-    
+
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -114,8 +114,8 @@ const CommitteeWorkModal = ({
         .eq('id', work.id);
 
       if (error) throw error;
-      
-      toast.success("Compte-rendu supprimé avec succès");
+
+      toast.success("Contenu supprimé avec succès");
       if (onSuccess) onSuccess();
       onOpenChange(false);
     } catch (error) {
@@ -127,6 +127,7 @@ const CommitteeWorkModal = ({
     }
   };
 
+
   // Edit/Create form
   if (mode === 'edit' || mode === 'create') {
     return (
@@ -137,38 +138,38 @@ const CommitteeWorkModal = ({
               {mode === 'create' ? 'Ajouter un nouveau compte-rendu' : 'Modifier le compte-rendu'}
             </DialogTitle>
             <DialogDescription>
-              {mode === 'create' 
-                ? 'Créez un nouveau compte-rendu pour cette commission' 
+              {mode === 'create'
+                ? 'Créez un nouveau compte-rendu pour cette commission'
                 : 'Modifiez les informations du compte-rendu existant'}
             </DialogDescription>
           </DialogHeader>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4 mt-6">
             <div className="space-y-2">
               <Label htmlFor="title">Titre</Label>
-              <Input 
-                id="title" 
-                value={title} 
+              <Input
+                id="title"
+                value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Titre du compte-rendu"
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="date">Date</Label>
-              <Input 
-                id="date" 
-                type="date" 
-                value={date} 
+              <Input
+                id="date"
+                type="date"
+                value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="content">Contenu</Label>
-              <Textarea 
+              <Textarea
                 id="content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -177,18 +178,51 @@ const CommitteeWorkModal = ({
                 required
               />
             </div>
-            
-            <DialogFooter className="pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
+
+            <DialogFooter className="pt-4 flex flex-col justify-between">
+              {mode === 'edit' &&
+                  <div className={"flex items-center gap-3"}>
+                  {isDeleteDialogOpen &&
+                      <>
+                        Confirmer la suppression ?
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={handleDelete}
+                        >
+                          Oui
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setIsDeleteDialogOpen(false)}
+                        >
+                          Non
+                        </Button>
+                      </>
+                  ||
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={(e) => {
+                          alert('Delete');
+                          setIsDeleteDialogOpen(true);
+                        }}
+                    >
+                      <Trash2/>
+                    </Button>
+                  }</div>
+              }
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
               >
                 Annuler
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isLoading}
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -215,7 +249,7 @@ const CommitteeWorkModal = ({
               <time>{formatDate(work.date)}</time>
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="mt-6">
             <div className="prose max-w-none">
               <div dangerouslySetInnerHTML={{ __html: work.content }} />
@@ -227,8 +261,8 @@ const CommitteeWorkModal = ({
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {(work.images as any[]).map((image, index) => (
                     <div key={index} className="aspect-square rounded-lg overflow-hidden">
-                      <img 
-                        src={image.url} 
+                      <img
+                        src={image.url}
                         alt={image.alt || `Image ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
@@ -237,13 +271,13 @@ const CommitteeWorkModal = ({
                 </div>
               </div>
             )}
-            
+
             {(work.files as any[])?.length > 0 && (
               <div className="mt-8">
                 <h3 className="text-lg font-medium mb-4">Documents</h3>
                 <div className="space-y-2">
                   {(work.files as any[]).map((file, index) => (
-                    <a 
+                    <a
                       key={index}
                       href={file.url}
                       target="_blank"
@@ -264,26 +298,27 @@ const CommitteeWorkModal = ({
               </div>
             )}
           </div>
+          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} disabled={isLoading} className="bg-red-600 hover:bg-red-700">
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer ce compte-rendu ? Cette action est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isLoading} className="bg-red-600 hover:bg-red-700">
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+
     </>
   );
 };

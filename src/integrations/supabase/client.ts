@@ -33,6 +33,16 @@ export type Committee = {
   created_at?: string;
   updated_at?: string;
 };
+export type CommitteeWork = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  committee_id: string;
+  created_at: string;
+  images: any; // Changed from any[] to any to accommodate Json type from Supabase
+  files: any; // Changed from any[] to any to accommodate Json type from Supabase
+}
 
 // Type assertion helper for Supabase queries
 export function asTable<T>(tableName: string): string {
