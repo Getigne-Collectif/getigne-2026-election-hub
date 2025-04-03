@@ -4,11 +4,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {Calendar, Loader2, Trash, Trash2} from 'lucide-react';
+import { Calendar, Loader2, Trash, Trash2, File, Paperclip, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import MarkdownEditor from '@/components/MarkdownEditor';
+import { v4 as uuidv4 } from 'uuid';
 
 interface CommitteeWorkModalProps {
   committeeId?: string;
@@ -17,6 +18,13 @@ interface CommitteeWorkModalProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   mode?: 'view' | 'edit' | 'create';
+}
+
+interface AttachedFile {
+  id?: string;
+  name: string;
+  url: string;
+  size?: number;
 }
 
 const CommitteeWorkModal = ({
@@ -32,17 +40,29 @@ const CommitteeWorkModal = ({
   const [date, setDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [files, setFiles] = useState<AttachedFile[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (work) {
       setTitle(work.title || '');
       setContent(work.content || '');
       setDate(work.date ? new Date(work.date).toISOString().split('T')[0] : '');
+      
+      // Initialize files from work data
+      const workFiles = work.files || [];
+      if (Array.isArray(workFiles)) {
+        setFiles(workFiles);
+      } else {
+        console.warn("Files data is not in expected format:", workFiles);
+        setFiles([]);
+      }
     } else {
       // Set default values for new work
       setTitle('');
       setContent('');
       setDate(new Date().toISOString().split('T')[0]);
+      setFiles([]);
     }
   }, [work]);
 
@@ -72,6 +92,7 @@ const CommitteeWorkModal = ({
             title,
             content,
             date,
+            files,
             updated_at: new Date().toISOString()
           })
           .eq('id', work.id);
@@ -87,6 +108,7 @@ const CommitteeWorkModal = ({
             content,
             date,
             committee_id: committeeId,
+            files,
           });
 
         if (error) throw error;
@@ -127,6 +149,56 @@ const CommitteeWorkModal = ({
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+
+    setIsUploading(true);
+    try {
+      // Generate unique filename
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `committees/files/${fileName}`;
+
+      // Upload file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('public')
+        .upload(filePath, selectedFile, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('public')
+        .getPublicUrl(filePath);
+
+      // Add file to list
+      const newFile: AttachedFile = {
+        id: uuidv4(),
+        name: selectedFile.name,
+        url: publicUrlData.publicUrl,
+        size: selectedFile.size,
+      };
+
+      setFiles([...files, newFile]);
+      toast.success(`Fichier "${selectedFile.name}" ajouté avec succès`);
+    } catch (error) {
+      console.error("Erreur lors de l'upload du fichier:", error);
+      toast.error("Impossible d'uploader le fichier");
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
+  const removeFile = (fileToRemove: AttachedFile) => {
+    setFiles(files.filter(file => file.id !== fileToRemove.id || file.url !== fileToRemove.url));
+    toast.success(`Fichier "${fileToRemove.name}" retiré`);
+  };
 
   // Edit/Create form
   if (mode === 'edit' || mode === 'create') {
@@ -169,65 +241,116 @@ const CommitteeWorkModal = ({
 
             <div className="space-y-2">
               <Label htmlFor="content">Contenu</Label>
-              <Textarea
-                id="content"
+              <MarkdownEditor
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Contenu du compte-rendu"
+                onChange={setContent}
                 className="min-h-[200px]"
-                required
+                contentType="news"
               />
             </div>
 
-            <DialogFooter className="pt-4 flex flex-col justify-between">
-              {mode === 'edit' &&
-                  <div className={"flex items-center gap-3"}>
-                  {isDeleteDialogOpen &&
-                      <>
-                        Confirmer la suppression ?
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={handleDelete}
+            {/* Fichiers joints */}
+            <div className="space-y-2">
+              <Label>Fichiers joints</Label>
+              <div className="mt-2 space-y-3">
+                {/* Liste des fichiers */}
+                {files.length > 0 && (
+                  <div className="space-y-2">
+                    {files.map((file, index) => (
+                      <div 
+                        key={file.id || index} 
+                        className="flex items-center justify-between p-3 border border-getigne-200 rounded-lg"
+                      >
+                        <div className="flex items-center gap-2">
+                          <File className="h-4 w-4 text-getigne-500" />
+                          <span>{file.name}</span>
+                        </div>
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => removeFile(file)}
                         >
-                          Oui
+                          <X className="h-4 w-4" />
                         </Button>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setIsDeleteDialogOpen(false)}
-                        >
-                          Non
-                        </Button>
-                      </>
-                  ||
-                    <Button
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Upload button */}
+                <div className="flex items-center">
+                  <input
+                    id="file-upload"
+                    type="file"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <label 
+                    htmlFor="file-upload" 
+                    className={`cursor-pointer flex items-center px-4 py-2 border border-dashed border-getigne-300 rounded-md ${isUploading ? 'opacity-50' : 'hover:bg-getigne-50'}`}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Paperclip className="h-4 w-4 mr-2" />
+                    )}
+                    Ajouter un fichier
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {mode === 'edit' && (
+                  isDeleteDialogOpen ? (
+                    <>
+                      <span>Confirmer la suppression ?</span>
+                      <Button
                         type="button"
                         variant="destructive"
-                        onClick={(e) => {
-                          alert('Delete');
-                          setIsDeleteDialogOpen(true);
-                        }}
+                        onClick={handleDelete}
+                      >
+                        Oui
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsDeleteDialogOpen(false)}
+                      >
+                        Non
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => setIsDeleteDialogOpen(true)}
                     >
-                      <Trash2/>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Supprimer
                     </Button>
-                  }</div>
-              }
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-              >
-                Annuler
-              </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {mode === 'create' ? 'Créer' : 'Enregistrer'}
-              </Button>
+                  )
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isLoading || isUploading}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading || isUploading}
+                >
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {mode === 'create' ? 'Créer' : 'Enregistrer'}
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -251,7 +374,7 @@ const CommitteeWorkModal = ({
           </DialogHeader>
 
           <div className="mt-6">
-            <div className="prose max-w-none">
+            <div className="prose max-w-none rich-content">
               <div dangerouslySetInnerHTML={{ __html: work.content }} />
             </div>
 
@@ -284,6 +407,7 @@ const CommitteeWorkModal = ({
                       rel="noopener noreferrer"
                       className="flex items-center p-3 border border-getigne-100 rounded-lg hover:bg-getigne-50 transition-colors"
                     >
+                      <File className="h-5 w-5 mr-2 text-getigne-500" />
                       <div className="text-getigne-700">
                         <div className="font-medium">{file.name}</div>
                         {file.size && (
@@ -298,27 +422,26 @@ const CommitteeWorkModal = ({
               </div>
             )}
           </div>
-          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} disabled={isLoading} className="bg-red-600 hover:bg-red-700">
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Supprimer
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </DialogContent>
       </Dialog>
 
-
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isLoading} className="bg-red-600 hover:bg-red-700">
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
