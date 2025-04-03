@@ -39,6 +39,7 @@ export type Database = {
       citizen_committees: {
         Row: {
           color: string | null
+          cover_photo_url: string | null
           created_at: string
           description: string
           icon: string
@@ -49,6 +50,7 @@ export type Database = {
         }
         Insert: {
           color?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           description: string
           icon: string
@@ -59,6 +61,7 @@ export type Database = {
         }
         Update: {
           color?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           description?: string
           icon?: string

@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, Committee } from '@/integrations/supabase/client';
 import CommitteeMembers from '@/components/CommitteeMembers';
 import CommitteeWorkModal from '@/components/CommitteeWorkModal';
 import CommitteeContactForm from '@/components/CommitteeContactForm';
@@ -34,16 +33,6 @@ interface Member {
   name: string;
   role: string;
   photo: string;
-}
-
-interface Committee {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  team_photo_url?: string | null;
-  cover_photo_url?: string | null;
-  color: string | null;
 }
 
 const iconMap = {
