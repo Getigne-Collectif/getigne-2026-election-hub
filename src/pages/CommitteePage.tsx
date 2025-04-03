@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -307,14 +308,17 @@ const CommitteePage = () => {
             return;
           }
 
-          // Définir l'image d'équipe
-          if (committeeData?.team_photo_url) {
-            setTeamPhotoUrl(committeeData.team_photo_url);
-          }
-          
-          // Définir l'image de couverture
-          if (committeeData?.cover_photo_url) {
-            setCoverPhotoUrl(committeeData.cover_photo_url);
+          // Safely check and set the image URLs
+          if (committeeData) {
+            // Set team photo if available
+            if (committeeData.team_photo_url) {
+              setTeamPhotoUrl(committeeData.team_photo_url);
+            }
+            
+            // Set cover photo if available
+            if (committeeData.cover_photo_url) {
+              setCoverPhotoUrl(committeeData.cover_photo_url);
+            }
           }
         }
       } catch (error) {
