@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { v4 as uuidv4 } from 'uuid';
+import { Json } from '@/integrations/supabase/types';
 
 interface CommitteeWorkModalProps {
   committeeId?: string;
@@ -84,6 +85,9 @@ const CommitteeWorkModal = ({
 
     setIsLoading(true);
     try {
+      // Convert files to Json compatible format
+      const filesJson = files as unknown as Json;
+      
       if (work?.id) {
         // Update existing work
         const { error } = await supabase
@@ -92,7 +96,7 @@ const CommitteeWorkModal = ({
             title,
             content,
             date,
-            files,
+            files: filesJson,
             updated_at: new Date().toISOString()
           })
           .eq('id', work.id);
@@ -108,7 +112,7 @@ const CommitteeWorkModal = ({
             content,
             date,
             committee_id: committeeId,
-            files,
+            files: filesJson,
           });
 
         if (error) throw error;
