@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, Trash2 } from 'lucide-react';
+import { User, Edit, Trash2, UploadCloud, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 
 type CommitteeMember = {
@@ -27,6 +28,9 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingMember, setEditingMember] = useState<CommitteeMember | null>(null);
+  const [memberPhotoFile, setMemberPhotoFile] = useState<File | null>(null);
+  const [memberPhotoPreview, setMemberPhotoPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -51,22 +55,78 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
     fetchMembers();
   }, [committeeId]);
 
+  const handleMemberPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setMemberPhotoFile(null);
+      setMemberPhotoPreview(null);
+      return;
+    }
+
+    const file = e.target.files[0];
+    setMemberPhotoFile(file);
+    
+    const objectUrl = URL.createObjectURL(file);
+    setMemberPhotoPreview(objectUrl);
+  };
+
+  const uploadMemberPhoto = async (file: File): Promise<string | null> => {
+    if (!file) return null;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `members/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Erreur lors de l\'upload de l\'avatar:', error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de télécharger l'avatar"
+      });
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleEditMember = async () => {
     if (!editingMember) return;
 
     try {
+      let photoUrl = editingMember.photo;
+      
+      if (memberPhotoFile) {
+        const uploadedUrl = await uploadMemberPhoto(memberPhotoFile);
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+        }
+      }
+
       const { error } = await supabase
         .from('committee_members')
         .update({ 
           name: editingMember.name, 
-          role: editingMember.role 
+          role: editingMember.role,
+          photo: photoUrl
         })
         .eq('id', editingMember.id);
 
       if (error) throw error;
 
       setMembers(members.map(m => 
-        m.id === editingMember.id ? editingMember : m
+        m.id === editingMember.id ? {...editingMember, photo: photoUrl} : m
       ));
 
       toast({
@@ -74,7 +134,10 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
         description: 'Les informations du membre ont été modifiées avec succès.',
       });
 
+      // Réinitialiser les états
       setEditingMember(null);
+      setMemberPhotoFile(null);
+      setMemberPhotoPreview(null);
     } catch (error) {
       console.error('Erreur lors de la mise à jour du membre:', error);
       toast({
@@ -110,6 +173,15 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
     }
   };
 
+  useEffect(() => {
+    // Initialiser la prévisualisation de la photo si on est en mode édition
+    if (editingMember?.photo && editingMember.photo !== 'placeholder.svg') {
+      setMemberPhotoPreview(editingMember.photo);
+    } else {
+      setMemberPhotoPreview(null);
+    }
+  }, [editingMember]);
+
   if (loading) {
     return <div className="py-2">Chargement des membres...</div>;
   }
@@ -133,7 +205,7 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
               {pilots.map(pilot => (
                 <div key={pilot.id} className="flex items-center">
                   <Avatar className="w-6 h-6 mr-2">
-                    {pilot.photo ? (
+                    {pilot.photo && pilot.photo !== 'placeholder.svg' ? (
                       <AvatarImage src={pilot.photo} alt={pilot.name} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-getigne-100">
@@ -171,7 +243,7 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
             {pilots.map(pilot => (
               <div key={pilot.id} className="flex flex-col items-center text-center relative">
                 <Avatar className="w-24 h-24 mb-3 border-2 border-getigne-accent">
-                  {pilot.photo ? (
+                  {pilot.photo && pilot.photo !== 'placeholder.svg' ? (
                     <AvatarImage src={pilot.photo} alt={pilot.name} className="object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-getigne-100">
@@ -218,7 +290,7 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
             {regularMembers.map(member => (
               <div key={member.id} className="flex flex-col items-center text-center relative">
                 <Avatar className="w-20 h-20 mb-3 border border-getigne-200">
-                  {member.photo ? (
+                  {member.photo && member.photo !== 'placeholder.svg' ? (
                     <AvatarImage src={member.photo} alt={member.name} className="object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-getigne-100">
@@ -272,15 +344,86 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
                 value={editingMember.name}
                 onChange={(e) => setEditingMember({...editingMember, name: e.target.value})}
               />
-              <Input 
-                placeholder="Rôle" 
-                value={editingMember.role}
-                onChange={(e) => setEditingMember({...editingMember, role: e.target.value})}
-              />
+              
+              <div>
+                <Label>Photo</Label>
+                <div className="flex flex-col items-center mt-2">
+                  {memberPhotoPreview && (
+                    <div className="mb-4 relative">
+                      <img 
+                        src={memberPhotoPreview} 
+                        alt="Aperçu avatar" 
+                        className="w-24 h-24 object-cover rounded-full"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-0 right-0 h-5 w-5"
+                        onClick={() => {
+                          setMemberPhotoFile(null);
+                          setMemberPhotoPreview(null);
+                          // Si c'était une photo déjà existante, la conserver
+                          if (editingMember.photo === memberPhotoPreview) {
+                            setMemberPhotoPreview(editingMember.photo);
+                          }
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-center w-full">
+                    <label htmlFor="memberPhotoUpload" className="cursor-pointer">
+                      <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        <UploadCloud className="h-6 w-6 text-gray-400" />
+                        <p className="mt-1 text-xs text-gray-500">
+                          {memberPhotoPreview ? 'Changer la photo' : 'Ajouter une photo'}
+                        </p>
+                      </div>
+                      <input
+                        type="file"
+                        id="memberPhotoUpload"
+                        accept="image/*"
+                        onChange={handleMemberPhotoChange}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="rolePilote"
+                  checked={editingMember.role === 'pilote'}
+                  onChange={() => setEditingMember({...editingMember, role: 'pilote'})}
+                  className="mr-2"
+                />
+                <label htmlFor="rolePilote">Pilote</label>
+                
+                <input
+                  type="radio"
+                  id="roleMembre"
+                  checked={editingMember.role === 'membre'}
+                  onChange={() => setEditingMember({...editingMember, role: 'membre'})}
+                  className="ml-4 mr-2"
+                />
+                <label htmlFor="roleMembre">Membre</label>
+              </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditingMember(null)}>Annuler</Button>
-              <Button onClick={handleEditMember}>Enregistrer</Button>
+              <Button variant="outline" onClick={() => {
+                setEditingMember(null);
+                setMemberPhotoFile(null);
+                setMemberPhotoPreview(null);
+              }}>
+                Annuler
+              </Button>
+              <Button onClick={handleEditMember} disabled={isUploading}>
+                {isUploading ? 'Envoi en cours...' : 'Enregistrer'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

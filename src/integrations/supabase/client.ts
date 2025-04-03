@@ -21,6 +21,19 @@ export type NewsCategory = {
 // Helper type for projects
 export type { Project } from '@/types/projects.types';
 
+// Helper type for committees
+export type Committee = {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  team_photo_url?: string | null;
+  cover_photo_url?: string | null;
+  color: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
 // Type assertion helper for Supabase queries
 export function asTable<T>(tableName: string): string {
   return tableName;

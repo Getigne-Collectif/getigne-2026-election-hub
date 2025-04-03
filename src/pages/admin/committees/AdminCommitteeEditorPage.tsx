@@ -44,6 +44,7 @@ type Committee = {
   description: string;
   icon: string;
   team_photo_url?: string | null;
+  cover_photo_url?: string | null;
   color: string | null;
   created_at: string;
   updated_at: string;
@@ -89,9 +90,15 @@ export default function AdminCommitteeEditorPage() {
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState('users');
   const [teamPhotoUrl, setTeamPhotoUrl] = useState('');
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState('');
   const [color, setColor] = useState(AVAILABLE_COLORS[0].value);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  
+  const [teamPhotoFile, setTeamPhotoFile] = useState<File | null>(null);
+  const [teamPhotoPreview, setTeamPhotoPreview] = useState<string | null>(null);
+  
+  const [coverPhotoFile, setCoverPhotoFile] = useState<File | null>(null);
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
+  
   const [isUploading, setIsUploading] = useState(false);
 
   const [members, setMembers] = useState<Member[]>([]);
@@ -100,7 +107,8 @@ export default function AdminCommitteeEditorPage() {
   const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = useState(false);
   const [memberName, setMemberName] = useState('');
   const [memberRole, setMemberRole] = useState('membre');
-  const [memberPhoto, setMemberPhoto] = useState('');
+  const [memberPhotoFile, setMemberPhotoFile] = useState<File | null>(null);
+  const [memberPhotoPreview, setMemberPhotoPreview] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [linkToUser, setLinkToUser] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
@@ -133,7 +141,12 @@ export default function AdminCommitteeEditorPage() {
         
         if (data.team_photo_url) {
           setTeamPhotoUrl(data.team_photo_url);
-          setPhotoPreview(data.team_photo_url);
+          setTeamPhotoPreview(data.team_photo_url);
+        }
+        
+        if (data.cover_photo_url) {
+          setCoverPhotoUrl(data.cover_photo_url);
+          setCoverPhotoPreview(data.cover_photo_url);
         }
         
         await fetchCommitteeMembers();
@@ -181,46 +194,99 @@ export default function AdminCommitteeEditorPage() {
     }
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTeamPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
-      setPhotoFile(null);
-      setPhotoPreview(null);
+      setTeamPhotoFile(null);
+      setTeamPhotoPreview(null);
       return;
     }
 
     const file = e.target.files[0];
-    setPhotoFile(file);
+    setTeamPhotoFile(file);
     
     const objectUrl = URL.createObjectURL(file);
-    setPhotoPreview(objectUrl);
+    setTeamPhotoPreview(objectUrl);
   };
 
-  const uploadPhoto = async () => {
-    if (!photoFile) return null;
+  const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setCoverPhotoFile(null);
+      setCoverPhotoPreview(null);
+      return;
+    }
+
+    const file = e.target.files[0];
+    setCoverPhotoFile(file);
+    
+    const objectUrl = URL.createObjectURL(file);
+    setCoverPhotoPreview(objectUrl);
+  };
+
+  const handleMemberPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setMemberPhotoFile(null);
+      setMemberPhotoPreview(null);
+      return;
+    }
+
+    const file = e.target.files[0];
+    setMemberPhotoFile(file);
+    
+    const objectUrl = URL.createObjectURL(file);
+    setMemberPhotoPreview(objectUrl);
+  };
+
+  const uploadPhoto = async (file: File, bucketName: string): Promise<string | null> => {
+    if (!file) return null;
 
     setIsUploading(true);
     try {
-      const fileExt = photoFile.name.split('.').pop();
+      const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `committee-photos/${fileName}`;
+      const filePath = `${bucketName === 'committee_covers' ? 'covers' : 'teams'}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('public')
-        .upload(filePath, photoFile);
+        .from(bucketName)
+        .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data } = supabase.storage
-        .from('public')
+        .from(bucketName)
         .getPublicUrl(filePath);
 
       return data.publicUrl;
     } catch (error) {
-      console.error('Erreur lors de l\'upload de l\'image:', error);
+      console.error(`Erreur lors de l'upload de l'image dans ${bucketName}:`, error);
       toast.error("Erreur lors de l'upload de l'image");
       return null;
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const uploadMemberPhoto = async (file: File): Promise<string | null> => {
+    if (!file) return null;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `members/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Erreur lors de l\'upload de l\'avatar du membre:', error);
+      toast.error("Erreur lors de l'upload de l'avatar du membre");
+      return null;
     }
   };
 
@@ -230,11 +296,20 @@ export default function AdminCommitteeEditorPage() {
     try {
       setIsLoading(true);
       
-      let photoUrl = teamPhotoUrl;
-      if (photoFile) {
-        const uploadedUrl = await uploadPhoto();
+      let teamPhotoUrlFinal = teamPhotoUrl;
+      let coverPhotoUrlFinal = coverPhotoUrl;
+      
+      if (teamPhotoFile) {
+        const uploadedUrl = await uploadPhoto(teamPhotoFile, 'public');
         if (uploadedUrl) {
-          photoUrl = uploadedUrl;
+          teamPhotoUrlFinal = uploadedUrl;
+        }
+      }
+      
+      if (coverPhotoFile) {
+        const uploadedUrl = await uploadPhoto(coverPhotoFile, 'committee_covers');
+        if (uploadedUrl) {
+          coverPhotoUrlFinal = uploadedUrl;
         }
       }
       
@@ -242,7 +317,8 @@ export default function AdminCommitteeEditorPage() {
         title,
         description,
         icon,
-        team_photo_url: photoUrl || null,
+        team_photo_url: teamPhotoUrlFinal || null,
+        cover_photo_url: coverPhotoUrlFinal || null,
         color
       };
       
@@ -327,11 +403,27 @@ export default function AdminCommitteeEditorPage() {
     }
 
     try {
+      // Si lié à un utilisateur, on utilise seulement l'ID utilisateur
+      // Sinon, on utilise les données saisies manuellement
+      let photoUrl = 'placeholder.svg';
+      
+      // Si un fichier photo a été sélectionné, on l'upload
+      if (memberPhotoFile) {
+        const uploadedUrl = await uploadMemberPhoto(memberPhotoFile);
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+        }
+      }
+
       const memberData = {
         committee_id: id,
-        name: memberName,
+        name: linkToUser ? 
+          // Si lié à un utilisateur, on récupère le nom complet du profil
+          userProfiles.find(p => p.id === selectedUserId)?.first_name + ' ' + 
+          userProfiles.find(p => p.id === selectedUserId)?.last_name : 
+          memberName,
         role: memberRole,
-        photo: memberPhoto || 'placeholder.svg',
+        photo: photoUrl,
         user_id: linkToUser ? selectedUserId : null
       };
 
@@ -344,9 +436,11 @@ export default function AdminCommitteeEditorPage() {
       toast.success("Membre ajouté avec succès");
       setIsAddMemberDialogOpen(false);
       
+      // Réinitialiser les champs
       setMemberName('');
       setMemberRole('membre');
-      setMemberPhoto('');
+      setMemberPhotoFile(null);
+      setMemberPhotoPreview(null);
       setSelectedUserId('');
       setLinkToUser(false);
       
@@ -379,11 +473,6 @@ export default function AdminCommitteeEditorPage() {
 
   const handleUserSelect = (userId: string) => {
     setSelectedUserId(userId);
-    
-    const selectedUser = userProfiles.find(profile => profile.id === userId);
-    if (selectedUser) {
-      setMemberName(`${selectedUser.first_name} ${selectedUser.last_name}`);
-    }
   };
 
   return (
@@ -481,13 +570,14 @@ export default function AdminCommitteeEditorPage() {
                       </div>
                     </div>
                     
+                    {/* Photo d'équipe */}
                     <div className="space-y-2">
                       <Label>Photo d'équipe</Label>
                       <div className="flex flex-col items-center mt-2">
-                        {photoPreview && (
+                        {teamPhotoPreview && (
                           <div className="mb-4 relative">
                             <img 
-                              src={photoPreview} 
+                              src={teamPhotoPreview} 
                               alt="Aperçu" 
                               className="w-64 h-48 object-cover rounded-lg shadow-md"
                             />
@@ -497,8 +587,8 @@ export default function AdminCommitteeEditorPage() {
                               size="icon"
                               className="absolute top-1 right-1 h-6 w-6"
                               onClick={() => {
-                                setPhotoFile(null);
-                                setPhotoPreview(null);
+                                setTeamPhotoFile(null);
+                                setTeamPhotoPreview(null);
                                 setTeamPhotoUrl('');
                               }}
                             >
@@ -507,16 +597,60 @@ export default function AdminCommitteeEditorPage() {
                           </div>
                         )}
                         <div className="flex items-center justify-center w-full">
-                          <label htmlFor="photoUpload" className="cursor-pointer">
+                          <label htmlFor="teamPhotoUpload" className="cursor-pointer">
                             <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                               <UploadCloud className="h-8 w-8 text-gray-400" />
-                              <p className="mt-1 text-sm text-gray-500">Cliquez pour sélectionner une image</p>
+                              <p className="mt-1 text-sm text-gray-500">Cliquez pour sélectionner une image d'équipe</p>
                             </div>
                             <input
                               type="file"
-                              id="photoUpload"
+                              id="teamPhotoUpload"
                               accept="image/*"
-                              onChange={handlePhotoChange}
+                              onChange={handleTeamPhotoChange}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Photo de couverture */}
+                    <div className="space-y-2">
+                      <Label>Photo de couverture</Label>
+                      <div className="flex flex-col items-center mt-2">
+                        {coverPhotoPreview && (
+                          <div className="mb-4 relative">
+                            <img 
+                              src={coverPhotoPreview} 
+                              alt="Aperçu couverture" 
+                              className="w-full h-48 object-cover rounded-lg shadow-md"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-1 right-1 h-6 w-6"
+                              onClick={() => {
+                                setCoverPhotoFile(null);
+                                setCoverPhotoPreview(null);
+                                setCoverPhotoUrl('');
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-center w-full">
+                          <label htmlFor="coverPhotoUpload" className="cursor-pointer w-full">
+                            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                              <UploadCloud className="h-8 w-8 text-gray-400" />
+                              <p className="mt-1 text-sm text-gray-500">Cliquez pour sélectionner une image de couverture</p>
+                            </div>
+                            <input
+                              type="file"
+                              id="coverPhotoUpload"
+                              accept="image/*"
+                              onChange={handleCoverPhotoChange}
                               className="hidden"
                             />
                           </label>
@@ -660,16 +794,62 @@ export default function AdminCommitteeEditorPage() {
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="memberName">Nom complet</Label>
-              <Input
-                id="memberName"
-                value={memberName}
-                onChange={(e) => setMemberName(e.target.value)}
-                placeholder="Prénom Nom"
-                required
-              />
-            </div>
+            {!linkToUser && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="memberName">Nom complet</Label>
+                  <Input
+                    id="memberName"
+                    value={memberName}
+                    onChange={(e) => setMemberName(e.target.value)}
+                    placeholder="Prénom Nom"
+                    required={!linkToUser}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Photo du membre</Label>
+                  <div className="flex flex-col items-center mt-2">
+                    {memberPhotoPreview && (
+                      <div className="mb-4 relative">
+                        <img 
+                          src={memberPhotoPreview} 
+                          alt="Aperçu avatar" 
+                          className="w-24 h-24 object-cover rounded-full"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-0 right-0 h-5 w-5"
+                          onClick={() => {
+                            setMemberPhotoFile(null);
+                            setMemberPhotoPreview(null);
+                          }}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-center w-full">
+                      <label htmlFor="memberPhotoUpload" className="cursor-pointer">
+                        <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                          <UploadCloud className="h-6 w-6 text-gray-400" />
+                          <p className="mt-1 text-xs text-gray-500">Sélectionner une photo</p>
+                        </div>
+                        <input
+                          type="file"
+                          id="memberPhotoUpload"
+                          accept="image/*"
+                          onChange={handleMemberPhotoChange}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="memberRole">Rôle</Label>
@@ -685,19 +865,6 @@ export default function AdminCommitteeEditorPage() {
                   <SelectItem value="membre">Membre</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="memberPhoto">URL de la photo</Label>
-              <Input
-                id="memberPhoto"
-                value={memberPhoto}
-                onChange={(e) => setMemberPhoto(e.target.value)}
-                placeholder="https://example.com/photo.jpg"
-              />
-              <p className="text-xs text-muted-foreground">
-                Si non spécifié, une image par défaut sera utilisée.
-              </p>
             </div>
           </div>
           <AlertDialogFooter>

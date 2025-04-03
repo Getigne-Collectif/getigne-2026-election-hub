@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -40,112 +41,200 @@ interface Committee {
   title: string;
   description: string;
   icon: string;
-  team_photo_url?: string;
+  team_photo_url?: string | null;
+  cover_photo_url?: string | null;
+  color: string | null;
 }
 
 const iconMap = {
-  'Lightbulb': Lightbulb,
-  'Bicycle': Bike,
-  'Utensils': Utensils,
-  'Music': Music,
-  'Leaf': Leaf
+  'users': Users,
+  'lightbulb': Lightbulb,
+  'bike': Bike,
+  'bicycle': Bike,
+  'utensils': Utensils,
+  'music': Music,
+  'leaf': Leaf
 };
 
-const colorMap = {
-  'Lightbulb': {
-    bg: 'bg-yellow-50',
-    text: 'text-yellow-600',
-    border: 'border-yellow-200',
-    hover: 'hover:bg-yellow-100/50',
-    accent: 'bg-yellow-400/10',
-    theme: 'Énergie',
-    coverImage: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80',
-    teamImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80'
-  },
-  'Bicycle': {
-    bg: 'bg-purple-50',
-    text: 'text-purple-600',
-    border: 'border-purple-200',
-    hover: 'hover:bg-purple-100/50',
-    accent: 'bg-purple-400/10',
-    theme: 'Mobilité',
-    coverImage: 'https://images.unsplash.com/photo-1519583272095-6433daf26b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2796&q=80',
-    teamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80'
-  },
-  'Utensils': {
-    bg: 'bg-orange-50',
-    text: 'text-orange-600',
-    border: 'border-orange-200',
-    hover: 'hover:bg-orange-100/50',
-    accent: 'bg-orange-400/10',
-    theme: 'Alimentation',
-    coverImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2974&q=80',
-    teamImage: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80'
-  },
-  'Music': {
-    bg: 'bg-blue-50',
-    text: 'text-blue-600',
-    border: 'border-blue-200',
-    hover: 'hover:bg-blue-100/50',
-    accent: 'bg-blue-400/10',
-    theme: 'Culture',
-    coverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80',
-    teamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80'
-  },
-  'Leaf': {
-    bg: 'bg-green-50',
-    text: 'text-green-600',
-    border: 'border-green-200',
-    hover: 'hover:bg-green-100/50',
-    accent: 'bg-green-400/10',
-    theme: 'Biodiversité',
-    coverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2971&q=80',
-    teamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80'
-  }
+// Fonctions utilitaires pour les couleurs
+const getIconComponent = (iconName: string) => {
+  const key = iconName ? iconName.toLowerCase() : 'users';
+  return iconMap[key] || Users;
 };
 
-const extendedDescriptions = {
-  'Lightbulb': `
-    La commission Énergie travaille sur les questions de transition énergétique et d'efficacité énergétique 
-    au niveau communal. Nous étudions les moyens de développer les énergies renouvelables à Gétigné, 
-    de réduire la consommation énergétique des bâtiments publics et d'accompagner les habitants dans leurs 
-    projets de rénovation énergétique. Nous travaillons également sur la question de l'éclairage public et 
-    de la lutte contre la pollution lumineuse.
-  `,
-  'Bicycle': `
-    La commission Mobilité réfléchit aux moyens d'améliorer les déplacements dans notre commune, en favorisant 
-    les mobilités douces et en réduisant la place de la voiture. Nous travaillons sur le développement des 
-    pistes cyclables, la sécurisation des cheminements piétons, l'amélioration des transports en commun et 
-    la mise en place de solutions innovantes comme le covoiturage local ou l'autopartage.
-  `,
-  'Utensils': `
-    La commission Alimentation s'intéresse à la question de l'autonomie alimentaire locale, au développement 
-    des circuits courts et à l'amélioration de la qualité des repas dans la restauration collective (école, EHPAD). 
-    Nous travaillons sur des projets de jardins partagés, de marchés de producteurs locaux et d'éducation à 
-    l'alimentation durable. Notre objectif est de promouvoir une alimentation saine, locale et respectueuse 
-    de l'environnement.
-  `,
-  'Music': `
-    La commission Culture travaille sur l'offre culturelle de notre commune, afin de la rendre plus riche, 
-    diversifiée et accessible à tous. Nous réfléchissons à la valorisation du patrimoine local, à l'amélioration 
-    des équipements culturels et à la mise en place d'événements fédérateurs. Nous voulons faire de Gétigné 
-    une commune où la culture est vivante et partagée par le plus grand nombre.
-  `,
-  'Leaf': `
-    La commission Biodiversité se concentre sur la préservation et la valorisation de notre environnement naturel. 
-    Nous travaillons sur la végétalisation des espaces publics, la gestion différenciée des espaces verts, 
-    la préservation des zones humides et la sensibilisation des habitants à la richesse de notre biodiversité locale. 
-    Nous portons également des projets de création de corridors écologiques et de protection des espèces locales.
-  `
+const getColorTheme = (colorClass: string | null) => {
+  // Valeurs par défaut au cas où la couleur n'est pas définie
+  const defaultTheme = {
+    bg: 'bg-getigne-50',
+    text: 'text-getigne-accent',
+    border: 'border-getigne-100',
+    hover: 'hover:bg-getigne-100/50',
+    accent: 'bg-getigne-accent/10',
+    theme: 'Thématique',
+    defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+    defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
+  };
+
+  // Si pas de couleur spécifiée, retourner les valeurs par défaut
+  if (!colorClass) return defaultTheme;
+
+  // Extraire la couleur de base de la classe Tailwind (bg-COLOR-500)
+  const colorMatch = colorClass.match(/bg-([a-z]+)-\d+/);
+  if (!colorMatch || !colorMatch[1]) return defaultTheme;
+
+  const color = colorMatch[1];
+  
+  // Mapper les couleurs avec leurs thèmes
+  const mapping = {
+    'green': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Environnement',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
+    },
+    'blue': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Général',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
+    },
+    'yellow': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Énergie',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=2970&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=2970&q=80'
+    },
+    'purple': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Mobilité',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1519583272095-6433daf26b6e?auto=format&fit=crop&w=2796&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
+    },
+    'red': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Urgence',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
+    },
+    'orange': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Alimentation',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=2974&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=2970&q=80'
+    },
+    'indigo': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Culture',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
+    },
+    'pink': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Social',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
+    },
+    'cyan': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Eau',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
+    },
+    'teal': {
+      bg: `bg-${color}-50`,
+      text: `text-${color}-600`,
+      border: `border-${color}-200`,
+      hover: `hover:bg-${color}-100/50`,
+      accent: `bg-${color}-400/10`,
+      theme: 'Biodiversité',
+      defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
+      defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
+    }
+  };
+
+  return mapping[color] || defaultTheme;
 };
 
 const CommitteePage = () => {
   const { id } = useParams();
   const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'> | null>(null);
   const [teamPhotoUrl, setTeamPhotoUrl] = useState<string | null>(null);
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [otherCommittees, setOtherCommittees] = useState<any[]>([]);
   const [currentCommitteeIndex, setCurrentCommitteeIndex] = useState<number>(-1);
+  const [isCommitteeMember, setIsCommitteeMember] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Vérifier si l'utilisateur actuel est membre de la commission
+  useEffect(() => {
+    const checkCommitteeMembership = async () => {
+      try {
+        // Récupérer l'utilisateur actuel
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          setIsCommitteeMember(false);
+          return;
+        }
+        
+        setCurrentUserId(user.id);
+        
+        // Vérifier s'il est membre de la commission
+        if (id && user) {
+          const { data, error } = await supabase.rpc(
+            'is_committee_member', 
+            { user_id: user.id, committee_id: id }
+          );
+          
+          if (error) throw error;
+          
+          setIsCommitteeMember(!!data);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de l'appartenance à la commission:", error);
+        setIsCommitteeMember(false);
+      }
+    };
+    
+    checkCommitteeMembership();
+  }, [id]);
 
   const membersQuery = useQuery({
     queryKey: ['committee', id, 'members'],
@@ -215,44 +304,39 @@ const CommitteePage = () => {
   const isLoading = membersQuery.isLoading || worksQuery.isLoading || committeeQuery.isLoading || allCommitteesQuery.isLoading;
 
   useEffect(() => {
-    const fetchTeamPhoto = async () => {
+    const fetchCommitteeImages = async () => {
       try {
         if (id) {
           const { data: committeeData, error } = await supabase
             .from('citizen_committees')
-            .select('team_photo_url')
+            .select('team_photo_url, cover_photo_url')
             .eq('id', id)
             .single();
 
           if (error) {
-            console.error("Error fetching team photo:", error);
-            const committee = committeeQuery.data?.[0];
-            if (committee) {
-              const themeColor = colorMap[committee.icon];
-              setTeamPhotoUrl(themeColor?.teamImage || null);
-            }
+            console.error("Error fetching committee images:", error);
             return;
           }
 
+          // Définir l'image d'équipe
           if (committeeData?.team_photo_url) {
             setTeamPhotoUrl(committeeData.team_photo_url);
-          } else {
-            const committee = committeeQuery.data?.[0];
-            if (committee) {
-              const themeColor = colorMap[committee.icon];
-              setTeamPhotoUrl(themeColor?.teamImage || null);
-            }
+          }
+          
+          // Définir l'image de couverture
+          if (committeeData?.cover_photo_url) {
+            setCoverPhotoUrl(committeeData.cover_photo_url);
           }
         }
       } catch (error) {
-        console.error("Erreur lors de la récupération de la photo d'équipe:", error);
-        setTeamPhotoUrl(null);
+        console.error("Erreur lors de la récupération des images de la commission:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     if (!isLoading && committeeQuery.data) {
-      fetchTeamPhoto();
-      setLoading(false);
+      fetchCommitteeImages();
     }
   }, [id, committeeQuery.data, isLoading]);
 
@@ -310,21 +394,14 @@ const CommitteePage = () => {
     );
   }
 
-  const themeColor = colorMap[committee.icon] || {
-    bg: 'bg-getigne-50',
-    text: 'text-getigne-accent',
-    border: 'border-getigne-100',
-    hover: 'hover:bg-getigne-100/50',
-    accent: 'bg-getigne-accent/10',
-    theme: 'Thématique',
-    coverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?ixlib=rb-4.0.3&auto=format&fit=crop&w=2971&q=80',
-    teamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80'
-  };
+  const themeColor = getColorTheme(committee.color);
+  const IconComponent = getIconComponent(committee.icon);
 
-  const IconComponent = iconMap[committee.icon] || Leaf;
-  const extendedDescription = extendedDescriptions[committee.icon] || committee.description;
-
-  const teamImage = teamPhotoUrl || themeColor.teamImage;
+  // Utiliser la photo de couverture depuis la DB ou la valeur par défaut
+  const coverImage = coverPhotoUrl || themeColor.defaultCoverImage;
+  
+  // Utiliser la photo d'équipe depuis la DB ou la valeur par défaut
+  const teamImage = teamPhotoUrl || themeColor.defaultTeamImage;
 
   return (
     <>
@@ -332,7 +409,7 @@ const CommitteePage = () => {
 
       <div
         className="h-64 md:h-80 w-full bg-cover bg-center relative"
-        style={{ backgroundImage: `url(${themeColor.coverImage})` }}
+        style={{ backgroundImage: `url(${coverImage})` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
         <div className="container mx-auto h-full flex items-center relative z-10">
@@ -383,7 +460,7 @@ const CommitteePage = () => {
           <div className="flex flex-col md:flex-row md:gap-8">
             <div className="md:flex-1">
               <p className="text-getigne-700 whitespace-pre-line mb-6">
-                {extendedDescription}
+                {committee.description}
               </p>
 
               <div className="mt-4">
@@ -408,12 +485,25 @@ const CommitteePage = () => {
         </div>
 
         <div className="bg-white shadow-sm rounded-xl p-6 border border-getigne-100">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-2">Travaux de la commission</h2>
-            <p className="text-getigne-700">
-              Retrouvez ci-dessous les comptes-rendus, études et propositions réalisés par la commission {committee.title}.
-              Ces travaux constituent la base de notre réflexion pour élaborer des propositions concrètes pour Gétigné.
-            </p>
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Travaux de la commission</h2>
+              <p className="text-getigne-700">
+                Retrouvez ci-dessous les comptes-rendus, études et propositions réalisés par la commission {committee.title}.
+                Ces travaux constituent la base de notre réflexion pour élaborer des propositions concrètes pour Gétigné.
+              </p>
+            </div>
+            
+            {isCommitteeMember && (
+              <Button 
+                className={`${themeColor.bg} ${themeColor.text} border ${themeColor.border} hover:${themeColor.hover}`}
+                asChild
+              >
+                <Link to={`/admin/committees/works/${committee.id}`}>
+                  Gérer les travaux
+                </Link>
+              </Button>
+            )}
           </div>
 
           {works.length === 0 ? (
