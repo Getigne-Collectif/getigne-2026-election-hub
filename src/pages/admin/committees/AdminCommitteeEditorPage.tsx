@@ -29,6 +29,7 @@ export default function AdminCommitteeEditorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [committee, setCommittee] = useState<Committee | null>(null);
 
+  // Fetch committee data when component mounts or id changes
   useEffect(() => {
     const fetchCommittee = async () => {
       if (!isEditMode) return;
@@ -79,7 +80,7 @@ export default function AdminCommitteeEditorPage() {
       }
     >
       <div className="max-w-3xl mx-auto mb-10">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="details">
           <TabsList className="w-full mb-6">
             <TabsTrigger value="details" className="flex-1">Détails</TabsTrigger>
             {isEditMode && <TabsTrigger value="members" className="flex-1">Membres</TabsTrigger>}
@@ -90,6 +91,7 @@ export default function AdminCommitteeEditorPage() {
               isEditMode={isEditMode} 
               committeeId={id} 
               initialData={committee}
+              isLoading={isLoading}
             />
           </TabsContent>
           

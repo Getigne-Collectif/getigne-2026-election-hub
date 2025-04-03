@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { UploadCloud, X } from 'lucide-react';
+import { UploadCloud, X, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -48,37 +48,55 @@ interface CommitteeDetailsFormProps {
   isEditMode: boolean;
   committeeId?: string;
   initialData?: Committee | null;
+  isLoading?: boolean;
 }
 
 export default function CommitteeDetailsForm({
   isEditMode,
   committeeId,
-  initialData
+  initialData,
+  isLoading = false
 }: CommitteeDetailsFormProps) {
   const navigate = useNavigate();
   
-  const [isLoading, setIsLoading] = useState(false);
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [description, setDescription] = useState(initialData?.description || '');
-  const [icon, setIcon] = useState(initialData?.icon || 'users');
-  const [teamPhotoUrl, setTeamPhotoUrl] = useState(initialData?.team_photo_url || '');
-  const [coverPhotoUrl, setCoverPhotoUrl] = useState(initialData?.cover_photo_url || '');
-  const [color, setColor] = useState(initialData?.color || AVAILABLE_COLORS[0].value);
+  const [isSaving, setIsSaving] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [icon, setIcon] = useState('users');
+  const [teamPhotoUrl, setTeamPhotoUrl] = useState<string | null>(null);
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
+  const [color, setColor] = useState(AVAILABLE_COLORS[0].value);
   
   const [teamPhotoFile, setTeamPhotoFile] = useState<File | null>(null);
-  const [teamPhotoPreview, setTeamPhotoPreview] = useState<string | null>(initialData?.team_photo_url || null);
+  const [teamPhotoPreview, setTeamPhotoPreview] = useState<string | null>(null);
   
   const [coverPhotoFile, setCoverPhotoFile] = useState<File | null>(null);
-  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(initialData?.cover_photo_url || null);
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
   
   const [isUploading, setIsUploading] = useState(false);
+  const [dataInitialized, setDataInitialized] = useState(false);
 
   useEffect(() => {
-    if (initialData) {
-      setTeamPhotoPreview(initialData.team_photo_url || null);
-      setCoverPhotoPreview(initialData.cover_photo_url || null);
+    if (initialData && !dataInitialized) {
+      console.log("Setting form data from initialData:", initialData);
+      setTitle(initialData.title || '');
+      setDescription(initialData.description || '');
+      setIcon(initialData.icon || 'users');
+      setTeamPhotoUrl(initialData.team_photo_url || null);
+      setCoverPhotoUrl(initialData.cover_photo_url || null);
+      setColor(initialData.color || AVAILABLE_COLORS[0].value);
+      
+      if (initialData.team_photo_url) {
+        setTeamPhotoPreview(initialData.team_photo_url);
+      }
+      
+      if (initialData.cover_photo_url) {
+        setCoverPhotoPreview(initialData.cover_photo_url);
+      }
+      
+      setDataInitialized(true);
     }
-  }, [initialData]);
+  }, [initialData, dataInitialized]);
 
   const handleTeamPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
@@ -152,7 +170,7 @@ export default function CommitteeDetailsForm({
     e.preventDefault();
     
     try {
-      setIsLoading(true);
+      setIsSaving(true);
       
       let teamPhotoUrlFinal = teamPhotoUrl;
       let coverPhotoUrlFinal = coverPhotoUrl;
@@ -231,9 +249,20 @@ export default function CommitteeDetailsForm({
       console.error('Erreur lors de la sauvegarde de la commission:', error);
       toast.error("Erreur lors de la sauvegarde");
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center p-10">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+          <p className="text-lg font-medium">Chargement des données...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -400,9 +429,14 @@ export default function CommitteeDetailsForm({
             </Button>
             <Button 
               type="submit" 
-              disabled={isLoading || isUploading}
+              disabled={isSaving || isUploading}
             >
-              {(isLoading || isUploading) ? 'Enregistrement...' : isEditMode ? 'Mettre à jour' : 'Créer'}
+              {(isSaving || isUploading) ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enregistrement...
+                </>
+              ) : isEditMode ? 'Mettre à jour' : 'Créer'}
             </Button>
           </div>
         </form>
