@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import CommitteeWorkModal from '@/components/CommitteeWorkModal';
@@ -16,14 +17,28 @@ type CommitteeData = {
   description: string;
 }
 
+type CommitteeWork = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  committee_id: string;
+  created_at: string;
+  images?: any[];
+  files?: any[];
+}
+
 export default function AdminCommitteeWorksPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
   const [committee, setCommittee] = useState<CommitteeData | null>(null);
+  const [works, setWorks] = useState<CommitteeWork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedWork, setSelectedWork] = useState<CommitteeWork | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('view');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  
   // Fetch committee data
   useEffect(() => {
     const fetchCommittee = async () => {
@@ -49,6 +64,49 @@ export default function AdminCommitteeWorksPage() {
     
     fetchCommittee();
   }, [id, navigate]);
+
+  // Fetch committee works
+  const fetchCommitteeWorks = async () => {
+    if (!id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('committee_works')
+        .select('*')
+        .eq('committee_id', id)
+        .order('date', { ascending: false });
+      
+      if (error) throw error;
+      setWorks(data || []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des comptes-rendus:', error);
+      toast.error("Impossible de charger les comptes-rendus");
+    }
+  };
+
+  useEffect(() => {
+    if (committee) {
+      fetchCommitteeWorks();
+    }
+  }, [committee, id]);
+
+  const handleOpenModal = (work: CommitteeWork | null, mode: 'view' | 'edit' | 'create') => {
+    setSelectedWork(work);
+    setModalMode(mode);
+    setIsModalOpen(true);
+  };
+
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -88,12 +146,12 @@ export default function AdminCommitteeWorksPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink>Travaux</BreadcrumbLink>
+            <BreadcrumbLink>Comptes-rendus</BreadcrumbLink>
           </BreadcrumbItem>
         </>
       }
-      title={`Travaux de ${committee.title}`}
-      description="Gérez les travaux et publications de cette commission citoyenne"
+      title={`Comptes-rendus de ${committee.title}`}
+      description="Gérez les comptes-rendus et publications de cette commission citoyenne"
     >
       <div className="mb-6">
         <Button variant="outline" onClick={() => navigate('/admin/committees')}>
@@ -103,21 +161,63 @@ export default function AdminCommitteeWorksPage() {
       </div>
       
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Liste des travaux</h2>
-        <Button onClick={() => setIsModalOpen(true)}>
+        <h2 className="text-xl font-semibold">Liste des comptes-rendus</h2>
+        <Button onClick={() => handleOpenModal(null, 'create')}>
           <Plus className="mr-2 h-4 w-4" />
-          Ajouter un travail
+          Ajouter un compte-rendu
         </Button>
       </div>
 
       <Card>
         <CardContent className="pt-6">
-          {/* Updated modal props to match the new interface */}
+          {works.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Aucun compte-rendu disponible pour cette commission.
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Titre</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="w-[180px] text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {works.map((work) => (
+                  <TableRow key={work.id}>
+                    <TableCell className="font-medium">{work.title}</TableCell>
+                    <TableCell>{formatDate(work.date)}</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleOpenModal(work, 'view')}
+                      >
+                        <Eye className="h-4 w-4 mr-1" /> Voir
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleOpenModal(work, 'edit')}
+                      >
+                        <Pencil className="h-4 w-4 mr-1" /> Modifier
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+          
           {isModalOpen && (
             <CommitteeWorkModal 
               committeeId={id} 
+              work={selectedWork} 
               open={isModalOpen} 
-              onOpenChange={() => setIsModalOpen(false)} 
+              onOpenChange={setIsModalOpen}
+              onSuccess={fetchCommitteeWorks}
+              mode={modalMode}
             />
           )}
         </CardContent>
