@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useNavigate, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,9 @@ import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home, LockKeyhole } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { supabase } from '@/integrations/supabase/client';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ProgramContentComponent from '@/components/program/ProgramContentComponent';
 
 const ProgramPage = () => {
   const { user, userRoles, authChecked } = useAuth();
@@ -18,6 +22,35 @@ const ProgramPage = () => {
   const { settings, loading: loadingSettings } = useAppSettings();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<string>("");
+
+  // Fetch program items for tabs
+  const { data: programItems, isLoading: loadingProgramItems } = useQuery({
+    queryKey: ['programItemsForTabs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_items')
+        .select('*')
+        .order('created_at', { ascending: true });
+        
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de charger les sections du programme."
+        });
+        throw error;
+      }
+      
+      // Set the first tab as active if we have program items and no active tab
+      if (data.length > 0 && !activeTab) {
+        setActiveTab(data[0].id);
+      }
+      
+      return data;
+    },
+    enabled: settings.showProgram || isAuthorized,
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -41,14 +74,14 @@ const ProgramPage = () => {
     setIsChecking(false);
   }, [user, userRoles, authChecked, toast]);
 
-  // Si les paramètres sont activés et que le programme est visible, on montre le programme à tous
+  // If settings are enabled and program is visible, show program to all
   const showProgramToAll = settings.showProgram;
 
-  if (loadingSettings || isChecking) {
+  if (loadingSettings || isChecking || (showProgramToAll && loadingProgramItems)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p>Vérification des droits d'accès...</p>
+          <p>Chargement...</p>
         </div>
       </div>
     );
@@ -101,76 +134,61 @@ const ProgramPage = () => {
         <div className="py-16">
           <div className="container mx-auto px-4">
             {showProgramToAll || isAuthorized ? (
-              // Contenu visible pour les utilisateurs autorisés ou si showProgram est activé
+              // Content visible to authorized users or if showProgram is enabled
               <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-8">
-                  <h2 className="text-2xl font-bold mb-4">En construction</h2>
-                  <p className="mb-4">
-                    Le programme de Gétigné Collectif pour les élections municipales de 2026 est actuellement
-                    en cours d'élaboration par nos commissions thématiques.
-                  </p>
-                  <p className="mb-4">
-                    Depuis mai 2024, nos commissions travaillent sur différentes thématiques pour construire
-                    un programme ambitieux et réaliste pour l'avenir de notre commune.
-                  </p>
-                  <p>
-                    Cette page sera mise à jour régulièrement pour partager l'avancement de nos travaux.
-                  </p>
-                </div>
-
-                {/* Contenu du programme - Section vide pour le moment */}
-                <div className="space-y-8">
-                  <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8">
-                    <h2 className="text-2xl font-bold mb-4">Calendrier d'élaboration</h2>
-                    <div className="space-y-4">
-                      <div className="flex items-start">
-                        <div className="bg-getigne-accent/10 text-getigne-accent font-bold rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 mt-1">1</div>
-                        <div className="ml-4">
-                          <h3 className="font-medium">Mai - Août 2024</h3>
-                          <p className="text-getigne-700">Constitution des commissions thématiques et premières réunions de travail</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="bg-getigne-accent/10 text-getigne-accent font-bold rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 mt-1">2</div>
-                        <div className="ml-4">
-                          <h3 className="font-medium">Septembre - Décembre 2024</h3>
-                          <p className="text-getigne-700">Élaboration des propositions prioritaires et consultations citoyennes</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="bg-getigne-accent/10 text-getigne-accent font-bold rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 mt-1">3</div>
-                        <div className="ml-4">
-                          <h3 className="font-medium">Janvier - Avril 2025</h3>
-                          <p className="text-getigne-700">Création du site web + élaboration d'une première version "brute" du programme</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="bg-getigne-accent/10 text-getigne-accent font-bold rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 mt-1">4</div>
-                        <div className="ml-4">
-                          <h3 className="font-medium">Avril 2025</h3>
-                          <p className="text-getigne-700">Lancement publique du mouvement</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="bg-getigne-accent/10 text-getigne-accent font-bold rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 mt-1">5</div>
-                        <div className="ml-4">
-                          <h3 className="font-medium">Mai - Septembre 2025</h3>
-                          <p className="text-getigne-700">Rencontres des citoyens et acteurs locaux, ateliers participatifs et maturation du programme</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="bg-getigne-accent/10 text-getigne-accent font-bold rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 mt-1">6</div>
-                        <div className="ml-4">
-                          <h3 className="font-medium">Septembre - Décembre 2025</h3>
-                          <p className="text-getigne-700">Présentations publiques des piliers du programme</p>
-                        </div>
-                      </div>
+                {programItems && programItems.length > 0 ? (
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-10">
+                    <div className="flex justify-center">
+                      <TabsList className="h-auto flex-wrap">
+                        {programItems.map(item => (
+                          <TabsTrigger 
+                            key={item.id} 
+                            value={item.id}
+                            className="gap-2 py-2 px-4"
+                          >
+                            {item.icon && (
+                              <span className="w-5 h-5">
+                                <img 
+                                  src={item.icon}
+                                  alt=""
+                                  className="w-full h-full object-contain"
+                                />
+                              </span>
+                            )}
+                            {item.title}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
                     </div>
+
+                    {/* Program Content for each tab */}
+                    {programItems.map(item => (
+                      <ProgramContentComponent 
+                        key={item.id}
+                        programItemId={item.id}
+                        value={item.id}
+                      />
+                    ))}
+                  </Tabs>
+                ) : (
+                  <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-8">
+                    <h2 className="text-2xl font-bold mb-4">En construction</h2>
+                    <p className="mb-4">
+                      Le programme de Gétigné Collectif pour les élections municipales de 2026 est actuellement
+                      en cours d'élaboration par nos commissions thématiques.
+                    </p>
+                    <p className="mb-4">
+                      Depuis mai 2024, nos commissions travaillent sur différentes thématiques pour construire
+                      un programme ambitieux et réaliste pour l'avenir de notre commune.
+                    </p>
+                    <p>
+                      Cette page sera mise à jour régulièrement pour partager l'avancement de nos travaux.
+                    </p>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
-              // Page d'accès restreint pour les autres utilisateurs
+              // Access restricted page for other users
               <div className="max-w-xl mx-auto text-center">
                 <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8">
                   <div className="flex justify-center mb-6">

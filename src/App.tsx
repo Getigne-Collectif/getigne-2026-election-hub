@@ -41,6 +41,8 @@ import AdminProjectEditorPage from "@/pages/admin/projects/AdminProjectEditorPag
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import AdminCommitteesPage from "@/pages/admin/committees/AdminCommitteesPage";
 import AdminCommitteeEditorPage from "@/pages/admin/committees/AdminCommitteeEditorPage";
+import AdminProgramPage from "@/pages/admin/program/AdminProgramPage";
+import AdminProgramEditorPage from "@/pages/admin/program/AdminProgramEditorPage";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +110,9 @@ function App() {
               <Route path="/admin/committees" element={<AdminCommitteesPage />} />
               <Route path="/admin/committees/new" element={<AdminCommitteeEditorPage />} />
               <Route path="/admin/committees/edit/:id" element={<AdminCommitteeEditorPage />} />
+              <Route path="/admin/program" element={<AdminProgramPage />} />
+              <Route path="/admin/program/edit" element={<AdminProgramEditorPage />} />
+              <Route path="/admin/program/edit/:id" element={<AdminProgramEditorPage />} />
               <Route path="/admin/pages" element={<AdminPagesPage />} />
               <Route path="/admin/pages/new" element={<AdminPageEditorPage />} />
               <Route path="/admin/pages/edit/:id" element={<AdminPageEditorPage />} />

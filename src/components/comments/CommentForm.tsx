@@ -9,11 +9,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 
 interface CommentFormProps {
-  newsId: string;
+  newsId?: string;
+  programItemId?: string;
   onCommentSubmitted: () => void;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ newsId, onCommentSubmitted }) => {
+const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onCommentSubmitted }) => {
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { user, isModerator } = useAuth();
@@ -44,73 +45,84 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, onCommentSubmitted })
 
     setSubmitting(true);
     try {
-      console.log('Submitting comment:', {
-        user_id: user.id,
-        news_id: newsId,
-        content: newComment.trim(),
-        status: 'pending'
-      });
-      
-      const { data: commentData, error: commentError } = await supabase
-        .from('comments')
-        .insert([
-          { 
-            user_id: user.id, 
-            news_id: newsId, 
-            content: newComment.trim(),
-            status: 'pending'
-          }
-        ])
-        .select();
-
-      if (commentError) {
-        console.error('Error inserting comment:', commentError);
-        throw commentError;
-      }
-      
-      console.log('Comment inserted:', commentData);
-      
-      // Fetch user profile to display name
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('id', user.id)
-        .single();
-        
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-        // Continue without profile data
-      } else {
-        console.log('Profile fetched:', profileData);
-      }
-
-      // Get article details for the notification
-      const { data: newsData, error: newsError } = await supabase
-        .from('news')
-        .select('title')
-        .eq('id', newsId)
-        .single();
-
-      if (!newsError && newsData) {
-        // Send Discord notification
-        const userName = profileData ? 
-          `${profileData.first_name} ${profileData.last_name}` : 
-          user.email || 'Utilisateur';
-          
-        await sendDiscordNotification({
-          title: `💬 Nouveau commentaire sur l'article: ${newsData.title}`,
-          message: `
-**De**: ${userName}
-**Statut**: ${isModerator ? 'Publié' : 'En attente de modération'}
-
-**Commentaire**:
-${newComment.trim()}
-          `,
-          color: DiscordColors.GREEN,
-          username: "Système de Commentaires",
-          resourceType: 'news',
-          resourceId: newsId
+      if (newsId) {
+        // Comment on news article
+        console.log('Submitting news comment:', {
+          user_id: user.id,
+          news_id: newsId,
+          content: newComment.trim(),
+          status: isModerator ? 'approved' : 'pending'
         });
+        
+        const { data: commentData, error: commentError } = await supabase
+          .from('comments')
+          .insert([
+            { 
+              user_id: user.id, 
+              news_id: newsId, 
+              content: newComment.trim(),
+              status: isModerator ? 'approved' : 'pending'
+            }
+          ])
+          .select();
+
+        if (commentError) {
+          console.error('Error inserting comment:', commentError);
+          throw commentError;
+        }
+        
+        console.log('Comment inserted:', commentData);
+        
+        // Get article details for the notification
+        const { data: newsData, error: newsError } = await supabase
+          .from('news')
+          .select('title')
+          .eq('id', newsId)
+          .single();
+
+        if (!newsError && newsData) {
+          // Fetch user profile and send notification for news comments
+          await sendNotification(newsData.title, 'news', newsId);
+        }
+      } else if (programItemId) {
+        // Comment on program item
+        console.log('Submitting program comment:', {
+          user_id: user.id,
+          program_item_id: programItemId,
+          content: newComment.trim(),
+          status: isModerator ? 'approved' : 'pending'
+        });
+        
+        const { data: commentData, error: commentError } = await supabase
+          .from('program_comments')
+          .insert([
+            { 
+              user_id: user.id, 
+              program_item_id: programItemId, 
+              content: newComment.trim(),
+              status: isModerator ? 'approved' : 'pending'
+            }
+          ])
+          .select();
+
+        if (commentError) {
+          console.error('Error inserting program comment:', commentError);
+          throw commentError;
+        }
+        
+        console.log('Program comment inserted:', commentData);
+        
+        // Get program item details for the notification
+        const { data: programData, error: programError } = await supabase
+          .from('program_items')
+          .select('title')
+          .eq('id', programItemId)
+          .single();
+
+        if (!programError && programData) {
+          // Fetch user profile and send notification for program comments
+          await sendNotification(programData.title, 'program', programItemId);
+        }
       }
       
       setNewComment('');
@@ -131,6 +143,51 @@ ${newComment.trim()}
       console.error('Error submitting comment:', error);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Helper function to send notifications
+  const sendNotification = async (title: string, resourceType: 'news' | 'program', resourceId: string) => {
+    try {
+      // Fetch user profile to display name
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', user.id)
+        .single();
+        
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        // Continue without profile data
+      } else {
+        console.log('Profile fetched:', profileData);
+      }
+
+      // Prepare notification title
+      const notificationTitle = resourceType === 'news' 
+        ? `💬 Nouveau commentaire sur l'article: ${title}`
+        : `💬 Nouveau commentaire sur la section du programme: ${title}`;
+
+      const userName = profileData ? 
+        `${profileData.first_name} ${profileData.last_name}` : 
+        user.email || 'Utilisateur';
+        
+      await sendDiscordNotification({
+        title: notificationTitle,
+        message: `
+**De**: ${userName}
+**Statut**: ${isModerator ? 'Publié' : 'En attente de modération'}
+
+**Commentaire**:
+${newComment.trim()}
+        `,
+        color: DiscordColors.GREEN,
+        username: "Système de Commentaires",
+        resourceType,
+        resourceId
+      });
+    } catch (error) {
+      console.error('Error sending notification:', error);
     }
   };
 

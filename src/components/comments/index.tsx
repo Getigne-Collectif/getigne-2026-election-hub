@@ -17,7 +17,8 @@ interface Profile {
 interface Comment {
   id: string;
   user_id: string;
-  news_id: string;
+  news_id?: string;
+  program_item_id?: string;
   content: string;
   created_at: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -26,10 +27,11 @@ interface Comment {
 }
 
 interface CommentsProps {
-  newsId: string;
+  newsId?: string;
+  programItemId?: string;
 }
 
-const Comments: React.FC<CommentsProps> = ({ newsId }) => {
+const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllComments, setShowAllComments] = useState(false);
@@ -37,11 +39,18 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log('Fetching comments for news ID:', newsId);
-    fetchComments();
-  }, [newsId, showAllComments]);
+    if (newsId) {
+      console.log('Fetching comments for news ID:', newsId);
+      fetchNewsComments();
+    } else if (programItemId) {
+      console.log('Fetching comments for program item ID:', programItemId);
+      fetchProgramComments();
+    }
+  }, [newsId, programItemId, showAllComments]);
 
-  const fetchComments = async () => {
+  const fetchNewsComments = async () => {
+    if (!newsId) return;
+    
     try {
       // Fetch comments
       let query = supabase
@@ -111,10 +120,83 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
     }
   };
 
+  const fetchProgramComments = async () => {
+    if (!programItemId) return;
+    
+    try {
+      // Fetch comments
+      let query = supabase
+        .from('program_comments')
+        .select('*')
+        .eq('program_item_id', programItemId);
+
+      if (!isModerator && !showAllComments) {
+        query = query.eq('status', 'approved');
+      }
+      
+      query = query.order('created_at', { ascending: false });
+
+      const { data: commentsData, error: commentsError } = await query;
+
+      if (commentsError) {
+        console.error('Error fetching program comments:', commentsError);
+        throw commentsError;
+      }
+      
+      if (!commentsData || commentsData.length === 0) {
+        setComments([]);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Fetched program comments:', commentsData);
+      
+      // Fetch profiles separately and combine them manually
+      const userIds = [...new Set(commentsData.map(comment => comment.user_id))];
+      
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', userIds);
+        
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        // Continue without profiles
+      }
+      
+      // Create a map of user_id to profile data
+      const profilesMap = (profilesData || []).reduce((acc, profile) => {
+        acc[profile.id] = profile;
+        return acc;
+      }, {});
+      
+      // Combine comments with their profile data
+      const commentsWithProfiles = commentsData.map(comment => {
+        const profile = profilesMap[comment.user_id];
+        return {
+          ...comment,
+          profiles: profile ? {
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            avatar_url: profile.avatar_url
+          } : undefined
+        };
+      });
+      
+      setComments(commentsWithProfiles as Comment[]);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des commentaires:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleModerateComment = async (commentId: string, newStatus: 'approved' | 'rejected') => {
     try {
+      const tableName = newsId ? 'comments' : 'program_comments';
+      
       const { error } = await supabase
-        .from('comments')
+        .from(tableName)
         .update({ 
           status: newStatus,
           updated_at: new Date().toISOString() 
@@ -136,7 +218,11 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
           'Le commentaire a été rejeté et ne sera pas visible publiquement'
       });
       
-      fetchComments();
+      if (newsId) {
+        fetchNewsComments();
+      } else if (programItemId) {
+        fetchProgramComments();
+      }
     } catch (error: any) {
       toast({
         title: 'Erreur de modération',
@@ -144,6 +230,14 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
         variant: 'destructive'
       });
       console.error('Error moderating comment:', error);
+    }
+  };
+
+  const onCommentSubmitted = () => {
+    if (newsId) {
+      fetchNewsComments();
+    } else if (programItemId) {
+      fetchProgramComments();
     }
   };
 
@@ -156,7 +250,8 @@ const Comments: React.FC<CommentsProps> = ({ newsId }) => {
 
       <CommentForm 
         newsId={newsId} 
-        onCommentSubmitted={fetchComments} 
+        programItemId={programItemId}
+        onCommentSubmitted={onCommentSubmitted} 
       />
 
       {loading ? (
