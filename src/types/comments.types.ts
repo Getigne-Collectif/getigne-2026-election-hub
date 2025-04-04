@@ -22,13 +22,15 @@ export interface BaseComment {
 export interface NewsComment extends BaseComment {
   news_id: string;
   program_item_id?: never;
+  program_point_id?: never;
 }
 
 export interface ProgramComment extends BaseComment {
-  program_item_id: string;
+  program_item_id?: string;
+  program_point_id?: string;
   news_id?: never;
 }
 
 export type Comment = NewsComment | ProgramComment;
 
-export type ResourceType = 'user' | 'news' | 'committee' | 'event' | 'program';
+export type ResourceType = 'user' | 'news' | 'committee' | 'event' | 'program' | 'program_point';

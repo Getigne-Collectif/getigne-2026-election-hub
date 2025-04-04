@@ -1,243 +1,156 @@
 
-import React, { useState, useEffect } from 'react';
-import { MessageSquare } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import CommentForm from './CommentForm';
-import UserView from './UserView';
+import { Separator } from '@/components/ui/separator';
 import ModeratorView from './ModeratorView';
-import { Comment, CommentStatus } from '@/types/comments.types';
+import UserView from './UserView';
+import { Comment } from '@/types/comments.types';
 
 interface CommentsProps {
   newsId?: string;
   programItemId?: string;
+  programPointId?: string;
 }
 
-const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
+const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPointId }) => {
+  const { user, userRoles, isAdmin } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAllComments, setShowAllComments] = useState(false);
-  const { user, isModerator } = useAuth();
-  const { toast } = useToast();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [view, setView] = useState<'all' | 'pending'>('all');
+  const isModerator = isAdmin || userRoles.includes('moderator');
+
+  const getSourceType = () => {
+    if (newsId) return 'news';
+    if (programPointId) return 'program_point';
+    if (programItemId) return 'program';
+    return 'news';
+  };
+
+  const sourceType = getSourceType();
 
   useEffect(() => {
-    if (newsId) {
-      console.log('Fetching comments for news ID:', newsId);
-      fetchNewsComments();
-    } else if (programItemId) {
-      console.log('Fetching comments for program item ID:', programItemId);
-      fetchProgramComments();
-    }
-  }, [newsId, programItemId, showAllComments]);
-  
-  const fetchNewsComments = async () => {
-    if (!newsId) return;
-    
+    fetchComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newsId, programItemId, programPointId, view]);
+
+  const fetchComments = async () => {
     try {
-      let query = supabase
-        .from('comments')
-        .select('*')
-        .eq('news_id', newsId);
+      setLoading(true);
+      let query: any;
 
-      if (!isModerator && !showAllComments) {
+      if (newsId) {
+        // Fetch comments for news
+        query = supabase
+          .from('comments')
+          .select('*, profiles(*)')
+          .eq('news_id', newsId)
+          .order('created_at', { ascending: false });
+      } else if (programPointId) {
+        // Fetch comments for program point
+        query = supabase
+          .from('program_comments' as any)
+          .select('*, profiles(*)')
+          .eq('program_point_id', programPointId)
+          .order('created_at', { ascending: false });
+      } else if (programItemId && !programPointId) {
+        // Fetch comments for program item (section)
+        query = supabase
+          .from('program_comments' as any)
+          .select('*, profiles(*)')
+          .eq('program_item_id', programItemId)
+          .is('program_point_id', null)
+          .order('created_at', { ascending: false });
+      }
+
+      // If user is not a moderator, only show approved comments
+      if (!isModerator) {
         query = query.eq('status', 'approved');
+      } else if (view === 'pending') {
+        query = query.eq('status', 'pending');
       }
-      
-      query = query.order('created_at', { ascending: false });
 
-      const { data: commentsData, error: commentsError } = await query;
+      const { data, error } = await query;
 
-      if (commentsError) {
-        console.error('Error fetching comments:', commentsError);
-        throw commentsError;
+      if (error) {
+        throw error;
       }
-      
-      if (!commentsData || commentsData.length === 0) {
-        setComments([]);
-        setLoading(false);
-        return;
-      }
-      
-      console.log('Fetched comments:', commentsData);
-      
-      // Since we can't use a JOIN due to apparent relationship issues,
-      // fetch profiles separately and combine them manually
-      const userIds = [...new Set(commentsData.map(comment => comment.user_id))];
-      
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, avatar_url')
-        .in('id', userIds);
-        
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        // Continue without profiles
-      }
-      
-      // Create a map of user_id to profile data
-      const profilesMap = (profilesData || []).reduce((acc, profile) => {
-        acc[profile.id] = profile;
-        return acc;
-      }, {});
-      
-      // Combine comments with their profile data
-      const commentsWithProfiles = commentsData.map(comment => {
-        const profile = profilesMap[comment.user_id];
-        return {
-          ...comment,
-          profiles: profile ? {
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            avatar_url: profile.avatar_url
-          } : undefined
-        };
-      });
-      
-      setComments(commentsWithProfiles as Comment[]);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des commentaires:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const fetchProgramComments = async () => {
-    if (!programItemId) return;
-    
-    try {
-      // Using type assertion to bypass TypeScript errors since the types file hasn't been updated
-      let query = supabase
-        .from('program_comments' as any)
-        .select('*')
-        .eq('program_item_id', programItemId);
-
-      if (!isModerator && !showAllComments) {
-        query = query.eq('status', 'approved');
-      }
-      
-      query = query.order('created_at', { ascending: false });
-
-      const { data: commentsData, error: commentsError } = await query;
-
-      if (commentsError) {
-        console.error('Error fetching program comments:', commentsError);
-        throw commentsError;
-      }
-      
-      if (!commentsData || commentsData.length === 0) {
-        setComments([]);
-        setLoading(false);
-        return;
-      }
-      
-      // Fetch profiles separately 
-      const userIds = [...new Set(commentsData.map((comment: any) => comment.user_id))];
-      
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, avatar_url')
-        .in('id', userIds);
-        
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-      }
-      
-      const profilesMap = (profilesData || []).reduce((acc, profile) => {
-        acc[profile.id] = profile;
-        return acc;
-      }, {});
-      
-      const commentsWithProfiles = commentsData.map((comment: any) => ({
+      // Transform data to ensure profiles is correctly formatted
+      const formattedComments = data.map((comment: any) => ({
         ...comment,
-        profiles: profilesMap[comment.user_id]
-      }));
-      
-      setComments(commentsWithProfiles as Comment[]);
+        profiles: comment.profiles
+      })) as Comment[];
+
+      setComments(formattedComments);
     } catch (error) {
-      console.error('Erreur lors de la récupération des commentaires:', error);
+      console.error('Error fetching comments:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleModerateComment = async (commentId: string, newStatus: CommentStatus) => {
+  const handleStatusChange = async (commentId: string, status: 'approved' | 'rejected') => {
     try {
-      const tableName = newsId ? 'comments' : 'program_comments';
+      const table = sourceType === 'news' ? 'comments' : 'program_comments';
       
-      // Use type assertion to handle both table types
       const { error } = await supabase
-        .from(tableName as any)
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString() 
-        })
+        .from(table as any)
+        .update({ status })
         .eq('id', commentId);
 
       if (error) {
         throw error;
       }
 
-      // Update local state with new status
-      setComments(comments.map(comment => 
-        comment.id === commentId ? { ...comment, status: newStatus } : comment
-      ));
-
-      toast({
-        title: newStatus === 'approved' ? 'Commentaire approuvé' : 'Commentaire rejeté',
-        description: newStatus === 'approved' ? 
-          'Le commentaire est maintenant visible pour tous les utilisateurs' : 
-          'Le commentaire a été rejeté et ne sera pas visible publiquement'
-      });
-      
-      // Refresh comments after moderation
-      if (newsId) {
-        fetchNewsComments();
-      } else if (programItemId) {
-        fetchProgramComments();
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Erreur de modération',
-        description: error.message || 'Une erreur est survenue lors de la modération',
-        variant: 'destructive'
-      });
-      console.error('Error moderating comment:', error);
+      // Update local state
+      setComments(prevComments =>
+        prevComments.map(comment =>
+          comment.id === commentId ? { ...comment, status } : comment
+        )
+      );
+    } catch (error) {
+      console.error('Error updating comment status:', error);
     }
   };
 
-  const onCommentSubmitted = () => {
-    if (newsId) {
-      fetchNewsComments();
-    } else if (programItemId) {
-      fetchProgramComments();
+  const handleCommentAdded = (newComment: Comment) => {
+    if (view === 'pending' && newComment.status !== 'pending') {
+      return;
     }
+    
+    setComments(prevComments => [newComment, ...prevComments]);
   };
 
   return (
-    <div className="mt-12 border-t border-getigne-100 pt-8">
-      <h3 className="text-2xl font-bold flex items-center gap-2 mb-6">
-        <MessageSquare className="h-6 w-6" />
-        Commentaires ({comments.length})
-      </h3>
+    <div className="comments-section">
+      <h3 className="text-2xl font-bold mb-6">Commentaires</h3>
 
-      <CommentForm 
-        newsId={newsId} 
-        programItemId={programItemId}
-        onCommentSubmitted={onCommentSubmitted} 
-      />
+      {user && (
+        <>
+          <CommentForm 
+            newsId={newsId} 
+            programItemId={programItemId} 
+            programPointId={programPointId}
+            onCommentAdded={handleCommentAdded} 
+            resourceType={sourceType}
+          />
+          <Separator className="my-6" />
+        </>
+      )}
 
-      {loading ? (
-        <div className="text-center py-8">Chargement des commentaires...</div>
-      ) : isModerator ? (
-        <ModeratorView 
+      {isModerator ? (
+        <ModeratorView
           comments={comments}
-          showAllComments={showAllComments}
-          setShowAllComments={setShowAllComments}
-          onModerateComment={handleModerateComment}
+          loading={loading}
+          view={view}
+          setView={setView}
+          onStatusChange={handleStatusChange}
+          sourceType={sourceType}
         />
       ) : (
-        <UserView comments={comments} />
+        <UserView comments={comments} loading={loading} />
       )}
     </div>
   );

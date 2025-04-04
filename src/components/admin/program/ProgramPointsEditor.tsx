@@ -196,7 +196,7 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
     // Update in the database
     setIsReordering(true);
     try {
-      // Update each point with new position
+      // Loop through each point and update its position
       for (const point of updatedPoints) {
         const { error } = await supabase
           .from('program_points')
@@ -255,6 +255,7 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
                     key={point.id} 
                     draggableId={point.id} 
                     index={index}
+                    isDragDisabled={isReordering}
                   >
                     {(provided) => (
                       <Card
@@ -267,11 +268,15 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
                             <div 
                               {...provided.dragHandleProps}
                               className="flex items-center cursor-grab text-muted-foreground"
+                              aria-label="Déplacer"
                             >
                               <GripVertical className="h-6 w-6" />
                             </div>
                             <div className="flex-1">
-                              <div className="prose max-w-none prose-sm" dangerouslySetInnerHTML={{ __html: point.content }} />
+                              <div 
+                                className="prose max-w-none prose-sm" 
+                                dangerouslySetInnerHTML={{ __html: point.content }} 
+                              />
                             </div>
                             <div className="flex gap-2 items-start ml-2">
                               <Button 

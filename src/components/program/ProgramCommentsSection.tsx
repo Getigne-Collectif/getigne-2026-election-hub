@@ -1,42 +1,32 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Comments from '../comments';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface ProgramCommentsSectionProps {
   programItemId: string;
+  programPointId?: string;
 }
 
-const ProgramCommentsSection: React.FC<ProgramCommentsSectionProps> = ({ programItemId }) => {
+const ProgramCommentsSection: React.FC<ProgramCommentsSectionProps> = ({ programItemId, programPointId }) => {
   const [commentsEnabled, setCommentsEnabled] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   
   useEffect(() => {
     const checkCommentsEnabled = async () => {
       try {
-        const { data, error } = await supabase
-          .from('program_items')
-          .select('*')  // Sélectionner toutes les colonnes
-          .eq('id', programItemId)
-          .single();
-          
-        if (error) {
-          console.error('Error checking if comments are enabled:', error);
-          return;
-        }
-        
         // Par défaut, les commentaires sont activés
-        setCommentsEnabled(true); // program_items doesn't have a comments_enabled column yet
+        setCommentsEnabled(true);
+        setLoading(false);
       } catch (error) {
         console.error('Error:', error);
-      } finally {
         setLoading(false);
       }
     };
     
     checkCommentsEnabled();
-  }, [programItemId]);
+  }, [programItemId, programPointId]);
   
   if (loading) {
     return <div className="mt-12 border-t border-getigne-100 pt-8">Chargement des commentaires...</div>;
@@ -53,7 +43,7 @@ const ProgramCommentsSection: React.FC<ProgramCommentsSectionProps> = ({ program
     );
   }
   
-  return <Comments programItemId={programItemId} />;
+  return <Comments programItemId={programItemId} programPointId={programPointId} />;
 };
 
 export default ProgramCommentsSection;

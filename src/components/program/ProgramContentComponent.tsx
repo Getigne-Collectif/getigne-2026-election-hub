@@ -9,6 +9,7 @@ import { TabsContent } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import ProgramCommentsSection from './ProgramCommentsSection';
 import ProgramLikeButton from './ProgramLikeButton';
+import ProgramPointCard from './ProgramPointCard';
 
 interface ProgramContentComponentProps {
   programItemId: string;
@@ -90,12 +91,8 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
             </p>
           ) : (
             <div className="space-y-4">
-              {programPoints.map((point, index) => (
-                <Card key={point.id} className="border-getigne-200">
-                  <CardContent className="p-4 prose max-w-none rich-content">
-                    <div dangerouslySetInnerHTML={{ __html: point.content }} />
-                  </CardContent>
-                </Card>
+              {programPoints.map((point) => (
+                <ProgramPointCard key={point.id} point={point} programItemId={programItemId} />
               ))}
             </div>
           )}

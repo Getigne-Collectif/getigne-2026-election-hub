@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/auth';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import SignInForm from '@/components/auth/SignInForm';
@@ -12,10 +12,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProgramLikeButtonProps {
   programItemId: string;
+  pointId?: string;
   initialLikesCount?: number;
 }
 
-const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLikeButtonProps) => {
+const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: ProgramLikeButtonProps) => {
   const { user } = useAuth();
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isLiked, setIsLiked] = useState(false);
@@ -24,7 +25,11 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
   const [pendingLike, setPendingLike] = useState(false);
   const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
 
-  // Vérifier si l'utilisateur a déjà liké cet élément du programme
+  // Déterminer le type de ressource
+  const resourceType = pointId ? 'program_point' : 'program_item';
+  const resourceId = pointId || programItemId;
+
+  // Vérifier si l'utilisateur a déjà liké cet élément
   useEffect(() => {
     const checkIfLiked = async () => {
       if (!user) {
@@ -33,12 +38,12 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
       }
 
       try {
-        // Use type assertion to bypass TypeScript errors
         const { data, error } = await supabase
-          .from('program_likes' as any)
+          .from('program_likes')
           .select('id')
-          .eq('program_item_id', programItemId)
+          .eq(pointId ? 'program_point_id' : 'program_item_id', resourceId)
           .eq('user_id', user.id)
+          .is(pointId ? 'program_point_id' : 'program_item_id', pointId ? 'not.null' : 'not.null')
           .maybeSingle();
 
         if (error) throw error;
@@ -50,34 +55,24 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
 
     const fetchLikesCount = async () => {
       try {
-        // We need to update this if there's no count_program_likes function yet
-        const { data, error } = await supabase.rpc('count_program_likes' as any, { 
-          program_id: programItemId 
-        });
-        
-        if (error) throw error;
-        setLikesCount(data || 0);
-      } catch (error) {
-        console.error('Erreur lors de la récupération du nombre de likes:', error);
-        
-        // Fallback: Count manually if the RPC doesn't exist
-        try {
-          const { count, error } = await supabase
-            .from('program_likes' as any)
-            .select('*', { count: 'exact' })
-            .eq('program_item_id', programItemId);
+        // Count likes manually
+        const { count, error } = await supabase
+          .from('program_likes')
+          .select('*', { count: 'exact' })
+          .eq(pointId ? 'program_point_id' : 'program_item_id', resourceId)
+          .is(pointId ? 'program_point_id' : 'program_item_id', pointId ? 'not.null' : 'not.null');
             
-          if (error) throw error;
-          setLikesCount(count || 0);
-        } catch (countError) {
-          console.error('Fallback count error:', countError);
-        }
+        if (error) throw error;
+        setLikesCount(count || 0);
+      } catch (countError) {
+        console.error('Erreur de comptage:', countError);
+        setLikesCount(0);
       }
     };
 
     checkIfLiked();
     fetchLikesCount();
-  }, [programItemId, user]);
+  }, [programItemId, pointId, resourceId, resourceType, user]);
 
   // Gérer le like/unlike
   const handleLikeToggle = async () => {
@@ -93,9 +88,9 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
       if (isLiked) {
         // Supprimer le like
         const { error } = await supabase
-          .from('program_likes' as any)
+          .from('program_likes')
           .delete()
-          .eq('program_item_id', programItemId)
+          .eq(pointId ? 'program_point_id' : 'program_item_id', resourceId)
           .eq('user_id', user.id);
 
         if (error) throw error;
@@ -105,9 +100,19 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
         toast.success('Votre like a été retiré');
       } else {
         // Ajouter le like
+        const likeData: any = { user_id: user.id };
+        
+        // Ajouter le bon champ selon le type
+        if (pointId) {
+          likeData.program_point_id = pointId;
+          likeData.program_item_id = programItemId; // Référence à la section parente
+        } else {
+          likeData.program_item_id = programItemId;
+        }
+        
         const { error } = await supabase
-          .from('program_likes' as any)
-          .insert([{ program_item_id: programItemId, user_id: user.id }] as any);
+          .from('program_likes')
+          .insert([likeData]);
 
         if (error) throw error;
         
@@ -115,7 +120,7 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
         setIsLiked(true);
         toast.success('Merci pour votre soutien !');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors du like/unlike:', error);
       toast.error("Une erreur s'est produite. Veuillez réessayer.");
     } finally {
