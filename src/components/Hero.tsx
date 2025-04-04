@@ -17,20 +17,20 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center px-4 py-20 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80" 
-          alt="Champ de fleurs oranges dans la campagne par une journée ensoleillée" 
+        <img
+          src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80"
+          alt="Champ de fleurs oranges dans la campagne par une journée ensoleillée"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-getigne-800/60 to-getigne-800/20 backdrop-blur-sm"></div>
       </div>
-      
+
       {/* Semi-transparent shapes */}
       <div className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-getigne-green-500/20 blur-3xl opacity-70 animate-pulse" />
       <div className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-getigne-green-100/20 blur-3xl opacity-70" />
-      
+
       <div className="container mx-auto relative z-10">
-        <div 
+        <div
           className={`max-w-4xl mx-auto text-center transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           <div className={`mb-4 inline-block transform transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
@@ -39,23 +39,23 @@ const Hero = () => {
             </span>
           </div>
 
-          <h1 
+          <h1
             className={`text-5xl md:text-7xl font-bold mb-6 tracking-tight transform transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'} text-white`}
           >
-            Ensemble, construisons
+            Ensemble, construire
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-getigne-green-100 block">
               l'avenir de Gétigné
             </span>
           </h1>
 
-          <p 
+          <p
             className={`text-lg md:text-xl text-white/90 mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
-            Un collectif citoyen engagé pour une commune plus solidaire, 
-            écologique et participative au service de toutes et tous.
+            Déployons la force du collectif pour faire de Gétigné une commune plus forte,
+            plus résiliente au service de toutes et tous.
           </p>
 
-          <div 
+          <div
             className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">

@@ -37,6 +37,7 @@ const AdminDashboardPage = () => {
     pages: 0,
     projects: 0,
     committees: 0,
+    programPoints: 0,
     comments: 0
   });
   const { toast } = useToast();
@@ -100,6 +101,12 @@ const AdminDashboardPage = () => {
         .from('citizen_committees')
         .select('*', { count: 'exact', head: true });
 
+
+      // Program
+      const { count: programPointsCount, error: programPointsError } = await supabase
+        .from('program_points')
+        .select('*', { count: 'exact', head: true });
+
       // Projets
       const { count: projectsCount, error: projectsError } = await supabase
         .from('projects')
@@ -115,6 +122,7 @@ const AdminDashboardPage = () => {
           pages: pagesCount || 0,
           projects: projectsCount || 0,
           committees: citizen_committeesCount || 0,
+          programPoints: programPointsCount || 0,
           comments: commentsCount || 0
         });
       }
@@ -251,6 +259,21 @@ const AdminDashboardPage = () => {
                   <CardContent>
                     <div className="text-3xl font-bold">{metrics.committees}</div>
                     <CardDescription>commissions créés</CardDescription>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to="/admin/program">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl flex items-center">
+                      <Component className="h-5 w-5 mr-2 text-getigne-accent" />
+                      Programme
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">{metrics.programPoints}</div>
+                    <CardDescription>points de programme</CardDescription>
                   </CardContent>
                 </Card>
               </Link>

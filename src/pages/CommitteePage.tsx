@@ -189,7 +189,7 @@ const CommitteePage = () => {
           // Safely check and set the image URLs
           if (committeeData) {
             console.log("Committee images retrieved:", committeeData);
-            
+
             // Set team photo if available
             if (committeeData.team_photo_url) {
               setTeamPhotoUrl(committeeData.team_photo_url);
@@ -280,23 +280,23 @@ const CommitteePage = () => {
   console.log("Cover photo URL from DB:", committee.cover_photo_url);
   console.log("Cover photo URL from state:", coverPhotoUrl);
   console.log("Theme default cover image:", themeColor.defaultCoverImage);
-  
+
   const coverImage = committee.cover_photo_url || themeColor.defaultCoverImage;
   console.log("Final cover image used:", coverImage);
 
   // Utiliser la photo d'équipe depuis la DB ou la valeur par défaut
   const teamImage = committee.team_photo_url || themeColor.defaultTeamImage;
-  
+
   const handleOpenShowModal = (work: Tables<'committee_works'> | null) => {
     setSelectedWork(work);
     setMode('view');
   };
-  
+
   const handleOpenNewModal = () => {
     setSelectedWork(null);
     setMode('create');
   };
-  
+
   const handleOpenEditModal = (work: Tables<'committee_works'> | null) => {
     setSelectedWork(work);
     setMode('edit');
@@ -366,9 +366,6 @@ const CommitteePage = () => {
               </p>
 
               <div className="mt-4">
-                <h3 className={`text-lg font-medium mb-3 ${themeColor.text}`}>
-                  Pilote de la commission
-                </h3>
                 {id && <CommitteeMembers committeeId={id} simplified={true} />}
               </div>
             </div>
