@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
+import { ResourceType } from '@/types/comments.types';
 
 interface CommentFormProps {
   newsId?: string;
@@ -88,8 +90,9 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
           status: isModerator ? 'approved' : 'pending'
         });
         
+        // Use type assertion to tell TypeScript this is valid
         const { data: commentData, error: commentError } = await supabase
-          .from('program_comments')
+          .from('program_comments' as any)
           .insert([
             { 
               user_id: user.id, 
@@ -97,7 +100,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
               content: newComment.trim(),
               status: isModerator ? 'approved' : 'pending'
             }
-          ])
+          ] as any)
           .select();
 
         if (commentError) {
@@ -139,7 +142,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
     }
   };
 
-  const sendNotification = async (title: string, resourceType: 'news' | 'program', resourceId: string) => {
+  const sendNotification = async (title: string, resourceType: ResourceType, resourceId: string) => {
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -170,7 +173,7 @@ ${newComment.trim()}
         `,
         color: DiscordColors.GREEN,
         username: "Système de Commentaires",
-        resourceType: resourceType,
+        resourceType: resourceType as any,
         resourceId
       });
     } catch (error) {

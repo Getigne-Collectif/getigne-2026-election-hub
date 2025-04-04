@@ -14,29 +14,13 @@ import {
 } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
 import { getInitials } from './utils';
-
-interface Profile {
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;  // Added avatar_url property
-}
-
-interface Comment {
-  id: string;
-  user_id: string;
-  news_id: string;
-  content: string;
-  created_at: string;
-  status: 'pending' | 'approved' | 'rejected';
-  updated_at: string;
-  profiles?: Profile;
-}
+import { Comment, CommentStatus } from '@/types/comments.types';
 
 interface ModeratorViewProps {
   comments: Comment[];
   showAllComments: boolean;
   setShowAllComments: (show: boolean) => void;
-  onModerateComment: (commentId: string, newStatus: 'approved' | 'rejected') => Promise<void>;
+  onModerateComment: (commentId: string, newStatus: CommentStatus) => Promise<void>;
 }
 
 const ModeratorView: React.FC<ModeratorViewProps> = ({ 

@@ -2,23 +2,7 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from './utils';
-
-interface Profile {
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-}
-
-interface Comment {
-  id: string;
-  user_id: string;
-  news_id: string;
-  content: string;
-  created_at: string;
-  status: 'pending' | 'approved' | 'rejected';
-  updated_at: string;
-  profiles?: Profile;
-}
+import { Comment } from '@/types/comments.types';
 
 interface UserViewProps {
   comments: Comment[];

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,8 +33,9 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
       }
 
       try {
+        // Use type assertion to bypass TypeScript errors
         const { data, error } = await supabase
-          .from('program_likes')
+          .from('program_likes' as any)
           .select('id')
           .eq('program_item_id', programItemId)
           .eq('user_id', user.id)
@@ -48,7 +50,8 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
 
     const fetchLikesCount = async () => {
       try {
-        const { data, error } = await supabase.rpc('count_program_likes', { 
+        // We need to update this if there's no count_program_likes function yet
+        const { data, error } = await supabase.rpc('count_program_likes' as any, { 
           program_id: programItemId 
         });
         
@@ -56,6 +59,19 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
         setLikesCount(data || 0);
       } catch (error) {
         console.error('Erreur lors de la récupération du nombre de likes:', error);
+        
+        // Fallback: Count manually if the RPC doesn't exist
+        try {
+          const { count, error } = await supabase
+            .from('program_likes' as any)
+            .select('*', { count: 'exact' })
+            .eq('program_item_id', programItemId);
+            
+          if (error) throw error;
+          setLikesCount(count || 0);
+        } catch (countError) {
+          console.error('Fallback count error:', countError);
+        }
       }
     };
 
@@ -77,7 +93,7 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
       if (isLiked) {
         // Supprimer le like
         const { error } = await supabase
-          .from('program_likes')
+          .from('program_likes' as any)
           .delete()
           .eq('program_item_id', programItemId)
           .eq('user_id', user.id);
@@ -90,8 +106,8 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
       } else {
         // Ajouter le like
         const { error } = await supabase
-          .from('program_likes')
-          .insert([{ program_item_id: programItemId, user_id: user.id }]);
+          .from('program_likes' as any)
+          .insert([{ program_item_id: programItemId, user_id: user.id }] as any);
 
         if (error) throw error;
         
