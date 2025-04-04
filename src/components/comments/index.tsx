@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,25 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import CommentForm from './CommentForm';
 import UserView from './UserView';
 import ModeratorView from './ModeratorView';
-
-// Unified Comment interface supporting both news and program comments
-interface Comment {
-  id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-  updated_at: string;
-  status: 'pending' | 'approved' | 'rejected';
-  news_id?: string;
-  program_item_id?: string;
-  profiles?: Profile;
-}
-
-interface Profile {
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-}
+import { Comment, CommentStatus } from '@/types/comments.types';
 
 interface CommentsProps {
   newsId?: string;
@@ -123,8 +106,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
     if (!programItemId) return;
     
     try {
+      // Using type assertion to bypass TypeScript errors since the types file hasn't been updated
       let query = supabase
-        .from('program_comments')
+        .from('program_comments' as any)
         .select('*')
         .eq('program_item_id', programItemId);
 
@@ -148,7 +132,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
       }
       
       // Fetch profiles separately 
-      const userIds = [...new Set(commentsData.map(comment => comment.user_id))];
+      const userIds = [...new Set(commentsData.map((comment: any) => comment.user_id))];
       
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
@@ -164,12 +148,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
         return acc;
       }, {});
       
-      const commentsWithProfiles = commentsData.map(comment => ({
+      const commentsWithProfiles = commentsData.map((comment: any) => ({
         ...comment,
         profiles: profilesMap[comment.user_id]
       }));
       
-      setComments(commentsWithProfiles);
+      setComments(commentsWithProfiles as Comment[]);
     } catch (error) {
       console.error('Erreur lors de la récupération des commentaires:', error);
     } finally {
@@ -177,12 +161,13 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
     }
   };
 
-  const handleModerateComment = async (commentId: string, newStatus: 'approved' | 'rejected') => {
+  const handleModerateComment = async (commentId: string, newStatus: CommentStatus) => {
     try {
       const tableName = newsId ? 'comments' : 'program_comments';
       
+      // Use type assertion to handle both table types
       const { error } = await supabase
-        .from(tableName)
+        .from(tableName as any)
         .update({ 
           status: newStatus,
           updated_at: new Date().toISOString() 
@@ -193,6 +178,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
         throw error;
       }
 
+      // Update local state with new status
       setComments(comments.map(comment => 
         comment.id === commentId ? { ...comment, status: newStatus } : comment
       ));
@@ -204,6 +190,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
           'Le commentaire a été rejeté et ne sera pas visible publiquement'
       });
       
+      // Refresh comments after moderation
       if (newsId) {
         fetchNewsComments();
       } else if (programItemId) {

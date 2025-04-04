@@ -26,8 +26,8 @@ const ProgramCommentsSection: React.FC<ProgramCommentsSectionProps> = ({ program
           return;
         }
         
-        // Par défaut, les commentaires sont activés, sauf indication contraire
-        setCommentsEnabled(data.comments_enabled !== false);
+        // Par défaut, les commentaires sont activés
+        setCommentsEnabled(true); // program_items doesn't have a comments_enabled column yet
       } catch (error) {
         console.error('Error:', error);
       } finally {
