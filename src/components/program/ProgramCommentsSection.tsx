@@ -17,7 +17,7 @@ const ProgramCommentsSection: React.FC<ProgramCommentsSectionProps> = ({ program
       try {
         const { data, error } = await supabase
           .from('program_items')
-          .select('comments_enabled')
+          .select('*')  // Sélectionner toutes les colonnes
           .eq('id', programItemId)
           .single();
           
@@ -26,6 +26,7 @@ const ProgramCommentsSection: React.FC<ProgramCommentsSectionProps> = ({ program
           return;
         }
         
+        // Par défaut, les commentaires sont activés, sauf indication contraire
         setCommentsEnabled(data.comments_enabled !== false);
       } catch (error) {
         console.error('Error:', error);

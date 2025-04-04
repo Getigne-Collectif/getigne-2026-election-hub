@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,22 +7,23 @@ import CommentForm from './CommentForm';
 import UserView from './UserView';
 import ModeratorView from './ModeratorView';
 
+// Unified Comment interface supporting both news and program comments
+interface Comment {
+  id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  status: 'pending' | 'approved' | 'rejected';
+  news_id?: string;
+  program_item_id?: string;
+  profiles?: Profile;
+}
+
 interface Profile {
   first_name: string;
   last_name: string;
   avatar_url?: string;
-}
-
-interface Comment {
-  id: string;
-  user_id: string;
-  news_id?: string;
-  program_item_id?: string;
-  content: string;
-  created_at: string;
-  status: 'pending' | 'approved' | 'rejected';
-  updated_at: string;
-  profiles?: Profile;
 }
 
 interface CommentsProps {
@@ -47,12 +47,11 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
       fetchProgramComments();
     }
   }, [newsId, programItemId, showAllComments]);
-
+  
   const fetchNewsComments = async () => {
     if (!newsId) return;
     
     try {
-      // Fetch comments
       let query = supabase
         .from('comments')
         .select('*')
@@ -124,7 +123,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
     if (!programItemId) return;
     
     try {
-      // Fetch comments
       let query = supabase
         .from('program_comments')
         .select('*')
@@ -149,9 +147,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
         return;
       }
       
-      console.log('Fetched program comments:', commentsData);
-      
-      // Fetch profiles separately and combine them manually
+      // Fetch profiles separately 
       const userIds = [...new Set(commentsData.map(comment => comment.user_id))];
       
       const { data: profilesData, error: profilesError } = await supabase
@@ -161,29 +157,19 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId }) => {
         
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
-        // Continue without profiles
       }
       
-      // Create a map of user_id to profile data
       const profilesMap = (profilesData || []).reduce((acc, profile) => {
         acc[profile.id] = profile;
         return acc;
       }, {});
       
-      // Combine comments with their profile data
-      const commentsWithProfiles = commentsData.map(comment => {
-        const profile = profilesMap[comment.user_id];
-        return {
-          ...comment,
-          profiles: profile ? {
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            avatar_url: profile.avatar_url
-          } : undefined
-        };
-      });
+      const commentsWithProfiles = commentsData.map(comment => ({
+        ...comment,
+        profiles: profilesMap[comment.user_id]
+      }));
       
-      setComments(commentsWithProfiles as Comment[]);
+      setComments(commentsWithProfiles);
     } catch (error) {
       console.error('Erreur lors de la récupération des commentaires:', error);
     } finally {

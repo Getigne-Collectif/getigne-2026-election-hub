@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
   const [pendingLike, setPendingLike] = useState(false);
   const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
 
-  // Check if the user has already liked this program item
+  // Vérifier si l'utilisateur a déjà liké cet élément du programme
   useEffect(() => {
     const checkIfLiked = async () => {
       if (!user) {
@@ -64,9 +63,9 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
     fetchLikesCount();
   }, [programItemId, user]);
 
-  // Handle like/unlike
+  // Gérer le like/unlike
   const handleLikeToggle = async () => {
-    // If user is not logged in, open the auth dialog
+    // Si l'utilisateur n'est pas connecté, ouvrir la boîte de dialogue d'authentification
     if (!user) {
       setPendingLike(true);
       setAuthDialogOpen(true);
@@ -76,7 +75,7 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
     setIsLoading(true);
     try {
       if (isLiked) {
-        // Remove the like
+        // Supprimer le like
         const { error } = await supabase
           .from('program_likes')
           .delete()
@@ -89,7 +88,7 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
         setIsLiked(false);
         toast.success('Votre like a été retiré');
       } else {
-        // Add the like
+        // Ajouter le like
         const { error } = await supabase
           .from('program_likes')
           .insert([{ program_item_id: programItemId, user_id: user.id }]);
@@ -108,11 +107,11 @@ const ProgramLikeButton = ({ programItemId, initialLikesCount = 0 }: ProgramLike
     }
   };
 
-  // After successful auth, close the dialog and like the program
+  // Après une authentification réussie, fermer la boîte de dialogue
   const handleAuthSuccess = () => {
     setAuthDialogOpen(false);
     
-    // Add a small delay to ensure the auth context is updated
+    // Ajouter un petit délai pour s'assurer que le contexte d'authentification est mis à jour
     setTimeout(() => {
       if (pendingLike) {
         handleLikeToggle();

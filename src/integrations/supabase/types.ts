@@ -592,6 +592,44 @@ export type Database = {
         }
         Relationships: []
       }
+      program_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          program_item_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          program_item_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          program_item_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_comments_program_item_id_fkey"
+            columns: ["program_item_id"]
+            isOneToOne: false
+            referencedRelation: "program_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       program_items: {
         Row: {
           created_at: string
@@ -618,6 +656,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      program_likes: {
+        Row: {
+          created_at: string
+          id: string
+          program_item_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          program_item_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          program_item_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_likes_program_item_id_fkey"
+            columns: ["program_item_id"]
+            isOneToOne: false
+            referencedRelation: "program_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       program_points: {
         Row: {
@@ -793,6 +860,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_program_likes: {
+        Args: {
+          program_id: string
+        }
+        Returns: number
+      }
       count_project_likes: {
         Args: {
           project_id: string

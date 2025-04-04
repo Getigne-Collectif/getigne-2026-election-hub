@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +45,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
     setSubmitting(true);
     try {
       if (newsId) {
-        // Comment on news article
         console.log('Submitting news comment:', {
           user_id: user.id,
           news_id: newsId,
@@ -73,7 +71,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
         
         console.log('Comment inserted:', commentData);
         
-        // Get article details for the notification
         const { data: newsData, error: newsError } = await supabase
           .from('news')
           .select('title')
@@ -81,11 +78,9 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
           .single();
 
         if (!newsError && newsData) {
-          // Fetch user profile and send notification for news comments
           await sendNotification(newsData.title, 'news', newsId);
         }
       } else if (programItemId) {
-        // Comment on program item
         console.log('Submitting program comment:', {
           user_id: user.id,
           program_item_id: programItemId,
@@ -112,7 +107,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
         
         console.log('Program comment inserted:', commentData);
         
-        // Get program item details for the notification
         const { data: programData, error: programError } = await supabase
           .from('program_items')
           .select('title')
@@ -120,7 +114,6 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
           .single();
 
         if (!programError && programData) {
-          // Fetch user profile and send notification for program comments
           await sendNotification(programData.title, 'program', programItemId);
         }
       }
@@ -146,10 +139,8 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
     }
   };
 
-  // Helper function to send notifications
   const sendNotification = async (title: string, resourceType: 'news' | 'program', resourceId: string) => {
     try {
-      // Fetch user profile to display name
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('first_name, last_name')
@@ -158,12 +149,8 @@ const CommentForm: React.FC<CommentFormProps> = ({ newsId, programItemId, onComm
         
       if (profileError) {
         console.error('Error fetching profile:', profileError);
-        // Continue without profile data
-      } else {
-        console.log('Profile fetched:', profileData);
       }
 
-      // Prepare notification title
       const notificationTitle = resourceType === 'news' 
         ? `💬 Nouveau commentaire sur l'article: ${title}`
         : `💬 Nouveau commentaire sur la section du programme: ${title}`;
@@ -183,7 +170,7 @@ ${newComment.trim()}
         `,
         color: DiscordColors.GREEN,
         username: "Système de Commentaires",
-        resourceType,
+        resourceType: resourceType,
         resourceId
       });
     } catch (error) {
