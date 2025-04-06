@@ -50,14 +50,14 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
       } else if (programPointId) {
         // Fetch comments for program point
         query = supabase
-          .from('program_comments' as any)
+          .from('program_comments')
           .select('*, profiles(*)')
           .eq('program_point_id', programPointId)
           .order('created_at', { ascending: false });
       } else if (programItemId && !programPointId) {
         // Fetch comments for program item (section)
         query = supabase
-          .from('program_comments' as any)
+          .from('program_comments')
           .select('*, profiles(*)')
           .eq('program_item_id', programItemId)
           .is('program_point_id', null)
@@ -143,11 +143,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
       {isModerator ? (
         <ModeratorView
           comments={comments}
+          showAllComments={view === 'all'}
+          setShowAllComments={(show) => setView(show ? 'all' : 'pending')}
+          onModerateComment={handleStatusChange}
           loading={loading}
-          view={view}
-          setView={setView}
-          onStatusChange={handleStatusChange}
-          sourceType={sourceType}
         />
       ) : (
         <UserView comments={comments} loading={loading} />

@@ -6,6 +6,8 @@ import { MessageSquare } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import ProgramLikeButton from './ProgramLikeButton';
 import Comments from '../comments';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface ProgramPointCardProps {
   point: {
@@ -22,7 +24,9 @@ export default function ProgramPointCard({ point, programItemId }: ProgramPointC
   return (
     <Card key={point.id} className="border-getigne-200">
       <CardContent className="p-4">
-        <div className="prose max-w-none rich-content" dangerouslySetInnerHTML={{ __html: point.content }} />
+        <div className="prose max-w-none rich-content">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{point.content}</ReactMarkdown>
+        </div>
         
         <div className="flex justify-between items-center mt-4">
           <Button 

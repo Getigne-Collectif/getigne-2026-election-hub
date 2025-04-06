@@ -21,13 +21,15 @@ interface ModeratorViewProps {
   showAllComments: boolean;
   setShowAllComments: (show: boolean) => void;
   onModerateComment: (commentId: string, newStatus: CommentStatus) => Promise<void>;
+  loading?: boolean;
 }
 
 const ModeratorView: React.FC<ModeratorViewProps> = ({ 
   comments, 
   showAllComments, 
   setShowAllComments, 
-  onModerateComment
+  onModerateComment,
+  loading = false
 }) => {
   // Function to get badge props based on status
   const getStatusBadgeProps = (status: string) => {
@@ -69,7 +71,13 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {comments.length > 0 ? (
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-4">
+                Chargement des commentaires...
+              </TableCell>
+            </TableRow>
+          ) : comments.length > 0 ? (
             comments.map((comment) => {
               const statusProps = getStatusBadgeProps(comment.status);
               const StatusIcon = statusProps.icon;

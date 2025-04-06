@@ -38,13 +38,20 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
       }
 
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('program_likes')
           .select('id')
-          .eq(pointId ? 'program_point_id' : 'program_item_id', resourceId)
-          .eq('user_id', user.id)
-          .is(pointId ? 'program_point_id' : 'program_item_id', pointId ? 'not.null' : 'not.null')
-          .maybeSingle();
+          .eq('program_item_id', programItemId)
+          .eq('user_id', user.id);
+          
+        // Add condition for program point if provided
+        if (pointId) {
+          query = query.eq('program_point_id', pointId);
+        } else {
+          query = query.is('program_point_id', null);
+        }
+          
+        const { data, error } = await query.maybeSingle();
 
         if (error) throw error;
         setIsLiked(!!data);
@@ -55,12 +62,19 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
 
     const fetchLikesCount = async () => {
       try {
-        // Count likes manually
-        const { count, error } = await supabase
+        // Count likes using a query based on resource type
+        let query = supabase
           .from('program_likes')
           .select('*', { count: 'exact' })
-          .eq(pointId ? 'program_point_id' : 'program_item_id', resourceId)
-          .is(pointId ? 'program_point_id' : 'program_item_id', pointId ? 'not.null' : 'not.null');
+          .eq('program_item_id', programItemId);
+          
+        if (pointId) {
+          query = query.eq('program_point_id', pointId);
+        } else {
+          query = query.is('program_point_id', null);
+        }
+            
+        const { count, error } = await query;
             
         if (error) throw error;
         setLikesCount(count || 0);
@@ -87,11 +101,19 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
     try {
       if (isLiked) {
         // Supprimer le like
-        const { error } = await supabase
+        let query = supabase
           .from('program_likes')
           .delete()
-          .eq(pointId ? 'program_point_id' : 'program_item_id', resourceId)
+          .eq('program_item_id', programItemId)
           .eq('user_id', user.id);
+          
+        if (pointId) {
+          query = query.eq('program_point_id', pointId);
+        } else {
+          query = query.is('program_point_id', null);
+        }
+          
+        const { error } = await query;
 
         if (error) throw error;
         
@@ -100,14 +122,14 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
         toast.success('Votre like a été retiré');
       } else {
         // Ajouter le like
-        const likeData: any = { user_id: user.id };
+        const likeData: any = { 
+          user_id: user.id,
+          program_item_id: programItemId
+        };
         
         // Ajouter le bon champ selon le type
         if (pointId) {
           likeData.program_point_id = pointId;
-          likeData.program_item_id = programItemId; // Référence à la section parente
-        } else {
-          likeData.program_item_id = programItemId;
         }
         
         const { error } = await supabase

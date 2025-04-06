@@ -6,9 +6,18 @@ import { Comment } from '@/types/comments.types';
 
 interface UserViewProps {
   comments: Comment[];
+  loading?: boolean;
 }
 
-const UserView: React.FC<UserViewProps> = ({ comments }) => {
+const UserView: React.FC<UserViewProps> = ({ comments, loading = false }) => {
+  if (loading) {
+    return (
+      <div className="text-center py-8 text-getigne-500">
+        Chargement des commentaires...
+      </div>
+    );
+  }
+
   if (comments.length === 0) {
     return (
       <div className="text-center py-8 text-getigne-500">
