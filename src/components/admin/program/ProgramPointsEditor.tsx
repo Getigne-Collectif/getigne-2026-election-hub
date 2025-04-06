@@ -73,8 +73,14 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
         throw error;
       }
       
-      setPoints(data || []);
-      return data;
+      // Convert the files from Json to string[] if needed
+      const transformedData = data?.map(point => ({
+        ...point,
+        files: Array.isArray(point.files) ? point.files : []
+      })) as ProgramPoint[];
+      
+      setPoints(transformedData || []);
+      return transformedData;
     },
   });
 

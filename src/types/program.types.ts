@@ -6,4 +6,6 @@ export interface ProgramPoint {
   position: number;
   program_item_id: string;
   files?: string[] | null;
+  created_at?: string;
+  updated_at?: string;
 }
