@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,22 +27,21 @@ import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus, GripVertical, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Plus, GripVertical, Pencil, Trash2, FileUp } from 'lucide-react';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-
-interface ProgramPointsEditorProps {
-  programItemId: string;
-}
+import { v4 as uuidv4 } from 'uuid';
 
 // Form schema for program point
 const programPointSchema = z.object({
+  title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
   content: z.string().min(10, "Le contenu doit comporter au moins 10 caractères"),
+  files: z.array(z.instanceof(File)).optional(),
 });
 
 type ProgramPointFormValues = z.infer<typeof programPointSchema>;
 
-export default function ProgramPointsEditor({ programItemId }: ProgramPointsEditorProps) {
+export default function ProgramPointsEditor({ programItemId }: { programItemId: string }) {
   const [points, setPoints] = useState<any[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -51,7 +49,15 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
 
-  // Query to fetch program points
+  const form = useForm<ProgramPointFormValues>({
+    resolver: zodResolver(programPointSchema),
+    defaultValues: {
+      title: '',
+      content: '',
+      files: [],
+    },
+  });
+
   const { isLoading, refetch } = useQuery({
     queryKey: ['programPoints', programItemId],
     queryFn: async () => {
@@ -71,42 +77,51 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
     },
   });
 
-  // Form setup
-  const form = useForm<ProgramPointFormValues>({
-    resolver: zodResolver(programPointSchema),
-    defaultValues: {
-      content: '',
-    },
-  });
+  const handleFileUpload = async (files: File[]) => {
+    const uploadPromises = files.map(async (file) => {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `program_points/${fileName}`;
 
-  // Handle opening the edit dialog
-  const handleEditClick = (point: any) => {
-    form.reset({ content: point.content });
-    setCurrentPointId(point.id);
-    setIsEditDialogOpen(true);
+      const { data, error } = await supabase.storage
+        .from('program_files')
+        .upload(filePath, file);
+
+      if (error) {
+        toast.error(`Erreur lors du téléchargement : ${error.message}`);
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('program_files')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    });
+
+    return await Promise.all(uploadPromises);
   };
 
-  // Handle adding a new point
-  const handleAddClick = () => {
-    form.reset({ content: '' });
-    setIsAddDialogOpen(true);
-  };
-
-  // Handle form submission for adding a new point
   const onSubmitAdd = async (values: ProgramPointFormValues) => {
     setIsSubmitting(true);
     
     try {
-      // Determine the next position
       const nextPosition = points.length > 0 
         ? Math.max(...points.map(p => p.position)) + 1 
         : 0;
       
+      let fileUrls: string[] = [];
+      if (values.files && values.files.length > 0) {
+        fileUrls = (await handleFileUpload(values.files)).filter(url => url !== null) as string[];
+      }
+
       const { error } = await supabase
         .from('program_points')
         .insert([{
           program_item_id: programItemId,
+          title: values.title,
           content: values.content,
+          files: fileUrls,
           position: nextPosition,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -126,17 +141,23 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
     }
   };
 
-  // Handle form submission for editing a point
   const onSubmitEdit = async (values: ProgramPointFormValues) => {
     if (!currentPointId) return;
     
     setIsSubmitting(true);
     
     try {
+      let fileUrls: string[] = [];
+      if (values.files && values.files.length > 0) {
+        fileUrls = (await handleFileUpload(values.files)).filter(url => url !== null) as string[];
+      }
+
       const { error } = await supabase
         .from('program_points')
         .update({
+          title: values.title,
           content: values.content,
+          files: fileUrls,
           updated_at: new Date().toISOString(),
         })
         .eq('id', currentPointId);
@@ -155,7 +176,17 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
     }
   };
 
-  // Handle deleting a point
+  const handleEditClick = (point: any) => {
+    form.reset({ title: point.title, content: point.content, files: point.files });
+    setCurrentPointId(point.id);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleAddClick = () => {
+    form.reset({ title: '', content: '', files: [] });
+    setIsAddDialogOpen(true);
+  };
+
   const handleDeletePoint = async (pointId: string) => {
     try {
       const { error } = await supabase
@@ -173,19 +204,15 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
     }
   };
 
-  // Handle drag and drop reordering
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
     
-    // Return if dropped in same position
     if (result.destination.index === result.source.index) return;
     
-    // Reorder points in the UI
     const reorderedPoints = Array.from(points);
     const [movedPoint] = reorderedPoints.splice(result.source.index, 1);
     reorderedPoints.splice(result.destination.index, 0, movedPoint);
     
-    // Update positions
     const updatedPoints = reorderedPoints.map((point, index) => ({
       ...point,
       position: index,
@@ -193,10 +220,8 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
     
     setPoints(updatedPoints);
     
-    // Update in the database
     setIsReordering(true);
     try {
-      // Loop through each point and update its position
       for (const point of updatedPoints) {
         const { error } = await supabase
           .from('program_points')
@@ -210,7 +235,7 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
     } catch (error: any) {
       toast.error(`Erreur lors de la mise à jour de l'ordre: ${error.message}`);
       console.error("Reorder error:", error);
-      refetch(); // Refetch to restore original order
+      refetch();
     } finally {
       setIsReordering(false);
     }
@@ -310,7 +335,6 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
         </DragDropContext>
       )}
 
-      {/* Add Point Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
@@ -324,6 +348,23 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
             <form onSubmit={form.handleSubmit(onSubmitAdd)} className="space-y-4">
               <FormField
                 control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Titre</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        {...field}
+                        className="prose max-w-none prose-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="content"
                 render={({ field }) => (
                   <FormItem>
@@ -334,6 +375,25 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
                         onChange={field.onChange}
                         className="min-h-[200px]"
                         contentType="news"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="files"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fichiers</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        multiple
+                        accept="image/*,video/*,audio/*"
+                        {...field}
+                        className="prose max-w-none prose-sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -368,7 +428,6 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
         </DialogContent>
       </Dialog>
 
-      {/* Edit Point Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
@@ -382,6 +441,23 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
             <form onSubmit={form.handleSubmit(onSubmitEdit)} className="space-y-4">
               <FormField
                 control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Titre</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        {...field}
+                        className="prose max-w-none prose-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="content"
                 render={({ field }) => (
                   <FormItem>
@@ -392,6 +468,25 @@ export default function ProgramPointsEditor({ programItemId }: ProgramPointsEdit
                         onChange={field.onChange}
                         className="min-h-[200px]"
                         contentType="news"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="files"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fichiers</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        multiple
+                        accept="image/*,video/*,audio/*"
+                        {...field}
+                        className="prose max-w-none prose-sm"
                       />
                     </FormControl>
                     <FormMessage />
