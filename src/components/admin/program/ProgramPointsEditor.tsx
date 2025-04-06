@@ -32,6 +32,7 @@ import { Loader2, Plus, GripVertical, Pencil, Trash2, FileUp } from 'lucide-reac
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { v4 as uuidv4 } from 'uuid';
+import { ProgramPoint } from '@/types/program.types';
 
 // Form schema for program point
 const programPointSchema = z.object({
@@ -42,7 +43,7 @@ const programPointSchema = z.object({
 type ProgramPointFormValues = z.infer<typeof programPointSchema>;
 
 export default function ProgramPointsEditor({ programItemId }: { programItemId: string }) {
-  const [points, setPoints] = useState<any[]>([]);
+  const [points, setPoints] = useState<ProgramPoint[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPointId, setCurrentPointId] = useState<string | null>(null);
@@ -167,7 +168,8 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
         .eq('id', currentPointId)
         .single();
       
-      const existingFiles = currentPoint?.files || [];
+      // Make sure we handle files correctly as an array
+      const existingFiles = Array.isArray(currentPoint?.files) ? currentPoint?.files : [];
       const allFiles = [...existingFiles, ...fileUrls];
 
       const { error } = await supabase
@@ -195,7 +197,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
     }
   };
 
-  const handleEditClick = (point: any) => {
+  const handleEditClick = (point: ProgramPoint) => {
     form.reset({ 
       title: point.title, 
       content: point.content 
