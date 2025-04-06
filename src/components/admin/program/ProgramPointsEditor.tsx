@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,7 +37,6 @@ import { v4 as uuidv4 } from 'uuid';
 const programPointSchema = z.object({
   title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
   content: z.string().min(10, "Le contenu doit comporter au moins 10 caractères"),
-  files: z.array(z.instanceof(File)).optional(),
 });
 
 type ProgramPointFormValues = z.infer<typeof programPointSchema>;
@@ -48,13 +48,13 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
   const [currentPointId, setCurrentPointId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const form = useForm<ProgramPointFormValues>({
     resolver: zodResolver(programPointSchema),
     defaultValues: {
       title: '',
       content: '',
-      files: [],
     },
   });
 
@@ -76,6 +76,13 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       return data;
     },
   });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const fileList = Array.from(event.target.files);
+      setSelectedFiles(fileList);
+    }
+  };
 
   const handleFileUpload = async (files: File[]) => {
     const uploadPromises = files.map(async (file) => {
@@ -111,8 +118,8 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
         : 0;
       
       let fileUrls: string[] = [];
-      if (values.files && values.files.length > 0) {
-        fileUrls = (await handleFileUpload(values.files)).filter(url => url !== null) as string[];
+      if (selectedFiles.length > 0) {
+        fileUrls = (await handleFileUpload(selectedFiles)).filter(url => url !== null) as string[];
       }
 
       const { error } = await supabase
@@ -131,6 +138,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       
       toast.success("Point ajouté avec succès");
       form.reset();
+      setSelectedFiles([]);
       setIsAddDialogOpen(false);
       refetch();
     } catch (error: any) {
@@ -148,16 +156,26 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
     
     try {
       let fileUrls: string[] = [];
-      if (values.files && values.files.length > 0) {
-        fileUrls = (await handleFileUpload(values.files)).filter(url => url !== null) as string[];
+      if (selectedFiles.length > 0) {
+        fileUrls = (await handleFileUpload(selectedFiles)).filter(url => url !== null) as string[];
       }
+
+      // Get existing files if any
+      const { data: currentPoint } = await supabase
+        .from('program_points')
+        .select('files')
+        .eq('id', currentPointId)
+        .single();
+      
+      const existingFiles = currentPoint?.files || [];
+      const allFiles = [...existingFiles, ...fileUrls];
 
       const { error } = await supabase
         .from('program_points')
         .update({
           title: values.title,
           content: values.content,
-          files: fileUrls,
+          files: allFiles,
           updated_at: new Date().toISOString(),
         })
         .eq('id', currentPointId);
@@ -166,6 +184,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       
       toast.success("Point mis à jour avec succès");
       form.reset();
+      setSelectedFiles([]);
       setIsEditDialogOpen(false);
       refetch();
     } catch (error: any) {
@@ -177,13 +196,18 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
   };
 
   const handleEditClick = (point: any) => {
-    form.reset({ title: point.title, content: point.content, files: point.files });
+    form.reset({ 
+      title: point.title, 
+      content: point.content 
+    });
     setCurrentPointId(point.id);
+    setSelectedFiles([]);
     setIsEditDialogOpen(true);
   };
 
   const handleAddClick = () => {
-    form.reset({ title: '', content: '', files: [] });
+    form.reset({ title: '', content: '' });
+    setSelectedFiles([]);
     setIsAddDialogOpen(true);
   };
 
@@ -298,10 +322,12 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
                               <GripVertical className="h-6 w-6" />
                             </div>
                             <div className="flex-1">
+                              <h4 className="font-medium text-getigne-800 mb-2">{point.title}</h4>
                               <div 
-                                className="prose max-w-none prose-sm" 
-                                dangerouslySetInnerHTML={{ __html: point.content }} 
-                              />
+                                className="prose prose-sm max-w-none text-muted-foreground line-clamp-2" 
+                              >
+                                {point.content.substring(0, 120)}...
+                              </div>
                             </div>
                             <div className="flex gap-2 items-start ml-2">
                               <Button 
@@ -381,25 +407,24 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="files"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fichiers</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        multiple
-                        accept="image/*,video/*,audio/*"
-                        {...field}
-                        className="prose max-w-none prose-sm"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
+              <FormItem>
+                <FormLabel>Fichiers</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    multiple
+                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                    onChange={handleFileChange}
+                    className="prose max-w-none prose-sm"
+                  />
+                </FormControl>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {selectedFiles.length > 0 && (
+                    <p>{selectedFiles.length} fichier(s) sélectionné(s)</p>
+                  )}
+                </div>
+              </FormItem>
               
               <DialogFooter>
                 <Button
@@ -474,25 +499,24 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="files"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fichiers</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        multiple
-                        accept="image/*,video/*,audio/*"
-                        {...field}
-                        className="prose max-w-none prose-sm"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
+              <FormItem>
+                <FormLabel>Ajouter des fichiers</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    multiple
+                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                    onChange={handleFileChange}
+                    className="prose max-w-none prose-sm"
+                  />
+                </FormControl>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {selectedFiles.length > 0 && (
+                    <p>{selectedFiles.length} nouveau(x) fichier(s) sélectionné(s)</p>
+                  )}
+                </div>
+              </FormItem>
               
               <DialogFooter>
                 <Button
