@@ -38,17 +38,17 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
       }
 
       try {
-        let query = supabase
-          .from('program_likes')
+        const query = supabase
+          .from('program_likes' as any)
           .select('id')
           .eq('program_item_id', programItemId)
           .eq('user_id', user.id);
           
         // Add condition for program point if provided
         if (pointId) {
-          query = query.eq('program_point_id', pointId);
+          query.eq('program_point_id', pointId);
         } else {
-          query = query.is('program_point_id', null);
+          query.is('program_point_id', null);
         }
           
         const { data, error } = await query.maybeSingle();
@@ -62,25 +62,39 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
 
     const fetchLikesCount = async () => {
       try {
-        // Count likes using a query based on resource type
-        let query = supabase
-          .from('program_likes')
+        // Count likes using a custom function when possible
+        try {
+          const { data, error } = await supabase
+            .rpc('count_program_likes', { program_id: programItemId });
+          
+          if (!error && data !== null) {
+            setLikesCount(data);
+            return;
+          }
+        } catch (rpcError) {
+          console.error('Using fallback for counting likes:', rpcError);
+        }
+        
+        // Fallback: Count likes using a query
+        const query = supabase
+          .from('program_likes' as any)
           .select('*', { count: 'exact' })
           .eq('program_item_id', programItemId);
           
         if (pointId) {
-          query = query.eq('program_point_id', pointId);
+          query.eq('program_point_id', pointId);
         } else {
-          query = query.is('program_point_id', null);
+          query.is('program_point_id', null);
         }
             
         const { count, error } = await query;
             
         if (error) throw error;
-        setLikesCount(count || 0);
+        if (count !== null) {
+          setLikesCount(count);
+        }
       } catch (countError) {
         console.error('Erreur de comptage:', countError);
-        setLikesCount(0);
       }
     };
 
@@ -101,16 +115,16 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
     try {
       if (isLiked) {
         // Supprimer le like
-        let query = supabase
-          .from('program_likes')
+        const query = supabase
+          .from('program_likes' as any)
           .delete()
           .eq('program_item_id', programItemId)
           .eq('user_id', user.id);
           
         if (pointId) {
-          query = query.eq('program_point_id', pointId);
+          query.eq('program_point_id', pointId);
         } else {
-          query = query.is('program_point_id', null);
+          query.is('program_point_id', null);
         }
           
         const { error } = await query;
@@ -122,7 +136,7 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
         toast.success('Votre like a été retiré');
       } else {
         // Ajouter le like
-        const likeData: any = { 
+        const likeData: Record<string, any> = { 
           user_id: user.id,
           program_item_id: programItemId
         };
@@ -133,7 +147,7 @@ const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: Pr
         }
         
         const { error } = await supabase
-          .from('program_likes')
+          .from('program_likes' as any)
           .insert([likeData]);
 
         if (error) throw error;
