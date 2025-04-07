@@ -4,7 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Save } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, ProgramGeneral } from '@/integrations/supabase/client';
 import MarkdownEditor from '@/components/MarkdownEditor';
 
 export default function GeneralPresentationEditor() {
@@ -17,8 +17,9 @@ export default function GeneralPresentationEditor() {
     const fetchPresentationContent = async () => {
       try {
         setIsLoading(true);
+        // Use the type assertion helper for the table name
         const { data, error } = await supabase
-          .from('program_general')
+          .from(asTable<ProgramGeneral>('program_general'))
           .select('*')
           .maybeSingle();
 
@@ -50,7 +51,7 @@ export default function GeneralPresentationEditor() {
       
       // Check if record exists first
       const { data: existingData, error: checkError } = await supabase
-        .from('program_general')
+        .from(asTable<ProgramGeneral>('program_general'))
         .select('id')
         .limit(1);
         
@@ -61,7 +62,7 @@ export default function GeneralPresentationEditor() {
       if (existingData && existingData.length > 0) {
         // Update existing record
         const { error } = await supabase
-          .from('program_general')
+          .from(asTable<ProgramGeneral>('program_general'))
           .update({ 
             content,
             updated_at: new Date().toISOString()
@@ -72,12 +73,12 @@ export default function GeneralPresentationEditor() {
       } else {
         // Insert new record
         const { error } = await supabase
-          .from('program_general')
-          .insert([{ 
+          .from(asTable<ProgramGeneral>('program_general'))
+          .insert({ 
             content,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
-          }]);
+          });
           
         saveError = error;
       }

@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, ProgramGeneral } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgramContentComponent from '@/components/program/ProgramContentComponent';
 import ReactMarkdown from 'react-markdown';
@@ -61,7 +61,7 @@ const ProgramPage = () => {
     queryKey: ['programGeneral'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('program_general')
+        .from(asTable<ProgramGeneral>('program_general'))
         .select('*')
         .maybeSingle();
         
