@@ -6,7 +6,7 @@ import CommentForm from './CommentForm';
 import { Separator } from '@/components/ui/separator';
 import ModeratorView from './ModeratorView';
 import UserView from './UserView';
-import { Comment } from '@/types/comments.types';
+import { Comment, ResourceType } from '@/types/comments.types';
 
 interface CommentsProps {
   newsId?: string;
@@ -21,7 +21,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const [view, setView] = useState<'all' | 'pending'>('all');
   const isModerator = isAdmin || userRoles.includes('moderator');
 
-  const getSourceType = () => {
+  const getSourceType = (): ResourceType => {
     if (newsId) return 'news';
     if (programPointId) return 'program_point';
     if (programItemId) return 'program';
@@ -38,48 +38,54 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const fetchComments = async () => {
     try {
       setLoading(true);
-      let query: any;
+      let commentsData: Comment[] = [];
 
       if (newsId) {
         // Fetch comments for news
-        query = supabase
+        const { data, error } = await supabase
           .from('comments')
           .select('*, profiles(*)')
           .eq('news_id', newsId)
           .order('created_at', { ascending: false });
-      } else if (programPointId) {
-        // Fetch comments for program point - handle profile data separately
-        query = supabase
+
+        if (error) throw error;
+
+        // Filter based on status if needed
+        const filteredData = !isModerator 
+          ? data.filter(comment => comment.status === 'approved')
+          : view === 'pending' 
+            ? data.filter(comment => comment.status === 'pending') 
+            : data;
+
+        commentsData = filteredData.map((comment: any) => ({
+          ...comment,
+          profiles: comment.profiles
+        })) as Comment[];
+      } else {
+        // Fetch comments for program items or points
+        let query = supabase
           .from(TABLES.PROGRAM_COMMENTS)
           .select('*')
-          .eq('program_point_id', programPointId)
           .order('created_at', { ascending: false });
-      } else if (programItemId && !programPointId) {
-        // Fetch comments for program item (section) - handle profile data separately
-        query = supabase
-          .from(TABLES.PROGRAM_COMMENTS)
-          .select('*')
-          .eq('program_item_id', programItemId)
-          .is('program_point_id', null)
-          .order('created_at', { ascending: false });
-      }
 
-      // If user is not a moderator, only show approved comments
-      if (!isModerator) {
-        query = query.eq('status', 'approved');
-      } else if (view === 'pending') {
-        query = query.eq('status', 'pending');
-      }
+        if (programPointId) {
+          query = query.eq('program_point_id', programPointId);
+        } else if (programItemId) {
+          query = query.eq('program_item_id', programItemId).is('program_point_id', null);
+        }
 
-      const { data, error } = await query;
+        // Apply status filter
+        if (!isModerator) {
+          query = query.eq('status', 'approved');
+        } else if (view === 'pending') {
+          query = query.eq('status', 'pending');
+        }
 
-      if (error) {
-        throw error;
-      }
+        const { data, error } = await query;
+        if (error) throw error;
 
-      if (data && (programPointId || (programItemId && !programPointId))) {
         // For program comments, fetch user profiles separately
-        const commentData = await Promise.all(
+        commentsData = await Promise.all(
           data.map(async (comment: any) => {
             const { data: userData, error: userError } = await supabase
               .from('profiles')
@@ -97,15 +103,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
             };
           })
         );
-        
-        setComments(commentData as Comment[]);
-      } else if (data) {
-        // For news comments, profiles are already joined in the initial query
-        setComments(data.map((comment: any) => ({
-          ...comment,
-          profiles: comment.profiles
-        })) as Comment[]);
       }
+      
+      setComments(commentsData);
     } catch (error) {
       console.error('Error fetching comments:', error);
     } finally {

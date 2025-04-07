@@ -14,9 +14,9 @@ export interface BaseComment {
   user_id: string;
   content: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
   status: CommentStatus;
-  profiles?: Profile;
+  profiles?: Profile | null;
 }
 
 export interface NewsComment extends BaseComment {
@@ -26,11 +26,11 @@ export interface NewsComment extends BaseComment {
 }
 
 export interface ProgramComment extends BaseComment {
-  program_item_id?: string;
-  program_point_id?: string;
+  program_item_id: string;
+  program_point_id?: string | null;
   news_id?: never;
 }
 
 export type Comment = NewsComment | ProgramComment;
 
-export type ResourceType = 'user' | 'news' | 'committee' | 'event' | 'program' | 'program_point';
+export type ResourceType = 'news' | 'program' | 'program_point';
