@@ -38,7 +38,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const fetchComments = async () => {
     try {
       setLoading(true);
-      let commentsData: Comment[] = [];
 
       if (newsId) {
         // Fetch comments for news
@@ -52,16 +51,16 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
         // Filter based on status if needed
         const filteredData = !isModerator 
-          ? data.filter(comment => comment.status === 'approved')
+          ? data.filter((comment: any) => comment.status === 'approved')
           : view === 'pending' 
-            ? data.filter(comment => comment.status === 'pending') 
+            ? data.filter((comment: any) => comment.status === 'pending') 
             : data;
 
-        commentsData = filteredData.map((comment: any) => ({
+        setComments(filteredData.map((comment: any) => ({
           ...comment,
           profiles: comment.profiles
-        })) as Comment[];
-      } else {
+        })) as Comment[]);
+      } else if (programItemId) {
         // Fetch comments for program items or points
         let query = supabase
           .from(TABLES.PROGRAM_COMMENTS)
@@ -70,7 +69,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
         if (programPointId) {
           query = query.eq('program_point_id', programPointId);
-        } else if (programItemId) {
+        } else {
           query = query.eq('program_item_id', programItemId).is('program_point_id', null);
         }
 
@@ -84,9 +83,15 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         const { data, error } = await query;
         if (error) throw error;
 
+        if (!data || data.length === 0) {
+          setComments([]);
+          setLoading(false);
+          return;
+        }
+
         // For program comments, fetch user profiles separately
-        commentsData = await Promise.all(
-          data.map(async (comment: any) => {
+        const commentsWithProfiles = await Promise.all(
+          data.map(async (comment) => {
             const { data: userData, error: userError } = await supabase
               .from('profiles')
               .select('*')
@@ -100,14 +105,15 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
             return {
               ...comment,
               profiles: userData || null
-            };
+            } as Comment;
           })
         );
+        
+        setComments(commentsWithProfiles);
       }
-      
-      setComments(commentsData);
     } catch (error) {
       console.error('Error fetching comments:', error);
+      setComments([]);
     } finally {
       setLoading(false);
     }
