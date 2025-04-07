@@ -20,9 +20,9 @@ export default function GeneralPresentationEditor() {
         const { data, error } = await supabase
           .from('program_general')
           .select('*')
-          .single();
+          .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        if (error) {
           throw error;
         }
 
@@ -73,11 +73,11 @@ export default function GeneralPresentationEditor() {
         // Insert new record
         const { error } = await supabase
           .from('program_general')
-          .insert({ 
+          .insert([{ 
             content,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
-          });
+          }]);
           
         saveError = error;
       }

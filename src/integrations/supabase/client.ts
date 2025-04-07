@@ -45,6 +45,14 @@ export type CommitteeWork = {
   files: string[] | null; // Mise à jour pour correspondre au type attendu
 };
 
+// Helper type for program_general
+export type ProgramGeneral = {
+  id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+};
+
 // Type assertion helper for Supabase queries
 export function asTable<T>(tableName: string): string {
   return tableName;

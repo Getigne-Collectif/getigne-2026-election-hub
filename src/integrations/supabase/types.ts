@@ -630,6 +630,27 @@ export type Database = {
           },
         ]
       }
+      program_general: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       program_items: {
         Row: {
           created_at: string

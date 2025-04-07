@@ -16,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgramContentComponent from '@/components/program/ProgramContentComponent';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import '../styles/richTextContent.css';
 
 const ProgramPage = () => {
@@ -62,7 +63,7 @@ const ProgramPage = () => {
       const { data, error } = await supabase
         .from('program_general')
         .select('*')
-        .single();
+        .maybeSingle();
         
       if (error && error.code !== 'PGRST116') {  // PGRST116 is "not found"
         toast({
