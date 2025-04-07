@@ -90,24 +90,25 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         }
 
         // For program comments, fetch user profiles separately
-        const commentsWithProfiles = await Promise.all(
-          data.map(async (comment) => {
-            const { data: userData, error: userError } = await supabase
+        // Use Promise.all with a properly typed mapper function to avoid excessive type depth
+        const userProfiles = await Promise.all(
+          data.map((comment) => {
+            return supabase
               .from('profiles')
               .select('*')
               .eq('id', comment.user_id)
               .single();
-
-            if (userError && userError.code !== 'PGRST116') {
-              console.error('Error fetching user profile:', userError);
-            }
-
-            return {
-              ...comment,
-              profiles: userData || null
-            } as Comment;
           })
         );
+
+        // Combine the comments with their profiles
+        const commentsWithProfiles: Comment[] = data.map((comment, index) => {
+          const profileResult = userProfiles[index];
+          return {
+            ...comment,
+            profiles: profileResult.error ? null : profileResult.data
+          } as Comment;
+        });
         
         setComments(commentsWithProfiles);
       }

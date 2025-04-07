@@ -1,8 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Comments from '../comments';
-import { supabase } from '@/integrations/supabase/client';
-import { useEffect } from 'react';
 
 interface ProgramCommentsSectionProps {
   programItemId: string;

@@ -1,6 +1,4 @@
 
-import { Json } from '@/integrations/supabase/types';
-
 export type CommentStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Profile {
@@ -9,6 +7,7 @@ export interface Profile {
   avatar_url?: string;
 }
 
+// Base comment interface with common properties
 export interface BaseComment {
   id: string;
   user_id: string;
@@ -19,18 +18,21 @@ export interface BaseComment {
   profiles?: Profile | null;
 }
 
+// Type for news comments
 export interface NewsComment extends BaseComment {
   news_id: string;
   program_item_id?: never;
   program_point_id?: never;
 }
 
+// Type for program comments
 export interface ProgramComment extends BaseComment {
   program_item_id: string;
   program_point_id?: string | null;
   news_id?: never;
 }
 
+// Union type for all comment types
 export type Comment = NewsComment | ProgramComment;
 
 export type ResourceType = 'news' | 'program' | 'program_point';
