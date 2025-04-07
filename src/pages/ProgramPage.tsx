@@ -9,11 +9,14 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, LockKeyhole } from 'lucide-react';
+import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgramContentComponent from '@/components/program/ProgramContentComponent';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import '../styles/richTextContent.css';
 
 const ProgramPage = () => {
   const { user, userRoles, authChecked } = useAuth();
@@ -52,6 +55,29 @@ const ProgramPage = () => {
     enabled: settings.showProgram || isAuthorized,
   });
 
+  // Fetch program general presentation
+  const { data: generalPresentation, isLoading: loadingPresentation } = useQuery({
+    queryKey: ['programGeneral'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_general')
+        .select('*')
+        .single();
+        
+      if (error && error.code !== 'PGRST116') {  // PGRST116 is "not found"
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de charger la présentation générale du programme."
+        });
+        throw error;
+      }
+      
+      return data || { content: '' };
+    },
+    enabled: settings.showProgram || isAuthorized,
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -77,7 +103,7 @@ const ProgramPage = () => {
   // If settings are enabled and program is visible, show program to all
   const showProgramToAll = settings.showProgram;
 
-  if (loadingSettings || isChecking || (showProgramToAll && loadingProgramItems)) {
+  if (loadingSettings || isChecking || (showProgramToAll && (loadingProgramItems || loadingPresentation))) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -136,6 +162,73 @@ const ProgramPage = () => {
             {showProgramToAll || isAuthorized ? (
               // Content visible to authorized users or if showProgram is enabled
               <div className="max-w-4xl mx-auto">
+                {/* General presentation section */}
+                {generalPresentation && generalPresentation.content && (
+                  <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-12">
+                    <div className="prose max-w-none rich-content">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {generalPresentation.content}
+                      </ReactMarkdown>
+                    </div>
+                    
+                    {isAuthorized && (
+                      <div className="mt-6 flex justify-end">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          asChild
+                        >
+                          <Link to="/admin/program">
+                            Modifier la présentation
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Program values */}
+                <div className="mb-12">
+                  <div className="text-center mb-10">
+                    <h2 className="text-2xl font-bold mb-4">Les valeurs qui guident notre projet</h2>
+                    <p className="text-getigne-700">Notre programme est construit autour de valeurs fortes qui orientent nos propositions.</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center">
+                      <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <UsersRound className="h-8 w-8 text-getigne-600" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">Participatif</h3>
+                      <p className="text-getigne-700">Impliquer les citoyens dans les décisions qui façonnent notre commune.</p>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center">
+                      <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Scale className="h-8 w-8 text-getigne-600" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">Durable</h3>
+                      <p className="text-getigne-700">Construire une commune résiliente face aux défis écologiques et sociaux.</p>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center">
+                      <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <BookOpen className="h-8 w-8 text-getigne-600" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">Solidaire</h3>
+                      <p className="text-getigne-700">Veiller à ce que personne ne soit laissé de côté dans notre vision commune.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Program themes */}
+                <div className="mb-12">
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold mb-4">Nos propositions thématiques</h2>
+                    <p className="text-getigne-700">Découvrez nos engagements détaillés pour chaque domaine d'action municipale.</p>
+                  </div>
+                </div>
+                
                 {programItems && programItems.length > 0 ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-10">
                     <div className="flex justify-center">
@@ -147,13 +240,7 @@ const ProgramPage = () => {
                             className="gap-2 py-2 px-4"
                           >
                             {item.icon && (
-                              <span className="w-5 h-5">
-                                <img 
-                                  src={item.icon}
-                                  alt=""
-                                  className="w-full h-full object-contain"
-                                />
-                              </span>
+                              <DynamicIcon name={item.icon} className="h-5 w-5" />
                             )}
                             {item.title}
                           </TabsTrigger>

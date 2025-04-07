@@ -1,27 +1,13 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
-import { Leaf, Home, Users, BarChart3, Lightbulb, Book, Heart, Shield } from 'lucide-react';
-
-// Map pour les icônes
-const iconMap = {
-  Leaf,
-  Home,
-  Users,
-  BarChart3,
-  Lightbulb,
-  Book,
-  Heart,
-  Shield
-};
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
 const ProgramItem = ({ icon, title, description, delay }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
-  const Icon = iconMap[icon] || Leaf;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,7 +42,7 @@ const ProgramItem = ({ icon, title, description, delay }) => {
       style={{ transitionDelay: `${delay * 100}ms` }}
     >
       <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center mb-4">
-        <Icon className="text-getigne-accent" size={24} />
+        {icon && <DynamicIcon name={icon} className="text-getigne-accent" size={24} />}
       </div>
       <h3 className="text-lg font-medium mb-2">{title}</h3>
       <p className="text-getigne-700 mb-4">{description}</p>
