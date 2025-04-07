@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase, TABLES } from '@/integrations/supabase/client';
@@ -89,21 +88,21 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           return;
         }
 
-        // Fetch user profiles separately to avoid deep type instantiation
-        type ProfileResult = { data: any; error: any };
-        const profilePromises: Promise<ProfileResult>[] = data.map(comment => 
-          supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', comment.user_id)
-            .single()
+        // Manually fetch profiles to avoid deep type instantiation issues
+        const profilesData = await Promise.all(
+          data.map(comment => 
+            supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', comment.user_id)
+              .single()
+              .then(result => ({ data: result.data, error: result.error }))
+          )
         );
         
-        const profileResults = await Promise.all(profilePromises);
-        
-        // Combine comments with profiles in a type-safe way
+        // Combine comments with profiles
         const commentsWithProfiles = data.map((comment, index) => {
-          const profileResult = profileResults[index];
+          const profileResult = profilesData[index];
           return {
             ...comment,
             profiles: profileResult.error ? null : profileResult.data
