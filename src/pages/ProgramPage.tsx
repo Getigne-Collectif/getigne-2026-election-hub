@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { supabase, asTable } from '@/integrations/supabase/client';
+import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgramContentComponent from '@/components/program/ProgramContentComponent';
 import ReactMarkdown from 'react-markdown';
@@ -33,7 +33,7 @@ const ProgramPage = () => {
     queryKey: ['programItemsForTabs'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('program_items')
+        .from(TABLES.PROGRAM_ITEMS)
         .select('*')
         .order('created_at', { ascending: true });
         
@@ -57,11 +57,11 @@ const ProgramPage = () => {
   });
 
   // Fetch program general presentation
-  const { data: generalPresentation, isLoading: loadingPresentation } = useQuery({
+  const { data: generalPresentation, isLoading: loadingPresentation } = useQuery<ProgramGeneral>({
     queryKey: ['programGeneral'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(asTable('program_general'))
+        .from(TABLES.PROGRAM_GENERAL)
         .select('*')
         .maybeSingle();
         
@@ -74,7 +74,7 @@ const ProgramPage = () => {
         throw error;
       }
       
-      return data || { content: '' };
+      return data as ProgramGeneral || { id: '', content: '', created_at: '', updated_at: '' };
     },
     enabled: settings.showProgram || isAuthorized,
   });

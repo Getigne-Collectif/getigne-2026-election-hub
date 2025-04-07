@@ -53,7 +53,16 @@ export interface ProgramGeneral {
   updated_at: string;
 }
 
+// List of tables to use with asTable function
+export const TABLES = {
+  PROGRAM_GENERAL: 'program_general',
+  PROGRAM_ITEMS: 'program_items',
+  PROGRAM_POINTS: 'program_points',
+  PROGRAM_COMMENTS: 'program_comments',
+  PROGRAM_LIKES: 'program_likes'
+} as const;
+
 // Fonction utilitaire pour typer les noms de table
-export function asTable<T>(tableName: string): string {
+export function asTable(tableName: keyof typeof TABLES | string): string {
   return tableName;
 }

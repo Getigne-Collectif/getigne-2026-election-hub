@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, TABLES } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
@@ -93,7 +93,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
         }
 
         const { data: commentData2, error } = await supabase
-          .from('program_comments')
+          .from(TABLES.PROGRAM_COMMENTS)
           .insert([commentData])
           .select()
           .single();

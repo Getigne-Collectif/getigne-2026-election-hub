@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, TABLES } from '@/integrations/supabase/client';
 import CommentForm from './CommentForm';
 import { Separator } from '@/components/ui/separator';
 import ModeratorView from './ModeratorView';
@@ -50,14 +50,14 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
       } else if (programPointId) {
         // Fetch comments for program point - handle profile data separately
         query = supabase
-          .from('program_comments')
+          .from(TABLES.PROGRAM_COMMENTS)
           .select('*')
           .eq('program_point_id', programPointId)
           .order('created_at', { ascending: false });
       } else if (programItemId && !programPointId) {
         // Fetch comments for program item (section) - handle profile data separately
         query = supabase
-          .from('program_comments')
+          .from(TABLES.PROGRAM_COMMENTS)
           .select('*')
           .eq('program_item_id', programItemId)
           .is('program_point_id', null)
@@ -115,7 +115,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
   const handleStatusChange = async (commentId: string, status: 'approved' | 'rejected') => {
     try {
-      const table = sourceType === 'news' ? 'comments' : 'program_comments';
+      const table = sourceType === 'news' ? 'comments' : TABLES.PROGRAM_COMMENTS;
       
       const { error } = await supabase
         .from(table)
