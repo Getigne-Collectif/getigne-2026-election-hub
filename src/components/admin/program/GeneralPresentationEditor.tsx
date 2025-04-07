@@ -19,7 +19,7 @@ export default function GeneralPresentationEditor() {
         setIsLoading(true);
         // Use the type assertion helper for the table name
         const { data, error } = await supabase
-          .from(asTable<ProgramGeneral>('program_general'))
+          .from('program_general')
           .select('*')
           .maybeSingle();
 
@@ -51,7 +51,7 @@ export default function GeneralPresentationEditor() {
       
       // Check if record exists first
       const { data: existingData, error: checkError } = await supabase
-        .from(asTable<ProgramGeneral>('program_general'))
+        .from('program_general')
         .select('id')
         .limit(1);
         
@@ -62,7 +62,7 @@ export default function GeneralPresentationEditor() {
       if (existingData && existingData.length > 0) {
         // Update existing record
         const { error } = await supabase
-          .from(asTable<ProgramGeneral>('program_general'))
+          .from('program_general')
           .update({ 
             content,
             updated_at: new Date().toISOString()
@@ -73,7 +73,7 @@ export default function GeneralPresentationEditor() {
       } else {
         // Insert new record
         const { error } = await supabase
-          .from(asTable<ProgramGeneral>('program_general'))
+          .from('program_general')
           .insert({ 
             content,
             created_at: new Date().toISOString(),

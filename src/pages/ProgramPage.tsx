@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen } from 'lucide-react';
+import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { supabase, ProgramGeneral, asTable } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgramContentComponent from '@/components/program/ProgramContentComponent';
 import ReactMarkdown from 'react-markdown';
@@ -61,7 +61,7 @@ const ProgramPage = () => {
     queryKey: ['programGeneral'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from(asTable<ProgramGeneral>('program_general'))
+        .from('program_general')
         .select('*')
         .maybeSingle();
         
@@ -196,7 +196,7 @@ const ProgramPage = () => {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center hover:shadow-md transition-all">
                       <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <UsersRound className="h-8 w-8 text-getigne-600" />
                       </div>
@@ -204,7 +204,7 @@ const ProgramPage = () => {
                       <p className="text-getigne-700">Impliquer les citoyens dans les décisions qui façonnent notre commune.</p>
                     </div>
                     
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center hover:shadow-md transition-all">
                       <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Scale className="h-8 w-8 text-getigne-600" />
                       </div>
@@ -212,9 +212,9 @@ const ProgramPage = () => {
                       <p className="text-getigne-700">Construire une commune résiliente face aux défis écologiques et sociaux.</p>
                     </div>
                     
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center hover:shadow-md transition-all">
                       <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <BookOpen className="h-8 w-8 text-getigne-600" />
+                        <Heart className="h-8 w-8 text-getigne-600" />
                       </div>
                       <h3 className="text-xl font-bold mb-2">Solidaire</h3>
                       <p className="text-getigne-700">Veiller à ce que personne ne soit laissé de côté dans notre vision commune.</p>

@@ -19,6 +19,7 @@ interface ProgramPointCardProps {
 
 export default function ProgramPointCard({ point, programItemId, icon }: ProgramPointCardProps) {
   const [showContent, setShowContent] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   const downloadFile = (fileUrl: string) => {
     const link = document.createElement('a');
@@ -82,13 +83,20 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                 variant="ghost" 
                 size="sm" 
                 className="flex items-center gap-1 text-getigne-600"
+                onClick={() => setShowComments(!showComments)}
               >
                 <MessageSquare className="h-4 w-4" />
-                <span>Commenter</span>
+                <span>{showComments ? 'Masquer les commentaires' : 'Commenter'}</span>
               </Button>
               
               <ProgramLikeButton programItemId={programItemId} pointId={point.id} />
             </div>
+
+            {showComments && (
+              <div className="mt-4 pt-4 border-t border-getigne-100">
+                <Comments programItemId={programItemId} programPointId={point.id} />
+              </div>
+            )}
           </>
         )}
       </CardContent>

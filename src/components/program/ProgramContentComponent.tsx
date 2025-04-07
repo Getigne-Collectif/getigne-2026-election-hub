@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { TabsContent } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import ProgramCommentsSection from './ProgramCommentsSection';
 import ProgramLikeButton from './ProgramLikeButton';
 import ProgramPointCard from './ProgramPointCard';
 
@@ -92,16 +91,16 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
           ) : (
             <div className="space-y-4">
               {programPoints.map((point) => (
-                <ProgramPointCard key={point.id} point={point} programItemId={programItemId} />
+                <ProgramPointCard 
+                  key={point.id} 
+                  point={point} 
+                  programItemId={programItemId} 
+                  icon={programItem.icon}
+                />
               ))}
             </div>
           )}
         </div>
-      </div>
-      
-      {/* Comments section */}
-      <div className="mt-8">
-        <ProgramCommentsSection programItemId={programItemId} />
       </div>
     </TabsContent>
   );
