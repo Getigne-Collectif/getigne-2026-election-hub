@@ -89,28 +89,28 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           return;
         }
 
-        // For program comments, fetch user profiles separately
-        // Use Promise.all with a properly typed mapper function to avoid excessive type depth
-        const userProfiles = await Promise.all(
-          data.map((comment) => {
-            return supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', comment.user_id)
-              .single();
-          })
+        // Fetch user profiles separately to avoid deep type instantiation
+        type ProfileResult = { data: any; error: any };
+        const profilePromises: Promise<ProfileResult>[] = data.map(comment => 
+          supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', comment.user_id)
+            .single()
         );
-
-        // Combine the comments with their profiles
-        const commentsWithProfiles: Comment[] = data.map((comment, index) => {
-          const profileResult = userProfiles[index];
+        
+        const profileResults = await Promise.all(profilePromises);
+        
+        // Combine comments with profiles in a type-safe way
+        const commentsWithProfiles = data.map((comment, index) => {
+          const profileResult = profileResults[index];
           return {
             ...comment,
             profiles: profileResult.error ? null : profileResult.data
-          } as Comment;
+          };
         });
         
-        setComments(commentsWithProfiles);
+        setComments(commentsWithProfiles as Comment[]);
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
