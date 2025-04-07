@@ -4,7 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Save } from 'lucide-react';
-import { supabase, ProgramGeneral } from '@/integrations/supabase/client';
+import { supabase, ProgramGeneral, asTable } from '@/integrations/supabase/client';
 import MarkdownEditor from '@/components/MarkdownEditor';
 
 export default function GeneralPresentationEditor() {
