@@ -9,13 +9,15 @@ import Comments from '../comments';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ProgramPoint } from '@/types/program.types';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
 interface ProgramPointCardProps {
   point: ProgramPoint;
   programItemId: string;
+  icon?: string;
 }
 
-export default function ProgramPointCard({ point, programItemId }: ProgramPointCardProps) {
+export default function ProgramPointCard({ point, programItemId, icon }: ProgramPointCardProps) {
   const [showContent, setShowContent] = useState(false);
 
   const downloadFile = (fileUrl: string) => {
@@ -32,7 +34,10 @@ export default function ProgramPointCard({ point, programItemId }: ProgramPointC
     <Card key={point.id} className="border-getigne-200">
       <CardContent className="p-4">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-getigne-800">{point.title}</h3>
+          <div className="flex items-center gap-2">
+            {icon && <DynamicIcon name={icon} size={20} className="text-getigne-600" />}
+            <h3 className="text-lg font-semibold text-getigne-800">{point.title}</h3>
+          </div>
           <Button 
             variant="ghost" 
             size="sm" 

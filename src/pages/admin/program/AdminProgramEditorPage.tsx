@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -31,8 +30,8 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import MarkdownEditor from '@/components/MarkdownEditor';
-import { v4 as uuidv4 } from 'uuid';
 import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
+import { IconSelect } from '@/components/ui/icon-select';
 
 // Form schema for program item details
 const programItemSchema = z.object({
@@ -48,8 +47,6 @@ export default function AdminProgramEditorPage() {
   const navigate = useNavigate();
   const isEditing = !!id;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [iconPreview, setIconPreview] = useState<string | null>(null);
-  const [iconFile, setIconFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState("details");
 
   // Form setup
@@ -92,10 +89,6 @@ export default function AdminProgramEditorPage() {
         description: programItem.description,
         icon: programItem.icon || '',
       });
-      
-      if (programItem.icon) {
-        setIconPreview(programItem.icon);
-      }
     }
   }, [programItem, form]);
 
@@ -104,35 +97,10 @@ export default function AdminProgramEditorPage() {
     setIsSubmitting(true);
     
     try {
-      let iconUrl = values.icon;
-      
-      // Upload icon if a new file was selected
-      if (iconFile) {
-        const fileExt = iconFile.name.split('.').pop();
-        const filePath = `program/icons/${uuidv4()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('public')
-          .upload(filePath, iconFile, {
-            cacheControl: '3600',
-            upsert: false
-          });
-          
-        if (uploadError) {
-          throw uploadError;
-        }
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('public')
-          .getPublicUrl(filePath);
-          
-        iconUrl = publicUrl;
-      }
-      
       const programData = {
         title: values.title,
         description: values.description,
-        icon: iconUrl,
+        icon: values.icon,
         updated_at: new Date().toISOString(),
       };
       
@@ -166,29 +134,7 @@ export default function AdminProgramEditorPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Handle icon selection
-  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      return;
-    }
-    
-    const file = e.target.files[0];
-    setIconFile(file);
-    
-    // Create preview
-    const objectUrl = URL.createObjectURL(file);
-    setIconPreview(objectUrl);
-    
-    return () => URL.revokeObjectURL(objectUrl);
-  };
   
-  const removeIcon = () => {
-    setIconFile(null);
-    setIconPreview(null);
-    form.setValue('icon', '');
-  };
-
   // Loading state
   if (isEditing && isLoadingItem) {
     return (
@@ -281,40 +227,25 @@ export default function AdminProgramEditorPage() {
                     )}
                   />
                   
-                  <div className="space-y-2">
-                    <FormLabel>Icône</FormLabel>
-                    <div className="flex flex-col gap-4">
-                      <Input 
-                        id="icon-upload" 
-                        type="file" 
-                        accept="image/*"
-                        onChange={handleIconChange}
-                      />
-                      <FormDescription>
-                        Choisissez une icône représentative pour cette section (format carré recommandé)
-                      </FormDescription>
-                      
-                      {iconPreview && (
-                        <div className="flex items-center gap-4">
-                          <div className="border border-gray-200 rounded-md p-2 w-16 h-16 flex items-center justify-center">
-                            <img 
-                              src={iconPreview}
-                              alt="Prévisualisation"
-                              className="max-w-full max-h-full object-contain"
-                            />
-                          </div>
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            size="sm"
-                            onClick={removeIcon}
-                          >
-                            Supprimer
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="icon"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Icône</FormLabel>
+                        <FormControl>
+                          <IconSelect 
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Choisissez une icône représentative pour cette section
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </CardContent>
               </Card>
 
