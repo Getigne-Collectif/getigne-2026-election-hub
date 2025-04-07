@@ -57,7 +57,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
       // Statut initial du commentaire (approuvé automatiquement pour les modérateurs/admins)
       const initialStatus = isModerator ? 'approved' : 'pending';
 
-      let newComment;
+      let newComment: any;
 
       if (resourceType === 'news') {
         // Insert into comments table for news
@@ -92,14 +92,25 @@ const CommentForm: React.FC<CommentFormProps> = ({
           commentData.program_item_id = programItemId;
         }
 
-        const { data, error } = await supabase
-          .from('program_comments' as any)
+        const { data: commentData2, error } = await supabase
+          .from('program_comments')
           .insert([commentData])
-          .select('*, profiles(*)')
+          .select()
           .single();
 
         if (error) throw error;
-        newComment = data;
+        
+        // Get user profile data separately
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        newComment = {
+          ...commentData2,
+          profiles: profileData || null
+        };
       }
 
       setContent('');

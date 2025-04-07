@@ -48,17 +48,17 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           .eq('news_id', newsId)
           .order('created_at', { ascending: false });
       } else if (programPointId) {
-        // Fetch comments for program point
+        // Fetch comments for program point - handle profile data separately
         query = supabase
-          .from('program_comments' as any)
-          .select('*, profiles(*)')
+          .from('program_comments')
+          .select('*')
           .eq('program_point_id', programPointId)
           .order('created_at', { ascending: false });
       } else if (programItemId && !programPointId) {
-        // Fetch comments for program item (section)
+        // Fetch comments for program item (section) - handle profile data separately
         query = supabase
-          .from('program_comments' as any)
-          .select('*, profiles(*)')
+          .from('program_comments')
+          .select('*')
           .eq('program_item_id', programItemId)
           .is('program_point_id', null)
           .order('created_at', { ascending: false });
@@ -77,13 +77,35 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         throw error;
       }
 
-      // Transform data to ensure profiles is correctly formatted
-      const formattedComments = data.map((comment: any) => ({
-        ...comment,
-        profiles: comment.profiles
-      })) as Comment[];
+      if (data && (programPointId || (programItemId && !programPointId))) {
+        // For program comments, fetch user profiles separately
+        const commentData = await Promise.all(
+          data.map(async (comment: any) => {
+            const { data: userData, error: userError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', comment.user_id)
+              .single();
 
-      setComments(formattedComments);
+            if (userError && userError.code !== 'PGRST116') {
+              console.error('Error fetching user profile:', userError);
+            }
+
+            return {
+              ...comment,
+              profiles: userData || null
+            };
+          })
+        );
+        
+        setComments(commentData as Comment[]);
+      } else if (data) {
+        // For news comments, profiles are already joined in the initial query
+        setComments(data.map((comment: any) => ({
+          ...comment,
+          profiles: comment.profiles
+        })) as Comment[]);
+      }
     } catch (error) {
       console.error('Error fetching comments:', error);
     } finally {
@@ -96,7 +118,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
       const table = sourceType === 'news' ? 'comments' : 'program_comments';
       
       const { error } = await supabase
-        .from(table as any)
+        .from(table)
         .update({ status })
         .eq('id', commentId);
 

@@ -89,12 +89,18 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                 <span>{showComments ? 'Masquer les commentaires' : 'Commenter'}</span>
               </Button>
               
-              <ProgramLikeButton programItemId={programItemId} pointId={point.id} />
+              <ProgramLikeButton 
+                programItemId={programItemId} 
+                pointId={point.id} 
+              />
             </div>
 
             {showComments && (
               <div className="mt-4 pt-4 border-t border-getigne-100">
-                <Comments programItemId={programItemId} programPointId={point.id} />
+                <Comments 
+                  programItemId={programItemId} 
+                  programPointId={point.id} 
+                />
               </div>
             )}
           </>
