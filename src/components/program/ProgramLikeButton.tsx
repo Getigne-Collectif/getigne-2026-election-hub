@@ -1,156 +1,154 @@
 
 import React, { useState, useEffect } from 'react';
-import { Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/auth';
-import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/auth';
+import { Button } from '@/components/ui/button';
+import { Heart } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ProgramLikeButtonProps {
-  programItemId: string;
-  pointId?: string;
+  programId: string;
+  programPointId?: string;
+  initialLikes?: number;
 }
 
-const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({ programItemId, pointId }) => {
+const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
+  programId,
+  programPointId,
+  initialLikes = 0,
+}) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [likes, setLikes] = useState(initialLikes);
   const [hasLiked, setHasLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Check if user has liked the program item or point
   useEffect(() => {
     if (user) {
       checkUserLike();
     }
-    countLikes();
-  }, [user, programItemId, pointId]);
+  }, [user, programId, programPointId]);
 
   const checkUserLike = async () => {
-    if (!user) return;
-
     try {
-      // Create query to check if user has liked this item/point
-      const query = supabase
+      const { data, error } = await supabase
         .from('program_likes')
         .select('*')
-        .eq('program_item_id', programItemId)
-        .eq('user_id', user.id);
-        
-      // If pointId is provided, add that condition
-      if (pointId) {
-        query.eq('program_point_id', pointId);
+        .eq('program_item_id', programId)
+        .eq('user_id', user?.id || '');
+
+      if (programPointId) {
+        const filteredData = data?.filter(like => like.program_point_id === programPointId);
+        setHasLiked(filteredData && filteredData.length > 0);
       } else {
-        query.is('program_point_id', null);
+        setHasLiked(data && data.length > 0);
       }
-      
-      const { data, error } = await query;
-      
-      if (error) throw error;
-      setHasLiked(data && data.length > 0);
-    } catch (error) {
-      console.error('Error checking like status:', error);
+
+      if (error) {
+        console.error('Error checking like:', error);
+      }
+    } catch (err) {
+      console.error('Error in checkUserLike:', err);
     }
   };
 
-  // Count total likes for this item/point
-  const countLikes = async () => {
+  const fetchLikes = async () => {
     try {
-      // Create query to count likes
-      const query = supabase
+      let query = supabase
         .from('program_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('program_item_id', programItemId);
-        
-      // If pointId is provided, add that condition
-      if (pointId) {
-        query.eq('program_point_id', pointId);
-      } else {
-        query.is('program_point_id', null);
+        .select('*', { count: 'exact' })
+        .eq('program_item_id', programId);
+
+      if (programPointId) {
+        query = query.eq('program_point_id', programPointId);
       }
-      
+
       const { count, error } = await query;
-      
-      if (error) throw error;
-      setLikeCount(count || 0);
-    } catch (error) {
-      console.error('Error counting likes:', error);
+
+      if (error) {
+        throw error;
+      }
+
+      setLikes(count || 0);
+    } catch (err) {
+      console.error('Error fetching likes:', err);
     }
   };
 
-  // Toggle like status
-  const toggleLike = async () => {
+  useEffect(() => {
+    fetchLikes();
+  }, [programId, programPointId]);
+
+  const handleLike = async () => {
     if (!user) {
       toast({
-        title: "Connexion requise",
-        description: "Veuillez vous connecter pour aimer cet élément du programme.",
-        variant: "destructive"
+        title: 'Connexion requise',
+        description: 'Vous devez être connecté pour aimer un point du programme.',
+        variant: 'destructive',
       });
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
+
     try {
       if (hasLiked) {
-        // Remove like
-        const query = supabase
+        // Unlike
+        let query = supabase
           .from('program_likes')
           .delete()
-          .eq('program_item_id', programItemId)
+          .eq('program_item_id', programId)
           .eq('user_id', user.id);
-          
-        // If pointId is provided, add that condition
-        if (pointId) {
-          query.eq('program_point_id', pointId);
-        } else {
-          query.is('program_point_id', null);
+
+        if (programPointId) {
+          query = query.eq('program_point_id', programPointId);
         }
-        
+
         const { error } = await query;
         
         if (error) throw error;
         
+        setLikes(prev => Math.max(0, prev - 1));
         setHasLiked(false);
-        setLikeCount(prev => Math.max(0, prev - 1));
       } else {
-        // Add like
+        // Like
+        const likeData = {
+          program_item_id: programId,
+          user_id: user.id,
+          program_point_id: programPointId || null
+        };
+
         const { error } = await supabase
           .from('program_likes')
-          .insert({
-            program_item_id: programItemId,
-            user_id: user.id,
-            program_point_id: pointId || null
-          });
+          .insert(likeData);
           
         if (error) throw error;
         
+        setLikes(prev => prev + 1);
         setHasLiked(true);
-        setLikeCount(prev => prev + 1);
       }
-    } catch (error) {
-      console.error('Error toggling like:', error);
+    } catch (err: any) {
+      console.error('Error toggling like:', err);
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive"
+        title: 'Erreur',
+        description: err.message || 'Une erreur est survenue',
+        variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className={`flex items-center gap-1 ${
-        hasLiked ? 'text-red-500 hover:text-red-600' : 'text-getigne-600 hover:text-getigne-700'
-      }`}
-      onClick={toggleLike}
-      disabled={loading || !user}
+    <Button 
+      variant="outline" 
+      size="sm" 
+      onClick={handleLike}
+      disabled={isLoading}
+      className={`flex items-center gap-2 ${hasLiked ? 'text-red-500' : ''}`}
     >
-      <Heart className={`h-5 w-5 ${hasLiked ? 'fill-current' : ''}`} />
-      <span>{likeCount}</span>
+      <Heart className={`h-4 w-4 ${hasLiked ? 'fill-red-500 text-red-500' : ''}`} />
+      <span>{likes}</span>
     </Button>
   );
 };

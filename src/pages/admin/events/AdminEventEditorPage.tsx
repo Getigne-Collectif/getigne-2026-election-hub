@@ -4,11 +4,8 @@ import {Link, useNavigate, useParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client.ts';
 import { useToast } from '@/components/ui/use-toast.ts';
-import Navbar from '@/components/Navbar.tsx';
-import Footer from '@/components/Footer.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import {Loader2, Save, Eye, ArrowLeft, Home, Upload, ImageIcon} from 'lucide-react';
-import EventRegistrationAdmin from '@/components/events/EventRegistrationAdmin.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
@@ -24,6 +21,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
+import { Switch } from '@/components/ui/switch.tsx';
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -265,12 +263,6 @@ const AdminEventEditorPage = () => {
     }
   };
 
-  const handleRegistrationUpdate = () => {
-    if (id) {
-      // Refetch event data
-    }
-  };
-
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -280,7 +272,6 @@ const AdminEventEditorPage = () => {
   if (!isAdmin && !isModerator) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar />
         <div className="flex-grow container mx-auto px-4 py-8">
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold">Accès refusé</h1>
@@ -290,7 +281,6 @@ const AdminEventEditorPage = () => {
             </Button>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -325,218 +315,231 @@ const AdminEventEditorPage = () => {
           <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'événement" : "Créer un événement"}</h1>
         </div>}>
 
-
           <div className="flex-grow container mx-auto px-4 py-8">
-        {isLoadingEvent ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            {isLoadingEvent ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
               <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">Titre *</Label>
-                    <Input
-                      id="title"
-                      value={title}
-                      onChange={(e) => {
-                        setTitle(e.target.value);
-                        if (!isEditMode || !slug) {
-                          setSlug(generateSlug(e.target.value));
-                        }
-                      }}
-                      placeholder="Titre de l'événement"
-                      required
-                    />
-                  </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    {/* Colonne de gauche avec titre, date/lieu, et contenu */}
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="title">Titre *</Label>
+                        <Input
+                          id="title"
+                          value={title}
+                          onChange={(e) => {
+                            setTitle(e.target.value);
+                            if (!isEditMode || !slug) {
+                              setSlug(generateSlug(e.target.value));
+                            }
+                          }}
+                          placeholder="Titre de l'événement"
+                          required
+                        />
+                      </div>
 
-                  <div>
-                    <Label htmlFor="slug">Slug</Label>
-                    <Input
-                      id="slug"
-                      value={slug}
-                      onChange={(e) => setSlug(e.target.value)}
-                      placeholder="slug-evenement"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      Identifiant URL de l'événement (généré automatiquement si laissé vide)
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="date">Date et heure *</Label>
-                      <Input
-                        id="date"
-                        type="datetime-local"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="location">Lieu *</Label>
-                      <Input
-                        id="location"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        placeholder="Lieu de l'événement"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="description">Description courte *</Label>
-                    <Textarea
-                      id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Courte description de l'événement"
-                      rows={3}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Image principale *</Label>
-                    <div className="mt-2 border rounded-md p-4 space-y-4">
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleImageChange}
-                        accept="image/*"
-                        className="hidden"
-                      />
-
-                      {image ? (
-                        <div className="space-y-3">
-                          <div className="relative w-full h-48 rounded-md overflow-hidden">
-                            <img
-                              src={image}
-                              alt="Aperçu"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={triggerFileInput}
-                          >
-                            <Upload className="h-4 w-4 mr-2" />
-                            Remplacer l'image
-                          </Button>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="date">Date et heure *</Label>
+                          <Input
+                            id="date"
+                            type="datetime-local"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                          />
                         </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center h-48 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer" onClick={triggerFileInput}>
-                          <ImageIcon className="h-10 w-10 text-gray-400" />
-                          <p className="mt-2 text-sm text-gray-500">Cliquez pour ajouter une image</p>
+
+                        <div>
+                          <Label htmlFor="location">Lieu *</Label>
+                          <Input
+                            id="location"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            placeholder="Lieu de l'événement"
+                            required
+                          />
                         </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="description">Description courte *</Label>
+                        <Textarea
+                          id="description"
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder="Courte description de l'événement"
+                          rows={3}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Contenu détaillé</Label>
+                        <div className="mt-2 border rounded-md">
+                          <MarkdownEditor
+                            value={content}
+                            onChange={setContent}
+                            contentType="event"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Colonne de droite avec les boutons, statut, slug, image, etc. */}
+                    <div className="flex flex-wrap gap-3 justify-end">
+                      {isEditMode && slug && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => window.open(`/agenda/${slug}`, '_blank')}
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          Prévisualiser
+                        </Button>
                       )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={(e) => handleSubmit(e, 'draft')}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                        Enregistrer comme brouillon
+                      </Button>
+
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                        Publier
+                      </Button>
                     </div>
-                  </div>
 
-                  <div>
-                    <Label htmlFor="committee">Commission</Label>
-                    <select
-                      id="committee"
-                      value={committeeId}
-                      onChange={(e) => setCommitteeId(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md p-2"
-                    >
-                      <option value="">-- Aucune commission --</option>
-                      {committees.map((committee) => (
-                        <option key={committee.id} value={committee.id}>
-                          {committee.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                    <div className="bg-getigne-50 p-4 rounded-lg">
+                      <h3 className="font-medium mb-4">État de publication</h3>
+                      <select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value as 'draft' | 'published' | 'archived')}
+                        className="w-full border border-gray-300 rounded-md p-2"
+                      >
+                        <option value="published">Publié</option>
+                        <option value="draft">Brouillon</option>
+                        <option value="archived">Archivé</option>
+                      </select>
+                    </div>
 
-                  <div>
-                    <Label>Contenu détaillé</Label>
-                    <div className="mt-2 border rounded-md">
-                      <MarkdownEditor
-                        value={content}
-                        onChange={setContent}
-                        contentType="event"
+                    <div>
+                      <Label htmlFor="slug">Slug</Label>
+                      <Input
+                        id="slug"
+                        value={slug}
+                        onChange={(e) => setSlug(e.target.value)}
+                        placeholder="slug-evenement"
                       />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Identifiant URL de l'événement (généré automatiquement si laissé vide)
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label>Image principale *</Label>
+                      <div className="mt-2 border rounded-md p-4 space-y-4">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleImageChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+
+                        {image ? (
+                          <div className="space-y-3">
+                            <div className="relative w-full h-48 rounded-md overflow-hidden">
+                              <img
+                                src={image}
+                                alt="Aperçu"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={triggerFileInput}
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Remplacer l'image
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center h-48 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer" onClick={triggerFileInput}>
+                            <ImageIcon className="h-10 w-10 text-gray-400" />
+                            <p className="mt-2 text-sm text-gray-500">Cliquez pour ajouter une image</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="bg-getigne-50 p-4 rounded-lg">
+                      <h3 className="font-medium mb-4">Paramètres d'inscription</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label htmlFor="allow-registration" className="font-medium">Autoriser les inscriptions</Label>
+                            <p className="text-sm text-getigne-500">Activez pour permettre aux utilisateurs de s'inscrire à cet événement</p>
+                          </div>
+                          <Switch 
+                            id="allow-registration" 
+                            checked={allowRegistration} 
+                            onCheckedChange={setAllowRegistration} 
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label htmlFor="members-only" className="font-medium">Réservé aux adhérents</Label>
+                            <p className="text-sm text-getigne-500">Activez pour limiter les inscriptions aux adhérents uniquement</p>
+                          </div>
+                          <Switch 
+                            id="members-only" 
+                            checked={isMembersOnly} 
+                            onCheckedChange={setIsMembersOnly} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="committee">Commission</Label>
+                      <select
+                        id="committee"
+                        value={committeeId}
+                        onChange={(e) => setCommitteeId(e.target.value)}
+                        className="w-full border border-gray-300 rounded-md p-2"
+                      >
+                        <option value="">-- Aucune commission --</option>
+                        {committees.map((committee) => (
+                          <option key={committee.id} value={committee.id}>
+                            {committee.title}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex flex-wrap gap-3 justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={(e) => handleSubmit(e, 'draft')}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                    Enregistrer comme brouillon
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                    Publier
-                  </Button>
                 </div>
               </form>
-            </div>
-
-            <div className="space-y-6">
-              {isEditMode && (
-                <EventRegistrationAdmin
-                  eventId={id || ''}
-                  isAllowRegistration={allowRegistration}
-                  isMembersOnly={isMembersOnly}
-                  onUpdate={handleRegistrationUpdate}
-                />
-              )}
-
-              <div className="bg-getigne-50 p-4 rounded-lg">
-                <h3 className="font-medium mb-4">État de publication</h3>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as 'draft' | 'published' | 'archived')}
-                  className="w-full border border-gray-300 rounded-md p-2"
-                >
-                  <option value="published">Publié</option>
-                  <option value="draft">Brouillon</option>
-                  <option value="archived">Archivé</option>
-                </select>
-              </div>
-
-              <div className="bg-getigne-50 p-4 rounded-lg">
-                <h3 className="font-medium mb-4">Prévisualisation</h3>
-                {isEditMode && slug && (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => window.open(`/agenda/${slug}`, '_blank')}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Prévisualiser
-                  </Button>
-                )}
-                {(!isEditMode || !slug) && (
-                  <p className="text-sm text-getigne-500">
-                    La prévisualisation sera disponible après la création de l'événement.
-                  </p>
-                )}
-              </div>
-            </div>
+            )}
           </div>
-        )}
-      </div>
-      </AdminLayout>
-    </HelmetProvider>
+        </AdminLayout>
+      </HelmetProvider>
   );
 };
 
