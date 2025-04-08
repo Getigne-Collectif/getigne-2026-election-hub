@@ -145,7 +145,7 @@ const ProgramPage = () => {
         <Navbar />
 
         {/* Hero Section améliorée */}
-        <div className="pt-24 pb-16 bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] text-white">
+        <div className="pt-24 bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] text-white">
           <div className="container mx-auto px-4">
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
@@ -162,7 +162,7 @@ const ProgramPage = () => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="text-white/60" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-white">Programme</BreadcrumbPage>
+                  <BreadcrumbPage className="text-white">Notre programme</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -173,19 +173,20 @@ const ProgramPage = () => {
               </span>
               <h1 className="text-4xl md:text-6xl font-bold mt-4 mb-6 drop-shadow-sm">Notre programme</h1>
               <p className="text-white/90 max-w-2xl mx-auto mb-8 text-lg">
-                Découvrez nos propositions concrètes pour Gétigné, issues d'un travail collaboratif
-                avec les citoyens et pour les citoyens.
+                Découvrez nos propositions concrètes pour Gétigné, issues d'un travail collaboratif 
+                <strong> avec</strong> les citoyens et <strong>pour</strong> les citoyens.
               </p>
-              
-              <Button 
-                asChild
-                variant="outline" 
+              {isAuthorized && (
+                <Button 
+                  asChild
+                  variant="outline" 
                 className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
               >
                 <a href="#programme" className="px-6 py-2 text-sm font-medium">
                   Découvrir nos propositions
                 </a>
               </Button>
+              )}
             </div>
           </div>
           
@@ -202,10 +203,39 @@ const ProgramPage = () => {
         </div>
 
         <div className="py-16">
+          
           <div className="container mx-auto px-4">
             {showProgramToAll || isAuthorized ? (
               // Content visible to authorized users or if showProgram is enabled
               <div className="max-w-4xl mx-auto">
+                
+
+                {/* General presentation section avec style amélioré */}
+                {generalPresentation && generalPresentation.content && (
+                  <div className=" mb-12 relative overflow-hidden">
+                    
+                    <div className="prose max-w-none rich-content relative z-10">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {generalPresentation.content}
+                      </ReactMarkdown>
+                    </div>
+                    
+                    {isAuthorized && (
+                      <div className="mt-6 flex justify-end relative z-10">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          asChild
+                        >
+                          <Link to="/admin/program">
+                            Modifier la présentation
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Chemin vers le programme - Nouveau */}
                 <div className="relative mb-16 p-6 rounded-xl border border-getigne-100 bg-white shadow-sm">
                   <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-getigne-50 border border-getigne-100 rounded-lg py-2 px-4 whitespace-nowrap">
@@ -246,34 +276,6 @@ const ProgramPage = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* General presentation section avec style amélioré */}
-                {generalPresentation && generalPresentation.content && (
-                  <div className="bg-white rounded-xl shadow-md border border-getigne-100 p-8 mb-12 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-getigne-accent/5 rounded-full -mr-32 -mt-32 z-0"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-getigne-accent/5 rounded-full -ml-32 -mb-32 z-0"></div>
-                    
-                    <div className="prose max-w-none rich-content relative z-10">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {generalPresentation.content}
-                      </ReactMarkdown>
-                    </div>
-                    
-                    {isAuthorized && (
-                      <div className="mt-6 flex justify-end relative z-10">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          asChild
-                        >
-                          <Link to="/admin/program">
-                            Modifier la présentation
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 {/* Banner avec citation ou message inspirant */}
                 <div className="mb-16 py-12 px-8 bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] rounded-xl text-white text-center relative overflow-hidden">

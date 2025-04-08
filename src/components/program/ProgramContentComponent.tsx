@@ -95,14 +95,6 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
               </Button>
             </div>
           </div>
-          
-          <div className="md:max-w-xs rounded-lg bg-getigne-50 p-4 border border-getigne-100">
-            <h4 className="font-semibold text-getigne-800 mb-2">Thématique clé</h4>
-            <p className="text-getigne-700 text-sm">
-              {programItem.title} est un axe essentiel de notre programme pour améliorer 
-              la qualité de vie à Gétigné et préparer l'avenir de notre commune.
-            </p>
-          </div>
         </div>
       
         {/* Description avec style amélioré */}
