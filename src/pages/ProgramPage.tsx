@@ -82,6 +82,22 @@ const ProgramPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Handle anchor if present in URL
+    const handleAnchor = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }, 500);
+        }
+      }
+    };
+    
+    handleAnchor();
   }, []);
 
   useEffect(() => {
@@ -128,38 +144,60 @@ const ProgramPage = () => {
       <div className="page-content">
         <Navbar />
 
-        <div className="pt-24 pb-12 bg-getigne-50">
+        {/* Hero Section améliorée */}
+        <div className="pt-24 pb-16 bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] text-white">
           <div className="container mx-auto px-4">
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/">
+                  <BreadcrumbLink href="/" className="text-white/90 hover:text-white">
                     <Home className="h-4 w-4 mr-1" />
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className="text-white/60" />
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/objectif-2026">
+                  <BreadcrumbLink href="/objectif-2026" className="text-white/90 hover:text-white">
                     Objectif 2026
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className="text-white/60" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Programme</BreadcrumbPage>
+                  <BreadcrumbPage className="text-white">Programme</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
 
             <div className="max-w-3xl mx-auto text-center">
-              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+              <span className="bg-white/10 text-white font-medium px-4 py-1 rounded-full text-sm inline-block mb-4 backdrop-blur-sm">
                 Élections 2026
               </span>
-              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Notre programme</h1>
-              <p className="text-getigne-700 max-w-2xl mx-auto mb-6">
+              <h1 className="text-4xl md:text-6xl font-bold mt-4 mb-6 drop-shadow-sm">Notre programme</h1>
+              <p className="text-white/90 max-w-2xl mx-auto mb-8 text-lg">
                 Découvrez nos propositions concrètes pour Gétigné, issues d'un travail collaboratif
-                avec les citoyens.
+                avec les citoyens et pour les citoyens.
               </p>
+              
+              <Button 
+                asChild
+                variant="outline" 
+                className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
+              >
+                <a href="#programme" className="px-6 py-2 text-sm font-medium">
+                  Découvrir nos propositions
+                </a>
+              </Button>
             </div>
+          </div>
+          
+          {/* Wave separator */}
+          <div className="w-full overflow-hidden -mb-1 mt-16">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
+              <path 
+                fill="#ffffff" 
+                fillOpacity="1" 
+                d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,53.3C1120,53,1280,75,1360,85.3L1440,96L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+              ></path>
+            </svg>
           </div>
         </div>
 
@@ -168,17 +206,61 @@ const ProgramPage = () => {
             {showProgramToAll || isAuthorized ? (
               // Content visible to authorized users or if showProgram is enabled
               <div className="max-w-4xl mx-auto">
-                {/* General presentation section */}
+                {/* Chemin vers le programme - Nouveau */}
+                <div className="relative mb-16 p-6 rounded-xl border border-getigne-100 bg-white shadow-sm">
+                  <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-getigne-50 border border-getigne-100 rounded-lg py-2 px-4 whitespace-nowrap">
+                    <h2 className="text-lg font-medium text-getigne-700">Notre méthode</h2>
+                  </div>
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-3">
+                    <div className="md:w-1/2">
+                      <p className="text-getigne-700 mb-4">
+                        Notre programme est le fruit d'un travail collaboratif mené depuis plusieurs mois avec
+                        les habitants de Gétigné à travers différentes commissions thématiques.
+                      </p>
+                      <Button asChild variant="outline" size="sm" className="flex items-center gap-2">
+                        <Link to="/objectif-2026#commissions">
+                          <ArrowLeft className="h-4 w-4" />
+                          Découvrir notre méthode
+                        </Link>
+                      </Button>
+                    </div>
+                    <div className="md:w-1/2 grid grid-cols-3 gap-2">
+                      <div className="flex flex-col items-center text-center p-2">
+                        <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center mb-2">
+                          <UsersRound className="h-5 w-5 text-getigne-accent" />
+                        </div>
+                        <span className="text-sm font-medium">Concertation</span>
+                      </div>
+                      <div className="flex flex-col items-center text-center p-2">
+                        <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center mb-2">
+                          <ClipboardList className="h-5 w-5 text-getigne-accent" />
+                        </div>
+                        <span className="text-sm font-medium">Rédaction</span>
+                      </div>
+                      <div className="flex flex-col items-center text-center p-2">
+                        <div className="w-10 h-10 rounded-full bg-getigne-accent/10 flex items-center justify-center mb-2">
+                          <BookOpen className="h-5 w-5 text-getigne-accent" />
+                        </div>
+                        <span className="text-sm font-medium">Publication</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* General presentation section avec style amélioré */}
                 {generalPresentation && generalPresentation.content && (
-                  <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-12">
-                    <div className="prose max-w-none rich-content">
+                  <div className="bg-white rounded-xl shadow-md border border-getigne-100 p-8 mb-12 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-getigne-accent/5 rounded-full -mr-32 -mt-32 z-0"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-getigne-accent/5 rounded-full -ml-32 -mb-32 z-0"></div>
+                    
+                    <div className="prose max-w-none rich-content relative z-10">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {generalPresentation.content}
                       </ReactMarkdown>
                     </div>
                     
                     {isAuthorized && (
-                      <div className="mt-6 flex justify-end">
+                      <div className="mt-6 flex justify-end relative z-10">
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -193,57 +275,81 @@ const ProgramPage = () => {
                   </div>
                 )}
 
-                {/* Program values */}
-                <div className="mb-12">
+                {/* Banner avec citation ou message inspirant */}
+                <div className="mb-16 py-12 px-8 bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] rounded-xl text-white text-center relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-10">
+                    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1"/>
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#grid)" />
+                    </svg>
+                  </div>
+                  
+                  <div className="relative z-10">
+                    <h3 className="text-3xl md:text-4xl font-bold mb-4">Ensemble, construisons l'avenir de Gétigné</h3>
+                    <p className="text-lg md:text-xl max-w-2xl mx-auto">
+                      Un programme pensé par et pour les citoyens, avec une vision durable et solidaire.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Program values avec style amélioré */}
+                <div id="valeurs" className="mb-16">
                   <div className="text-center mb-10">
-                    <h2 className="text-2xl font-bold mb-4">Les valeurs qui guident notre projet</h2>
-                    <p className="text-getigne-700">Notre programme est construit autour de valeurs fortes qui orientent nos propositions.</p>
+                    <h2 className="text-3xl font-bold mb-4">Les valeurs qui guident notre projet</h2>
+                    <p className="text-getigne-700 max-w-2xl mx-auto">Notre programme est construit autour de valeurs fortes qui orientent nos propositions et notre vision pour Gétigné.</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center hover:shadow-md transition-all">
-                      <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <UsersRound className="h-8 w-8 text-getigne-600" />
+                    <div className="bg-white p-8 rounded-xl shadow-md border border-getigne-100 text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
+                      <div className="w-20 h-20 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <UsersRound className="h-10 w-10 text-getigne-600" />
                       </div>
-                      <h3 className="text-xl font-bold mb-2">Participatif</h3>
-                      <p className="text-getigne-700">Impliquer les citoyens dans les décisions qui façonnent notre commune.</p>
+                      <h3 className="text-xl font-bold mb-3">Participatif</h3>
+                      <p className="text-getigne-700">Impliquer les citoyens dans les décisions qui façonnent notre commune, pour une démocratie locale vivante.</p>
                     </div>
                     
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center hover:shadow-md transition-all">
-                      <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Scale className="h-8 w-8 text-getigne-600" />
+                    <div className="bg-white p-8 rounded-xl shadow-md border border-getigne-100 text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
+                      <div className="w-20 h-20 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Scale className="h-10 w-10 text-getigne-600" />
                       </div>
-                      <h3 className="text-xl font-bold mb-2">Durable</h3>
-                      <p className="text-getigne-700">Construire une commune résiliente face aux défis écologiques et sociaux.</p>
+                      <h3 className="text-xl font-bold mb-3">Durable</h3>
+                      <p className="text-getigne-700">Construire une commune résiliente face aux défis écologiques et sociaux, pour préserver notre environnement.</p>
                     </div>
                     
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 text-center hover:shadow-md transition-all">
-                      <div className="w-16 h-16 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Heart className="h-8 w-8 text-getigne-600" />
+                    <div className="bg-white p-8 rounded-xl shadow-md border border-getigne-100 text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
+                      <div className="w-20 h-20 bg-getigne-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Heart className="h-10 w-10 text-getigne-600" />
                       </div>
-                      <h3 className="text-xl font-bold mb-2">Solidaire</h3>
-                      <p className="text-getigne-700">Veiller à ce que personne ne soit laissé de côté dans notre vision commune.</p>
+                      <h3 className="text-xl font-bold mb-3">Solidaire</h3>
+                      <p className="text-getigne-700">Veiller à ce que personne ne soit laissé de côté dans notre vision commune, pour une société plus juste et inclusive.</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Program themes */}
-                <div className="mb-12">
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold mb-4">Nos propositions thématiques</h2>
-                    <p className="text-getigne-700">Découvrez nos engagements détaillés pour chaque domaine d'action municipale.</p>
+                {/* Program themes - Style amélioré */}
+                <div id="programme" className="mb-16">
+                  <div className="text-center mb-12">
+                    <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm inline-block mb-4">
+                      Nos engagements
+                    </span>
+                    <h2 className="text-3xl font-bold mb-4">Nos propositions thématiques</h2>
+                    <p className="text-getigne-700 max-w-2xl mx-auto">Découvrez nos engagements détaillés pour chaque domaine d'action municipale, fruit d'une réflexion collective.</p>
                   </div>
                 </div>
                 
                 {programItems && programItems.length > 0 ? (
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-10">
-                    <div className="flex justify-center">
-                      <TabsList className="h-auto flex-wrap">
+                    <div className="flex justify-center mb-8">
+                      <TabsList className="h-auto flex-wrap bg-getigne-50 p-2">
                         {programItems.map(item => (
                           <TabsTrigger 
                             key={item.id} 
                             value={item.id}
-                            className="gap-2 py-2 px-4"
+                            className="gap-2 py-3 px-6 data-[state=active]:bg-getigne-accent data-[state=active]:text-white"
                           >
                             {item.icon && (
                               <DynamicIcon name={item.icon} className="h-5 w-5" />
@@ -264,26 +370,61 @@ const ProgramPage = () => {
                     ))}
                   </Tabs>
                 ) : (
-                  <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-8">
-                    <h2 className="text-2xl font-bold mb-4">En construction</h2>
-                    <p className="mb-4">
-                      Le programme de Gétigné Collectif pour les élections municipales de 2026 est actuellement
-                      en cours d'élaboration par nos commissions thématiques.
-                    </p>
-                    <p className="mb-4">
-                      Depuis mai 2024, nos commissions travaillent sur différentes thématiques pour construire
-                      un programme ambitieux et réaliste pour l'avenir de notre commune.
-                    </p>
-                    <p>
-                      Cette page sera mise à jour régulièrement pour partager l'avancement de nos travaux.
-                    </p>
+                  <div className="bg-white rounded-xl shadow-md border border-getigne-100 p-8 mb-8">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-16 h-16 rounded-full bg-getigne-50 flex items-center justify-center mb-4">
+                        <Clock className="h-8 w-8 text-getigne-600" />
+                      </div>
+                      <h2 className="text-2xl font-bold mb-4">En construction</h2>
+                      <p className="mb-4 max-w-2xl">
+                        Le programme de Gétigné Collectif pour les élections municipales de 2026 est actuellement
+                        en cours d'élaboration par nos commissions thématiques.
+                      </p>
+                      <p className="mb-4 max-w-2xl">
+                        Depuis mai 2024, nos commissions travaillent sur différentes thématiques pour construire
+                        un programme ambitieux et réaliste pour l'avenir de notre commune.
+                      </p>
+                      <p className="max-w-2xl">
+                        Cette page sera mise à jour régulièrement pour partager l'avancement de nos travaux.
+                      </p>
+                    </div>
                   </div>
                 )}
+
+                {/* CTA de participation */}
+                <div className="mt-16 mb-8">
+                  <div className="bg-getigne-50 rounded-xl overflow-hidden shadow-md">
+                    <div className="grid grid-cols-1 md:grid-cols-2">
+                      <div className="p-8 flex flex-col justify-center">
+                        <h3 className="text-2xl font-bold mb-4">Participez à l'avenir de Gétigné</h3>
+                        <p className="mb-6 text-getigne-700">
+                          Vous souhaitez contribuer à l'élaboration de notre programme ou nous rejoindre ?
+                          Participez à nos réunions et ateliers ouverts à tous les habitants.
+                        </p>
+                        <div className="flex flex-wrap gap-3">
+                          <Button asChild>
+                            <Link to="/contact">
+                              Nous contacter
+                            </Link>
+                          </Button>
+                          <Button asChild variant="outline">
+                            <Link to="/objectif-2026#commissions">
+                              Rejoindre une commission
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="bg-getigne-green-500 hidden md:block">
+                        <div className="h-full w-full bg-[url('https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=1140')] bg-cover bg-center opacity-80"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               // Access restricted page with alert form for other users
               <div className="max-w-xl mx-auto">
-                <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-8">
+                <div className="bg-white rounded-xl shadow-md border border-getigne-100 p-8 mb-8">
                   <div className="flex justify-center mb-6">
                     <div className="bg-getigne-100 rounded-full p-4">
                       <Clock size={48} className="text-getigne-700" />
