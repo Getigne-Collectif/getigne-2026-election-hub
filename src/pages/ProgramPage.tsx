@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft } from 'lucide-react';
+import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft, Clock } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -94,8 +94,8 @@ const ProgramPage = () => {
       if (user) {
         toast({
           variant: "destructive",
-          title: "Accès restreint",
-          description: "Vous n'avez pas les droits nécessaires pour accéder à cette page."
+          title: "Travail en cours",
+          description: "Le programme est en cours d'élaboration par les différentes commissions et l'équipe programme."
         });
       }
     }
@@ -159,11 +159,6 @@ const ProgramPage = () => {
                 Découvrez nos propositions concrètes pour Gétigné, issues d'un travail collaboratif
                 avec les citoyens.
               </p>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/objectif-2026">
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Découvrir notre démarche
-                </Link>
-              </Button>
             </div>
           </div>
         </div>
@@ -291,22 +286,25 @@ const ProgramPage = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-8">
                   <div className="flex justify-center mb-6">
                     <div className="bg-getigne-100 rounded-full p-4">
-                      <LockKeyhole size={48} className="text-getigne-700" />
+                      <Clock size={48} className="text-getigne-700" />
                     </div>
                   </div>
-                  <h2 className="text-2xl font-bold mb-4 text-center">Accès restreint</h2>
+                  <h2 className="text-2xl font-bold mb-4 text-center">Tic Tac... Tic Tac...</h2>
                   <p className="text-getigne-700 mb-6 text-center">
-                    Notre programme est actuellement en cours d'élaboration et
-                    sera rendu public prochainement.
+                    Notre programme est actuellement en cours d'élaboration par les différentes commissions et l'équipe programme.
+                    Il sera rendu public très prochainement !
                   </p>
-                  <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                  <div className="flex flex-col justify-center gap-4 mb-8">
                     <Button asChild>
-                      <Link to="/objectif-2026">Découvrir notre projet</Link>
+                      <Link to="/objectif-2026#commissions">Patientez avec le travail des commissions</Link>
                     </Button>
                     {!user && (
-                      <Button asChild variant="outline">
-                        <Link to="/auth">Se connecter</Link>
-                      </Button>
+                      <div className="flex items-center justify-center gap-4">
+                        <div className="text-xs text-center">Vous êtes membre de l'équipe programme ?</div>
+                        <Button asChild variant="outline" size="sm">
+                          <Link to="/auth">Identifiez-vous</Link>
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>

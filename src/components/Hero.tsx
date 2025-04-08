@@ -60,7 +60,7 @@ const Hero = () => {
           >
             <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <Link to="/objectif-2026">
-                Découvrir le programme
+                Objectif 2026
               </Link>
             </Button>
             <Button asChild variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 py-6 px-8 rounded-md text-lg backdrop-blur-sm">

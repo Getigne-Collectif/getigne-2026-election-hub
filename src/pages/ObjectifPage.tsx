@@ -1,5 +1,4 @@
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -32,11 +31,35 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
+import { toast } from '@/components/ui/use-toast';
 
 const ObjectifPage = () => {
+  const { user, userRoles, authChecked } = useAuth();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const { settings } = useAppSettings();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (!authChecked) return;
+
+    if (userRoles.includes('admin') || userRoles.includes('program_manager')) {
+      setIsAuthorized(true);
+    } else {
+      setIsAuthorized(false);
+      if (user) {
+        toast({
+          variant: "destructive",
+          title: "Accès restreint",
+          description: "Vous n'avez pas les droits nécessaires pour accéder à cette page."
+        });
+      }
+    }
+    setIsChecking(false);
+  }, [user, userRoles, authChecked, toast]);
 
   return (
     <HelmetProvider>
@@ -73,11 +96,11 @@ const ObjectifPage = () => {
                   </p>
                   <p className="text-getigne-700 mb-6">
                     Nous sommes convaincus que Gétigné a besoin d'un souffle nouveau, d'idées innovantes
-                    et d'une équipe dynamique pour construire un avenir plus durable, plus solidaire et plus participatif.
+                    et d'une équipe dynamique, réellement à l'écoute pour construire un avenir plus durable, plus solidaire et plus participatif.
                   </p>
                   <div className="flex flex-wrap gap-4 mt-2">
                     <Button asChild className="bg-getigne-accent hover:bg-getigne-accent/90">
-                      <Link to="/objectif-2026/programme">Découvrir le programme</Link>
+                      <Link to="/objectif-2026/programme">{isAuthorized && "Découvrir le programme" || "Où en est le programme ?"}</Link>
                     </Button>
                   </div>
                 </div>

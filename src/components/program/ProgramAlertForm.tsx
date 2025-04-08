@@ -73,9 +73,9 @@ const ProgramAlertForm = () => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-6">
-      <h3 className="text-xl font-semibold mb-4">Être notifié de la sortie du programme</h3>
-      <p className="text-getigne-700 mb-6">
-        Notre programme est en cours d'élaboration. Laissez-nous vos coordonnées pour être informé dès sa publication.
+      <h3 className="text-xl font-semibold mb-4 text-center">Vous souhaitez être prévenu·e ?</h3>
+      <p className="text-getigne-700 mb-6 text-center">
+        Laissez-nous vos coordonnées et vous recevrez un email<br/>dès que le programme sera publié.
       </p>
       
       <Form {...form}>
