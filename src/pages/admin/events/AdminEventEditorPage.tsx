@@ -514,32 +514,6 @@ const AdminEventEditorPage = () => {
               </div>
 
               <div className="bg-getigne-50 p-4 rounded-lg">
-                <h3 className="font-medium mb-4">Options</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="allowRegistration"
-                      checked={allowRegistration}
-                      onChange={(e) => setAllowRegistration(e.target.checked)}
-                      className="mr-2 h-4 w-4"
-                    />
-                    <Label htmlFor="allowRegistration">Permettre les inscriptions</Label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isMembersOnly"
-                      checked={isMembersOnly}
-                      onChange={(e) => setIsMembersOnly(e.target.checked)}
-                      className="mr-2 h-4 w-4"
-                    />
-                    <Label htmlFor="isMembersOnly">Réservé aux adhérents</Label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-getigne-50 p-4 rounded-lg">
                 <h3 className="font-medium mb-4">Prévisualisation</h3>
                 {isEditMode && slug && (
                   <Button
