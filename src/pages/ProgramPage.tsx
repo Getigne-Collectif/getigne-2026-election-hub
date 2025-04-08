@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart } from 'lucide-react';
+import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -154,6 +154,15 @@ const ProgramPage = () => {
                 Élections 2026
               </span>
               <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Notre programme</h1>
+              <p className="text-getigne-700 max-w-2xl mx-auto mb-6">
+                Découvrez nos propositions concrètes pour Gétigné, issues d'un travail collaboratif
+                avec les citoyens.
+              </p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/objectif-2026">
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Découvrir notre démarche
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

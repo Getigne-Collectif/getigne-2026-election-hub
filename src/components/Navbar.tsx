@@ -6,12 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from './AuthButton';
 import { useAuth } from '@/context/AuthContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { isAdmin, user, refreshUserRoles, userRoles } = useAuth();
   const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
+  const { settings } = useAppSettings();
+
+  // Détermine si l'utilisateur peut accéder au programme
+  const canAccessProgram = 
+    settings.showProgram || 
+    userRoles.includes('admin') || 
+    userRoles.includes('program_manager');
 
   useEffect(() => {
     const handleScroll = () => {

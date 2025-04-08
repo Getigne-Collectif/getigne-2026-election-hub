@@ -1,9 +1,12 @@
+
 import { useEffect } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import {
   BrainCircuit,
   ShieldCheck,

@@ -2,8 +2,24 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UserPlusIcon, CalendarCheck, PlusCircle } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { useAuth } from '@/context/AuthContext';
 
 const Campaign = () => {
+  const { settings } = useAppSettings();
+  const { isAdmin, userRoles } = useAuth();
+  
+  // Détermine si l'utilisateur peut accéder au programme
+  const canAccessProgram = 
+    settings.showProgram || 
+    userRoles.includes('admin') || 
+    userRoles.includes('program_manager');
+  
+  // Détermine le lien cible pour le CTA principal
+  const programLink = canAccessProgram 
+    ? "/objectif-2026/programme" 
+    : "/objectif-2026";
+
   return (
     <section id="campaign" className="py-24 px-4 bg-white">
       <div className="container mx-auto">
@@ -56,7 +72,7 @@ const Campaign = () => {
               </div>
               <div className="mt-8">
                 <Button asChild>
-                  <Link to="/objectif-2026">En savoir plus</Link>
+                  <Link to={programLink}>En savoir plus</Link>
                 </Button>
               </div>
             </div>
