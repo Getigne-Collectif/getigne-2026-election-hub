@@ -40,7 +40,7 @@ import { DynamicIcon } from '@/components/ui/dynamic-icon';
 export default function AdminProgramPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [programItemToDelete, setProgramItemToDelete] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("sections");
+  const [activeTab, setActiveTab] = useState("presentation");
 
   // Fetch program items
   const { data: programItems, isLoading, refetch } = useQuery({
