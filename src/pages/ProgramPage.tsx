@@ -14,6 +14,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProgramContentComponent from '@/components/program/ProgramContentComponent';
+import ProgramAlertForm from '@/components/program/ProgramAlertForm';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
@@ -285,21 +286,20 @@ const ProgramPage = () => {
                 )}
               </div>
             ) : (
-              // Access restricted page for other users
-              <div className="max-w-xl mx-auto text-center">
-                <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8">
+              // Access restricted page with alert form for other users
+              <div className="max-w-xl mx-auto">
+                <div className="bg-white rounded-xl shadow-sm border border-getigne-100 p-8 mb-8">
                   <div className="flex justify-center mb-6">
                     <div className="bg-getigne-100 rounded-full p-4">
                       <LockKeyhole size={48} className="text-getigne-700" />
                     </div>
                   </div>
-                  <h2 className="text-2xl font-bold mb-4">Accès restreint</h2>
-                  <p className="text-getigne-700 mb-6">
-                    Cette page est réservée aux membres de l'équipe Programme.
+                  <h2 className="text-2xl font-bold mb-4 text-center">Accès restreint</h2>
+                  <p className="text-getigne-700 mb-6 text-center">
                     Notre programme est actuellement en cours d'élaboration et
                     sera rendu public prochainement.
                   </p>
-                  <div className="flex flex-col sm:flex-row justify-center gap-4">
+                  <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
                     <Button asChild>
                       <Link to="/objectif-2026">Découvrir notre projet</Link>
                     </Button>
@@ -310,6 +310,9 @@ const ProgramPage = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Formulaire d'alerte pour la sortie du programme */}
+                <ProgramAlertForm />
               </div>
             )}
           </div>
