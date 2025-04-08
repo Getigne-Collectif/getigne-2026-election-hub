@@ -46,7 +46,7 @@ const ProgramItem = ({ icon, title, description, delay }) => {
       </div>
       <h3 className="text-lg font-medium mb-2">{title}</h3>
       <p className="text-getigne-700 mb-4">{description}</p>
-      <Link to="/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
+      <Link to="/objectif-2026/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
         En savoir plus
         <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
       </Link>
@@ -140,7 +140,7 @@ const Program = () => {
               <p className="text-getigne-700 text-sm mb-2">
                 Découvrez nos propositions pour une meilleure coopération intercommunale.
               </p>
-              <Link to="/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
+              <Link to="/objectif-2026/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
                 En savoir plus
                 <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
               </Link>
@@ -151,7 +151,7 @@ const Program = () => {
             asChild
             className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
           >
-            <Link to="/programme">
+            <Link to="/objectif-2026/programme">
               Programme complet
             </Link>
           </Button>

@@ -59,8 +59,8 @@ const Hero = () => {
             className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <Link to="/programme">
-                Découvrir notre programme
+              <Link to="/objectif-2026">
+                Découvrir le programme
               </Link>
             </Button>
             <Button asChild variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 py-6 px-8 rounded-md text-lg backdrop-blur-sm">

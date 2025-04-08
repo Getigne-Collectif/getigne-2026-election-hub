@@ -77,10 +77,7 @@ const ObjectifPage = () => {
                   </p>
                   <div className="flex flex-wrap gap-4 mt-2">
                     <Button asChild className="bg-getigne-accent hover:bg-getigne-accent/90">
-                      <Link to="/objectif-2026#commissions">Découvrir nos commissions</Link>
-                    </Button>
-                    <Button asChild variant="outline">
-                      <Link to="/adherer">Rejoindre le collectif</Link>
+                      <Link to="/objectif-2026/programme">Découvrir le programme</Link>
                     </Button>
                   </div>
                 </div>
