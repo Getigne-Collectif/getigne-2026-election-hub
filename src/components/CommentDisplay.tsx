@@ -17,7 +17,7 @@ interface Comment {
   content: string;
   created_at: string;
   status: 'pending' | 'approved' | 'rejected';
-  profiles?: Profile;
+  profiles?: Profile | null;
 }
 
 interface CommentDisplayProps {

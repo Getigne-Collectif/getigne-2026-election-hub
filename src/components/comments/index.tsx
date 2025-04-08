@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 import { supabase, TABLES } from '@/integrations/supabase/client';
 import CommentForm from './CommentForm';
 import { Separator } from '@/components/ui/separator';
@@ -64,7 +64,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         // Fetch comments for program items or points with profiles included
         let query = supabase
           .from(TABLES.PROGRAM_COMMENTS)
-          .select('*, profiles:profiles(*)')
+          .select('*, profiles(*)')
           .order('created_at', { ascending: false });
 
         if (programPointId) {
@@ -89,11 +89,18 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           return;
         }
         
-        // Map the data with profiles properly included
-        const commentsWithProfiles = data.map(comment => ({
-          ...comment,
-          profiles: comment.profiles
-        }));
+        // Fix: Convert the data to proper Comment type before setting state
+        const commentsWithProfiles = data.map(comment => {
+          // Ensure profiles has the correct shape or set to null if not
+          const profiles = comment.profiles && typeof comment.profiles === 'object' && !('error' in comment.profiles)
+            ? comment.profiles
+            : null;
+            
+          return {
+            ...comment,
+            profiles
+          };
+        });
         
         setComments(commentsWithProfiles as Comment[]);
       }

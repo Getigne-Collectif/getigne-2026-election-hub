@@ -18,6 +18,7 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({ programItemId, po
   const [likeCount, setLikeCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  // Check if user has liked the program item or point
   useEffect(() => {
     if (user) {
       checkUserLike();
@@ -29,6 +30,7 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({ programItemId, po
     if (!user) return;
 
     try {
+      // Create query to check if user has liked this item/point
       const query = supabase
         .from('program_likes')
         .select('*')
@@ -51,8 +53,10 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({ programItemId, po
     }
   };
 
+  // Count total likes for this item/point
   const countLikes = async () => {
     try {
+      // Create query to count likes
       const query = supabase
         .from('program_likes')
         .select('*', { count: 'exact', head: true })
@@ -74,6 +78,7 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({ programItemId, po
     }
   };
 
+  // Toggle like status
   const toggleLike = async () => {
     if (!user) {
       toast({
