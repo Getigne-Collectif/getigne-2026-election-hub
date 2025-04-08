@@ -73,7 +73,9 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({
             </Avatar>
             <div className="flex-1">
               <h4 className="font-medium">
-                {comment.profiles ? `${comment.profiles.first_name} ${comment.profiles.last_name}` : 'Utilisateur'}
+                {comment.profiles?.first_name && comment.profiles?.last_name 
+                  ? `${comment.profiles.first_name} ${comment.profiles.last_name}` 
+                  : 'Utilisateur anonyme'}
                 {comment.user_id === user?.id && <span className="ml-2 text-sm text-getigne-500">(Vous)</span>}
               </h4>
               <time className="text-getigne-500 text-sm">

@@ -44,7 +44,9 @@ const UserView: React.FC<UserViewProps> = ({ comments, loading = false }) => {
             </Avatar>
             <div>
               <h4 className="font-medium">
-                {comment.profiles ? `${comment.profiles.first_name} ${comment.profiles.last_name}` : 'Utilisateur'}
+                {comment.profiles && comment.profiles.first_name && comment.profiles.last_name
+                  ? `${comment.profiles.first_name} ${comment.profiles.last_name}`
+                  : 'Utilisateur anonyme'}
               </h4>
               <time className="text-getigne-500 text-sm">
                 {new Date(comment.created_at).toLocaleDateString('fr-FR', {

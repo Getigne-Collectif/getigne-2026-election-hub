@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase, TABLES } from '@/integrations/supabase/client';
@@ -60,10 +61,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           profiles: comment.profiles
         })) as Comment[]);
       } else if (programItemId) {
-        // Fetch comments for program items or points
+        // Fetch comments for program items or points with profiles included
         let query = supabase
           .from(TABLES.PROGRAM_COMMENTS)
-          .select('*')
+          .select('*, profiles:profiles(*)')
           .order('created_at', { ascending: false });
 
         if (programPointId) {
@@ -87,26 +88,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           setLoading(false);
           return;
         }
-
-        // Manuellement récupérer les profils pour éviter les problèmes de type
-        const profileResults = await Promise.all(
-          data.map(comment => 
-            supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', comment.user_id)
-              .single()
-          )
-        );
         
-        // Combiner les commentaires avec les profils
-        const commentsWithProfiles = data.map((comment, index) => {
-          const profileResult = profileResults[index];
-          return {
-            ...comment,
-            profiles: profileResult.error ? null : profileResult.data
-          };
-        });
+        // Map the data with profiles properly included
+        const commentsWithProfiles = data.map(comment => ({
+          ...comment,
+          profiles: comment.profiles
+        }));
         
         setComments(commentsWithProfiles as Comment[]);
       }

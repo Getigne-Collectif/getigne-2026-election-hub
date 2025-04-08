@@ -1,220 +1,152 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth';
+import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
-import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import SignInForm from '@/components/auth/SignInForm';
-import SignUpForm from '@/components/auth/SignUpForm';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProgramLikeButtonProps {
   programItemId: string;
   pointId?: string;
-  initialLikesCount?: number;
 }
 
-const ProgramLikeButton = ({ programItemId, pointId, initialLikesCount = 0 }: ProgramLikeButtonProps) => {
+const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({ programItemId, pointId }) => {
   const { user } = useAuth();
-  const [likesCount, setLikesCount] = useState(initialLikesCount);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const [pendingLike, setPendingLike] = useState(false);
-  const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
+  const { toast } = useToast();
+  const [hasLiked, setHasLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  // Déterminer le type de ressource
-  const resourceType = pointId ? 'program_point' : 'program_item';
-  const resourceId = pointId || programItemId;
-
-  // Vérifier si l'utilisateur a déjà liké cet élément
   useEffect(() => {
-    const checkIfLiked = async () => {
-      if (!user) {
-        setIsLiked(false);
-        return;
-      }
+    if (user) {
+      checkUserLike();
+    }
+    countLikes();
+  }, [user, programItemId, pointId]);
 
-      try {
-        const query = supabase
-          .from('program_likes' as any)
-          .select('id')
-          .eq('program_item_id', programItemId)
-          .eq('user_id', user.id);
-          
-        // Add condition for program point if provided
-        if (pointId) {
-          query.eq('program_point_id', pointId);
-        } else {
-          query.is('program_point_id', null);
-        }
-          
-        const { data, error } = await query.maybeSingle();
+  const checkUserLike = async () => {
+    if (!user) return;
 
-        if (error) throw error;
-        setIsLiked(!!data);
-      } catch (error) {
-        console.error('Erreur lors de la vérification du like:', error);
-      }
-    };
-
-    const fetchLikesCount = async () => {
-      try {
-        // Count likes using a custom function when possible
-        try {
-          const { data, error } = await supabase
-            .rpc('count_program_likes', { program_id: programItemId });
-          
-          if (!error && data !== null) {
-            setLikesCount(data);
-            return;
-          }
-        } catch (rpcError) {
-          console.error('Using fallback for counting likes:', rpcError);
-        }
+    try {
+      const query = supabase
+        .from('program_likes')
+        .select('*')
+        .eq('program_item_id', programItemId)
+        .eq('user_id', user.id);
         
-        // Fallback: Count likes using a query
-        const query = supabase
-          .from('program_likes' as any)
-          .select('*', { count: 'exact' })
-          .eq('program_item_id', programItemId);
-          
-        if (pointId) {
-          query.eq('program_point_id', pointId);
-        } else {
-          query.is('program_point_id', null);
-        }
-            
-        const { count, error } = await query;
-            
-        if (error) throw error;
-        if (count !== null) {
-          setLikesCount(count);
-        }
-      } catch (countError) {
-        console.error('Erreur de comptage:', countError);
+      // If pointId is provided, add that condition
+      if (pointId) {
+        query.eq('program_point_id', pointId);
+      } else {
+        query.is('program_point_id', null);
       }
-    };
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      setHasLiked(data && data.length > 0);
+    } catch (error) {
+      console.error('Error checking like status:', error);
+    }
+  };
 
-    checkIfLiked();
-    fetchLikesCount();
-  }, [programItemId, pointId, resourceId, resourceType, user]);
+  const countLikes = async () => {
+    try {
+      const query = supabase
+        .from('program_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('program_item_id', programItemId);
+        
+      // If pointId is provided, add that condition
+      if (pointId) {
+        query.eq('program_point_id', pointId);
+      } else {
+        query.is('program_point_id', null);
+      }
+      
+      const { count, error } = await query;
+      
+      if (error) throw error;
+      setLikeCount(count || 0);
+    } catch (error) {
+      console.error('Error counting likes:', error);
+    }
+  };
 
-  // Gérer le like/unlike
-  const handleLikeToggle = async () => {
-    // Si l'utilisateur n'est pas connecté, ouvrir la boîte de dialogue d'authentification
+  const toggleLike = async () => {
     if (!user) {
-      setPendingLike(true);
-      setAuthDialogOpen(true);
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter pour aimer cet élément du programme.",
+        variant: "destructive"
+      });
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true);
     try {
-      if (isLiked) {
-        // Supprimer le like
+      if (hasLiked) {
+        // Remove like
         const query = supabase
-          .from('program_likes' as any)
+          .from('program_likes')
           .delete()
           .eq('program_item_id', programItemId)
           .eq('user_id', user.id);
           
+        // If pointId is provided, add that condition
         if (pointId) {
           query.eq('program_point_id', pointId);
         } else {
           query.is('program_point_id', null);
         }
-          
+        
         const { error } = await query;
-
+        
         if (error) throw error;
         
-        setLikesCount(prev => Math.max(0, prev - 1));
-        setIsLiked(false);
-        toast.success('Votre like a été retiré');
+        setHasLiked(false);
+        setLikeCount(prev => Math.max(0, prev - 1));
       } else {
-        // Ajouter le like
-        const likeData: Record<string, any> = { 
-          user_id: user.id,
-          program_item_id: programItemId
-        };
-        
-        // Ajouter le bon champ selon le type
-        if (pointId) {
-          likeData.program_point_id = pointId;
-        }
-        
+        // Add like
         const { error } = await supabase
-          .from('program_likes' as any)
-          .insert([likeData]);
-
+          .from('program_likes')
+          .insert({
+            program_item_id: programItemId,
+            user_id: user.id,
+            program_point_id: pointId || null
+          });
+          
         if (error) throw error;
         
-        setLikesCount(prev => prev + 1);
-        setIsLiked(true);
-        toast.success('Merci pour votre soutien !');
+        setHasLiked(true);
+        setLikeCount(prev => prev + 1);
       }
-    } catch (error: any) {
-      console.error('Erreur lors du like/unlike:', error);
-      toast.error("Une erreur s'est produite. Veuillez réessayer.");
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive"
+      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Après une authentification réussie, fermer la boîte de dialogue
-  const handleAuthSuccess = () => {
-    setAuthDialogOpen(false);
-    
-    // Ajouter un petit délai pour s'assurer que le contexte d'authentification est mis à jour
-    setTimeout(() => {
-      if (pendingLike) {
-        handleLikeToggle();
-        setPendingLike(false);
-      }
-    }, 500);
-  };
-
   return (
-    <>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        className={`flex items-center gap-1 ${isLiked ? 'bg-pink-50 text-pink-600 hover:bg-pink-100 hover:text-pink-700' : ''}`}
-        onClick={handleLikeToggle}
-        disabled={isLoading}
-      >
-        <Heart 
-          className={`h-4 w-4 ${isLiked ? 'fill-pink-500 text-pink-500' : ''}`} 
-        />
-        <span>{likesCount}</span>
-      </Button>
-
-      <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Connectez-vous pour soutenir cette proposition</DialogTitle>
-          </DialogHeader>
-          
-          <Tabs value={authTab} onValueChange={(value) => setAuthTab(value as 'signin' | 'signup')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Se connecter</TabsTrigger>
-              <TabsTrigger value="signup">Créer un compte</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <SignInForm onSuccess={handleAuthSuccess} />
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <SignUpForm onSuccess={handleAuthSuccess} />
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Button
+      variant="ghost"
+      size="sm"
+      className={`flex items-center gap-1 ${
+        hasLiked ? 'text-red-500 hover:text-red-600' : 'text-getigne-600 hover:text-getigne-700'
+      }`}
+      onClick={toggleLike}
+      disabled={loading || !user}
+    >
+      <Heart className={`h-5 w-5 ${hasLiked ? 'fill-current' : ''}`} />
+      <span>{likeCount}</span>
+    </Button>
   );
 };
 
