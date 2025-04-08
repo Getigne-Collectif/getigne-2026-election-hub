@@ -58,8 +58,7 @@ const Navbar = () => {
           to="/objectif-2026"
           className={
             isActive('/objectif-2026') ||
-            isActive('/objectif-2026/programme') ||
-            isActive('/objectif-2026/commissions')
+            isActive('/objectif-2026/programme')
               ? 'text-getigne-accent'
               : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
           }

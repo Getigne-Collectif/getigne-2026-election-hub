@@ -12,7 +12,6 @@ import NewsPage from "./pages/NewsPage";
 import NewsDetailPage from "./pages/NewsDetailPage";
 import AgendaPage from "./pages/AgendaPage";
 import EventDetailPage from "./pages/EventDetailPage";
-import CommitteesPage from "./pages/CommitteesPage";
 import CommitteePage from "./pages/CommitteePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import JoinPage from "./pages/JoinPage";
@@ -61,8 +60,7 @@ function App() {
               {/* Objectif 2026 et sous-pages */}
               <Route path="/objectif-2026" element={<ObjectifPage />} />
               <Route path="/objectif-2026/programme" element={<ProgramPage />} />
-              <Route path="/objectif-2026/commissions" element={<CommitteesPage />} />
-              <Route path="/objectif-2026/commissions/:id" element={<CommitteePage />} />
+              <Route path="/objectif-2026/:id" element={<CommitteePage />} />
 
               {/* Nos projets */}
               <Route path="/nos-projets" element={<ProjectsPage />} />
@@ -118,13 +116,6 @@ function App() {
               <Route path="/admin/pages/edit/:id" element={<AdminPageEditorPage />} />
               <Route path="/admin/menu" element={<AdminMenuPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
-
-              {/* Routes de compatibilité (redirections pour les anciens liens) */}
-              <Route path="/programme" element={<ProgramPage />} />
-              <Route path="/equipe" element={<AboutUsPage />} />
-              <Route path="/commissions" element={<CommitteesPage />} />
-              <Route path="/commissions/:id" element={<CommitteePage />} />
-
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

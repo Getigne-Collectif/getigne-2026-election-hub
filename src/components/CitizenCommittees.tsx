@@ -27,7 +27,6 @@ export const getColorTheme = (colorClass: string | null) => {
     border: 'border-getigne-100',
     hover: 'hover:bg-getigne-100/50',
     accent: 'bg-getigne-accent/10',
-    theme: 'Thématique',
     defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
     defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
   };
@@ -49,7 +48,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-green-200`,
       hover: `hover:bg-green-100/50`,
       accent: `bg-green-400/10`,
-      theme: 'Environnement',
       defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
     },
@@ -59,7 +57,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-blue-200`,
       hover: `hover:bg-blue-100/50`,
       accent: `bg-blue-400/10`,
-      theme: 'Général',
       defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
     },
@@ -69,7 +66,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-yellow-400`,
       hover: `hover:bg-yellow-100/50`,
       accent: `bg-yellow-400/10`,
-      theme: 'Énergie',
       defaultCoverImage: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=2970&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=2970&q=80'
     },
@@ -79,7 +75,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-purple-200`,
       hover: `hover:bg-purple-100/50`,
       accent: `bg-purple-400/10`,
-      theme: 'Mobilité',
       defaultCoverImage: 'https://images.unsplash.com/photo-1519583272095-6433daf26b6e?auto=format&fit=crop&w=2796&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
@@ -89,7 +84,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-red-200`,
       hover: `hover:bg-red-100/50`,
       accent: `bg-red-400/10`,
-      theme: 'Urgence',
       defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
@@ -99,7 +93,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-orange-200`,
       hover: `hover:bg-orange-100/50`,
       accent: `bg-orange-400/10`,
-      theme: 'Alimentation',
       defaultCoverImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=2974&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=2970&q=80'
     },
@@ -109,7 +102,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-indigo-200`,
       hover: `hover:bg-indigo-100/50`,
       accent: `bg-indigo-400/10`,
-      theme: 'Culture',
       defaultCoverImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=2970&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=2970&q=80'
     },
@@ -119,7 +111,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-pink-200`,
       hover: `hover:bg-pink-100/50`,
       accent: `bg-pink-400/10`,
-      theme: 'Social',
       defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
@@ -129,7 +120,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-cyan-200`,
       hover: `hover:bg-cyan-100/50`,
       accent: `bg-cyan-400/10`,
-      theme: 'Eau',
       defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
     },
@@ -139,7 +129,6 @@ export const getColorTheme = (colorClass: string | null) => {
       border: `border-teal-200`,
       hover: `hover:bg-teal-100/50`,
       accent: `bg-teal-400/10`,
-      theme: 'Biodiversité',
       defaultCoverImage: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=2971&q=80',
       defaultTeamImage: 'https://images.unsplash.com/photo-1582213782179-e0d4d3cce817?auto=format&fit=crop&w=2970&q=80'
     }
@@ -192,7 +181,7 @@ const CommitteeItem = ({ committee, index }) => {
   }, [committee.id]);
 
   return (
-    <Link to={`/commissions/${committee.id}`} className="block">
+    <Link to={`/objectif-2026/${committee.id}`} className="block">
       <div
         ref={ref}
         className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift transition-all duration-200 ${
@@ -205,9 +194,6 @@ const CommitteeItem = ({ committee, index }) => {
         <div className={`w-12 h-12 ${themeColor.accent} rounded-lg flex items-center justify-center mb-4`}>
           <Icon className={themeColor.text} size={24} />
         </div>
-        <span className={`text-xs ${themeColor.text} ${themeColor.bg} px-2 py-0.5 rounded-full inline-block mb-2`}>
-          {themeColor.theme}
-        </span>
         <h3 className="text-lg font-medium mb-2">{committee.title}</h3>
         <p className="text-getigne-700 mb-2 line-clamp-2">{committee.description}</p>
 

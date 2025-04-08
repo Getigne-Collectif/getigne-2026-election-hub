@@ -92,7 +92,7 @@ const Campaign = () => {
               Intégrez l'une de nos commissions de travail selon vos centres d'intérêt et compétences.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/objectif-2026/commissions">Découvrir</Link>
+              <Link to="/objectif-2026#commissions">Découvrir</Link>
             </Button>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">

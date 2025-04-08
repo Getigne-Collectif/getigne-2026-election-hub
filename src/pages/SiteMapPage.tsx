@@ -47,7 +47,7 @@ const SiteMapPage = () => {
                         </Link>
                       </li>
                       <li>
-                        <Link to="/objectif-2026/commissions" className="text-getigne-700 hover:text-getigne-accent">
+                        <Link to="/objectif-2026#commissions" className="text-getigne-700 hover:text-getigne-accent">
                           Commissions citoyennes
                         </Link>
                       </li>
