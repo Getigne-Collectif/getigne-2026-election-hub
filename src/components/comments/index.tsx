@@ -88,21 +88,20 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           return;
         }
 
-        // Manually fetch profiles to avoid deep type instantiation issues
-        const profilesData = await Promise.all(
+        // Manuellement récupérer les profils pour éviter les problèmes de type
+        const profileResults = await Promise.all(
           data.map(comment => 
             supabase
               .from('profiles')
               .select('*')
               .eq('id', comment.user_id)
               .single()
-              .then(result => ({ data: result.data, error: result.error }))
           )
         );
         
-        // Combine comments with profiles
+        // Combiner les commentaires avec les profils
         const commentsWithProfiles = data.map((comment, index) => {
-          const profileResult = profilesData[index];
+          const profileResult = profileResults[index];
           return {
             ...comment,
             profiles: profileResult.error ? null : profileResult.data

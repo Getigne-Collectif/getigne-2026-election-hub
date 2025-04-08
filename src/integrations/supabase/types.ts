@@ -598,6 +598,7 @@ export type Database = {
           created_at: string
           id: string
           program_item_id: string
+          program_point_id: string | null
           status: string
           updated_at: string
           user_id: string
@@ -607,6 +608,7 @@ export type Database = {
           created_at?: string
           id?: string
           program_item_id: string
+          program_point_id?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -616,16 +618,31 @@ export type Database = {
           created_at?: string
           id?: string
           program_item_id?: string
+          program_point_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
+            foreignKeyName: "fk_program_comments_point"
+            columns: ["program_point_id"]
+            isOneToOne: false
+            referencedRelation: "program_points"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "program_comments_program_item_id_fkey"
             columns: ["program_item_id"]
             isOneToOne: false
             referencedRelation: "program_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_comments_program_point_id_fkey"
+            columns: ["program_point_id"]
+            isOneToOne: false
+            referencedRelation: "program_points"
             referencedColumns: ["id"]
           },
         ]
