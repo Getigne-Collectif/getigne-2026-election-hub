@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -24,7 +23,6 @@ import AdminLayout from "@/components/admin/AdminLayout.tsx";
 import { Switch } from '@/components/ui/switch.tsx';
 import { sendDiscordNotification, DiscordColors, createDiscordEvent } from '@/utils/notifications.ts';
 
-// Helper function to generate slug
 const generateSlug = (title: string): string => {
   return title
     .toLowerCase()
@@ -58,11 +56,9 @@ const AdminEventEditorPage = () => {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Nouveau état pour gérer la création d'événement Discord
   const [createDiscordScheduledEvent, setCreateDiscordScheduledEvent] = useState(true);
-  const [estimatedDuration, setEstimatedDuration] = useState(2); // Durée estimée en heures
+  const [estimatedDuration, setEstimatedDuration] = useState(2);
 
-  // Fetch committees data
   const { data: committees = [] } = useQuery({
     queryKey: ['committees'],
     queryFn: async () => {
@@ -75,7 +71,6 @@ const AdminEventEditorPage = () => {
     },
   });
 
-  // Fetch event data if in edit mode
   const { data: event, isLoading: isLoadingEvent } = useQuery({
     queryKey: ['event', id],
     queryFn: async () => {
@@ -104,7 +99,6 @@ const AdminEventEditorPage = () => {
     enabled: isEditMode,
   });
 
-  // Update form fields when event data is loaded
   useEffect(() => {
     if (event) {
       setTitle(event.title || '');
@@ -124,7 +118,6 @@ const AdminEventEditorPage = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setUploadedImage(e.target.files[0]);
-      // Afficher un aperçu local
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -209,27 +202,32 @@ const AdminEventEditorPage = () => {
       console.error("Erreur lors de l'envoi de la notification Discord:", error);
     }
   };
-  
+
   const createDiscordScheduled = async (eventData: any) => {
     if (!createDiscordScheduledEvent) return;
     
     try {
       const eventDate = new Date(date);
       
-      // Calculer la date de fin (date de début + durée estimée)
       const endDate = new Date(eventDate);
       endDate.setHours(endDate.getHours() + estimatedDuration);
       
-      // Formatage pour l'API Discord
       const startTime = eventDate.toISOString();
       const endTime = endDate.toISOString();
+      
+      const committeeInfo = committeeId 
+        ? committees.find(c => c.id === committeeId)?.title || ''
+        : '';
       
       await createDiscordEvent({
         name: title,
         description: description,
         scheduledStartTime: startTime,
         scheduledEndTime: endTime,
-        location: location
+        location: location,
+        image: image,
+        committee: committeeInfo,
+        slug: slug
       });
       
       toast({
@@ -261,16 +259,13 @@ const AdminEventEditorPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Générer le slug si nécessaire
       const eventSlug = slug || generateSlug(title);
 
-      // Upload de l'image si une nouvelle a été sélectionnée
       let imageUrl = image;
       if (uploadedImage) {
         imageUrl = await uploadImage();
       }
 
-      // Si nous n'avons pas d'URL d'image à ce stade, afficher une erreur
       if (!imageUrl) {
         toast({
           title: "Image manquante",
@@ -299,7 +294,6 @@ const AdminEventEditorPage = () => {
       let result;
 
       if (isEditMode && id) {
-        // Mise à jour d'un événement existant
         const { error } = await supabase
           .from('events')
           .update(eventData)
@@ -314,10 +308,8 @@ const AdminEventEditorPage = () => {
           description: "L'événement a été mis à jour avec succès",
         });
         
-        // Envoyer une notification Discord pour l'événement mis à jour
         await notifyDiscord(result, false);
       } else {
-        // Création d'un nouvel événement
         const { data, error } = await supabase
           .from('events')
           .insert(eventData)
@@ -336,16 +328,13 @@ const AdminEventEditorPage = () => {
           description: "L'événement a été créé avec succès",
         });
         
-        // Envoyer une notification Discord pour le nouvel événement
         await notifyDiscord(result, true);
         
-        // Créer un événement programmé Discord si l'option est cochée
         if (createDiscordScheduledEvent) {
           await createDiscordScheduled(result);
         }
       }
 
-      // Redirection vers la liste des événements
       navigate('/admin/events');
     } catch (error: any) {
       console.error('Error saving event:', error);
@@ -421,7 +410,6 @@ const AdminEventEditorPage = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 space-y-6">
-                    {/* Colonne de gauche avec titre, date/lieu, et contenu */}
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="title">Titre *</Label>
@@ -488,7 +476,6 @@ const AdminEventEditorPage = () => {
                   </div>
 
                   <div className="space-y-6">
-                    {/* Colonne de droite */}
                     <div className="flex flex-wrap gap-3 justify-end">
                       {isEditMode && slug && (
                         <Button
@@ -605,7 +592,7 @@ const AdminEventEditorPage = () => {
                       </div>
                     </div>
                     
-                    {!isEditMode && ( // Uniquement pour la création d'événements
+                    {!isEditMode && (
                       <div className="bg-getigne-50 p-4 rounded-lg">
                         <h3 className="font-medium mb-4">Paramètres Discord</h3>
                         

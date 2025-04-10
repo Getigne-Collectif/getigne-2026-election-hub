@@ -68,6 +68,9 @@ export const createDiscordEvent = async (eventData: {
   scheduledEndTime?: string;
   location: string;
   entityType?: 'EXTERNAL' | 'VOICE' | 'STAGE'; // Defaults to EXTERNAL in the edge function
+  image?: string;      // URL de l'image
+  committee?: string;  // Nom de la commission organisatrice  
+  slug?: string;       // Slug pour construire l'URL
 }) => {
   try {
     const { data, error } = await supabase.functions.invoke('discord-create-event', {

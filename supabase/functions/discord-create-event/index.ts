@@ -26,6 +26,9 @@ interface DiscordEventRequest {
   scheduledEndTime?: string;   // ISO 8601 timestamp (optionnel)
   location: string;
   entityType?: 'EXTERNAL' | 'VOICE' | 'STAGE';  // Défaut: EXTERNAL
+  image?: string;              // URL de l'image
+  committee?: string;          // Nom de la commission organisatrice
+  slug?: string;               // Slug pour construire l'URL de l'événement
 }
 
 serve(async (req) => {
@@ -67,18 +70,35 @@ serve(async (req) => {
       scheduledStartTime,
       scheduledEndTime,
       location,
-      entityType = 'EXTERNAL'
+      entityType = 'EXTERNAL',
+      image,
+      committee,
+      slug
     } = requestData;
 
     console.log("Discord event request:", requestData);
 
     // Convertir le type d'entité en valeur numérique pour l'API Discord
     const entityTypeValue = ENTITY_TYPES[entityType];
+    
+    // Créer l'URL complète de l'événement
+    const eventUrl = slug ? `${PUBLIC_URL}/agenda/${slug}` : null;
+    
+    // Enrichir la description avec l'URL et les infos de commission
+    let enhancedDescription = description;
+    
+    if (eventUrl) {
+      enhancedDescription += `\n\n📎 Plus d'informations : ${eventUrl}`;
+    }
+    
+    if (committee) {
+      enhancedDescription += `\n\n👥 Événement organisé par la commission ${committee}`;
+    }
 
     // Préparer les données pour l'API Discord
-    const eventData = {
+    const eventData: any = {
       name,
-      description,
+      description: enhancedDescription,
       scheduled_start_time: scheduledStartTime,
       scheduled_end_time: scheduledEndTime,
       entity_type: entityTypeValue,
@@ -87,10 +107,77 @@ serve(async (req) => {
         location
       }
     };
+    
+    // Ajouter l'image si elle est fournie
+    if (image) {
+      try {
+        // Télécharger l'image pour la fournir à Discord
+        const imageResponse = await fetch(image);
+        if (imageResponse.ok) {
+          const imageBlob = await imageResponse.blob();
+          const formData = new FormData();
+          
+          // Ajouter les données de l'événement au formData
+          formData.append('payload_json', JSON.stringify(eventData));
+          
+          // Ajouter l'image au formData
+          formData.append('image', imageBlob);
+          
+          console.log("Sending to Discord API with image");
+          
+          // Envoyer la requête avec formData pour inclure l'image
+          const response = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bot ${DISCORD_BOT_TOKEN}`
+            },
+            body: formData
+          });
+          
+          // Récupérer la réponse
+          const responseData = await response.json();
 
-    console.log("Sending to Discord API:", eventData);
+          if (!response.ok) {
+            console.error("Discord API error:", response.status, responseData);
+            return new Response(
+              JSON.stringify({ 
+                error: "Failed to create Discord event", 
+                details: responseData 
+              }),
+              {
+                status: response.status,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              }
+            );
+          }
 
-    // Envoyer la requête à l'API Discord pour créer l'événement
+          console.log("Discord event created successfully with image:", responseData);
+          
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              message: "Événement Discord créé avec succès",
+              event: responseData
+            }),
+            {
+              status: 200,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        } else {
+          console.error("Failed to fetch image:", imageResponse.statusText);
+          // Si l'image ne peut pas être récupérée, continuer sans image
+        }
+      } catch (imageError) {
+        console.error("Error processing image:", imageError);
+        // Si une erreur se produit lors du traitement de l'image, continuer sans image
+      }
+    }
+    
+    // Si nous arrivons ici, soit il n'y a pas d'image, soit le traitement de l'image a échoué
+    // Envoyer la requête sans image
+    console.log("Sending to Discord API without image:", eventData);
+
     const response = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`, {
       method: "POST",
       headers: {
