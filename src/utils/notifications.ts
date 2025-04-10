@@ -73,8 +73,17 @@ export const createDiscordEvent = async (eventData: {
   slug?: string;       // Slug pour construire l'URL
 }) => {
   try {
+    // Limiter la taille des données envoyées si l'image est en base64
+    let processedData = { ...eventData };
+    
+    // Si l'image est en base64 et trop grande, ne pas l'envoyer
+    if (processedData.image && processedData.image.startsWith('data:') && processedData.image.length > 1024 * 1024) {
+      console.warn('Image too large, sending event without image');
+      delete processedData.image;
+    }
+    
     const { data, error } = await supabase.functions.invoke('discord-create-event', {
-      body: eventData
+      body: processedData
     });
 
     if (error) {

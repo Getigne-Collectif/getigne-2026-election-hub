@@ -219,13 +219,24 @@ const AdminEventEditorPage = () => {
         ? committees.find(c => c.id === committeeId)?.title || ''
         : '';
       
+      let imageToSend = image;
+      if (imageToSend && imageToSend.startsWith('data:') && imageToSend.length > 1024 * 1024) {
+        console.warn('Image en base64 trop volumineuse, tentative de conversion ou upload');
+        if (uploadedImage) {
+          imageToSend = await uploadImage();
+        } else {
+          console.warn('Image trop grande et pas de fichier disponible, événement créé sans image');
+          imageToSend = undefined;
+        }
+      }
+      
       await createDiscordEvent({
         name: title,
         description: description,
         scheduledStartTime: startTime,
         scheduledEndTime: endTime,
         location: location,
-        image: image,
+        image: imageToSend,
         committee: committeeInfo,
         slug: slug
       });
