@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -21,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 import { Switch } from '@/components/ui/switch.tsx';
+import { sendDiscordNotification, DiscordColors } from '@/utils/notifications.ts';
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -160,7 +162,51 @@ const AdminEventEditorPage = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, saveStatus: 'draft' | 'published' | 'archived' = 'published') => {
+  const notifyDiscord = async (eventData: any, isNew: boolean) => {
+    try {
+      const committeeInfo = committeeId 
+        ? committees.find(c => c.id === committeeId)?.title || ''
+        : '';
+      
+      const eventDate = new Date(date);
+      const formattedDate = eventDate.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      const formattedTime = eventDate.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      const message = isNew 
+        ? `**Nouvel événement créé : ${title}**\n\n` +
+          `📅 ${formattedDate} à ${formattedTime}\n` +
+          `📍 ${location}\n` +
+          (committeeInfo ? `👥 Commission: ${committeeInfo}\n` : '') +
+          `\n${description}\n\n` +
+          `${isMembersOnly ? '🔒 Réservé aux adhérents' : '🔓 Ouvert à tous'}\n` +
+          `${allowRegistration ? '✅ Inscriptions ouvertes' : '❌ Sans inscription'}`
+        : `**Événement mis à jour : ${title}**\n\n` +
+          `📅 ${formattedDate} à ${formattedTime}\n` +
+          `📍 ${location}\n` +
+          (committeeInfo ? `👥 Commission: ${committeeInfo}\n` : '') +
+          `\n${description}`;
+      
+      await sendDiscordNotification({
+        title: isNew ? "Nouvel événement" : "Événement mis à jour",
+        message,
+        color: isNew ? DiscordColors.GREEN : DiscordColors.BLUE,
+        username: "Calendrier Gétigné Collectif",
+        resourceType: "event",
+        resourceId: eventData.slug || eventData.id
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de la notification Discord:", error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title || !date || !location || !description) {
@@ -206,7 +252,7 @@ const AdminEventEditorPage = () => {
         committee: committeeId ? committees.find(c => c.id === committeeId)?.title : null,
         allow_registration: allowRegistration,
         is_members_only: isMembersOnly,
-        status: saveStatus,
+        status,
         slug: eventSlug
       };
 
@@ -227,6 +273,9 @@ const AdminEventEditorPage = () => {
           title: "Événement mis à jour",
           description: "L'événement a été mis à jour avec succès",
         });
+        
+        // Envoyer une notification Discord pour l'événement mis à jour
+        await notifyDiscord(result, false);
       } else {
         // Création d'un nouvel événement
         const { data, error } = await supabase
@@ -246,6 +295,9 @@ const AdminEventEditorPage = () => {
           title: "Événement créé",
           description: "L'événement a été créé avec succès",
         });
+        
+        // Envoyer une notification Discord pour le nouvel événement
+        await notifyDiscord(result, true);
       }
 
       // Redirection vers la liste des événements
@@ -283,6 +335,7 @@ const AdminEventEditorPage = () => {
       </div>
     );
   }
+  
   const breadcrumb = <>
     <BreadcrumbSeparator />
     <BreadcrumbItem>
@@ -320,7 +373,7 @@ const AdminEventEditorPage = () => {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : (
-              <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 space-y-6">
                     {/* Colonne de gauche avec titre, date/lieu, et contenu */}
@@ -341,93 +394,39 @@ const AdminEventEditorPage = () => {
                         />
                       </div>
 
-                      <div className="flex gap-4">
-                        <div className="w-1/2">
-                          <div>
-                            <Label htmlFor="description">Description courte *</Label>
-                            <Textarea
-                              id="description"
-                              value={description}
-                              onChange={(e) => setDescription(e.target.value)}
-                              placeholder="Courte description de l'événement"
-                              rows={3}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="date">Date et heure *</Label>
-                            <Input
-                              id="date"
-                              type="datetime-local"
-                              value={date}
-                              onChange={(e) => setDate(e.target.value)}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="location">Lieu *</Label>
-                            <Input
-                              id="location"
-                              value={location}
-                              onChange={(e) => setLocation(e.target.value)}
-                              placeholder="Lieu de l'événement"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="committee">Commission</Label>
-                            <select
-                              id="committee"
-                              value={committeeId}
-                              onChange={(e) => setCommitteeId(e.target.value)}
-                              className="w-full border border-gray-300 rounded-md p-2"
-                            >
-                              <option value="">-- Aucune commission --</option>
-                              {committees.map((committee) => (
-                                <option key={committee.id} value={committee.id}>
-                                  {committee.title}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="date">Date et heure *</Label>
+                          <Input
+                            id="date"
+                            type="datetime-local"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                          />
                         </div>
-                        <div className="w-1/2">
-                          <Label>Image principale *</Label>
-                          <div className="mt-2 border rounded-md p-4 space-y-4">
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={handleImageChange}
-                              accept="image/*"
-                              className="hidden"
-                            />
+                        <div>
+                          <Label htmlFor="location">Lieu *</Label>
+                          <Input
+                            id="location"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            placeholder="Lieu de l'événement"
+                            required
+                          />
+                        </div>
+                      </div>
 
-                            {image ? (
-                              <div className="space-y-3">
-                                <div className="relative w-full h-48 rounded-md overflow-hidden">
-                                  <img
-                                    src={image}
-                                    alt="Aperçu"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  onClick={triggerFileInput}
-                                >
-                                  <Upload className="h-4 w-4 mr-2" />
-                                  Remplacer l'image
-                                </Button>
-                              </div>
-                              ) : (
-                              <div className="flex flex-col items-center justify-center h-48 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer" onClick={triggerFileInput}>
-                                <ImageIcon className="h-10 w-10 text-gray-400" />
-                                <p className="mt-2 text-sm text-gray-500">Cliquez pour ajouter une image</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                      <div>
+                        <Label htmlFor="description">Description courte *</Label>
+                        <Textarea
+                          id="description"
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder="Courte description de l'événement"
+                          rows={3}
+                          required
+                        />
                       </div>
 
                       <div>
@@ -444,7 +443,7 @@ const AdminEventEditorPage = () => {
                   </div>
 
                   <div className="space-y-6">
-                    {/* Colonne de droite avec les boutons, statut, slug, image, etc. */}
+                    {/* Colonne de droite */}
                     <div className="flex flex-wrap gap-3 justify-end">
                       {isEditMode && slug && (
                         <Button
@@ -453,17 +452,17 @@ const AdminEventEditorPage = () => {
                           size='sm'
                           onClick={() => window.open(`/agenda/${slug}`, '_blank')}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-4 w-4 mr-2" />
                           Prévisualiser
                         </Button>
                       )}
                       <Button
                         type="submit"
-                          size='sm'
+                        size='sm'
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                        Publier
+                        {isEditMode ? "Enregistrer" : "Publier"}
                       </Button>
                     </div>
 
@@ -491,6 +490,44 @@ const AdminEventEditorPage = () => {
                       <p className="text-sm text-gray-500 mt-1">
                         Identifiant URL de l'événement (généré automatiquement si laissé vide)
                       </p>
+                    </div>
+
+                    <div>
+                      <Label>Image principale *</Label>
+                      <div className="mt-2 border rounded-md p-4 space-y-4">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleImageChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+
+                        {image ? (
+                          <div className="space-y-3">
+                            <div className="relative w-full h-48 rounded-md overflow-hidden">
+                              <img
+                                src={image}
+                                alt="Aperçu"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={triggerFileInput}
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Remplacer l'image
+                            </Button>
+                          </div>
+                          ) : (
+                          <div className="flex flex-col items-center justify-center h-48 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer" onClick={triggerFileInput}>
+                            <ImageIcon className="h-10 w-10 text-gray-400" />
+                            <p className="mt-2 text-sm text-gray-500">Cliquez pour ajouter une image</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="bg-getigne-50 p-4 rounded-lg">
@@ -521,6 +558,23 @@ const AdminEventEditorPage = () => {
                           />
                         </div>
                       </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="committee">Commission</Label>
+                      <select
+                        id="committee"
+                        value={committeeId}
+                        onChange={(e) => setCommitteeId(e.target.value)}
+                        className="w-full border border-gray-300 rounded-md p-2"
+                      >
+                        <option value="">-- Aucune commission --</option>
+                        {committees.map((committee) => (
+                          <option key={committee.id} value={committee.id}>
+                            {committee.title}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
