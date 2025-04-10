@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 import { Switch } from '@/components/ui/switch.tsx';
-import { sendDiscordNotification, DiscordColors } from '@/utils/notifications.ts';
+import { sendDiscordNotification, DiscordColors, createDiscordEvent } from '@/utils/notifications.ts';
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -57,6 +57,10 @@ const AdminEventEditorPage = () => {
   const [slug, setSlug] = useState('');
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Nouveau état pour gérer la création d'événement Discord
+  const [createDiscordScheduledEvent, setCreateDiscordScheduledEvent] = useState(true);
+  const [estimatedDuration, setEstimatedDuration] = useState(2); // Durée estimée en heures
 
   // Fetch committees data
   const { data: committees = [] } = useQuery({
@@ -205,6 +209,42 @@ const AdminEventEditorPage = () => {
       console.error("Erreur lors de l'envoi de la notification Discord:", error);
     }
   };
+  
+  const createDiscordScheduled = async (eventData: any) => {
+    if (!createDiscordScheduledEvent) return;
+    
+    try {
+      const eventDate = new Date(date);
+      
+      // Calculer la date de fin (date de début + durée estimée)
+      const endDate = new Date(eventDate);
+      endDate.setHours(endDate.getHours() + estimatedDuration);
+      
+      // Formatage pour l'API Discord
+      const startTime = eventDate.toISOString();
+      const endTime = endDate.toISOString();
+      
+      await createDiscordEvent({
+        name: title,
+        description: description,
+        scheduledStartTime: startTime,
+        scheduledEndTime: endTime,
+        location: location
+      });
+      
+      toast({
+        title: "Événement Discord créé",
+        description: "L'événement a été ajouté au calendrier Discord avec succès",
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de la création de l'événement Discord:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer l'événement Discord. " + (error.message || ""),
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -298,6 +338,11 @@ const AdminEventEditorPage = () => {
         
         // Envoyer une notification Discord pour le nouvel événement
         await notifyDiscord(result, true);
+        
+        // Créer un événement programmé Discord si l'option est cochée
+        if (createDiscordScheduledEvent) {
+          await createDiscordScheduled(result);
+        }
       }
 
       // Redirection vers la liste des événements
@@ -559,6 +604,43 @@ const AdminEventEditorPage = () => {
                         </div>
                       </div>
                     </div>
+                    
+                    {!isEditMode && ( // Uniquement pour la création d'événements
+                      <div className="bg-getigne-50 p-4 rounded-lg">
+                        <h3 className="font-medium mb-4">Paramètres Discord</h3>
+                        
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <Label htmlFor="create-discord-event" className="font-medium">Créer un événement Discord</Label>
+                              <p className="text-sm text-getigne-500">Ajouter automatiquement l'événement au serveur Discord</p>
+                            </div>
+                            <Switch 
+                              id="create-discord-event" 
+                              checked={createDiscordScheduledEvent} 
+                              onCheckedChange={setCreateDiscordScheduledEvent} 
+                            />
+                          </div>
+                          
+                          {createDiscordScheduledEvent && (
+                            <div>
+                              <Label htmlFor="duration">Durée estimée (heures)</Label>
+                              <Input
+                                id="duration"
+                                type="number"
+                                min="1"
+                                max="12"
+                                value={estimatedDuration}
+                                onChange={(e) => setEstimatedDuration(parseInt(e.target.value))}
+                              />
+                              <p className="text-sm text-getigne-500 mt-1">
+                                Durée estimée de l'événement pour le calendrier Discord
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     <div>
                       <Label htmlFor="committee">Commission</Label>

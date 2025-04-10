@@ -56,6 +56,36 @@ export const sendDiscordNotification = async ({
   }
 };
 
+/**
+ * Create a Discord Guild Scheduled Event
+ * @param eventData The data for the event to create in Discord
+ * @returns A promise that resolves when the event is created
+ */
+export const createDiscordEvent = async (eventData: {
+  name: string;
+  description: string;
+  scheduledStartTime: string;
+  scheduledEndTime?: string;
+  location: string;
+  entityType?: 'EXTERNAL' | 'VOICE' | 'STAGE'; // Defaults to EXTERNAL in the edge function
+}) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('discord-create-event', {
+      body: eventData
+    });
+
+    if (error) {
+      console.error('Error creating Discord event:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to create Discord event:', error);
+    throw error;
+  }
+};
+
 // Discord colors (for reference)
 export const DiscordColors = {
   RED: 16711680,      // #FF0000
