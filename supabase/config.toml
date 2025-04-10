@@ -14,6 +14,9 @@ verify_jwt = true
 [functions.discord-notify]
 verify_jwt = true
 
+[functions.discord-create-event]
+verify_jwt = true
+
 [functions.contact-form]
 verify_jwt = true
 

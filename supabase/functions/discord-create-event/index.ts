@@ -12,6 +12,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Constantes pour les types d'événement Discord
+const ENTITY_TYPES = {
+  EXTERNAL: 3,  // Événement externe (hors Discord)
+  VOICE: 2,     // Événement dans un salon vocal
+  STAGE: 1      // Événement dans un salon de conférence
+};
+
 interface DiscordEventRequest {
   name: string;
   description: string;
@@ -65,18 +72,23 @@ serve(async (req) => {
 
     console.log("Discord event request:", requestData);
 
+    // Convertir le type d'entité en valeur numérique pour l'API Discord
+    const entityTypeValue = ENTITY_TYPES[entityType];
+
     // Préparer les données pour l'API Discord
     const eventData = {
       name,
       description,
       scheduled_start_time: scheduledStartTime,
       scheduled_end_time: scheduledEndTime,
-      entity_type: entityType,
+      entity_type: entityTypeValue,
       privacy_level: 2, // GUILD_ONLY
       entity_metadata: {
         location
       }
     };
+
+    console.log("Sending to Discord API:", eventData);
 
     // Envoyer la requête à l'API Discord pour créer l'événement
     const response = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`, {
