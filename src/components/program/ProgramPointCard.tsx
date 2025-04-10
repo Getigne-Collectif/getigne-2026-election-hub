@@ -10,7 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ProgramPoint } from '@/types/program.types';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
-import { supabase, TABLES } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProgramPointCardProps {
   point: ProgramPoint;
@@ -40,7 +40,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
       const fetchCommentCount = async () => {
         try {
           const { count, error } = await supabase
-            .from(TABLES.PROGRAM_COMMENTS)
+            .from('program_comments')
             .select('*', { count: 'exact', head: true })
             .eq('program_point_id', point.id)
             .eq('status', 'approved');
@@ -59,8 +59,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
           const { count, error } = await supabase
             .from('program_likes')
             .select('*', { count: 'exact', head: true })
-            .eq('program_item_id', programItemId)
-            .eq('program_point_id', point.id);
+            .eq('program_item_id', programItemId);
             
           if (!error && count !== null) {
             setLikeCount(count);
@@ -136,8 +135,8 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             
             <div className="flex justify-between items-center mt-4">
               <ProgramLikeButton 
-                programItemId={programItemId} 
-                pointId={point.id} 
+                programId={programItemId}
+                programPointId={point.id}
               />
             </div>
 
@@ -145,7 +144,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             <div className="mt-4 pt-4 border-t border-getigne-100">
               <Comments 
                 programItemId={programItemId} 
-                programPointId={point.id} 
+                programPointId={point.id}
               />
             </div>
           </>

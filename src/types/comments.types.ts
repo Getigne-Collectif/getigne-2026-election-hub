@@ -36,4 +36,5 @@ export interface ProgramComment extends BaseComment {
 // Union type for all comment types
 export type Comment = NewsComment | ProgramComment;
 
-export type ResourceType = 'news' | 'program' | 'program_point';
+// Resource type used for determining which table to query
+export type ResourceType = 'news' | 'program';

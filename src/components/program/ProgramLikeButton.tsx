@@ -37,15 +37,12 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
         .eq('program_item_id', programId)
         .eq('user_id', user?.id || '');
 
-      if (programPointId) {
-        const filteredData = data?.filter(like => like.program_point_id === programPointId);
-        setHasLiked(filteredData && filteredData.length > 0);
-      } else {
-        setHasLiked(data && data.length > 0);
-      }
-
       if (error) {
         console.error('Error checking like:', error);
+      } else {
+        // Currently the likes don't have program_point_id
+        // In the future if that gets added we would check it here
+        setHasLiked(data && data.length > 0);
       }
     } catch (err) {
       console.error('Error in checkUserLike:', err);
@@ -54,16 +51,10 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
 
   const fetchLikes = async () => {
     try {
-      let query = supabase
+      const { count, error } = await supabase
         .from('program_likes')
         .select('*', { count: 'exact' })
         .eq('program_item_id', programId);
-
-      if (programPointId) {
-        query = query.eq('program_point_id', programPointId);
-      }
-
-      const { count, error } = await query;
 
       if (error) {
         throw error;
@@ -77,7 +68,7 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
 
   useEffect(() => {
     fetchLikes();
-  }, [programId, programPointId]);
+  }, [programId]);
 
   const handleLike = async () => {
     if (!user) {
@@ -94,17 +85,11 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
     try {
       if (hasLiked) {
         // Unlike
-        let query = supabase
+        const { error } = await supabase
           .from('program_likes')
           .delete()
           .eq('program_item_id', programId)
           .eq('user_id', user.id);
-
-        if (programPointId) {
-          query = query.eq('program_point_id', programPointId);
-        }
-
-        const { error } = await query;
         
         if (error) throw error;
         
@@ -114,8 +99,7 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
         // Like
         const likeData = {
           program_item_id: programId,
-          user_id: user.id,
-          program_point_id: programPointId || null
+          user_id: user.id
         };
 
         const { error } = await supabase

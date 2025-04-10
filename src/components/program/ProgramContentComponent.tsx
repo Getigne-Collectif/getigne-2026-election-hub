@@ -84,7 +84,7 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
           <div>
             <h2 className="text-3xl font-bold text-getigne-800 mb-2">{programItem.title}</h2>
             <div className="flex items-center gap-4">
-              <ProgramLikeButton programItemId={programItemId} />
+              <ProgramLikeButton programId={programItemId} />
               <Button 
                 variant="ghost" 
                 className="text-getigne-600 flex items-center gap-2" 

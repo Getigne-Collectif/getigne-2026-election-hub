@@ -5,7 +5,7 @@ import { Check, X } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from './utils';
 import { Separator } from '@/components/ui/separator';
-import { Comment } from '@/types/comments.types';
+import { Comment, CommentStatus } from '@/types/comments.types';
 
 interface ModeratorViewProps {
   comments: Comment[];

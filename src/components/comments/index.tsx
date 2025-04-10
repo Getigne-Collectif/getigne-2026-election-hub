@@ -5,41 +5,63 @@ import UserView from './UserView';
 import ModeratorView from './ModeratorView';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { Comment, CommentStatus, CommentType, Profile } from '@/types/comments.types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Comment, CommentStatus, ResourceType } from '@/types/comments.types';
 
 interface CommentsProps {
-  entityId: string;
-  type: CommentType;
-  pointId?: string;
+  newsId?: string;
+  programItemId?: string;
+  programPointId?: string;
 }
 
-const Comments: React.FC<CommentsProps> = ({ entityId, type, pointId }) => {
+const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPointId }) => {
   const { user, isAdmin, isModerator } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [showAllComments, setShowAllComments] = useState(false);
+
+  // Determine which resource type we're dealing with
+  const resourceType: ResourceType = newsId ? 'news' : 'program';
+  const resourceId = newsId || programItemId || '';
 
   const fetchComments = async () => {
     setLoading(true);
     
     try {
-      let query = supabase
-        .from(`${type}_comments`)
-        .select(`
-          *,
-          profiles:user_id (
-            id,
-            first_name,
-            last_name
-          )
-        `)
-        .eq(`${type}_item_id`, entityId);
+      let query;
+      
+      if (resourceType === 'news') {
+        query = supabase
+          .from('comments')
+          .select(`
+            *,
+            profiles:user_id (
+              id,
+              first_name,
+              last_name,
+              avatar_url
+            )
+          `)
+          .eq('news_id', resourceId);
+      } else {
+        query = supabase
+          .from('program_comments')
+          .select(`
+            *,
+            profiles:user_id (
+              id,
+              first_name,
+              last_name,
+              avatar_url
+            )
+          `)
+          .eq('program_item_id', resourceId);
 
-      // If this is for a program point, add the point filter
-      if (type === 'program' && pointId) {
-        query = query.eq('program_point_id', pointId);
+        // If this is for a program point, add the point filter
+        if (programPointId) {
+          query = query.eq('program_point_id', programPointId);
+        }
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
@@ -51,7 +73,7 @@ const Comments: React.FC<CommentsProps> = ({ entityId, type, pointId }) => {
         // Handle the case where profiles is null or has an error
         if (!comment.profiles || 'error' in comment.profiles) {
           // Create a placeholder profile
-          const placeholderProfile: Profile = {
+          const placeholderProfile = {
             id: comment.user_id,
             first_name: 'Utilisateur',
             last_name: ''
@@ -82,7 +104,7 @@ const Comments: React.FC<CommentsProps> = ({ entityId, type, pointId }) => {
 
   useEffect(() => {
     fetchComments();
-  }, [entityId, type, pointId]);
+  }, [resourceId, resourceType, programPointId]);
 
   const handleAddComment = async (content: string) => {
     if (!user) {
@@ -95,34 +117,58 @@ const Comments: React.FC<CommentsProps> = ({ entityId, type, pointId }) => {
     }
 
     try {
-      const newComment = {
-        [`${type}_item_id`]: entityId,
-        user_id: user.id,
-        content,
-        status: 'pending' as CommentStatus,
-      };
+      let newComment: any;
+      
+      if (resourceType === 'news' && newsId) {
+        // Add comment to news
+        const { data, error } = await supabase
+          .from('comments')
+          .insert({
+            news_id: newsId,
+            user_id: user.id,
+            content,
+            status: 'pending' as CommentStatus
+          })
+          .select('*')
+          .single();
 
-      // Add the program_point_id if applicable
-      if (type === 'program' && pointId) {
-        Object.assign(newComment, { program_point_id: pointId });
+        if (error) throw error;
+        newComment = data;
+      } else if (programItemId) {
+        // Add comment to program
+        const commentData: any = {
+          program_item_id: programItemId,
+          user_id: user.id,
+          content,
+          status: 'pending' as CommentStatus
+        };
+
+        // Add the program_point_id if applicable
+        if (programPointId) {
+          commentData.program_point_id = programPointId;
+        }
+
+        const { data, error } = await supabase
+          .from('program_comments')
+          .insert(commentData)
+          .select('*')
+          .single();
+
+        if (error) throw error;
+        newComment = data;
       }
 
-      const { data, error } = await supabase
-        .from(`${type}_comments`)
-        .insert(newComment)
-        .select('*')
-        .single();
+      // Add user profile information to the new comment
+      // This is needed to match our Comment type format
+      const userProfile = {
+        id: user.id,
+        first_name: user.user_metadata?.first_name || 'Utilisateur',
+        last_name: user.user_metadata?.last_name || '',
+      };
 
-      if (error) throw error;
-
-      // Add the user profile to match our Comment type format
       const commentWithProfile = {
-        ...data,
-        profiles: {
-          id: user.id,
-          first_name: user.first_name || 'Utilisateur',
-          last_name: user.last_name || '',
-        },
+        ...newComment,
+        profiles: userProfile,
       } as Comment;
 
       setComments([commentWithProfile, ...comments]);
@@ -141,10 +187,12 @@ const Comments: React.FC<CommentsProps> = ({ entityId, type, pointId }) => {
     }
   };
 
-  const updateComment = async (commentId: string, status: CommentStatus) => {
+  const handleModerateComment = async (commentId: string, status: CommentStatus) => {
     try {
+      const table = resourceType === 'news' ? 'comments' : 'program_comments';
+      
       const { error } = await supabase
-        .from(`${type}_comments`)
+        .from(table)
         .update({ status })
         .eq('id', commentId);
 
@@ -173,54 +221,14 @@ const Comments: React.FC<CommentsProps> = ({ entityId, type, pointId }) => {
   if (isAdmin || isModerator) {
     return (
       <div className="space-y-6">
-        <Tabs defaultValue="all">
-          <TabsList className="mb-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="all">
-            <ModeratorView
-              comments={comments}
-              loading={loading}
-              error={error}
-              onUpdateComment={updateComment}
-              onAddComment={handleAddComment}
-            />
-          </TabsContent>
-
-          <TabsContent value="pending">
-            <ModeratorView
-              comments={comments.filter((c) => c.status === 'pending')}
-              loading={loading}
-              error={error}
-              onUpdateComment={updateComment}
-              onAddComment={handleAddComment}
-            />
-          </TabsContent>
-
-          <TabsContent value="approved">
-            <ModeratorView
-              comments={comments.filter((c) => c.status === 'approved')}
-              loading={loading}
-              error={error}
-              onUpdateComment={updateComment}
-              onAddComment={handleAddComment}
-            />
-          </TabsContent>
-
-          <TabsContent value="rejected">
-            <ModeratorView
-              comments={comments.filter((c) => c.status === 'rejected')}
-              loading={loading}
-              error={error}
-              onUpdateComment={updateComment}
-              onAddComment={handleAddComment}
-            />
-          </TabsContent>
-        </Tabs>
+        <ModeratorView
+          comments={showAllComments ? comments : comments.filter(c => c.status === 'pending')}
+          showAllComments={showAllComments}
+          setShowAllComments={setShowAllComments}
+          onModerateComment={handleModerateComment}
+          loading={loading}
+          sourceType={resourceType}
+        />
       </div>
     );
   }
@@ -231,9 +239,6 @@ const Comments: React.FC<CommentsProps> = ({ entityId, type, pointId }) => {
     <UserView
       comments={approvedComments}
       loading={loading}
-      error={error}
-      onAddComment={handleAddComment}
-      isAuthenticated={!!user}
     />
   );
 };
