@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -240,9 +241,12 @@ const AdminEventEditorPage = () => {
         toast({
           title: "Avertissement",
           description: "L'image est trop volumineuse pour Discord. L'événement sera créé sans image.",
-          variant: "warning"
+          // Fix type error: "warning" is not a valid variant
+          variant: "default"
         });
       }
+      
+      const currentSlug = eventData.slug || slug;
       
       await createDiscordEvent({
         name: title,
@@ -252,7 +256,7 @@ const AdminEventEditorPage = () => {
         location: location,
         image: imageToSend,
         committee: committeeInfo,
-        slug: eventSlug
+        slug: currentSlug
       });
       
       toast({
@@ -681,3 +685,4 @@ const AdminEventEditorPage = () => {
 };
 
 export default AdminEventEditorPage;
+
