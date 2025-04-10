@@ -220,14 +220,28 @@ const AdminEventEditorPage = () => {
         : '';
       
       let imageToSend = image;
-      if (imageToSend && imageToSend.startsWith('data:') && imageToSend.length > 1024 * 1024) {
-        console.warn('Image en base64 trop volumineuse, tentative de conversion ou upload');
-        if (uploadedImage) {
+      if (uploadedImage) {
+        try {
           imageToSend = await uploadImage();
-        } else {
-          console.warn('Image trop grande et pas de fichier disponible, événement créé sans image');
-          imageToSend = undefined;
+        } catch (error) {
+          console.error("Erreur lors de l'upload de l'image:", error);
+          imageToSend = undefined; // En cas d'erreur, ne pas envoyer d'image
+          
+          toast({
+            title: "Avertissement",
+            description: "L'événement sera créé sans image en raison d'une erreur d'upload",
+            variant: "destructive"
+          });
         }
+      } else if (image && image.startsWith('data:') && image.length > 1024 * 1024) {
+        console.warn('Image en base64 trop volumineuse, événement créé sans image');
+        imageToSend = undefined;
+        
+        toast({
+          title: "Avertissement",
+          description: "L'image est trop volumineuse pour Discord. L'événement sera créé sans image.",
+          variant: "warning"
+        });
       }
       
       await createDiscordEvent({
@@ -238,7 +252,7 @@ const AdminEventEditorPage = () => {
         location: location,
         image: imageToSend,
         committee: committeeInfo,
-        slug: slug
+        slug: eventSlug
       });
       
       toast({
@@ -342,7 +356,7 @@ const AdminEventEditorPage = () => {
         await notifyDiscord(result, true);
         
         if (createDiscordScheduledEvent) {
-          await createDiscordScheduled(result);
+          await createDiscordScheduled({...result, slug: eventSlug});
         }
       }
 

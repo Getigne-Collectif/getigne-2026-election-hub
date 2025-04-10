@@ -156,203 +156,158 @@ serve(async (req) => {
     
     // Variable pour stocker la réponse finale de Discord
     let responseData;
+    let hasImage = false;
     
-    // Ajouter l'image si elle est fournie et si c'est une URL valide
+    // Fonction pour traiter les erreurs de l'API Discord
+    const handleDiscordAPIError = async (response) => {
+      const responseText = await response.text();
+      console.error(`Discord API error: ${response.status} ${responseText}`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Failed to create Discord event", 
+          details: responseText,
+          status: response.status
+        }),
+        {
+          status: response.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    };
+    
+    // Essayer d'ajouter l'image si elle est fournie
     if (image && typeof image === 'string') {
-      // Vérifier si c'est une URL d'image valide (commence par http ou data:)
-      if (image.startsWith('http') || image.startsWith('https')) {
-        try {
-          console.log("Fetching image from URL");
-          // Télécharger l'image pour la fournir à Discord
+      let imageBlob;
+      
+      try {
+        // Si c'est une URL d'image
+        if (image.startsWith('http') || image.startsWith('https')) {
+          console.log("Processing image URL...");
+          
           const imageResponse = await fetch(image);
           if (!imageResponse.ok) {
-            console.error("Failed to fetch image from URL:", imageResponse.status, imageResponse.statusText);
-            throw new Error(`Failed to fetch image: ${imageResponse.status} ${imageResponse.statusText}`);
+            console.error("Failed to fetch image from URL:", imageResponse.status);
+            // Continuer sans image
+          } else {
+            const contentType = imageResponse.headers.get('content-type');
+            if (contentType && contentType.startsWith('image/')) {
+              imageBlob = await imageResponse.blob();
+              hasImage = true;
+            } else {
+              console.error("URL does not point to an image, content-type:", contentType);
+            }
+          }
+        } 
+        // Si c'est une image base64
+        else if (image.startsWith('data:image/')) {
+          console.log("Processing base64 image...");
+          
+          const matches = image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+          if (matches && matches.length === 3) {
+            const [, mimeType, base64Data] = matches;
+            
+            if (mimeType.startsWith('image/')) {
+              // Décoder le base64 et créer un blob
+              const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+              imageBlob = new Blob([binaryData], { type: mimeType });
+              hasImage = true;
+            }
+          } else {
+            console.error("Invalid data URL format");
+          }
+        }
+        
+        // Vérifier la taille de l'image
+        if (imageBlob && imageBlob.size > 8 * 1024 * 1024) {
+          console.error("Image too large:", imageBlob.size, "bytes");
+          hasImage = false;
+          imageBlob = null;
+        }
+        
+        // Si nous avons une image valide, créer l'événement avec l'image
+        if (hasImage && imageBlob) {
+          // Pour les événements avec image, nous devons envoyer la requête en deux parties
+          // D'abord, envoyer les données JSON
+          const response = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bot ${DISCORD_BOT_TOKEN}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(eventData)
+          });
+          
+          // Vérifier si l'événement a été créé avec succès
+          if (!response.ok) {
+            return handleDiscordAPIError(response);
           }
           
-          const contentType = imageResponse.headers.get('content-type');
-          if (!contentType || !contentType.startsWith('image/')) {
-            console.error("URL does not point to an image. Content-Type:", contentType);
-            throw new Error(`URL does not point to an image. Content-Type: ${contentType}`);
-          }
+          responseData = await response.json();
+          console.log("Discord event created successfully, now adding image...");
           
-          // Limiter la taille de l'image pour éviter les problèmes
-          const MAX_IMAGE_SIZE = 1024 * 1024 * 8; // 8 MB maximum
-          const imageBlob = await imageResponse.blob();
-          if (imageBlob.size > MAX_IMAGE_SIZE) {
-            console.error("Image too large:", imageBlob.size, "bytes. Max size:", MAX_IMAGE_SIZE);
-            throw new Error(`Image too large: ${imageBlob.size} bytes. Max size: ${MAX_IMAGE_SIZE}`);
-          }
+          // Ensuite, mettre à jour l'événement avec l'image
+          const eventId = responseData.id;
           
+          // Créer un FormData pour l'image
           const formData = new FormData();
-          
-          // Ajouter les données de l'événement au formData
-          formData.append('payload_json', JSON.stringify(eventData));
-          
-          // Ajouter l'image au formData
           formData.append('image', imageBlob);
           
-          console.log("Sending request to Discord API with image");
-          
-          // Envoyer la requête avec formData pour inclure l'image
-          const response = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`, {
-            method: "POST",
+          // Mettre à jour l'événement avec l'image
+          const imageUpdateResponse = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events/${eventId}`, {
+            method: "PATCH",
             headers: {
               "Authorization": `Bot ${DISCORD_BOT_TOKEN}`
             },
             body: formData
           });
           
-          // Récupérer la réponse
-          responseData = await response.json();
-          
-          if (!response.ok) {
-            console.error("Discord API error:", response.status, JSON.stringify(responseData));
-            return new Response(
-              JSON.stringify({ 
-                error: "Failed to create Discord event", 
-                details: responseData,
-                status: response.status
-              }),
-              {
-                status: response.status,
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-              }
-            );
+          if (!imageUpdateResponse.ok) {
+            console.error("Failed to add image to the event, but event was created");
+            // On continue car l'événement a déjà été créé
+          } else {
+            const updatedData = await imageUpdateResponse.json();
+            responseData = updatedData;
+            console.log("Image added to Discord event successfully");
           }
-          
-          console.log("Discord event created successfully with image");
-          
-        } catch (imageError) {
-          console.error("Error processing image:", imageError);
-          // Continuer sans image en cas d'erreur
-          console.log("Continuing without image due to error");
         }
-      } else if (image.startsWith('data:image/')) {
-        try {
-          console.log("Processing data URL image");
-          // C'est une image en base64
-          // Extraire le type MIME et les données de base64
-          const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-          
-          if (!matches || matches.length !== 3) {
-            console.error("Invalid data URL format");
-            throw new Error("Invalid data URL format");
-          }
-          
-          const [, mimeType, base64Data] = matches;
-          
-          if (!mimeType.startsWith('image/')) {
-            console.error("Data URL is not an image. MIME type:", mimeType);
-            throw new Error(`Data URL is not an image. MIME type: ${mimeType}`);
-          }
-          
-          // Convertir en Uint8Array
-          const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-          
-          // Limiter la taille de l'image
-          const MAX_IMAGE_SIZE = 1024 * 1024 * 8; // 8 MB maximum
-          if (binaryData.length > MAX_IMAGE_SIZE) {
-            console.error("Image too large:", binaryData.length, "bytes. Max size:", MAX_IMAGE_SIZE);
-            throw new Error(`Image too large: ${binaryData.length} bytes. Max size: ${MAX_IMAGE_SIZE}`);
-          }
-          
-          // Créer un Blob à partir des données binaires
-          const blob = new Blob([binaryData], { type: mimeType });
-          
-          const formData = new FormData();
-          
-          // Ajouter les données de l'événement au formData
-          formData.append('payload_json', JSON.stringify(eventData));
-          
-          // Ajouter l'image au formData
-          formData.append('image', blob);
-          
-          console.log("Sending request to Discord API with base64 image");
-          
-          // Envoyer la requête avec formData pour inclure l'image
-          const response = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`, {
-            method: "POST",
-            headers: {
-              "Authorization": `Bot ${DISCORD_BOT_TOKEN}`
-            },
-            body: formData
-          });
-          
-          // Récupérer la réponse
-          responseData = await response.json();
-          
-          if (!response.ok) {
-            console.error("Discord API error:", response.status, JSON.stringify(responseData));
-            return new Response(
-              JSON.stringify({ 
-                error: "Failed to create Discord event", 
-                details: responseData,
-                status: response.status
-              }),
-              {
-                status: response.status,
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-              }
-            );
-          }
-          
-          console.log("Discord event created successfully with base64 image");
-          
-        } catch (imageError) {
-          console.error("Error processing base64 image:", imageError);
-          // Continuer sans image en cas d'erreur
-          console.log("Continuing without image due to error");
-        }
-      } else {
-        console.error("Unsupported image format, not a URL or data URL");
+      } catch (imageError) {
+        console.error("Error processing image:", imageError);
+        // Continuer sans image
       }
     }
     
-    // Si nous n'avons pas encore de réponse (image non traitée ou erreur lors du traitement),
-    // envoyer la requête sans image
+    // Si nous n'avons pas traité l'image ou si le traitement a échoué, créer l'événement sans image
     if (!responseData) {
-      console.log("Sending to Discord API without image");
+      console.log("Creating Discord event without image...");
       
       const response = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/scheduled-events`, {
         method: "POST",
         headers: {
           "Authorization": `Bot ${DISCORD_BOT_TOKEN}`,
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(eventData),
+        body: JSON.stringify(eventData)
       });
       
-      // Récupérer la réponse
-      responseData = await response.json();
-      
+      // Vérifier la réponse
       if (!response.ok) {
-        console.error("Discord API error:", response.status, JSON.stringify(responseData));
-        return new Response(
-          JSON.stringify({ 
-            error: "Failed to create Discord event", 
-            details: responseData,
-            status: response.status
-          }),
-          {
-            status: response.status,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
+        return handleDiscordAPIError(response);
       }
       
+      responseData = await response.json();
       console.log("Discord event created successfully without image");
     }
     
+    // Retourner la réponse de succès
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "Événement Discord créé avec succès",
+      JSON.stringify({
+        success: true,
+        message: "Événement Discord créé avec succès" + (hasImage ? " avec image" : ""),
         event: responseData
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
   } catch (error) {
@@ -364,7 +319,7 @@ serve(async (req) => {
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
   }

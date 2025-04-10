@@ -78,7 +78,7 @@ export const createDiscordEvent = async (eventData: {
     
     // Si l'image est en base64 et trop grande, ne pas l'envoyer
     if (processedData.image && processedData.image.startsWith('data:') && processedData.image.length > 1024 * 1024) {
-      console.warn('Image too large, sending event without image');
+      console.warn('Image too large for Discord API, sending event without image');
       delete processedData.image;
     }
     
