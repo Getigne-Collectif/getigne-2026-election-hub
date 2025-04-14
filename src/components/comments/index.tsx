@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth';
 import UserView from './UserView';
 import ModeratorView from './ModeratorView';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, TABLES } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Comment, CommentStatus, ResourceType } from '@/types/comments.types';
 
