@@ -4,25 +4,16 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useAuth } from '@/context/AuthContext.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { supabase } from '@/integrations/supabase/client.ts';
-import Navbar from '@/components/Navbar.tsx';
-import Footer from '@/components/Footer.tsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
 import {
-  Home,
   Users,
   Newspaper,
   Calendar,
-  Settings,
   MessageSquare,
-  EditIcon,
-  UsersIcon,
   Component,
   File,
   Star, MenuIcon
 } from 'lucide-react';
-import { Button } from '@/components/ui/button.tsx';
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 import {GearIcon} from "@radix-ui/react-icons";
 

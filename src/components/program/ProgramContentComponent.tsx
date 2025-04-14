@@ -28,7 +28,7 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         .select('*')
         .eq('id', programItemId)
         .single();
-        
+
       if (error) throw error;
       return data;
     },
@@ -44,7 +44,7 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         .select('*')
         .eq('program_item_id', programItemId)
         .order('position', { ascending: true });
-        
+
       if (error) throw error;
       setProgramPoints(data || []);
       return data;
@@ -85,9 +85,9 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
             <h2 className="text-3xl font-bold text-getigne-800 mb-2">{programItem.title}</h2>
             <div className="flex items-center gap-4">
               <ProgramLikeButton programId={programItemId} />
-              <Button 
-                variant="ghost" 
-                className="text-getigne-600 flex items-center gap-2" 
+              <Button
+                variant="ghost"
+                className="text-getigne-600 flex items-center gap-2"
                 onClick={() => setShowComments(!showComments)}
               >
                 <MessageSquare className="h-5 w-5" />
@@ -96,10 +96,10 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
             </div>
           </div>
         </div>
-      
+
         {/* Description avec style amélioré */}
         <div className="prose max-w-none mb-12 rich-content bg-white rounded-xl p-6 shadow-sm border border-getigne-100" dangerouslySetInnerHTML={{ __html: programItem.description }} />
-        
+
         {/* Section des propositions */}
         <div className="my-12">
           <div className="flex items-center gap-4 mb-8">
@@ -108,7 +108,7 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
             </div>
             <h3 className="text-2xl font-bold text-getigne-800">Nos propositions concrètes</h3>
           </div>
-          
+
           {programPoints.length === 0 ? (
             <div className="bg-getigne-50 border border-getigne-100 rounded-lg p-8 text-center">
               <p className="text-getigne-700 italic mb-2">
@@ -121,36 +121,15 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
           ) : (
             <div className="space-y-6">
               {programPoints.map((point, index) => (
-                <ProgramPointCard 
-                  key={point.id} 
-                  point={point} 
-                  programItemId={programItemId} 
+                <ProgramPointCard
+                  key={point.id}
+                  point={point}
+                  programItemId={programItemId}
                   icon={programItem.icon}
                 />
               ))}
             </div>
           )}
-        </div>
-        
-        {/* Banner avec citation en rapport avec la thématique */}
-        <div className="bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] text-white py-10 px-8 rounded-xl my-12 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
-            </svg>
-          </div>
-          
-          <div className="relative z-10">
-            <blockquote className="text-xl md:text-2xl italic font-medium max-w-3xl mx-auto text-center mb-6">
-              " Ensemble, nous avons le pouvoir de transformer notre commune et de créer un avenir plus durable et solidaire. "
-            </blockquote>
-            <p className="text-center text-white/80">L'équipe Gétigné Collectif</p>
-          </div>
         </div>
         
         {/* Section commentaires */}
