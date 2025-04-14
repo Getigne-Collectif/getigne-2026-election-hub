@@ -76,19 +76,21 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
               // Return comment with a placeholder profile
               return {
                 ...comment,
+                status: comment.status as CommentStatus, // Cast the status to the correct type
                 profiles: {
                   id: comment.user_id,
                   first_name: 'Utilisateur',
                   last_name: ''
                 }
-              };
+              } as Comment; // Cast the entire object to Comment type
             }
 
             // Return comment with fetched profile
             return {
               ...comment,
+              status: comment.status as CommentStatus, // Cast the status to the correct type
               profiles: profileData
-            };
+            } as Comment; // Cast the entire object to Comment type
           })
         );
 
@@ -114,11 +116,15 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           
           return {
             ...comment,
+            status: comment.status as CommentStatus, // Cast the status to the correct type
             profiles: placeholderProfile
-          } as Comment;
+          } as Comment; // Cast the entire object to Comment type
         }
         
-        return comment as Comment;
+        return {
+          ...comment,
+          status: comment.status as CommentStatus // Cast the status to the correct type
+        } as Comment; // Cast the entire object to Comment type
       });
 
       setComments(validComments);
@@ -162,7 +168,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
             content,
             status: 'pending' as CommentStatus
           })
-          .select('*')
+          .select('*, profiles(*)')
           .single();
 
         if (error) throw error;
@@ -181,41 +187,50 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           commentData.program_point_id = programPointId;
         }
 
-        const { data, error } = await supabase
-          .from('program_comments')
-          .insert(commentData)
-          .select('*')
+        const { data: commentData2, error } = await supabase
+          .from(TABLES.PROGRAM_COMMENTS)
+          .insert([commentData])
+          .select()
           .single();
 
         if (error) throw error;
-        newComment = data;
+        
+        // Get user profile data separately
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        // Add user profile information to the new comment
+        const userProfile = profileError ? {
+          id: user.id,
+          first_name: user.user_metadata?.first_name || 'Utilisateur',
+          last_name: user.user_metadata?.last_name || '',
+        } : profileData;
+
+        newComment = {
+          ...commentData2,
+          status: commentData2.status as CommentStatus, // Cast to correct type
+          profiles: userProfile
+        };
       }
 
-      // Fetch the user profile information separately
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, avatar_url')
-        .eq('id', user.id)
-        .single();
+      setContent('');
 
-      // Add user profile information to the new comment
-      const userProfile = profileError ? {
-        id: user.id,
-        first_name: user.user_metadata?.first_name || 'Utilisateur',
-        last_name: user.user_metadata?.last_name || '',
-      } : profileData;
+      if ((newComment.status as CommentStatus) === 'pending') {
+        toast({
+          title: "Commentaire envoyé",
+          description: "Votre commentaire sera visible après modération.",
+        });
+      } else {
+        toast({
+          title: "Commentaire publié",
+          description: "Votre commentaire a été publié avec succès.",
+        });
+      }
 
-      const commentWithProfile = {
-        ...newComment,
-        profiles: userProfile,
-      } as Comment;
-
-      setComments([commentWithProfile, ...comments]);
-
-      toast({
-        title: 'Comment submitted',
-        description: 'Your comment has been submitted for moderation.',
-      });
+      setComments([newComment as Comment, ...comments]);
     } catch (err: any) {
       console.error('Error adding comment:', err);
       toast({

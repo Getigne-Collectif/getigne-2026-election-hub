@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 import { supabase, TABLES } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
-import { ResourceType, Comment } from '@/types/comments.types';
+import { ResourceType, Comment, CommentStatus } from '@/types/comments.types';
 
 interface CommentFormProps {
   newsId?: string;
@@ -55,7 +55,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
       // Déterminer si l'utilisateur est modérateur ou admin
       const isModerator = isAdmin || userRoles.includes('moderator');
       // Statut initial du commentaire (approuvé automatiquement pour les modérateurs/admins)
-      const initialStatus = isModerator ? 'approved' : 'pending';
+      const initialStatus: CommentStatus = isModerator ? 'approved' : 'pending';
 
       let newComment: any;
 
@@ -107,6 +107,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
         
         newComment = {
           ...commentData2,
+          status: commentData2.status as CommentStatus,
           profiles: profileData || null
         };
       }
@@ -126,7 +127,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
       }
 
       // Call the callback with the new comment
-      onCommentAdded(newComment);
+      onCommentAdded(newComment as Comment);
     } catch (error) {
       console.error('Error submitting comment:', error);
       toast({
