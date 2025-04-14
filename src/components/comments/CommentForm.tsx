@@ -80,16 +80,14 @@ const CommentForm: React.FC<CommentFormProps> = ({
         // Insert into program_comments table for program items or points
         const commentData: any = {
           user_id: user.id,
+          program_item_id: programItemId,
           content,
           status: initialStatus,
         };
 
-        // Add the appropriate ID based on the resource type
+        // Add the program_point_id if applicable
         if (programPointId) {
           commentData.program_point_id = programPointId;
-          commentData.program_item_id = programItemId; // Always include the parent item
-        } else if (programItemId) {
-          commentData.program_item_id = programItemId;
         }
 
         const { data: commentData2, error } = await supabase

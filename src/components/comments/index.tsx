@@ -45,23 +45,56 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           `)
           .eq('news_id', resourceId);
       } else {
-        query = supabase
+        // For program comments, we need to use a different approach
+        const { data, error } = await supabase
           .from('program_comments')
-          .select(`
-            *,
-            profiles:user_id (
-              id,
-              first_name,
-              last_name,
-              avatar_url
-            )
-          `)
+          .select('*')
           .eq('program_item_id', resourceId);
 
-        // If this is for a program point, add the point filter
+        if (error) throw error;
+
+        // If this is for a program point, filter by program_point_id
+        let filteredData = data;
         if (programPointId) {
-          query = query.eq('program_point_id', programPointId);
+          filteredData = data.filter(comment => comment.program_point_id === programPointId);
+        } else {
+          // If not for a specific point, only get comments without a point id
+          filteredData = data.filter(comment => comment.program_point_id === null);
         }
+
+        // Now fetch the profile information for each comment
+        const commentsWithProfiles = await Promise.all(
+          filteredData.map(async (comment) => {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('id, first_name, last_name, avatar_url')
+              .eq('id', comment.user_id)
+              .single();
+
+            if (profileError) {
+              console.error('Error fetching profile:', profileError);
+              // Return comment with a placeholder profile
+              return {
+                ...comment,
+                profiles: {
+                  id: comment.user_id,
+                  first_name: 'Utilisateur',
+                  last_name: ''
+                }
+              };
+            }
+
+            // Return comment with fetched profile
+            return {
+              ...comment,
+              profiles: profileData
+            };
+          })
+        );
+
+        setComments(commentsWithProfiles);
+        setLoading(false);
+        return; // Exit early as we've already set the comments
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
@@ -158,13 +191,19 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         newComment = data;
       }
 
+      // Fetch the user profile information separately
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+
       // Add user profile information to the new comment
-      // This is needed to match our Comment type format
-      const userProfile = {
+      const userProfile = profileError ? {
         id: user.id,
         first_name: user.user_metadata?.first_name || 'Utilisateur',
         last_name: user.user_metadata?.last_name || '',
-      };
+      } : profileData;
 
       const commentWithProfile = {
         ...newComment,
