@@ -43,7 +43,7 @@ const Footer = () => {
           <div>
             <div className="mb-4">
               <img
-                src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png"
+                src="/images/getigne-collectif-logo.png"
                 alt="Gétigné Collectif"
                 className="h-14 mb-4"
               />

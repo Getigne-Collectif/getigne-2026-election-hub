@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, ChevronDown, Settings, FileText } from 'lucide-react';
@@ -134,7 +133,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center">
             <img
-              src="/lovable-uploads/ef5618c7-2730-4f0e-bccf-554d89c7ff53.png"
+              src="/images/getigne-collectif-logo.png"
               alt="Gétigné Collectif"
               className="h-10"
             />

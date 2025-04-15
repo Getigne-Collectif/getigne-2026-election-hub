@@ -127,7 +127,7 @@ const ObjectifPage = () => {
                 </div>
                 <div className="h-64 md:h-auto bg-getigne-100">
                   <img
-                    src="/lovable-uploads/team-meeting.jpg"
+                    src="/placeholder.svg"
                     alt="Réunion du collectif"
                     className="w-full h-full object-cover"
                   />
