@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
@@ -33,14 +32,17 @@ interface CommitteeData {
   color?: string | null;
 }
 
-interface CommitteeWork {
+type CommitteeWork = {
   id: string;
   title: string;
   content: string;
   date: string;
   committee_id: string;
-  files?: any[];
-}
+  files?: any[] | null;
+  images?: any[] | null;
+  created_at?: string;
+  updated_at?: string;
+};
 
 const CommitteeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,16 +57,13 @@ const CommitteeDetailPage: React.FC = () => {
   const { user, isAdmin, userRoles } = useAuth();
   const { settings } = useAppSettings();
 
-  // Vérifier si l'utilisateur est membre de la commission
   const [isCommitteeMember, setIsCommitteeMember] = useState(false);
 
-  // Vérifier si l'utilisateur peut voir les travaux de commission
   const canViewWorks = settings.showCommitteeWorks || 
                        isAdmin || 
                        userRoles.includes('program_team') || 
                        isCommitteeMember;
 
-  // Créer un thème en fonction de la couleur de la commission
   const [themeColor, setThemeColor] = useState({
     bg: 'bg-getigne-green-50',
     text: 'text-getigne-green-700',
@@ -88,7 +87,6 @@ const CommitteeDetailPage: React.FC = () => {
         
         setCommittee(committeeData);
         
-        // Configure le thème en fonction de la couleur
         if (committeeData.color) {
           switch (committeeData.color) {
             case 'green':
@@ -128,12 +126,10 @@ const CommitteeDetailPage: React.FC = () => {
               });
               break;
             default:
-              // Conserver le thème par défaut (vert)
               break;
           }
         }
 
-        // Vérifier si l'utilisateur est membre de la commission
         if (user) {
           const { data: memberData, error: memberError } = await supabase
             .rpc('is_committee_member', { 
@@ -146,7 +142,6 @@ const CommitteeDetailPage: React.FC = () => {
           }
         }
         
-        // Récupérer les travaux de la commission
         const { data: worksData, error: worksError } = await supabase
           .from('committee_works')
           .select('*')
@@ -229,7 +224,6 @@ const CommitteeDetailPage: React.FC = () => {
     );
   }
 
-  // Format dates
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -252,7 +246,6 @@ const CommitteeDetailPage: React.FC = () => {
         <Navbar />
         
         <main className="flex-grow">
-          {/* En-tête de la commission */}
           <section className={`pt-32 pb-12 ${themeColor.bg}`}>
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
@@ -285,9 +278,7 @@ const CommitteeDetailPage: React.FC = () => {
           <div className="container mx-auto px-4 py-16">
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Colonne principale */}
                 <div className="lg:col-span-2 space-y-10">
-                  {/* Section des travaux de la commission */}
                   <section>
                     <div className="flex justify-between items-center mb-6">
                       <h2 className="text-2xl font-semibold">Travaux de la commission</h2>
@@ -361,15 +352,12 @@ const CommitteeDetailPage: React.FC = () => {
                   </section>
                 </div>
                 
-                {/* Colonne latérale */}
                 <div className="space-y-8">
-                  {/* Section des membres */}
                   <div className="p-6 border border-getigne-200 rounded-xl">
                     <h3 className="text-xl font-semibold mb-4">Membres de la commission</h3>
                     <CommitteeMembers committeeId={id} />
                   </div>
                   
-                  {/* Formulaire de contact */}
                   <CommitteeContactForm 
                     committeeId={id} 
                     committeeName={committee.title}
@@ -384,7 +372,6 @@ const CommitteeDetailPage: React.FC = () => {
         <Footer />
       </div>
       
-      {/* Modal pour afficher un travail */}
       <CommitteeWorkModal
         committeeId={id}
         work={selectedWork}
@@ -393,7 +380,6 @@ const CommitteeDetailPage: React.FC = () => {
         mode="view"
       />
       
-      {/* Modal pour créer un travail */}
       <CommitteeWorkModal
         committeeId={id}
         open={isCreateModalOpen}

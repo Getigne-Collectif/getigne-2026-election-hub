@@ -10,8 +10,8 @@ type AppSettings = {
 
 type AppSettingsContextType = {
   settings: AppSettings;
-  updateSettings: (key: keyof AppSettings, value: boolean) => Promise<void>;
-  isLoading: boolean;
+  updateSetting: (key: keyof AppSettings, value: boolean) => Promise<boolean>;
+  loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
 };
@@ -23,21 +23,21 @@ const defaultSettings: AppSettings = {
 
 const AppSettingsContext = createContext<AppSettingsContextType>({
   settings: defaultSettings,
-  updateSettings: async () => {},
-  isLoading: false,
+  updateSetting: async () => false,
+  loading: false,
   error: null,
   refresh: async () => {},
 });
 
 export function AppSettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { isAdmin } = useAuth();
 
   const fetchSettings = async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       setError(null);
 
       const { data, error } = await supabase
@@ -62,7 +62,7 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
       console.error('Error fetching settings:', err);
       setError(err as Error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -70,10 +70,10 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
     fetchSettings();
   }, []);
 
-  const updateSettings = async (key: keyof AppSettings, value: boolean) => {
+  const updateSetting = async (key: keyof AppSettings, value: boolean) => {
     if (!isAdmin) {
       console.error('Only admins can update settings');
-      return;
+      return false;
     }
 
     try {
@@ -89,9 +89,11 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
         ...prev,
         [key]: value,
       }));
+
+      return true;
     } catch (err) {
       console.error(`Error updating setting ${key}:`, err);
-      throw err;
+      return false;
     }
   };
 
@@ -99,8 +101,8 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
     <AppSettingsContext.Provider
       value={{
         settings,
-        updateSettings,
-        isLoading,
+        updateSetting,
+        loading,
         error,
         refresh: fetchSettings,
       }}

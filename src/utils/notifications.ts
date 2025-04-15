@@ -45,3 +45,24 @@ export const sendDiscordNotification = async (options: DiscordMessageOptions): P
     throw error;
   }
 };
+
+export const createDiscordEvent = async (options: DiscordMessageOptions): Promise<void> => {
+  try {
+    const response = await fetch('/api/discord-create-event', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(options),
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.text();
+      console.error('Discord event creation error:', errorResponse);
+      throw new Error(`Erreur lors de la création de l'événement (${response.status})`);
+    }
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'événement Discord:', error);
+    throw error;
+  }
+};
