@@ -68,9 +68,6 @@ function App() {
               {/* Contact */}
               <Route path="/contact" element={<ContactPage />} />
 
-              {/* Route principale pour "Qui sommes-nous" */}
-              <Route path="/qui-sommes-nous" element={<AboutUsPage />} />
-
               {/* Routes existantes */}
               <Route path="/actualites" element={<NewsPage />} />
               <Route path="/actualites/:slug" element={<NewsDetailPage />} />

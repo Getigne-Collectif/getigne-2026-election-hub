@@ -84,13 +84,13 @@ const Navbar = () => {
         </Link>
       </li>
       <li>
-        <Link to="/qui-sommes-nous" className={isActive('/qui-sommes-nous')}>
-          Qui sommes-nous ?
+        <Link to="/adherer" className={isActive('/adherer')}>
+          Adhérer
         </Link>
       </li>
       <li>
-        <Link to="/adherer" className={isActive('/adherer')}>
-          Adhérer
+        <Link to="/contact" className={isActive('/contact')}>
+          Contact
         </Link>
       </li>
     </>

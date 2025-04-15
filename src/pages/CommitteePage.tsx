@@ -34,6 +34,8 @@ import {
 import { Home } from 'lucide-react';
 import {toast} from "sonner";
 import { getColorTheme } from '@/components/CitizenCommittees';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { useAuth } from '@/context/AuthContext';
 
 interface Member {
   id: string;
@@ -69,7 +71,9 @@ const CommitteePage = () => {
   const [isCommitteeMember, setIsCommitteeMember] = useState(false);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('view');
   const [works, setWorks] = useState<Tables<'committee_works'>[]>([]);
-
+  const { settings } = useAppSettings();
+  const { userRoles } = useAuth();
+  const canSeeWorks = settings.showCommitteeWorks || isCommitteeMember || userRoles.includes('program_manager');
   // Vérifier si l'utilisateur actuel est membre de la commission
   useEffect(() => {
     const checkCommitteeMembership = async () => {
@@ -338,10 +342,6 @@ const CommitteePage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/commissions">Commissions citoyennes</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
                 <BreadcrumbPage>{committee.title}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -385,6 +385,7 @@ const CommitteePage = () => {
           </div>
         </div>
 
+        {canSeeWorks && (
         <div className={`bg-white shadow-sm rounded-xl p-6 border ${themeColor.border}`}>
           <div className="mb-6 flex justify-between items-center">
             <div>
@@ -491,6 +492,7 @@ const CommitteePage = () => {
             </div>
           )}
         </div>
+        )}
 
         {committee && (
           <CommitteeContactForm

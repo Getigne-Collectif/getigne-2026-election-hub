@@ -30,10 +30,9 @@ const Index = () => {
         <Hero />
         {settings.showProgram && <Program />}
         <Values />
-        <Committees />
-        <News limit={3} />
-        <Events />
         <Campaign />
+        <Events />
+        <News limit={3} />
         {/* <Team /> */}
         <Footer />
       </div>

@@ -151,7 +151,7 @@ const News = ({ limit, showPagination = false }) => {
 
   if (loading) {
     return (
-      <section id="actualites" className="py-24 px-4 bg-getigne-50">
+      <section id="actualites" className="py-12 px-4 bg-getigne-50">
         <div className="container mx-auto">
           <div className="text-center">Chargement des actualités...</div>
         </div>
@@ -161,7 +161,7 @@ const News = ({ limit, showPagination = false }) => {
 
   if (error) {
     return (
-      <section id="actualites" className="py-24 px-4 bg-getigne-50">
+      <section id="actualites" className="py-12 px-4 bg-getigne-50">
         <div className="container mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">

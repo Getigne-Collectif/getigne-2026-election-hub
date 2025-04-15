@@ -69,11 +69,6 @@ const SiteMapPage = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/qui-sommes-nous" className="text-getigne-accent hover:underline">
-                      Qui sommes-nous ?
-                    </Link>
-                  </li>
-                  <li>
                     <Link to="/contact" className="text-getigne-accent hover:underline">
                       Contact
                     </Link>
