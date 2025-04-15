@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from '@/components/ui/button';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
+import { submitContactForm } from '@/utils/contactForm';
 
 interface CommitteeContactFormProps {
   committeeId: string;
@@ -37,7 +38,19 @@ export const CommitteeContactForm = ({ committeeId, committeeName, themeColor }:
     setIsSubmitting(true);
 
     try {
-      // Envoi de la notification Discord
+      // Envoi via edge function contact-form
+      await submitContactForm({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        subject: `Contact commission: ${committeeName}`,
+        message: formData.message,
+        source: 'committee',
+        committeeId,
+        committeeTitle: committeeName,
+        url: window.location.href
+      });
+
+      // Envoi de la notification Discord comme backup
       await sendDiscordNotification({
         title: `🤝 Demande d'information commission: ${committeeName}`,
         message: `

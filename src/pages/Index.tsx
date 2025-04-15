@@ -10,6 +10,7 @@ import Team from "@/components/Team";
 import Values from "@/components/Values";
 import Campaign from "@/components/Campaign";
 import { useAppSettings } from "@/hooks/useAppSettings";
+import Committees from "@/components/Committees";
 
 const Index = () => {
   const { settings } = useAppSettings();
@@ -29,6 +30,7 @@ const Index = () => {
         <Hero />
         {settings.showProgram && <Program />}
         <Values />
+        <Committees />
         <News limit={3} />
         <Events />
         <Campaign />

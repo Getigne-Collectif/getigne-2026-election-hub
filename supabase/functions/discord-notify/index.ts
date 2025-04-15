@@ -1,24 +1,26 @@
 
+// Follow this setup guide to integrate the Deno language server with your editor:
+// https://deno.land/manual/getting_started/setup_your_environment
+// This enables autocomplete, go to definition, etc.
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-// Webhook URL from environment variable
 const DISCORD_WEBHOOK_URL = Deno.env.get('DISCORD_WEBHOOK_URL');
-const PUBLIC_URL = Deno.env.get('PUBLIC_URL') || 'https://getigne-collectif.fr';
+const CONTACT_EMAIL = Deno.env.get('CONTACT_EMAIL') || 'contact@getigne-collectif.fr';
 
-// CORS headers for browser requests
+// CORS headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface NotificationRequest {
-  title?: string;
+interface DiscordMessageOptions {
+  title: string;
   message: string;
-  color?: number; // Discord embed color (optional)
-  username?: string; // Override the webhook's default username
-  url?: string; // URL de contexte (page où l'action a été effectuée)
-  resourceId?: string; // ID de la ressource (article, événement, etc.)
-  resourceType?: string; // Type de ressource (article, event, etc.)
+  color?: number;
+  username?: string;
+  url?: string;
+  timestamp?: string;
 }
 
 serve(async (req) => {
@@ -28,66 +30,39 @@ serve(async (req) => {
   }
 
   try {
-    // Verify webhook URL is configured
-    if (!DISCORD_WEBHOOK_URL) {
-      console.error("Discord webhook URL not configured");
-      return new Response(
-        JSON.stringify({ error: "Discord webhook URL not configured" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    // Parse the request body
-    const requestData: NotificationRequest = await req.json();
+    // Parse request body
+    const options: DiscordMessageOptions = await req.json();
     const { 
-      message, 
       title, 
-      color = 3447003, 
-      username,
-      url,
-      resourceId,
-      resourceType 
-    } = requestData; // Default blue color if not specified
+      message, 
+      color = 3447003, // Bleu par défaut
+      username = "Notification", 
+      url = null,
+      timestamp = new Date().toISOString()
+    } = options;
 
-    console.log("Notification request:", requestData);
+    console.log("Received notification request:", { title, username });
 
-    // Déterminer l'URL de contexte si elle n'est pas fournie
-    let contextUrl = url;
-    if (!contextUrl && resourceId && resourceType) {
-      switch(resourceType) {
-        case 'news':
-          contextUrl = `${PUBLIC_URL}/actualites/${resourceId}`;
-          break;
-        case 'event':
-          contextUrl = `${PUBLIC_URL}/agenda/${resourceId}`;
-          break;
-        case 'committee':
-          contextUrl = `${PUBLIC_URL}/commissions/${resourceId}`;
-          break;
-        default:
-          contextUrl = PUBLIC_URL;
-      }
+    if (!DISCORD_WEBHOOK_URL) {
+      throw new Error("DISCORD_WEBHOOK_URL n'est pas configuré");
     }
 
-    // Prepare the Discord message payload
+    // Préparer le payload Discord
     const payload = {
-      username: username || "Notification Bot",
+      username,
       embeds: [
         {
-          title: title || "Notification",
+          title,
           description: message,
-          color: color,
-          timestamp: new Date().toISOString(),
-          url: contextUrl, // Ajouter l'URL comme lien cliquable sur le titre
+          color,
+          timestamp,
+          ...(url && { url }),
         },
       ],
     };
 
-    // Send the message to Discord
-    const response = await fetch(DISCORD_WEBHOOK_URL, {
+    // Envoyer à Discord
+    const discordResponse = await fetch(DISCORD_WEBHOOK_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -95,40 +70,37 @@ serve(async (req) => {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error("Discord API error:", response.status, errorData);
-      return new Response(
-        JSON.stringify({ 
-          error: "Failed to send Discord notification", 
-          details: errorData 
-        }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+    if (!discordResponse.ok) {
+      const errorText = await discordResponse.text();
+      console.error("Discord API error:", errorText);
+      throw new Error(`Discord API error: ${discordResponse.status} ${errorText}`);
     }
 
     console.log("Discord notification sent successfully");
-    
+
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "Notification envoyée avec succès" 
-      }),
+      JSON.stringify({ success: true }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders
+        }
       }
     );
   } catch (error) {
-    console.error("Error processing Discord notification:", error);
+    console.error("Error in discord-notify function:", error);
+    
     return new Response(
-      JSON.stringify({ error: error.message || "Une erreur est survenue" }),
+      JSON.stringify({ 
+        error: error.message || "Une erreur s'est produite lors de l'envoi de la notification" 
+      }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders
+        }
       }
     );
   }
