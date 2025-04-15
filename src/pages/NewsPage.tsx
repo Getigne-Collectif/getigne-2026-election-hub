@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/pagination';
 import { toast } from '@/components/ui/use-toast';
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 9;
 
 const NewsPage = () => {
   const location = useLocation();

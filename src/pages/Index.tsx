@@ -27,8 +27,8 @@ const Index = () => {
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <Hero />
-        {settings.showProgram && <Program />}
         <Values />
+        {settings.showProgram && <Program />}
         <Campaign />
         <Events />
         <News limit={3} />
