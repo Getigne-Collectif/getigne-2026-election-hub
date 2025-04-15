@@ -13,7 +13,7 @@ export enum DiscordColors {
   ORANGE = 15105570,  // #E67E22
 }
 
-interface DiscordMessageOptions {
+export interface DiscordMessageOptions {
   title: string;
   message: string;
   color?: DiscordColors;

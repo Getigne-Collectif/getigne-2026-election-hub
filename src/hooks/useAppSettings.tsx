@@ -3,7 +3,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
 
-type AppSettings = {
+export type AppSettings = {
   showProgram: boolean;
   showCommitteeWorks: boolean;
 };
@@ -11,7 +11,9 @@ type AppSettings = {
 type AppSettingsContextType = {
   settings: AppSettings;
   updateSetting: (key: keyof AppSettings, value: boolean) => Promise<boolean>;
+  updateSettings: (newSettings: Partial<AppSettings>) => Promise<boolean>;
   loading: boolean;
+  isLoading: boolean; // alias for loading
   error: Error | null;
   refresh: () => Promise<void>;
 };
@@ -24,7 +26,9 @@ const defaultSettings: AppSettings = {
 const AppSettingsContext = createContext<AppSettingsContextType>({
   settings: defaultSettings,
   updateSetting: async () => false,
+  updateSettings: async () => false,
   loading: false,
+  isLoading: false,
   error: null,
   refresh: async () => {},
 });
@@ -96,13 +100,45 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
       return false;
     }
   };
+  
+  const updateSettings = async (newSettings: Partial<AppSettings>) => {
+    if (!isAdmin) {
+      console.error('Only admins can update settings');
+      return false;
+    }
+    
+    try {
+      // Update each setting in the database
+      for (const [key, value] of Object.entries(newSettings)) {
+        const { error } = await supabase
+          .from('app_settings')
+          .update({ value })
+          .eq('key', key);
+          
+        if (error) throw error;
+      }
+      
+      // Update local state
+      setSettings((prev) => ({
+        ...prev,
+        ...newSettings,
+      }));
+      
+      return true;
+    } catch (err) {
+      console.error('Error updating settings:', err);
+      return false;
+    }
+  };
 
   return (
     <AppSettingsContext.Provider
       value={{
         settings,
         updateSetting,
+        updateSettings,
         loading,
+        isLoading: loading, // alias for backward compatibility
         error,
         refresh: fetchSettings,
       }}

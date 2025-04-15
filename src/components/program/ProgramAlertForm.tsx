@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +15,8 @@ const ProgramAlertForm = () => {
 
   const handleSendAlert = async () => {
     try {
+      setIsSendingAlert(true);
+      
       const alertOptions: DiscordMessageOptions = {
         title: programAlertTitle || 'Alerte sur le programme',
         message: programAlertContent,

@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { useState } from 'react';
-import { subscribeToNewsletter } from '../utils/newsletter';
+import { subscribeToNewsletter, NewsletterSubscription } from '../utils/newsletter';
 import { toast } from 'sonner';
 import {DiscordLogoIcon} from "@radix-ui/react-icons";
 import FacebookIcon from '@/components/icons/facebook.svg?react';
@@ -23,7 +23,8 @@ const Footer = () => {
     setIsSubmitting(true);
 
     try {
-      await subscribeToNewsletter({ email });
+      const subscription: NewsletterSubscription = { email };
+      await subscribeToNewsletter(subscription);
       toast.success("Merci de votre inscription à notre newsletter !");
       setEmail(''); // Réinitialiser le champ email
     } catch (error) {

@@ -2,13 +2,15 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-type AppSettings = {
+export type AppSettings = {
   showProgram: boolean;
+  showCommitteeWorks: boolean;
   [key: string]: any;
 };
 
 const defaultSettings: AppSettings = {
   showProgram: false,
+  showCommitteeWorks: false,
 };
 
 export function useAppSettings() {
@@ -30,13 +32,18 @@ export function useAppSettings() {
         data.forEach((setting) => {
           switch (setting.key) {
             case 'show_program':
-              // Vérifier si value est un objet avec une propriété enabled
-              if (typeof setting.value === 'object' && setting.value !== null && 'enabled' in setting.value) {
-                formattedSettings.showProgram = setting.value.enabled === true;
-              } else {
-                console.warn('Format inattendu pour le paramètre show_program:', setting.value);
-                formattedSettings.showProgram = false;
-              }
+            case 'showProgram':
+              formattedSettings.showProgram = setting.value === true || 
+                (typeof setting.value === 'object' && setting.value !== null && 'enabled' in setting.value 
+                  ? setting.value.enabled === true 
+                  : false);
+              break;
+            case 'show_committee_works':
+            case 'showCommitteeWorks':
+              formattedSettings.showCommitteeWorks = setting.value === true || 
+                (typeof setting.value === 'object' && setting.value !== null && 'enabled' in setting.value 
+                  ? setting.value.enabled === true 
+                  : false);
               break;
             default:
               formattedSettings[setting.key] = setting.value;
@@ -63,6 +70,9 @@ export function useAppSettings() {
       if (key === 'showProgram') {
         dbKey = 'show_program';
         dbValue = { enabled: value };
+      } else if (key === 'showCommitteeWorks') {
+        dbKey = 'show_committee_works';
+        dbValue = { enabled: value };
       }
       
       const { error } = await supabase
@@ -81,5 +91,57 @@ export function useAppSettings() {
     }
   };
 
-  return { settings, loading, error, updateSetting };
+  return { 
+    settings, 
+    loading, 
+    error, 
+    updateSetting,
+    isLoading: loading, 
+    updateSettings: async (newSettings: Partial<AppSettings>) => {
+      try {
+        for (const [key, value] of Object.entries(newSettings)) {
+          await updateSetting(key, value);
+        }
+        return true;
+      } catch (err) {
+        console.error('Error updating settings:', err);
+        return false;
+      }
+    },
+    refresh: async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.from('app_settings').select('*');
+        if (error) throw error;
+        
+        const formattedSettings = { ...defaultSettings };
+        data.forEach((setting) => {
+          switch (setting.key) {
+            case 'show_program':
+            case 'showProgram':
+              formattedSettings.showProgram = setting.value === true || 
+                (typeof setting.value === 'object' && setting.value !== null && 'enabled' in setting.value 
+                  ? setting.value.enabled === true 
+                  : false);
+              break;
+            case 'show_committee_works':
+            case 'showCommitteeWorks':
+              formattedSettings.showCommitteeWorks = setting.value === true || 
+                (typeof setting.value === 'object' && setting.value !== null && 'enabled' in setting.value 
+                  ? setting.value.enabled === true 
+                  : false);
+              break;
+            default:
+              formattedSettings[setting.key] = setting.value;
+          }
+        });
+        
+        setSettings(formattedSettings);
+      } catch (err) {
+        console.error('Error refreshing settings:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 }
