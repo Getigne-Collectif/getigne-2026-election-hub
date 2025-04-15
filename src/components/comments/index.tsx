@@ -219,8 +219,11 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
     }
   };
 
-  if (isAdmin || isModerator) {
-    return (
+  const approvedComments = comments.filter((c) => c.status === 'approved');
+
+  return (
+    <div className="space-y-8">
+      {(isAdmin || isModerator) && (
       <div className="space-y-6">
         <ModeratorView
           comments={showAllComments ? comments : comments.filter(c => c.status === 'pending')}
@@ -231,13 +234,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           sourceType={resourceType}
         />
       </div>
-    );
-  }
-
-  const approvedComments = comments.filter((c) => c.status === 'approved');
-
-  return (
-    <div className="space-y-8">
+    )}
       {user && (
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4">Ajouter un commentaire</h3>
@@ -248,6 +245,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
             onCommentAdded={handleAddComment}
             resourceType={resourceType}
           />
+        </div>
+      ) || (
+        <div>
+          Vous devez être connecté pour ajouter un commentaire
         </div>
       )}
       

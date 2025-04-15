@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
-import { submitContactForm } from '@/utils/contactForm';
 
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,16 +49,6 @@ ${formData.message}
         `,
         color: DiscordColors.BLUE,
         username: "Formulaire de Contact"
-      });
-
-      // Envoyer via l'edge function contact-form
-      await submitContactForm({
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        subject: formData.subject || 'Message depuis le formulaire de contact',
-        message: formData.message,
-        source: 'contact',
-        url: window.location.href
       });
       
       // Réinitialiser le formulaire

@@ -10,7 +10,6 @@ import Team from "@/components/Team";
 import Values from "@/components/Values";
 import Campaign from "@/components/Campaign";
 import { useAppSettings } from "@/hooks/useAppSettings";
-import Committees from "@/components/Committees";
 
 const Index = () => {
   const { settings } = useAppSettings();
