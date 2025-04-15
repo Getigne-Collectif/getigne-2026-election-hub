@@ -30,6 +30,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submitting comment for resourceType:', resourceType);
 
     if (!user) {
       toast({
@@ -57,11 +58,11 @@ const CommentForm: React.FC<CommentFormProps> = ({
       // Statut initial du commentaire (approuvé automatiquement pour les modérateurs/admins)
       const initialStatus: CommentStatus = isModerator ? 'approved' : 'pending';
 
-      let newComment: any;
-
       if (resourceType === 'news') {
+        console.log('Adding comment to news:', newsId);
+        
         // Insert into comments table for news
-        const { data, error } = await supabase
+        const { data: commentData, error: commentError } = await supabase
           .from('comments')
           .insert([
             {
@@ -71,12 +72,43 @@ const CommentForm: React.FC<CommentFormProps> = ({
               status: initialStatus,
             },
           ])
-          .select('*, profiles(*)')
+          .select()
           .single();
 
-        if (error) throw error;
-        newComment = data;
+        if (commentError) {
+          console.error('Error inserting comment:', commentError);
+          throw commentError;
+        }
+
+        console.log('Inserted comment data:', commentData);
+        
+        // Fetch the user profile separately
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          console.warn('Error fetching profile:', profileError);
+        }
+
+        const profile = profileError ? {
+          id: user.id,
+          first_name: user.user_metadata?.first_name || 'Utilisateur',
+          last_name: user.user_metadata?.last_name || '',
+        } : profileData;
+
+        const newComment = {
+          ...commentData,
+          status: commentData.status as CommentStatus,
+          profiles: profile
+        } as Comment;
+
+        onCommentAdded(newComment);
       } else {
+        console.log('Adding comment to program:', programItemId, 'program point:', programPointId);
+        
         // Insert into program_comments table for program items or points
         const commentData: any = {
           user_id: user.id,
@@ -90,26 +122,43 @@ const CommentForm: React.FC<CommentFormProps> = ({
           commentData.program_point_id = programPointId;
         }
 
-        const { data: commentData2, error } = await supabase
+        const { data: insertedComment, error: commentError } = await supabase
           .from(TABLES.PROGRAM_COMMENTS)
           .insert([commentData])
           .select()
           .single();
 
-        if (error) throw error;
+        if (commentError) {
+          console.error('Error inserting program comment:', commentError);
+          throw commentError;
+        }
+        
+        console.log('Inserted program comment data:', insertedComment);
         
         // Get user profile data separately
-        const { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('*')
+          .select('id, first_name, last_name, avatar_url')
           .eq('id', user.id)
           .single();
+
+        if (profileError) {
+          console.warn('Error fetching profile for program comment:', profileError);
+        }
+
+        const profile = profileError ? {
+          id: user.id,
+          first_name: user.user_metadata?.first_name || 'Utilisateur',
+          last_name: user.user_metadata?.last_name || '',
+        } : profileData;
         
-        newComment = {
-          ...commentData2,
-          status: commentData2.status as CommentStatus,
-          profiles: profileData || null
-        };
+        const newComment = {
+          ...insertedComment,
+          status: insertedComment.status as CommentStatus,
+          profiles: profile
+        } as Comment;
+
+        onCommentAdded(newComment);
       }
 
       setContent('');
@@ -125,10 +174,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
           description: "Votre commentaire a été publié avec succès.",
         });
       }
-
-      // Call the callback with the new comment
-      onCommentAdded(newComment as Comment);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting comment:', error);
       toast({
         title: "Erreur",

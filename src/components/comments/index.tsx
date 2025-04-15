@@ -6,6 +6,7 @@ import ModeratorView from './ModeratorView';
 import { supabase, TABLES } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Comment, CommentStatus, ResourceType } from '@/types/comments.types';
+import CommentForm from './CommentForm';
 
 interface CommentsProps {
   newsId?: string;
@@ -27,35 +28,89 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
   const fetchComments = async () => {
     setLoading(true);
+    console.log('Fetching comments for resourceType:', resourceType, 'resourceId:', resourceId);
     
     try {
-      let query;
-      
       if (resourceType === 'news') {
-        query = supabase
+        console.log('Fetching news comments for newsId:', newsId);
+        // Modification importante: ne pas utiliser la relation directe, mais plutôt deux requêtes séparées
+        const { data: commentsData, error: commentsError } = await supabase
           .from('comments')
-          .select(`
-            *,
-            profiles:user_id (
-              id,
-              first_name,
-              last_name,
-              avatar_url
-            )
-          `)
-          .eq('news_id', resourceId);
+          .select('*')
+          .eq('news_id', resourceId)
+          .order('created_at', { ascending: false });
+
+        if (commentsError) {
+          console.error('Error fetching comments:', commentsError);
+          throw commentsError;
+        }
+
+        console.log('Comments data fetched:', commentsData);
+
+        // Maintenant, récupérons les profils utilisateur séparément
+        const commentWithProfiles = await Promise.all(
+          commentsData.map(async (comment) => {
+            try {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name, avatar_url')
+                .eq('id', comment.user_id)
+                .single();
+
+              if (profileError) {
+                console.warn('Error fetching profile for user_id:', comment.user_id, profileError);
+                return {
+                  ...comment,
+                  status: comment.status as CommentStatus,
+                  profiles: {
+                    id: comment.user_id,
+                    first_name: 'Utilisateur',
+                    last_name: ''
+                  }
+                } as Comment;
+              }
+
+              return {
+                ...comment,
+                status: comment.status as CommentStatus,
+                profiles: profileData
+              } as Comment;
+            } catch (err) {
+              console.error('Error processing comment:', err);
+              return {
+                ...comment,
+                status: comment.status as CommentStatus,
+                profiles: {
+                  id: comment.user_id,
+                  first_name: 'Utilisateur',
+                  last_name: ''
+                }
+              } as Comment;
+            }
+          })
+        );
+
+        console.log('Comments with profiles:', commentWithProfiles);
+        setComments(commentWithProfiles);
       } else {
         // For program comments, we need to use a different approach
+        console.log('Fetching program comments for programItemId:', programItemId);
         const { data, error } = await supabase
           .from('program_comments')
           .select('*')
           .eq('program_item_id', resourceId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching program comments:', error);
+          throw error;
+        }
+
+        console.log('Program comments data fetched:', data);
 
         // If this is for a program point, filter by program_point_id
         let filteredData = data;
         if (programPointId) {
+          console.log('Filtering by program_point_id:', programPointId);
           filteredData = data.filter(comment => comment.program_point_id === programPointId);
         } else {
           // If not for a specific point, only get comments without a point id
@@ -65,71 +120,51 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         // Now fetch the profile information for each comment
         const commentsWithProfiles = await Promise.all(
           filteredData.map(async (comment) => {
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('id, first_name, last_name, avatar_url')
-              .eq('id', comment.user_id)
-              .single();
+            try {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name, avatar_url')
+                .eq('id', comment.user_id)
+                .single();
 
-            if (profileError) {
-              console.error('Error fetching profile:', profileError);
-              // Return comment with a placeholder profile
+              if (profileError) {
+                console.warn('Error fetching profile for program comment user_id:', comment.user_id, profileError);
+                return {
+                  ...comment,
+                  status: comment.status as CommentStatus,
+                  profiles: {
+                    id: comment.user_id,
+                    first_name: 'Utilisateur',
+                    last_name: ''
+                  }
+                } as Comment;
+              }
+
               return {
                 ...comment,
-                status: comment.status as CommentStatus, // Cast the status to the correct type
+                status: comment.status as CommentStatus,
+                profiles: profileData
+              } as Comment;
+            } catch (err) {
+              console.error('Error processing program comment:', err);
+              return {
+                ...comment,
+                status: comment.status as CommentStatus,
                 profiles: {
                   id: comment.user_id,
                   first_name: 'Utilisateur',
                   last_name: ''
                 }
-              } as Comment; // Cast the entire object to Comment type
+              } as Comment;
             }
-
-            // Return comment with fetched profile
-            return {
-              ...comment,
-              status: comment.status as CommentStatus, // Cast the status to the correct type
-              profiles: profileData
-            } as Comment; // Cast the entire object to Comment type
           })
         );
 
+        console.log('Program comments with profiles:', commentsWithProfiles);
         setComments(commentsWithProfiles);
-        setLoading(false);
-        return; // Exit early as we've already set the comments
       }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Validate that the data format matches what we expect
-      const validComments = data.map(comment => {
-        // Handle the case where profiles is null or has an error
-        if (!comment.profiles || 'error' in comment.profiles) {
-          // Create a placeholder profile
-          const placeholderProfile = {
-            id: comment.user_id,
-            first_name: 'Utilisateur',
-            last_name: ''
-          };
-          
-          return {
-            ...comment,
-            status: comment.status as CommentStatus, // Cast the status to the correct type
-            profiles: placeholderProfile
-          } as Comment; // Cast the entire object to Comment type
-        }
-        
-        return {
-          ...comment,
-          status: comment.status as CommentStatus // Cast the status to the correct type
-        } as Comment; // Cast the entire object to Comment type
-      });
-
-      setComments(validComments);
     } catch (err: any) {
-      console.error('Error fetching comments:', err);
+      console.error('Error in fetchComments:', err);
       setError(err.message || 'Error fetching comments');
       toast({
         title: 'Error',
@@ -152,13 +187,17 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const handleModerateComment = async (commentId: string, status: CommentStatus) => {
     try {
       const table = resourceType === 'news' ? 'comments' : 'program_comments';
+      console.log('Moderating comment:', commentId, 'with status:', status, 'in table:', table);
       
       const { error } = await supabase
         .from(table)
         .update({ status })
         .eq('id', commentId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating comment status:', error);
+        throw error;
+      }
 
       setComments(
         comments.map((comment) =>
@@ -171,7 +210,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         description: `Comment has been ${status}.`,
       });
     } catch (err: any) {
-      console.error('Error updating comment:', err);
+      console.error('Error in handleModerateComment:', err);
       toast({
         title: 'Error',
         description: err.message || 'Failed to update the comment',
@@ -198,10 +237,28 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const approvedComments = comments.filter((c) => c.status === 'approved');
 
   return (
-    <UserView
-      comments={approvedComments}
-      loading={loading}
-    />
+    <div className="space-y-8">
+      {user && (
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Ajouter un commentaire</h3>
+          <CommentForm
+            newsId={newsId}
+            programItemId={programItemId}
+            programPointId={programPointId}
+            onCommentAdded={handleAddComment}
+            resourceType={resourceType}
+          />
+        </div>
+      )}
+      
+      <div>
+        <h3 className="text-xl font-semibold mb-4">Commentaires</h3>
+        <UserView
+          comments={approvedComments}
+          loading={loading}
+        />
+      </div>
+    </div>
   );
 };
 

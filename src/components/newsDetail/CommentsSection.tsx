@@ -15,6 +15,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ newsId }) => {
   useEffect(() => {
     const checkCommentsEnabled = async () => {
       try {
+        console.log('Checking if comments are enabled for news ID:', newsId);
         const { data, error } = await supabase
           .from('news')
           .select('comments_enabled')
@@ -26,9 +27,10 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ newsId }) => {
           return;
         }
         
+        console.log('Comments enabled data:', data);
         setCommentsEnabled(data.comments_enabled !== false);
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error in checkCommentsEnabled:', error);
       } finally {
         setLoading(false);
       }
@@ -52,7 +54,12 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ newsId }) => {
     );
   }
   
-  return <Comments newsId={newsId} />;
+  return (
+    <div className="mt-12 border-t border-getigne-100 pt-8">
+      <h3 className="text-2xl font-bold mb-6">Commentaires</h3>
+      <Comments newsId={newsId} />
+    </div>
+  );
 };
 
 export default CommentsSection;
