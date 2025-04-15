@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
@@ -21,6 +22,7 @@ import { supabase } from '@/integrations/supabase/client';
 import CommitteeWorkModal from '@/components/CommitteeWorkModal';
 import { useToast } from '@/components/ui/use-toast';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { CommitteeWork } from '@/types/committee.types';
 
 interface CommitteeData {
   id: string;
@@ -31,18 +33,6 @@ interface CommitteeData {
   cover_photo_url?: string | null;
   color?: string | null;
 }
-
-type CommitteeWork = {
-  id: string;
-  title: string;
-  content: string;
-  date: string;
-  committee_id: string;
-  files?: any[] | null;
-  images?: any[] | null;
-  created_at?: string;
-  updated_at?: string;
-};
 
 const CommitteeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -150,7 +140,14 @@ const CommitteeDetailPage: React.FC = () => {
         
         if (worksError) throw worksError;
         
-        setWorks(worksData);
+        // Convert files and images from JSON to arrays if they're strings
+        const processedWorks = worksData.map(work => ({
+          ...work,
+          files: Array.isArray(work.files) ? work.files : (work.files ? JSON.parse(work.files as string) : []),
+          images: Array.isArray(work.images) ? work.images : (work.images ? JSON.parse(work.images as string) : [])
+        })) as CommitteeWork[];
+        
+        setWorks(processedWorks);
         setLoading(false);
       } catch (err: any) {
         console.error('Erreur lors de la récupération des données de la commission:', err);
@@ -174,7 +171,14 @@ const CommitteeDetailPage: React.FC = () => {
       
       if (error) throw error;
       
-      setWorks(data);
+      // Convert files and images from JSON to arrays if they're strings
+      const processedWorks = data.map(work => ({
+        ...work,
+        files: Array.isArray(work.files) ? work.files : (work.files ? JSON.parse(work.files as string) : []),
+        images: Array.isArray(work.images) ? work.images : (work.images ? JSON.parse(work.images as string) : [])
+      })) as CommitteeWork[];
+      
+      setWorks(processedWorks);
       toast({
         title: "Succès",
         description: "Les travaux de la commission ont été mis à jour",

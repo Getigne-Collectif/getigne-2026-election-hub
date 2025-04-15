@@ -13,6 +13,7 @@ const SiteSettings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [localSettings, setLocalSettings] = useState({
     showProgram: false,
+    showCommitteeWorks: false,
   });
 
   // Mettre à jour les paramètres locaux quand les paramètres sont chargés
@@ -20,6 +21,7 @@ const SiteSettings = () => {
     if (!loading) {
       setLocalSettings({
         showProgram: settings.showProgram,
+        showCommitteeWorks: settings.showCommitteeWorks,
       });
     }
   }, [loading, settings]);
@@ -28,6 +30,7 @@ const SiteSettings = () => {
     setIsSaving(true);
     try {
       await updateSetting('showProgram', localSettings.showProgram);
+      await updateSetting('showCommitteeWorks', localSettings.showCommitteeWorks);
       toast.success('Paramètres mis à jour avec succès');
     } catch (error) {
       console.error('Erreur lors de la mise à jour des paramètres:', error);
@@ -69,6 +72,23 @@ const SiteSettings = () => {
               checked={localSettings.showProgram}
               onCheckedChange={(checked) => 
                 setLocalSettings((prev) => ({ ...prev, showProgram: checked }))
+              }
+            />
+          </div>
+          
+          <div className="flex items-center justify-between border p-4 rounded-md">
+            <div className="space-y-0.5">
+              <Label htmlFor="show-committee-works">Afficher les travaux des commissions</Label>
+              <p className="text-sm text-muted-foreground">
+                Active l'affichage des travaux des commissions pour tous les visiteurs.
+                Si désactivé, seuls les membres de l'équipe programme, les membres des commissions et les administrateurs pourront y accéder.
+              </p>
+            </div>
+            <Switch
+              id="show-committee-works"
+              checked={localSettings.showCommitteeWorks}
+              onCheckedChange={(checked) => 
+                setLocalSettings((prev) => ({ ...prev, showCommitteeWorks: checked }))
               }
             />
           </div>
