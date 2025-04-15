@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, User, Shield, Newspaper, UserCog, Calendar, Users} from 'lucide-react';
+import {LogIn, LogOut, User, Shield, Newspaper, UserCog, Calendar, Users, Settings} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +38,10 @@ const AuthButton = () => {
 
   const handleProfileClick = () => {
     navigate('/profile');
+  };
+
+  const handleAdminClick = () => {
+    navigate('/admin');
   };
 
   // Pas d'utilisateur - afficher bouton connexion
@@ -118,37 +122,15 @@ const AuthButton = () => {
         <DropdownMenuItem onClick={handleProfileClick} className="flex items-center">
           <UserCog className="h-4 w-4 mr-2" />
           Mon profil
-          {isInvitedUser && (
-            <span className="bg-yellow-100 text-yellow-800 text-xs py-0.5 px-1.5 rounded ml-auto">
-              Nouveau
-            </span>
-          )}
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
         {isAdmin && (
-          <>
-            <DropdownMenuItem asChild>
-              <Link to="/admin/users" className="flex items-center w-full">
-                <Users className="h-4 w-4 mr-2" />
-                Utilisateurs
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/admin/news" className="flex items-center w-full">
-                <Newspaper className="h-4 w-4 mr-2" />
-                Actualités
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/admin/events" className="flex items-center w-full">
-                <Calendar className="h-4 w-4 mr-2" />
-                Agenda
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
+          <DropdownMenuItem onClick={handleAdminClick} className="flex items-center">
+            <Settings className="h-4 w-4 mr-2" />
+            Paramètres
+        </DropdownMenuItem>
         )}
 
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">

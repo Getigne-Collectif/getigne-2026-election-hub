@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
@@ -38,10 +38,31 @@ const ObjectifPage = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const { settings } = useAppSettings();
+  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Logique pour défiler jusqu'à l'ancre après le chargement initial
+    const hash = location.hash;
+    if (hash) {
+      // Petit délai pour s'assurer que le DOM est complètement chargé
+      setTimeout(() => {
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          // Ajouter un offset pour éviter que le menu fixe ne cache le contenu
+          const offset = 80; // hauteur approximative du menu en pixels
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
+        }
+      }, 100);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (!authChecked) return;
@@ -522,7 +543,9 @@ const ObjectifPage = () => {
             </section>
 
             {/* Section Commissions Citoyennes */}
-            <CitizenCommittees />
+            <div id="commissions">
+              <CitizenCommittees />
+            </div>
 
             {/* Engagez-vous section */}
             <div className="bg-getigne-accent/5 rounded-xl p-8 md:p-12 mb-16">

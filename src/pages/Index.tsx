@@ -32,7 +32,7 @@ const Index = () => {
         <News limit={3} />
         <Events />
         <Campaign />
-        <Team />
+        {/* <Team /> */}
         <Footer />
       </div>
     </HelmetProvider>

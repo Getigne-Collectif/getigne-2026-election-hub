@@ -1,7 +1,6 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { UserPlusIcon, CalendarCheck, PlusCircle } from 'lucide-react';
+import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, Heart } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useAuth } from '@/context/AuthContext';
 
@@ -29,7 +28,7 @@ const Campaign = () => {
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Objectif 2026</h2>
           <p className="text-getigne-700 text-lg">
-            Engagés ensemble pour construire l'avenir de Gétigné : rejoignez notre campagne pour les élections municipales de 2026.
+            Tous engagés pour construire l'avenir de Gétigné !<br/>rejoignez notre campagne pour les élections municipales de 2026.
           </p>
         </div>
 
@@ -72,20 +71,20 @@ const Campaign = () => {
               </div>
               <div className="mt-8">
                 <Button asChild>
-                  <Link to={programLink}>En savoir plus</Link>
+                  <Link to={"/objectif-2026"}> Découvrez notre projet pour 2026</Link>
                 </Button>
               </div>
             </div>
             <div className="relative h-64 md:h-96 rounded-xl overflow-hidden">
               <img 
-                src="/placeholder.svg" 
-                alt="Gétigné Collectif en campagne" 
+                src="https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+                alt="Groupe d'amis discutant ensemble" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-getigne-900/50 to-transparent pointer-events-none"></div>
               <div className="absolute bottom-6 left-6 right-6">
                 <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg inline-block">
-                  <p className="font-medium text-getigne-900">Rejoignez-nous pour préparer 2026 !</p>
+                  <p className="font-medium text-getigne-900">Faites partie de l'aventure collective !</p>
                 </div>
               </div>
             </div>
@@ -94,16 +93,20 @@ const Campaign = () => {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
-            <h3 className="text-xl font-semibold mb-3">Adhérer au collectif</h3>
+            <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
+              <Heart size={18} className="text-getigne-accent" /> Soutenez le collectif
+            </h3>
             <p className="text-getigne-700 mb-4">
-              Devenez membre du Gétigné Collectif et participez activement à notre projet pour 2026.
+              Adhérez ou faites un don pour financer la campagne.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/adherer">Rejoindre</Link>
+              <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noopener noreferrer">Adhérer ou faire un don</a>
             </Button>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
-            <h3 className="text-xl font-semibold mb-3">Commissions thématiques</h3>
+            <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
+              <Component size={18} className="text-getigne-accent" /> Rejoignez une commission
+            </h3>
             <p className="text-getigne-700 mb-4">
               Intégrez l'une de nos commissions de travail selon vos centres d'intérêt et compétences.
             </p>
@@ -112,7 +115,9 @@ const Campaign = () => {
             </Button>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
-            <h3 className="text-xl font-semibold mb-3">Prochains événements</h3>
+            <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
+              <CalendarCheck size={18} className="text-getigne-accent" /> Participez à nos événements
+            </h3>
             <p className="text-getigne-700 mb-4">
               Consultez l'agenda de nos prochaines rencontres et événements à Gétigné.
             </p>

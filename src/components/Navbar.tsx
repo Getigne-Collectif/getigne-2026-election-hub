@@ -149,20 +149,6 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <AuthButton />
 
-            {userRoles.includes('admin') && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hidden md:flex"
-                aria-label="Administration"
-                asChild
-              >
-                <Link to="/admin">
-                  <Settings className="h-5 w-5" />
-                </Link>
-              </Button>
-            )}
-
             <Sheet>
               <SheetTrigger asChild>
                 <Button

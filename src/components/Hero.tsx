@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -34,7 +33,7 @@ const Hero = () => {
           className={`max-w-4xl mx-auto text-center transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           <div className={`mb-4 inline-block transform transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            <span className="text-white bg-getigne-green-500/30 px-4 py-1 rounded-full text-sm font-medium">
+            <span className="text-white bg-getigne-green-500/30 px-5 py-2 rounded-full text-base font-medium">
               Élections municipales 2026
             </span>
           </div>
@@ -60,12 +59,7 @@ const Hero = () => {
           >
             <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <Link to="/objectif-2026">
-                Objectif 2026
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 py-6 px-8 rounded-md text-lg backdrop-blur-sm">
-              <Link to="/contact">
-                Nous rejoindre
+                Découvez notre projet pour 2026
               </Link>
             </Button>
           </div>
