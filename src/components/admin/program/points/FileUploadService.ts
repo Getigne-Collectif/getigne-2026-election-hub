@@ -2,6 +2,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Uploads files to Supabase storage and returns an array of public URLs
+ */
 export async function uploadFiles(files: File[]): Promise<string[]> {
   if (files.length === 0) return [];
   

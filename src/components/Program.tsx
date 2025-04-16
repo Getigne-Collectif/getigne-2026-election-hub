@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 
-const ProgramItem = ({ icon, title, description, delay }) => {
+const ProgramItem = ({ icon, title, description, delay, image }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
 
@@ -41,10 +42,19 @@ const ProgramItem = ({ icon, title, description, delay }) => {
       }`}
       style={{ transitionDelay: `${delay * 100}ms` }}
     >
-      <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center mb-4">
-        {icon && <DynamicIcon name={icon} className="text-getigne-accent" size={24} />}
+      <div className="flex items-center gap-4 mb-4">
+        <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
+          {icon && <DynamicIcon name={icon} className="text-getigne-accent" size={24} />}
+        </div>
+        <h3 className="text-lg font-medium">{title}</h3>
       </div>
-      <h3 className="text-lg font-medium mb-2">{title}</h3>
+      
+      {image && (
+        <div className="mb-4 rounded-lg overflow-hidden h-32">
+          <img src={image} alt={title} className="w-full h-full object-cover" />
+        </div>
+      )}
+      
       <p className="text-getigne-700 mb-4">{description?.substring(0, 150) + (description?.length > 150 ? '...' : '')}</p>
       <Link to="/objectif-2026/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
         En savoir plus
@@ -122,7 +132,8 @@ const Program = () => {
               key={item.id} 
               icon={item.icon} 
               title={item.title} 
-              description={item.description?.substring(0, 150) + (item.description?.length > 150 ? '...' : '')} 
+              description={item.description}
+              image={item.image}
               delay={index}
             />
           ))}

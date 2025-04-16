@@ -16,6 +16,7 @@ export interface ProgramItem {
   description: string;
   icon: string;
   image?: string;
+  content?: string;
   created_at: string;
   updated_at: string;
 }

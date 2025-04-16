@@ -670,26 +670,32 @@ export type Database = {
       }
       program_items: {
         Row: {
+          content: string | null
           created_at: string
           description: string
           icon: string
           id: string
+          image: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          content?: string | null
           created_at?: string
           description: string
           icon: string
           id?: string
+          image?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          content?: string | null
           created_at?: string
           description?: string
           icon?: string
           id?: string
+          image?: string | null
           title?: string
           updated_at?: string
         }
