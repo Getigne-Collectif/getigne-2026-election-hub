@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useAuth } from '@/context/AuthContext.tsx';
-import { useToast } from '@/components/ui/use-toast.ts';
+import { toast } from 'sonner';
 import Navbar from '@/components/Navbar.tsx';
 import Footer from '@/components/Footer.tsx';
 import { Calendar as CalendarIcon, CheckCheck, Clock, Copy, Globe, Lock, Plus, Send, Trash, Upload, User, Users } from 'lucide-react';
-import { addHours } from 'date-fns';
+import { addHours, format } from 'date-fns';
 import {
   Card,
   CardContent,
@@ -29,7 +29,6 @@ import {
 import { Calendar } from "@/components/ui/calendar.tsx";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx";
 import { cn } from "@/lib/utils.ts";
-import { format } from "date-fns";
 import { da } from "date-fns/locale";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb.tsx";
 import { Home } from 'lucide-react';
@@ -70,7 +69,6 @@ const AdminEventEditorPage = () => {
   const { user, isAdmin, authChecked } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [event, setEvent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -91,9 +89,9 @@ const AdminEventEditorPage = () => {
       setIsAuthorized(false);
       if (user) {
         toast({
-          variant: "destructive",
           title: "Accès restreint",
-          description: "Vous n'avez pas les droits nécessaires pour accéder à cette page."
+          description: "Vous n'avez pas les droits nécessaires pour accéder à cette page.",
+          variant: "destructive"
         });
         navigate('/');
       } else {
@@ -101,7 +99,7 @@ const AdminEventEditorPage = () => {
       }
     }
     setIsChecking(false);
-  }, [user, isAdmin, authChecked, navigate, toast]);
+  }, [user, isAdmin, authChecked, navigate]);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -120,14 +118,19 @@ const AdminEventEditorPage = () => {
 
         if (error) throw error;
 
+        const eventWithDateObj = {
+          ...data,
+          date: data.date ? new Date(data.date) : new Date()
+        };
+
         setEvent(data);
-        form.reset(data);
+        form.reset(eventWithDateObj);
       } catch (error) {
         console.error("Erreur lors de la récupération de l'événement:", error);
         toast({
-          variant: "destructive",
           title: "Erreur",
-          description: "Impossible de récupérer l'événement."
+          description: "Impossible de récupérer l'événement.",
+          variant: "destructive"
         });
       } finally {
         setLoading(false);
@@ -158,25 +161,37 @@ const AdminEventEditorPage = () => {
     setLoading(true);
     try {
       if (id) {
-        // Mise à jour de l'événement existant
+        const dbValues = {
+          ...values,
+          date: values.date.toISOString()
+        };
+
         const { data, error } = await supabase
           .from('events')
-          .update(values)
+          .update(dbValues)
           .eq('id', id);
 
         if (error) throw error;
 
-        toast.success("Événement mis à jour avec succès");
+        toast("Événement mis à jour avec succès", {
+          description: "Les modifications ont été enregistrées",
+        });
       } else {
-        // Création d'un nouvel événement
+        const dbValues = {
+          ...values,
+          date: values.date.toISOString()
+        };
+
         const { data, error } = await supabase
           .from('events')
-          .insert([values])
-          .select()
+          .insert([dbValues])
+          .select();
 
         if (error) throw error;
 
-        toast.success("Événement créé avec succès");
+        toast("Événement créé avec succès", {
+          description: "Le nouvel événement a été ajouté",
+        });
         navigate('/admin/events');
 
         if (data && data.length > 0) {
@@ -185,9 +200,12 @@ const AdminEventEditorPage = () => {
           createDiscordEvent(newEvent);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur lors de la sauvegarde de l'événement:", error);
-      toast.error("Erreur lors de la sauvegarde de l'événement");
+      toast("Erreur lors de la sauvegarde de l'événement", {
+        description: error.message,
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -205,17 +223,21 @@ const AdminEventEditorPage = () => {
 
       if (error) throw error;
 
-      toast.success("Événement supprimé avec succès");
+      toast("Événement supprimé avec succès", {
+        description: "L'événement a été supprimé définitivement",
+      });
       navigate('/admin/events');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur lors de la suppression de l'événement:", error);
-      toast.error("Erreur lors de la suppression de l'événement");
+      toast("Erreur lors de la suppression de l'événement", {
+        description: error.message,
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Find the sendDiscordNotification function and update it
   const sendDiscordNotification = async (event: any) => {
     try {
       const { data, error } = await supabase.functions.invoke('discord-notify', {
@@ -254,14 +276,18 @@ const AdminEventEditorPage = () => {
 
       if (error) throw error;
       setNotificationSent(true);
-      toast.success("Notification Discord envoyée avec succès");
-    } catch (error) {
+      toast("Notification Discord envoyée avec succès", {
+        description: "L'événement a été annoncé sur Discord",
+      });
+    } catch (error: any) {
       console.error("Erreur lors de l'envoi de la notification Discord:", error);
-      toast.error("Erreur lors de l'envoi de la notification Discord");
+      toast("Erreur lors de l'envoi de la notification Discord", {
+        description: error.message,
+        variant: "destructive"
+      });
     }
   };
 
-  // Find the createDiscordEvent function and update it
   const createDiscordEvent = async (event: any) => {
     try {
       const { data, error } = await supabase.functions.invoke('discord-create-event', {
@@ -278,10 +304,15 @@ const AdminEventEditorPage = () => {
 
       if (error) throw error;
       setEventCreated(true);
-      toast.success("Événement Discord créé avec succès");
-    } catch (error) {
+      toast("Événement Discord créé avec succès", {
+        description: "L'événement a été ajouté au calendrier Discord",
+      });
+    } catch (error: any) {
       console.error("Erreur lors de la création de l'événement Discord:", error);
-      toast.error("Erreur lors de la création de l'événement Discord");
+      toast("Erreur lors de la création de l'événement Discord", {
+        description: error.message,
+        variant: "destructive"
+      });
     }
   };
 
@@ -467,6 +498,7 @@ const AdminEventEditorPage = () => {
                                 type="number"
                                 placeholder="Nombre maximum de participants"
                                 {...field}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                               />
                             </FormControl>
                             <FormMessage />

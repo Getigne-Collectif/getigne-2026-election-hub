@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -50,7 +49,6 @@ const ProgramAlertForm = () => {
       if (data.newsletter) {
         await subscribeToNewsletter({
           email: data.email,
-          name: data.name,
         });
       }
       

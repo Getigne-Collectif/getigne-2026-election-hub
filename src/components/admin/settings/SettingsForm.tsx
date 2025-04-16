@@ -1,94 +1,368 @@
-
-import { useState } from 'react';
-import { useAppSettings } from '@/hooks/useAppSettings';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { Loader2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
+const formSchema = z.object({
+  site_name: z.string().min(2, {
+    message: 'Le nom du site doit comporter au moins 2 caractères.',
+  }),
+  site_description: z.string().min(10, {
+    message: 'La description du site doit comporter au moins 10 caractères.',
+  }),
+  contact_email: z.string().email({
+    message: 'Veuillez entrer une adresse email valide.',
+  }),
+  maintenance_mode: z.boolean().default(false),
+  maintenance_message: z.string().optional(),
+  social_facebook: z.string().url({
+    message: 'Veuillez entrer une URL valide.',
+  }).optional().or(z.literal('')),
+  social_twitter: z.string().url({
+    message: 'Veuillez entrer une URL valide.',
+  }).optional().or(z.literal('')),
+  social_instagram: z.string().url({
+    message: 'Veuillez entrer une URL valide.',
+  }).optional().or(z.literal('')),
+  social_linkedin: z.string().url({
+    message: 'Veuillez entrer une URL valide.',
+  }).optional().or(z.literal('')),
+  social_youtube: z.string().url({
+    message: 'Veuillez entrer une URL valide.',
+  }).optional().or(z.literal('')),
+});
+
+type SettingsFormValues = z.infer<typeof formSchema>;
 
 export default function SettingsForm() {
-  const { settings, updateSettings, isLoading, refresh } = useAppSettings();
-  const [updating, setUpdating] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleToggleSetting = async (key: keyof typeof settings, value: boolean) => {
+  const form = useForm<SettingsFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      site_name: '',
+      site_description: '',
+      contact_email: '',
+      maintenance_mode: false,
+      maintenance_message: '',
+      social_facebook: '',
+      social_twitter: '',
+      social_instagram: '',
+      social_linkedin: '',
+      social_youtube: '',
+    },
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('settings')
+          .select('*')
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          form.reset({
+            site_name: data.site_name || '',
+            site_description: data.site_description || '',
+            contact_email: data.contact_email || '',
+            maintenance_mode: data.maintenance_mode || false,
+            maintenance_message: data.maintenance_message || '',
+            social_facebook: data.social_facebook || '',
+            social_twitter: data.social_twitter || '',
+            social_instagram: data.social_instagram || '',
+            social_linkedin: data.social_linkedin || '',
+            social_youtube: data.social_youtube || '',
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les paramètres du site.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, [form]);
+
+  const onSubmit = async (values: SettingsFormValues) => {
+    setIsSaving(true);
     try {
-      setUpdating(true);
-      await updateSettings(key, value);
+      const { error } = await supabase
+        .from('settings')
+        .update(values)
+        .eq('id', 1);
+
+      if (error) throw error;
+
       toast({
-        title: "Paramètre mis à jour",
-        description: `Le paramètre a été modifié avec succès.`,
+        title: "Paramètres enregistrés",
+        description: "Les paramètres du site ont été mis à jour avec succès."
       });
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du paramètre:', error);
+      console.error('Error saving settings:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour le paramètre.",
+        description: "Impossible d'enregistrer les paramètres du site.",
         variant: "destructive"
       });
     } finally {
-      setUpdating(false);
+      setIsSaving(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Paramètres généraux</CardTitle>
-        <CardDescription>
-          Configurez les paramètres de visibilité et comportement du site.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-getigne-600" />
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-between py-3 border-b">
-              <div>
-                <Label className="text-base font-medium">Afficher le programme</Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Active la section programme sur la page d'accueil et le menu de navigation
-                </p>
-              </div>
-              <Switch
-                checked={settings.showProgram}
-                onCheckedChange={(checked) => handleToggleSetting('showProgram', checked)}
-                disabled={updating}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between py-3 border-b">
-              <div>
-                <Label className="text-base font-medium">Afficher les travaux des commissions</Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Rend visible publiquement les travaux des commissions ou les limite à l'équipe programme
-                </p>
-              </div>
-              <Switch
-                checked={settings.showCommitteeWorks}
-                onCheckedChange={(checked) => handleToggleSetting('showCommitteeWorks', checked)}
-                disabled={updating}
-              />
-            </div>
-            
-            <div className="pt-4">
-              <Button 
-                variant="outline" 
-                onClick={() => refresh()}
-                disabled={isLoading || updating}
-              >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Actualiser
-              </Button>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Paramètres généraux</CardTitle>
+            <CardDescription>
+              Configurez les informations de base du site.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <FormField
+              control={form.control}
+              name="site_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom du site</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Gétigné Collectif" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Ce nom apparaît dans le titre des pages et dans l'en-tête du site.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="site_description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description du site</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Une description concise du site..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Cette description est utilisée pour le référencement et les partages sur les réseaux sociaux.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contact_email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email de contact</FormLabel>
+                  <FormControl>
+                    <Input placeholder="contact@getigne-collectif.fr" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Adresse email principale pour les contacts via le site.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Mode maintenance</CardTitle>
+            <CardDescription>
+              Activez le mode maintenance pour afficher un message temporaire aux visiteurs.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <FormField
+              control={form.control}
+              name="maintenance_mode"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Activer le mode maintenance
+                    </FormLabel>
+                    <FormDescription>
+                      Lorsqu'il est activé, les visiteurs verront un message de maintenance au lieu du contenu normal.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="maintenance_message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Message de maintenance</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Notre site est actuellement en maintenance. Nous serons de retour très bientôt !"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Ce message sera affiché aux visiteurs lorsque le mode maintenance est activé.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Réseaux sociaux</CardTitle>
+            <CardDescription>
+              Configurez les liens vers vos profils de réseaux sociaux.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <FormField
+              control={form.control}
+              name="social_facebook"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Facebook</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://facebook.com/..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="social_twitter"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Twitter</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://twitter.com/..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="social_instagram"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Instagram</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://instagram.com/..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="social_linkedin"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>LinkedIn</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://linkedin.com/in/..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="social_youtube"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>YouTube</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://youtube.com/..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enregistrement...
+                </>
+              ) : (
+                "Enregistrer les paramètres"
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+    </Form>
   );
 }
