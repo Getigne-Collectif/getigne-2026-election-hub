@@ -1,84 +1,120 @@
 
-import { useState } from 'react';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { DialogFooter } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
-import MarkdownEditor from '@/components/MarkdownEditor';
-import { ProgramPoint } from '@/types/program.types';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { ProgramPoint } from "@/types/program.types";
+import { FileUploadService } from "./FileUploadService";
+import { Loader2, Paperclip, Trash2, Upload, X } from "lucide-react";
 
-// Form schema for program point
-const programPointSchema = z.object({
-  title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
-  content: z.string().min(10, "Le contenu doit comporter au moins 10 caractères"),
+const formSchema = z.object({
+  title: z.string().min(1, "Le titre est requis"),
+  content: z.string().min(1, "Le contenu est requis"),
+  files: z.array(z.string()).optional(),
 });
 
-export type ProgramPointFormValues = z.infer<typeof programPointSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 interface PointFormProps {
-  defaultValues?: ProgramPointFormValues;
-  onSubmit: (values: ProgramPointFormValues, files: File[]) => Promise<void>;
+  onSubmit: (data: FormValues) => void;
   isSubmitting: boolean;
-  onCancel: () => void;
-  submitLabel: string;
+  point?: ProgramPoint | null;
+  programItemId: string;
 }
 
-export default function PointForm({ 
-  defaultValues = { title: '', content: '' },
-  onSubmit, 
-  isSubmitting, 
-  onCancel,
-  submitLabel
-}: PointFormProps) {
+export default function PointForm({ onSubmit, isSubmitting, point, programItemId }: PointFormProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
-  const form = useForm<ProgramPointFormValues>({
-    resolver: zodResolver(programPointSchema),
-    defaultValues,
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: point?.title || "",
+      content: point?.content || "",
+      files: point?.files || [],
+    },
   });
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const fileList = Array.from(event.target.files);
-      setSelectedFiles(fileList);
+  // Load point data when editing
+  useEffect(() => {
+    if (point) {
+      form.reset({
+        title: point.title,
+        content: point.content,
+        files: point.files || [],
+      });
+      if (point.files && Array.isArray(point.files)) {
+        setUploadedFiles(point.files);
+      }
+    }
+  }, [point, form]);
+
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      if (selectedFiles.length > 0) {
+        setUploading(true);
+        const fileService = new FileUploadService();
+        const newUploadedFiles = await fileService.uploadFiles(selectedFiles, programItemId);
+        setUploading(false);
+        
+        values.files = [...uploadedFiles, ...newUploadedFiles];
+      } else {
+        values.files = uploadedFiles;
+      }
+      
+      onSubmit(values);
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      setUploading(false);
     }
   };
 
-  const handleFormSubmit = async (values: ProgramPointFormValues) => {
-    await onSubmit(values, selectedFiles);
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setSelectedFiles(Array.from(files));
+    }
+  };
+
+  const removeSelectedFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeUploadedFile = (fileUrl: string) => {
+    setUploadedFiles(prev => prev.filter(f => f !== fileUrl));
+    form.setValue("files", form.getValues("files")?.filter(f => f !== fileUrl) || []);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Titre</FormLabel>
+              <FormLabel>Titre du point</FormLabel>
               <FormControl>
-                <Input
-                  type="text"
-                  {...field}
-                  className="prose max-w-none prose-sm"
-                />
+                <Input placeholder="Ex: Créer un jardin partagé" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="content"
@@ -86,58 +122,117 @@ export default function PointForm({
             <FormItem>
               <FormLabel>Contenu</FormLabel>
               <FormControl>
-                <MarkdownEditor
-                  value={field.value}
-                  onChange={field.onChange}
-                  className="min-h-[200px]"
-                  contentType="news"
+                <Textarea
+                  placeholder="Décrivez ce point du programme..."
+                  className="h-32"
+                  {...field}
                 />
               </FormControl>
+              <FormDescription>
+                Détaillez cette proposition et ses objectifs
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
-        <FormItem>
-          <FormLabel>Fichiers</FormLabel>
-          <FormControl>
-            <Input
-              type="file"
-              multiple
-              onChange={handleFileChange}
-              accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-              className="prose max-w-none prose-sm"
-            />
-          </FormControl>
-          <div className="text-sm text-muted-foreground mt-1">
-            {selectedFiles.length > 0 && (
-              <p>{selectedFiles.length} fichier(s) sélectionné(s)</p>
-            )}
+
+        {/* File upload section */}
+        <div className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <FormLabel>Fichiers attachés</FormLabel>
+            <FormDescription>
+              Vous pouvez joindre des fichiers complémentaires à cette proposition (PDF, images, etc.)
+            </FormDescription>
           </div>
-        </FormItem>
-        
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-          >
-            Annuler
-          </Button>
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Traitement en cours...
-              </>
-            ) : (
-              submitLabel
+
+          {/* Previously uploaded files */}
+          {uploadedFiles.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Fichiers existants</p>
+              <div className="space-y-2">
+                {uploadedFiles.map((fileUrl, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between bg-muted/30 border border-border rounded-md p-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Paperclip className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm truncate max-w-[300px]">
+                        {fileUrl.split("/").pop()}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeUploadedFile(fileUrl)}
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Selected files waiting to be uploaded */}
+          {selectedFiles.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Fichiers à téléverser</p>
+              <div className="space-y-2">
+                {selectedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between bg-muted/30 border border-border rounded-md p-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Paperclip className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm truncate max-w-[300px]">
+                        {file.name}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeSelectedFile(index)}
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => document.getElementById("file-upload")?.click()}
+            >
+              <Upload className="h-4 w-4" />
+              Ajouter des fichiers
+            </Button>
+            <input
+              id="file-upload"
+              type="file"
+              className="hidden"
+              multiple
+              onChange={handleFilesSelected}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting || uploading}>
+            {(isSubmitting || uploading) && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
+            {point ? "Mettre à jour" : "Ajouter"}
           </Button>
-        </DialogFooter>
+        </div>
       </form>
     </Form>
   );

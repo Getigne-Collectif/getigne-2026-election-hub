@@ -9,3 +9,13 @@ export interface ProgramPoint {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface ProgramItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  image?: string;
+  created_at: string;
+  updated_at: string;
+}

@@ -45,7 +45,7 @@ const ProgramItem = ({ icon, title, description, delay }) => {
         {icon && <DynamicIcon name={icon} className="text-getigne-accent" size={24} />}
       </div>
       <h3 className="text-lg font-medium mb-2">{title}</h3>
-      <p className="text-getigne-700 mb-4">{description}</p>
+      <p className="text-getigne-700 mb-4">{description?.substring(0, 150) + (description?.length > 150 ? '...' : '')}</p>
       <Link to="/objectif-2026/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
         En savoir plus
         <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
@@ -122,7 +122,7 @@ const Program = () => {
               key={item.id} 
               icon={item.icon} 
               title={item.title} 
-              description={item.description} 
+              description={item.description?.substring(0, 150) + (item.description?.length > 150 ? '...' : '')} 
               delay={index}
             />
           ))}

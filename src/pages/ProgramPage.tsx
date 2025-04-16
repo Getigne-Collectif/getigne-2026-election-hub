@@ -25,6 +25,7 @@ interface ProgramItem {
   description: string;
   content: string;
   icon: string;
+  image: string;
   created_at: string;
   updated_at: string;
 }
@@ -52,7 +53,7 @@ const ProgramPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from(TABLES.PROGRAM_ITEMS)
-        .select('id, title, description, content, icon, created_at, updated_at')
+        .select('id, title, description, content, icon, image, created_at, updated_at')
         .order('created_at', { ascending: true });
         
       if (error) {
@@ -317,7 +318,7 @@ const ProgramPage = () => {
                       <div key={item.id} className="flex flex-col md:flex-row gap-8 items-center mb-16">
                         <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:order-2' : ''}`}>
                           <img
-                            src="/placeholder.svg"
+                            src={item.image || "/placeholder.svg"}
                             alt={item.title}
                             className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg"
                           />
@@ -343,7 +344,7 @@ const ProgramPage = () => {
                               <h4 className="text-xl font-semibold mb-4">Nos propositions concrètes</h4>
                               <div className="prose max-w-none rich-content">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                  {item.content}
+                                  {item.content || "Les propositions détaillées sont en cours d'élaboration."}
                                 </ReactMarkdown>
                               </div>
                             </div>

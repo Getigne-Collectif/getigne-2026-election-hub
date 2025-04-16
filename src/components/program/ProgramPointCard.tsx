@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -106,7 +105,9 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
         {showContent && (
           <>
             <div className="prose max-w-none rich-content mb-4">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{point.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {point.content || "Contenu en cours d'élaboration"}
+              </ReactMarkdown>
             </div>
 
             {point.files && point.files.length > 0 && (

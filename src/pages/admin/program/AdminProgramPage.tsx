@@ -148,6 +148,7 @@ export default function AdminProgramPage() {
                       <TableHead className="w-12"></TableHead>
                       <TableHead>Titre</TableHead>
                       <TableHead>Description</TableHead>
+                      <TableHead>Image</TableHead>
                       <TableHead className="w-[150px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -166,9 +167,18 @@ export default function AdminProgramPage() {
                           </div>
                         </TableCell>
                         <TableCell className="font-medium">{item.title}</TableCell>
-                        <TableCell className="truncate max-w-[400px]">
+                        <TableCell className="truncate max-w-[250px]">
                           {item.description.substring(0, 100)}
                           {item.description.length > 100 ? '...' : ''}
+                        </TableCell>
+                        <TableCell>
+                          {item.image ? (
+                            <div className="w-10 h-10 rounded-md overflow-hidden">
+                              <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">Aucune</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">

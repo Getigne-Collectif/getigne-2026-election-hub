@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -27,7 +28,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Upload } from 'lucide-react';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
@@ -38,6 +39,7 @@ const programItemSchema = z.object({
   title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
   description: z.string().min(10, "La description doit comporter au moins 10 caractères"),
   icon: z.string().optional(),
+  image: z.string().optional(),
 });
 
 type ProgramItemFormValues = z.infer<typeof programItemSchema>;
@@ -48,6 +50,8 @@ export default function AdminProgramEditorPage() {
   const isEditing = !!id;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Form setup
   const form = useForm<ProgramItemFormValues>({
@@ -56,6 +60,7 @@ export default function AdminProgramEditorPage() {
       title: '',
       description: '',
       icon: '',
+      image: '',
     },
   });
 
@@ -88,19 +93,71 @@ export default function AdminProgramEditorPage() {
         title: programItem.title,
         description: programItem.description,
         icon: programItem.icon || '',
+        image: programItem.image || '',
       });
+      
+      if (programItem.image) {
+        setImagePreview(programItem.image);
+      }
     }
   }, [programItem, form]);
+
+  // Handle image selection
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const imageUrl = URL.createObjectURL(file);
+      setImagePreview(imageUrl);
+      form.setValue('image', 'uploading...');
+    }
+  };
+
+  // Upload image to supabase storage
+  const uploadImage = async (): Promise<string | null> => {
+    if (!imageFile) return form.getValues('image') || null;
+
+    try {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('program_images')
+        .upload(`sections/${fileName}`, imageFile);
+        
+      if (error) throw error;
+      
+      const { data: urlData } = supabase.storage
+        .from('program_images')
+        .getPublicUrl(`sections/${fileName}`);
+        
+      return urlData.publicUrl;
+    } catch (error: any) {
+      toast.error(`Erreur lors de l'upload de l'image: ${error.message}`);
+      console.error('Upload error:', error);
+      return null;
+    }
+  };
 
   // Handle form submission
   const onSubmit = async (values: ProgramItemFormValues) => {
     setIsSubmitting(true);
     
     try {
+      // Upload image if new one selected
+      let imageUrl = values.image;
+      if (imageFile) {
+        imageUrl = await uploadImage();
+        if (!imageUrl) {
+          throw new Error("Échec de l'upload de l'image");
+        }
+      }
+      
       const programData = {
         title: values.title,
         description: values.description,
         icon: values.icon,
+        image: imageUrl,
         updated_at: new Date().toISOString(),
       };
       
@@ -222,6 +279,69 @@ export default function AdminProgramEditorPage() {
                         <FormDescription>
                           Décrivez l'orientation générale et l'importance de cette thématique dans votre programme
                         </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {/* Image de section */}
+                  <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Image de la section</FormLabel>
+                        <div className="space-y-4">
+                          {imagePreview && (
+                            <div className="w-full h-40 relative rounded-md overflow-hidden border border-getigne-200">
+                              <img 
+                                src={imagePreview} 
+                                alt="Aperçu" 
+                                className="w-full h-full object-cover"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-2 right-2"
+                                onClick={() => {
+                                  setImagePreview(null);
+                                  setImageFile(null);
+                                  field.onChange("");
+                                }}
+                              >
+                                Supprimer
+                              </Button>
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-4">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => document.getElementById('image-upload')?.click()}
+                            >
+                              <Upload className="mr-2 h-4 w-4" />
+                              {imagePreview ? "Changer l'image" : "Ajouter une image"}
+                            </Button>
+                            <input
+                              id="image-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleImageChange}
+                            />
+                            <input 
+                              type="hidden" 
+                              {...field} 
+                              value={field.value || ""} 
+                            />
+                          </div>
+                          
+                          <FormDescription>
+                            Ajoutez une image représentative pour cette section du programme (format recommandé: 16:9)
+                          </FormDescription>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
