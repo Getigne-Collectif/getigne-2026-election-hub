@@ -112,28 +112,6 @@ export default function AdminProgramEditorPage() {
     }
   }, [programItem, form]);
 
-  const handleImageUpload = useCallback(async (file: File): Promise<string | null> => {
-    console.log(`[ProgramEditor] Starting image upload process for file: ${file.name}`);
-    
-    try {
-      const imageUrl = await uploadProgramImage(file);
-      
-      if (!imageUrl) {
-        console.error("[ProgramEditor] Image upload returned null");
-        toast.error("Échec de l'upload de l'image");
-        return null;
-      }
-      
-      console.log(`[ProgramEditor] Image upload successful, URL: ${imageUrl}`);
-      setUploadedImageUrl(imageUrl);
-      return imageUrl;
-    } catch (error) {
-      console.error("[ProgramEditor] Image upload exception:", error);
-      toast.error(`Erreur lors de l'upload: ${error instanceof Error ? error.message : String(error)}`);
-      return null;
-    }
-  }, []);
-
   const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
@@ -149,13 +127,19 @@ export default function AdminProgramEditorPage() {
     console.log(`[ProgramEditor] Created object URL for preview: ${objectUrl}`);
     setImagePreview(objectUrl);
     
-    setUploadedImageUrl(null);
-  }, []);
+    uploadProgramImage(file).then(url => {
+      if (url) {
+        console.log(`[ProgramEditor] Image uploaded, setting URL: ${url}`);
+        setUploadedImageUrl(url);
+        form.setValue('image', url);
+      }
+    });
+  }, [form]);
 
   const removeImage = useCallback(() => {
     console.log("[ProgramEditor] Removing image");
     
-    if (imagePreview) {
+    if (imagePreview && !imagePreview.startsWith('http')) {
       URL.revokeObjectURL(imagePreview);
       console.log("[ProgramEditor] Revoked object URL");
     }
@@ -173,22 +157,8 @@ export default function AdminProgramEditorPage() {
     setIsSubmitting(true);
     
     try {
-      let finalImageUrl = uploadedImageUrl;
-      
-      if (imageFile && !uploadedImageUrl) {
-        console.log("[ProgramEditor] New image file selected, uploading...");
-        finalImageUrl = await handleImageUpload(imageFile);
-        
-        if (!finalImageUrl) {
-          throw new Error("Échec de l'upload de l'image");
-        }
-      } else if (imagePreview && !imageFile && programItem?.image) {
-        console.log("[ProgramEditor] Keeping existing image:", programItem.image);
-        finalImageUrl = programItem.image;
-      } else if (!imagePreview) {
-        console.log("[ProgramEditor] No image selected, clearing image field");
-        finalImageUrl = null;
-      }
+      const finalImageUrl = uploadedImageUrl || values.image || null;
+      console.log(`[ProgramEditor] Final image URL for saving: ${finalImageUrl}`);
       
       const programData = {
         title: values.title,
@@ -339,6 +309,10 @@ export default function AdminProgramEditorPage() {
                                 src={imagePreview} 
                                 alt="Aperçu" 
                                 className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  console.error(`[ProgramEditor] Failed to load image preview: ${imagePreview}`);
+                                  e.currentTarget.src = '/placeholder.svg';
+                                }}
                               />
                               <Button
                                 type="button"
@@ -373,6 +347,11 @@ export default function AdminProgramEditorPage() {
                               {...field} 
                               value={uploadedImageUrl || field.value} 
                             />
+                            {(field.value || uploadedImageUrl) && (
+                              <span className="text-xs text-muted-foreground">
+                                Image sélectionnée
+                              </span>
+                            )}
                           </div>
                           
                           <FormDescription>

@@ -1,6 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 /**
  * Uploads files to Supabase storage and returns an array of public URLs
@@ -36,7 +37,8 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
 }
 
 /**
- * Uploads a single image to Supabase storage and returns the public URL
+ * Uploads a single image to Supabase storage specifically for program sections
+ * and returns the public URL
  */
 export async function uploadProgramImage(file: File): Promise<string | null> {
   if (!file) {
@@ -45,31 +47,49 @@ export async function uploadProgramImage(file: File): Promise<string | null> {
   }
 
   try {
-    console.log(`[FileUploadService] Starting image upload for: ${file.name}`);
+    console.log(`[FileUploadService] Starting program section image upload for: ${file.name}`);
     
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${uuidv4()}.${fileExt}`;
+    // Validate file type
+    const fileType = file.type.toLowerCase();
+    if (!fileType.startsWith('image/')) {
+      console.error(`[FileUploadService] Invalid file type: ${fileType}. Only images are allowed.`);
+      toast.error("Seules les images peuvent être téléchargées");
+      return null;
+    }
+    
+    // Generate a unique filename
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const uniqueId = uuidv4();
+    const fileName = `program_section_${uniqueId}.${fileExt}`;
     const filePath = `program_images/${fileName}`;
 
-    console.log(`[FileUploadService] Uploading to path: ${filePath}`);
+    console.log(`[FileUploadService] Uploading program image to path: ${filePath}`);
 
+    // Upload the file
     const { error: uploadError } = await supabase.storage
       .from('program_images')
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
     if (uploadError) {
-      console.error("[FileUploadService] Image upload error:", uploadError);
+      console.error("[FileUploadService] Program image upload error:", uploadError);
+      toast.error(`Erreur lors de l'upload: ${uploadError.message}`);
       return null;
     }
 
+    // Get the public URL
     const { data: { publicUrl } } = supabase.storage
       .from('program_images')
       .getPublicUrl(filePath);
 
-    console.log(`[FileUploadService] Image upload successful. Public URL: ${publicUrl}`);
+    console.log(`[FileUploadService] Program image upload successful. Public URL: ${publicUrl}`);
+    toast.success("Image téléchargée avec succès");
     return publicUrl;
   } catch (error) {
-    console.error("[FileUploadService] Image upload exception:", error);
+    console.error("[FileUploadService] Program image upload exception:", error);
+    toast.error(`Erreur lors de l'upload: ${error instanceof Error ? error.message : String(error)}`);
     return null;
   }
 }

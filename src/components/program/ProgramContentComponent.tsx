@@ -118,18 +118,20 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         </div>
 
         {/* Image de la section si disponible */}
-        <div className="mb-8">
-          <img 
-            src={programItem.image || placeholder} 
-            alt={programItem.title} 
-            className="rounded-xl w-full max-h-[400px] object-cover"
-            onError={(e) => {
-              console.error(`[ProgramContent] Image failed to load: ${programItem.image}`);
-              // @ts-ignore
-              e.target.src = placeholder;
-            }}
-          />
-        </div>
+        {programItem.image && (
+          <div className="mb-8">
+            <img 
+              src={programItem.image} 
+              alt={programItem.title} 
+              className="rounded-xl w-full max-h-[400px] object-cover"
+              onError={(e) => {
+                console.error(`[ProgramContent] Image failed to load: ${programItem.image}`);
+                // @ts-ignore
+                e.target.src = placeholder;
+              }}
+            />
+          </div>
+        )}
 
         {/* Description avec style amélioré */}
         <div className="prose max-w-none mb-12 rich-content bg-white rounded-xl p-6 shadow-sm border border-getigne-100" dangerouslySetInnerHTML={{ __html: programItem.description }} />
