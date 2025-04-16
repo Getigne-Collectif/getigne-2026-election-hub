@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/context/auth';
 import { supabase, TABLES } from '@/integrations/supabase/client';
@@ -190,7 +189,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Textarea
-          placeholder="Partagez votre avis..."
+          placeholder="Qu'est-ce que cela vous inspire... ajoutez un commentaire"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={4}

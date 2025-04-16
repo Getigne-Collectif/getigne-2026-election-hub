@@ -1,8 +1,9 @@
-
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from './utils';
 import { Comment } from '@/types/comments.types';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface UserViewProps {
   comments: Comment[];
@@ -19,47 +20,37 @@ const UserView: React.FC<UserViewProps> = ({ comments, loading = false }) => {
   }
 
   if (comments.length === 0) {
-    return (
-      <div className="text-center py-8 text-getigne-500">
-        Aucun commentaire pour cet article
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {comments.map((comment) => (
         <div 
           key={comment.id} 
-          className="bg-white p-5 rounded-lg shadow-sm border border-getigne-100"
+          className="flex gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors"
         >
-          <div className="flex items-center gap-2 mb-3">
-            <Avatar className="h-10 w-10 bg-getigne-100">
-              {comment.profiles?.avatar_url ? (
-                <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
-              ) : null}
-              <AvatarFallback className="text-getigne-700">
-                {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h4 className="font-medium">
+          <Avatar className="h-8 w-8 bg-getigne-100">
+            {comment.profiles?.avatar_url ? (
+              <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
+            ) : null}
+            <AvatarFallback className="text-getigne-700 text-xs">
+              {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-medium text-sm">
                 {comment.profiles && comment.profiles.first_name && comment.profiles.last_name
                   ? `${comment.profiles.first_name} ${comment.profiles.last_name}`
                   : 'Utilisateur anonyme'}
-              </h4>
-              <time className="text-getigne-500 text-sm">
-                {new Date(comment.created_at).toLocaleDateString('fr-FR', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </time>
+              </span>
+              <span className="text-muted-foreground text-xs">
+                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: fr })}
+              </span>
             </div>
+            <p className="text-sm text-foreground">{comment.content}</p>
           </div>
-          <p className="text-getigne-700">{comment.content}</p>
         </div>
       ))}
     </div>

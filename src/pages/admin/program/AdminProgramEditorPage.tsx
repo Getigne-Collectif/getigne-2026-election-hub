@@ -73,8 +73,6 @@ export default function AdminProgramEditorPage() {
     queryFn: async () => {
       if (!id) return null;
       
-      console.log(`[ProgramEditor] Fetching program item with ID: ${id}`);
-      
       const { data, error } = await supabase
         .from('program_items')
         .select('*')
@@ -82,12 +80,10 @@ export default function AdminProgramEditorPage() {
         .single();
         
       if (error) {
-        console.error("[ProgramEditor] Error loading program item:", error);
         toast.error("Erreur lors du chargement de la section");
         throw error;
       }
       
-      console.log("[ProgramEditor] Program item loaded:", data);
       return data;
     },
     enabled: isEditing,
@@ -95,8 +91,6 @@ export default function AdminProgramEditorPage() {
 
   useEffect(() => {
     if (programItem) {
-      console.log("[ProgramEditor] Setting form values from program item:", programItem);
-      
       form.reset({
         title: programItem.title,
         description: programItem.description,
@@ -105,7 +99,6 @@ export default function AdminProgramEditorPage() {
       });
       
       if (programItem.image) {
-        console.log(`[ProgramEditor] Setting image preview from existing image: ${programItem.image}`);
         setImagePreview(programItem.image);
         setUploadedImageUrl(programItem.image);
       }
@@ -114,22 +107,19 @@ export default function AdminProgramEditorPage() {
 
   const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) {
-      console.log("[ProgramEditor] No file selected in input");
-      return;
-    }
+    if (!file) return;
     
-    console.log(`[ProgramEditor] File selected: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
+    // Empêcher la propagation de l'événement
+    e.preventDefault();
+    e.stopPropagation();
     
     setImageFile(file);
     
     const objectUrl = URL.createObjectURL(file);
-    console.log(`[ProgramEditor] Created object URL for preview: ${objectUrl}`);
     setImagePreview(objectUrl);
     
     uploadProgramImage(file).then(url => {
       if (url) {
-        console.log(`[ProgramEditor] Image uploaded, setting URL: ${url}`);
         setUploadedImageUrl(url);
         form.setValue('image', url);
       }
@@ -137,28 +127,21 @@ export default function AdminProgramEditorPage() {
   }, [form]);
 
   const removeImage = useCallback(() => {
-    console.log("[ProgramEditor] Removing image");
-    
     if (imagePreview && !imagePreview.startsWith('http')) {
       URL.revokeObjectURL(imagePreview);
-      console.log("[ProgramEditor] Revoked object URL");
     }
     
     setImageFile(null);
     setImagePreview(null);
     setUploadedImageUrl(null);
     form.setValue('image', '');
-    
-    console.log("[ProgramEditor] Image removed from form");
   }, [imagePreview, form]);
 
   const onSubmit = async (values: ProgramItemFormValues) => {
-    console.log("[ProgramEditor] Form submission started with values:", values);
     setIsSubmitting(true);
     
     try {
       const finalImageUrl = uploadedImageUrl || values.image || null;
-      console.log(`[ProgramEditor] Final image URL for saving: ${finalImageUrl}`);
       
       const programData = {
         title: values.title,
@@ -168,18 +151,14 @@ export default function AdminProgramEditorPage() {
         updated_at: new Date().toISOString(),
       };
       
-      console.log("[ProgramEditor] Saving program data:", programData);
-      
       let error;
       
       if (isEditing && id) {
-        console.log(`[ProgramEditor] Updating existing program item with ID: ${id}`);
         ({ error } = await supabase
           .from('program_items')
           .update(programData)
           .eq('id', id));
       } else {
-        console.log("[ProgramEditor] Creating new program item");
         ({ error } = await supabase
           .from('program_items')
           .insert([{
@@ -188,17 +167,12 @@ export default function AdminProgramEditorPage() {
           }]));
       }
       
-      if (error) {
-        console.error("[ProgramEditor] Database operation error:", error);
-        throw error;
-      }
+      if (error) throw error;
       
-      console.log("[ProgramEditor] Program item saved successfully");
       toast.success(isEditing ? "Section du programme mise à jour" : "Section du programme créée");
       navigate('/admin/program');
       
     } catch (error: any) {
-      console.error("[ProgramEditor] Submit error:", error);
       toast.error(`Erreur: ${error.message}`);
     } finally {
       setIsSubmitting(false);
@@ -286,6 +260,7 @@ export default function AdminProgramEditorPage() {
                             onChange={field.onChange}
                             className="min-h-[200px]"
                             contentType="news"
+                            disableImageUpload={true}
                           />
                         </FormControl>
                         <FormDescription>
@@ -310,7 +285,6 @@ export default function AdminProgramEditorPage() {
                                 alt="Aperçu" 
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                  console.error(`[ProgramEditor] Failed to load image preview: ${imagePreview}`);
                                   e.currentTarget.src = '/placeholder.svg';
                                 }}
                               />

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
@@ -26,22 +25,27 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
   useEffect(() => {
     if (user) {
       checkUserLike();
+      fetchLikes();
     }
   }, [user, programId, programPointId]);
 
   const checkUserLike = async () => {
     try {
-      const { data, error } = await supabase
+      const query = supabase
         .from('program_likes')
         .select('*')
         .eq('program_item_id', programId)
         .eq('user_id', user?.id || '');
 
+      if (programPointId) {
+        query.eq('program_point_id', programPointId);
+      }
+
+      const { data, error } = await query;
+
       if (error) {
         console.error('Error checking like:', error);
       } else {
-        // Currently the likes don't have program_point_id
-        // In the future if that gets added we would check it here
         setHasLiked(data && data.length > 0);
       }
     } catch (err) {
@@ -51,10 +55,16 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
 
   const fetchLikes = async () => {
     try {
-      const { count, error } = await supabase
+      const query = supabase
         .from('program_likes')
         .select('*', { count: 'exact' })
         .eq('program_item_id', programId);
+
+      if (programPointId) {
+        query.eq('program_point_id', programPointId);
+      }
+
+      const { count, error } = await query;
 
       if (error) {
         throw error;
@@ -65,10 +75,6 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
       console.error('Error fetching likes:', err);
     }
   };
-
-  useEffect(() => {
-    fetchLikes();
-  }, [programId]);
 
   const handleLike = async () => {
     if (!user) {
@@ -85,11 +91,17 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
     try {
       if (hasLiked) {
         // Unlike
-        const { error } = await supabase
+        const query = supabase
           .from('program_likes')
           .delete()
           .eq('program_item_id', programId)
           .eq('user_id', user.id);
+
+        if (programPointId) {
+          query.eq('program_point_id', programPointId);
+        }
+
+        const { error } = await query;
         
         if (error) throw error;
         
@@ -99,7 +111,8 @@ const ProgramLikeButton: React.FC<ProgramLikeButtonProps> = ({
         // Like
         const likeData = {
           program_item_id: programId,
-          user_id: user.id
+          user_id: user.id,
+          program_point_id: programPointId || null
         };
 
         const { error } = await supabase

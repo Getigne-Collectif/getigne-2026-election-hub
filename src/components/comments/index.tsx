@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth';
 import UserView from './UserView';
@@ -220,21 +219,33 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   };
 
   const approvedComments = comments.filter((c) => c.status === 'approved');
+  const pendingComments = comments.filter((c) => c.status === 'pending');
 
   return (
     <div className="space-y-8">
-      {(isAdmin || isModerator) && (
-      <div className="space-y-6">
-        <ModeratorView
-          comments={showAllComments ? comments : comments.filter(c => c.status === 'pending')}
-          showAllComments={showAllComments}
-          setShowAllComments={setShowAllComments}
-          onModerateComment={handleModerateComment}
+      {(isAdmin || isModerator) && pendingComments.length > 0 && (
+        <div className="space-y-6">
+          <ModeratorView
+            comments={showAllComments ? comments : pendingComments}
+            showAllComments={showAllComments}
+            setShowAllComments={setShowAllComments}
+            onModerateComment={handleModerateComment}
+            loading={loading}
+            sourceType={resourceType}
+          />
+        </div>
+      )}
+      
+      {approvedComments.length > 0 && (
+        <div>
+          <h3 className="text-xl font-semibold mb-4">Commentaires</h3>
+          <UserView
+          comments={approvedComments}
           loading={loading}
-          sourceType={resourceType}
-        />
-      </div>
-    )}
+          />
+        </div>
+      )}
+
       {user && (
         <div className="mb-8">
           <h3 className="text-xl font-semibold mb-4">Ajouter un commentaire</h3>
@@ -251,14 +262,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           Vous devez être connecté pour ajouter un commentaire
         </div>
       )}
-      
-      <div>
-        <h3 className="text-xl font-semibold mb-4">Commentaires</h3>
-        <UserView
-          comments={approvedComments}
-          loading={loading}
-        />
-      </div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -14,8 +13,6 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
     const fileName = `${uuidv4()}.${fileExt}`;
     const filePath = `program_points/${fileName}`;
 
-    console.log(`[FileUploadService] Uploading file: ${filePath}`);
-
     const { data, error } = await supabase.storage
       .from('program_files')
       .upload(filePath, file);
@@ -29,7 +26,6 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
       .from('program_files')
       .getPublicUrl(filePath);
 
-    console.log(`[FileUploadService] File uploaded successfully. Public URL: ${publicUrl}`);
     return publicUrl;
   });
 
@@ -41,18 +37,12 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
  * and returns the public URL
  */
 export async function uploadProgramImage(file: File): Promise<string | null> {
-  if (!file) {
-    console.log("[FileUploadService] No file provided for upload");
-    return null;
-  }
+  if (!file) return null;
 
   try {
-    console.log(`[FileUploadService] Starting program section image upload for: ${file.name}`);
-    
     // Validate file type
     const fileType = file.type.toLowerCase();
     if (!fileType.startsWith('image/')) {
-      console.error(`[FileUploadService] Invalid file type: ${fileType}. Only images are allowed.`);
       toast.error("Seules les images peuvent être téléchargées");
       return null;
     }
@@ -63,32 +53,27 @@ export async function uploadProgramImage(file: File): Promise<string | null> {
     const fileName = `program_section_${uniqueId}.${fileExt}`;
     const filePath = `program_images/${fileName}`;
 
-    console.log(`[FileUploadService] Uploading program image to path: ${filePath}`);
-
     // Upload the file
     const { error: uploadError } = await supabase.storage
-      .from('program_images')
+      .from('program_files')
       .upload(filePath, file, {
         cacheControl: '3600',
         upsert: false
       });
 
     if (uploadError) {
-      console.error("[FileUploadService] Program image upload error:", uploadError);
       toast.error(`Erreur lors de l'upload: ${uploadError.message}`);
       return null;
     }
 
     // Get the public URL
     const { data: { publicUrl } } = supabase.storage
-      .from('program_images')
+      .from('program_files')
       .getPublicUrl(filePath);
 
-    console.log(`[FileUploadService] Program image upload successful. Public URL: ${publicUrl}`);
     toast.success("Image téléchargée avec succès");
     return publicUrl;
   } catch (error) {
-    console.error("[FileUploadService] Program image upload exception:", error);
     toast.error(`Erreur lors de l'upload: ${error instanceof Error ? error.message : String(error)}`);
     return null;
   }

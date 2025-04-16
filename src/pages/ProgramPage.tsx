@@ -18,6 +18,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import '../styles/richTextContent.css';
+import ProgramPointPreview from '@/components/program/ProgramPointPreview';
 
 interface ProgramItem {
   id: string;
@@ -71,6 +72,29 @@ const ProgramPage = () => {
       }
       
       return data as ProgramItem[];
+    },
+    enabled: settings.showProgram || isAuthorized,
+  });
+
+  // Fetch program points
+  const { data: programPoints, isLoading: loadingProgramPoints } = useQuery({
+    queryKey: ['programPoints'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_points')
+        .select('*')
+        .order('position', { ascending: true });
+        
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de charger les points du programme."
+        });
+        throw error;
+      }
+      
+      return data;
     },
     enabled: settings.showProgram || isAuthorized,
   });
@@ -139,7 +163,7 @@ const ProgramPage = () => {
   // If settings are enabled and program is visible, show program to all
   const showProgramToAll = settings.showProgram;
 
-  if (loadingSettings || isChecking || (showProgramToAll && (loadingProgramItems || loadingPresentation))) {
+  if (loadingSettings || isChecking || (showProgramToAll && (loadingProgramItems || loadingPresentation || loadingProgramPoints))) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -315,41 +339,73 @@ const ProgramPage = () => {
 
                   {programItems && programItems.length > 0 ? (
                     programItems.map((item, index) => (
-                      <div key={item.id} className="flex flex-col md:flex-row gap-8 items-center mb-16">
-                        <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:order-2' : ''}`}>
-                          <img
-                            src={item.image || "/placeholder.svg"}
-                            alt={item.title}
-                            className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg"
-                          />
-                        </div>
-                        <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:order-1' : ''}`}>
-                          <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
-                          <div className="prose max-w-none rich-content">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {item.description}
-                            </ReactMarkdown>
+                      <div key={item.id} className="mb-16">
+                        <div className="flex flex-col md:flex-row gap-8 items-stretch">
+                          <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:order-2' : ''}`}>
+                            <img
+                              src={item.image || "/placeholder.svg"}
+                              alt={item.title}
+                              className="w-full h-64 md:h-80 object-cover rounded-xl shadow-lg"
+                            />
                           </div>
-                          <div className="mt-6">
-                            <Button
-                              variant="outline"
-                              onClick={() => toggleSection(item.id)}
-                              className="w-full"
-                            >
-                              {openSections[item.id] ? "Masquer les propositions" : "Voir les propositions"}
-                            </Button>
-                          </div>
-                          {openSections[item.id] && (
-                            <div className="mt-6 bg-getigne-50 rounded-xl p-6">
-                              <h4 className="text-xl font-semibold mb-4">Nos propositions concrètes</h4>
+                          <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:order-1' : ''} flex flex-col`}>
+                            <div className="flex-grow"></div>
+                            <div>
+                              <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
                               <div className="prose max-w-none rich-content">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                  {item.content || "Les propositions détaillées sont en cours d'élaboration."}
+                                  {item.description}
                                 </ReactMarkdown>
                               </div>
+                              <div className="mt-6">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => toggleSection(item.id)}
+                                  className="w-full"
+                                >
+                                  {openSections[item.id] ? "Masquer les propositions" : "Voir les propositions"}
+                                </Button>
+                              </div>
                             </div>
-                          )}
+                          </div>
                         </div>
+                        {openSections[item.id] && (
+                          <div className="mt-8">
+                            <div className="relative">
+                              <div className="absolute -top-[6px] left-8 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[10px] border-l-transparent border-r-transparent border-b-getigne-50 border-t-0 border-t-transparent">
+                                <div className="absolute -top-[3px] -left-[10px] w-0 h-0 border-l-[10px] border-r-[10px] border-b-[10px] border-l-transparent border-r-transparent border-b-getigne-200 border-t-0 border-t-transparent"></div>
+                              </div>
+                              <div className="bg-getigne-50 rounded-xl p-6 border border-getigne-200">
+                                <div className="flex items-center gap-3 mb-6">
+                                  <div className="h-10 w-10 rounded-full bg-getigne-accent/10 flex items-center justify-center">
+                                    <ClipboardList className="h-5 w-5 text-getigne-accent" />
+                                  </div>
+                                  <h4 className="text-xl font-semibold text-getigne-800">Nos propositions concrètes</h4>
+                                </div>
+                                {programPoints && programPoints.length > 0 ? (
+                                  <div className="space-y-6">
+                                    {programPoints
+                                      .filter(point => point.program_item_id === item.id)
+                                      .map((point, index) => (
+                                        <ProgramPointPreview
+                                          key={point.id}
+                                          point={point}
+                                          programItemId={item.id}
+                                          icon={item.icon}
+                                        />
+                                      ))}
+                                  </div>
+                                ) : (
+                                  <div className="bg-white rounded-lg p-6 text-center">
+                                    <p className="text-getigne-700 italic">
+                                      Les propositions détaillées sont en cours d'élaboration.
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   ) : (
@@ -370,90 +426,6 @@ const ProgramPage = () => {
                         <p className="max-w-2xl">
                           Cette page sera mise à jour régulièrement pour partager l'avancement de nos travaux.
                         </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Program themes - Style amélioré */}
-                <div id="programme" className="mb-16">
-                  <div className="text-center mb-12">
-                    <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm inline-block mb-4">
-                      Nos engagements
-                    </span>
-                    <h2 className="text-3xl font-bold mb-4">Nos propositions thématiques</h2>
-                    <p className="text-getigne-700 max-w-2xl mx-auto">Découvrez nos engagements détaillés pour chaque domaine d'action municipale, fruit d'une réflexion collective.</p>
-                  </div>
-                  
-                  {showProgramToAll || isAuthorized ? (
-                    programItems && programItems.length > 0 ? (
-                      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-10">
-                        <div className="flex justify-center mb-8">
-                          <TabsList className="h-auto flex-wrap bg-getigne-50 p-2">
-                            {programItems.map(item => (
-                              <TabsTrigger 
-                                key={item.id} 
-                                value={item.id}
-                                className="gap-2 py-3 px-6 data-[state=active]:bg-getigne-accent data-[state=active]:text-white"
-                              >
-                                {item.icon && (
-                                  <DynamicIcon name={item.icon} className="h-5 w-5" />
-                                )}
-                                {item.title}
-                              </TabsTrigger>
-                            ))}
-                          </TabsList>
-                        </div>
-
-                        {/* Program Content for each tab */}
-                        {programItems.map(item => (
-                          <ProgramContentComponent 
-                            key={item.id}
-                            programItemId={item.id}
-                            value={item.id}
-                          />
-                        ))}
-                      </Tabs>
-                    ) : (
-                      <div className="bg-white rounded-xl shadow-md border border-getigne-100 p-8 mb-8">
-                        <div className="flex flex-col items-center text-center">
-                          <div className="w-16 h-16 rounded-full bg-getigne-50 flex items-center justify-center mb-4">
-                            <Clock className="h-8 w-8 text-getigne-600" />
-                          </div>
-                          <h2 className="text-2xl font-bold mb-4">En construction</h2>
-                          <p className="mb-4 max-w-2xl">
-                            Le programme de Gétigné Collectif pour les élections municipales de 2026 est actuellement
-                            en cours d'élaboration par nos commissions thématiques.
-                          </p>
-                          <p className="mb-4 max-w-2xl">
-                            Depuis mai 2024, nos commissions travaillent sur différentes thématiques pour construire
-                            un programme ambitieux et réaliste pour l'avenir de notre commune.
-                          </p>
-                          <p className="max-w-2xl">
-                            Cette page sera mise à jour régulièrement pour partager l'avancement de nos travaux.
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  ) : (
-                    <div className="bg-white rounded-xl shadow-md border border-getigne-100 p-8 mb-8">
-                      <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 rounded-full bg-getigne-50 flex items-center justify-center mb-4">
-                          <LockKeyhole className="h-8 w-8 text-getigne-600" />
-                        </div>
-                        <h2 className="text-2xl font-bold mb-4">Accès restreint</h2>
-                        <p className="mb-4 max-w-2xl">
-                          Les propositions thématiques sont actuellement en cours d'élaboration par les différentes commissions.
-                          Elles seront rendues publiques très prochainement.
-                        </p>
-                        {!user && (
-                          <div className="flex items-center justify-center gap-4">
-                            <div className="text-xs text-center">Vous êtes membre de l'équipe programme ?</div>
-                            <Button asChild variant="outline" size="sm">
-                              <Link to="/auth">Identifiez-vous</Link>
-                            </Button>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}

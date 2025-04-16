@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,13 +12,15 @@ interface MarkdownEditorProps {
   onChange: (value: string) => void;
   className?: string;
   contentType?: 'news' | 'event';
+  disableImageUpload?: boolean;
 }
 
 const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ 
   value, 
   onChange,
   className = '',
-  contentType = 'news'
+  contentType = 'news',
+  disableImageUpload = false
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -218,21 +219,23 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             <TabsTrigger value="preview">Aperçu</TabsTrigger>
           </TabsList>
           
-          <div className="flex items-center">
-            <input
-              type="file"
-              id="image-upload"
-              accept="image/*"
-              className="hidden"
-              onChange={handleInsertImage}
-            />
-            <label 
-              htmlFor="image-upload"
-              className="flex items-center px-3 py-1 text-sm bg-getigne-50 text-getigne-800 rounded hover:bg-getigne-100 cursor-pointer"
-            >
-              Insérer une image
-            </label>
-          </div>
+          {!disableImageUpload && (
+            <div className="flex items-center">
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                className="hidden"
+                onChange={handleInsertImage}
+              />
+              <label 
+                htmlFor="image-upload"
+                className="flex items-center px-3 py-1 text-sm bg-getigne-50 text-getigne-800 rounded hover:bg-getigne-100 cursor-pointer"
+              >
+                Insérer une image
+              </label>
+            </div>
+          )}
         </div>
         
         <TabsContent value="write" className="p-0 m-0">
@@ -240,7 +243,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             ref={textareaRef}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            onPaste={handlePaste}
+            onPaste={disableImageUpload ? undefined : handlePaste}
             onKeyDown={handleKeyDown}
             placeholder="Rédigez votre contenu en Markdown... (Vous pouvez aussi coller des images directement)"
             className="min-h-[400px] resize-y rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-4 font-mono"
@@ -254,9 +257,11 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         </TabsContent>
       </Tabs>
 
-      <div className="border-t p-2 text-xs text-muted-foreground">
-        Astuce: Vous pouvez coller des images directement dans l'éditeur.
-      </div>
+      {!disableImageUpload && (
+        <div className="border-t p-2 text-xs text-muted-foreground">
+          Astuce: Vous pouvez coller des images directement dans l'éditeur.
+        </div>
+      )}
     </div>
   );
 };
