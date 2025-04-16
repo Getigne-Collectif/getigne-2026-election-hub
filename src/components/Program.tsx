@@ -51,7 +51,16 @@ const ProgramItem = ({ icon, title, description, delay, image }) => {
       
       {image && (
         <div className="mb-4 rounded-lg overflow-hidden h-32">
-          <img src={image} alt={title} className="w-full h-full object-cover" />
+          <img 
+            src={image} 
+            alt={title} 
+            className="w-full h-full object-cover" 
+            onError={(e) => {
+              console.error(`[Program] Failed to load image: ${image}`);
+              // @ts-ignore
+              e.target.src = '/placeholder.svg';
+            }}
+          />
         </div>
       )}
       
@@ -72,6 +81,7 @@ const Program = () => {
   useEffect(() => {
     const fetchProgramItems = async () => {
       try {
+        console.log("[Program] Fetching program items for homepage");
         const { data, error } = await supabase
           .from('program_items')
           .select('*')
@@ -79,11 +89,22 @@ const Program = () => {
         
         if (error) throw error;
         
+        console.log(`[Program] Fetched ${data.length} program items`);
+        
+        // Log images to check if they exist
+        data.forEach(item => {
+          if (item.image) {
+            console.log(`[Program] Item "${item.title}" has image: ${item.image}`);
+          } else {
+            console.log(`[Program] Item "${item.title}" has no image`);
+          }
+        });
+        
         // Limiter à 5 items pour la page d'accueil
         setProgramItems(data.slice(0, 5));
         setLoading(false);
       } catch (error) {
-        console.error('Erreur lors de la récupération des éléments du programme:', error);
+        console.error('[Program] Error fetching program items:', error);
         setError(error.message);
         setLoading(false);
       }

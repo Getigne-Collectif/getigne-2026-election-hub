@@ -24,13 +24,19 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
   const { data: programItem, isLoading: isLoadingItem } = useQuery({
     queryKey: ['programItemDetail', programItemId],
     queryFn: async () => {
+      console.log(`[ProgramContent] Fetching program item details: ${programItemId}`);
       const { data, error } = await supabase
         .from('program_items')
         .select('*')
         .eq('id', programItemId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("[ProgramContent] Error fetching program item:", error);
+        throw error;
+      }
+      
+      console.log("[ProgramContent] Program item loaded:", data);
       return data;
     },
     enabled: !!programItemId,
@@ -40,13 +46,19 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
   const { isLoading: isLoadingPoints } = useQuery({
     queryKey: ['programPoints', programItemId],
     queryFn: async () => {
+      console.log(`[ProgramContent] Fetching program points for item: ${programItemId}`);
       const { data, error } = await supabase
         .from('program_points')
         .select('*')
         .eq('program_item_id', programItemId)
         .order('position', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("[ProgramContent] Error fetching program points:", error);
+        throw error;
+      }
+      
+      console.log(`[ProgramContent] Loaded ${data?.length || 0} program points`);
       setProgramPoints(data || []);
       return data;
     },
@@ -77,6 +89,13 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
     );
   }
 
+  // Check if there's an image and log it
+  if (programItem.image) {
+    console.log(`[ProgramContent] Section image found: ${programItem.image}`);
+  } else {
+    console.log("[ProgramContent] No section image found, using placeholder");
+  }
+
   return (
     <TabsContent value={value} className="space-y-6 animate-fade-in">
       <div>
@@ -104,6 +123,11 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
             src={programItem.image || placeholder} 
             alt={programItem.title} 
             className="rounded-xl w-full max-h-[400px] object-cover"
+            onError={(e) => {
+              console.error(`[ProgramContent] Image failed to load: ${programItem.image}`);
+              // @ts-ignore
+              e.target.src = placeholder;
+            }}
           />
         </div>
 

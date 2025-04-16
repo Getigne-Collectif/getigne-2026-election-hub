@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,6 +56,7 @@ export default function AdminProgramEditorPage() {
   const [activeTab, setActiveTab] = useState("details");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 
   const form = useForm<ProgramItemFormValues>({
     resolver: zodResolver(programItemSchema),
@@ -73,6 +73,8 @@ export default function AdminProgramEditorPage() {
     queryFn: async () => {
       if (!id) return null;
       
+      console.log(`[ProgramEditor] Fetching program item with ID: ${id}`);
+      
       const { data, error } = await supabase
         .from('program_items')
         .select('*')
@@ -80,10 +82,12 @@ export default function AdminProgramEditorPage() {
         .single();
         
       if (error) {
+        console.error("[ProgramEditor] Error loading program item:", error);
         toast.error("Erreur lors du chargement de la section");
         throw error;
       }
       
+      console.log("[ProgramEditor] Program item loaded:", data);
       return data;
     },
     enabled: isEditing,
@@ -91,6 +95,8 @@ export default function AdminProgramEditorPage() {
 
   useEffect(() => {
     if (programItem) {
+      console.log("[ProgramEditor] Setting form values from program item:", programItem);
+      
       form.reset({
         title: programItem.title,
         description: programItem.description,
@@ -99,51 +105,111 @@ export default function AdminProgramEditorPage() {
       });
       
       if (programItem.image) {
+        console.log(`[ProgramEditor] Setting image preview from existing image: ${programItem.image}`);
         setImagePreview(programItem.image);
+        setUploadedImageUrl(programItem.image);
       }
     }
   }, [programItem, form]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const imageUrl = URL.createObjectURL(file);
-      setImagePreview(imageUrl);
+  const handleImageUpload = useCallback(async (file: File): Promise<string | null> => {
+    console.log(`[ProgramEditor] Starting image upload process for file: ${file.name}`);
+    
+    try {
+      const imageUrl = await uploadProgramImage(file);
+      
+      if (!imageUrl) {
+        console.error("[ProgramEditor] Image upload returned null");
+        toast.error("Échec de l'upload de l'image");
+        return null;
+      }
+      
+      console.log(`[ProgramEditor] Image upload successful, URL: ${imageUrl}`);
+      setUploadedImageUrl(imageUrl);
+      return imageUrl;
+    } catch (error) {
+      console.error("[ProgramEditor] Image upload exception:", error);
+      toast.error(`Erreur lors de l'upload: ${error instanceof Error ? error.message : String(error)}`);
+      return null;
     }
-  };
+  }, []);
+
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      console.log("[ProgramEditor] No file selected in input");
+      return;
+    }
+    
+    console.log(`[ProgramEditor] File selected: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
+    
+    setImageFile(file);
+    
+    const objectUrl = URL.createObjectURL(file);
+    console.log(`[ProgramEditor] Created object URL for preview: ${objectUrl}`);
+    setImagePreview(objectUrl);
+    
+    setUploadedImageUrl(null);
+  }, []);
+
+  const removeImage = useCallback(() => {
+    console.log("[ProgramEditor] Removing image");
+    
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+      console.log("[ProgramEditor] Revoked object URL");
+    }
+    
+    setImageFile(null);
+    setImagePreview(null);
+    setUploadedImageUrl(null);
+    form.setValue('image', '');
+    
+    console.log("[ProgramEditor] Image removed from form");
+  }, [imagePreview, form]);
 
   const onSubmit = async (values: ProgramItemFormValues) => {
+    console.log("[ProgramEditor] Form submission started with values:", values);
     setIsSubmitting(true);
     
     try {
-      let imageUrl = values.image;
+      let finalImageUrl = uploadedImageUrl;
       
-      // Upload image if a new one was selected
-      if (imageFile) {
-        const uploadedImageUrl = await uploadProgramImage(imageFile);
-        if (!uploadedImageUrl) {
+      if (imageFile && !uploadedImageUrl) {
+        console.log("[ProgramEditor] New image file selected, uploading...");
+        finalImageUrl = await handleImageUpload(imageFile);
+        
+        if (!finalImageUrl) {
           throw new Error("Échec de l'upload de l'image");
         }
-        imageUrl = uploadedImageUrl;
+      } else if (imagePreview && !imageFile && programItem?.image) {
+        console.log("[ProgramEditor] Keeping existing image:", programItem.image);
+        finalImageUrl = programItem.image;
+      } else if (!imagePreview) {
+        console.log("[ProgramEditor] No image selected, clearing image field");
+        finalImageUrl = null;
       }
       
       const programData = {
         title: values.title,
         description: values.description,
         icon: values.icon,
-        image: imageUrl,
+        image: finalImageUrl,
         updated_at: new Date().toISOString(),
       };
+      
+      console.log("[ProgramEditor] Saving program data:", programData);
       
       let error;
       
       if (isEditing && id) {
+        console.log(`[ProgramEditor] Updating existing program item with ID: ${id}`);
         ({ error } = await supabase
           .from('program_items')
           .update(programData)
           .eq('id', id));
       } else {
+        console.log("[ProgramEditor] Creating new program item");
         ({ error } = await supabase
           .from('program_items')
           .insert([{
@@ -153,15 +219,17 @@ export default function AdminProgramEditorPage() {
       }
       
       if (error) {
+        console.error("[ProgramEditor] Database operation error:", error);
         throw error;
       }
       
+      console.log("[ProgramEditor] Program item saved successfully");
       toast.success(isEditing ? "Section du programme mise à jour" : "Section du programme créée");
       navigate('/admin/program');
       
     } catch (error: any) {
+      console.error("[ProgramEditor] Submit error:", error);
       toast.error(`Erreur: ${error.message}`);
-      console.error("Submit error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -277,11 +345,7 @@ export default function AdminProgramEditorPage() {
                                 variant="destructive"
                                 size="sm"
                                 className="absolute top-2 right-2"
-                                onClick={() => {
-                                  setImagePreview(null);
-                                  setImageFile(null);
-                                  field.onChange("");
-                                }}
+                                onClick={removeImage}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -307,12 +371,20 @@ export default function AdminProgramEditorPage() {
                             <input 
                               type="hidden" 
                               {...field} 
+                              value={uploadedImageUrl || field.value} 
                             />
                           </div>
                           
                           <FormDescription>
                             Ajoutez une image représentative pour cette section du programme (format recommandé: 16:9)
                           </FormDescription>
+                          
+                          <div className="text-xs text-muted-foreground mt-4 p-2 bg-muted/30 rounded-md">
+                            <p><strong>État de l'image:</strong></p>
+                            <p>Image sélectionnée: {imageFile ? 'Oui' : 'Non'}</p>
+                            <p>Image URL (champ): {field.value || 'Non définie'}</p>
+                            <p>URL téléchargée: {uploadedImageUrl || 'Non téléchargée'}</p>
+                          </div>
                         </div>
                         <FormMessage />
                       </FormItem>

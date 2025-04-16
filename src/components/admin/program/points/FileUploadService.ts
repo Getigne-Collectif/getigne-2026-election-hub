@@ -13,12 +13,14 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
     const fileName = `${uuidv4()}.${fileExt}`;
     const filePath = `program_points/${fileName}`;
 
+    console.log(`[FileUploadService] Uploading file: ${filePath}`);
+
     const { data, error } = await supabase.storage
       .from('program_files')
       .upload(filePath, file);
 
     if (error) {
-      console.error("File upload error:", error);
+      console.error("[FileUploadService] File upload error:", error);
       return null;
     }
 
@@ -26,6 +28,7 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
       .from('program_files')
       .getPublicUrl(filePath);
 
+    console.log(`[FileUploadService] File uploaded successfully. Public URL: ${publicUrl}`);
     return publicUrl;
   });
 
@@ -36,19 +39,26 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
  * Uploads a single image to Supabase storage and returns the public URL
  */
 export async function uploadProgramImage(file: File): Promise<string | null> {
-  if (!file) return null;
+  if (!file) {
+    console.log("[FileUploadService] No file provided for upload");
+    return null;
+  }
 
   try {
+    console.log(`[FileUploadService] Starting image upload for: ${file.name}`);
+    
     const fileExt = file.name.split('.').pop();
     const fileName = `${uuidv4()}.${fileExt}`;
-    const filePath = `sections/${fileName}`;
+    const filePath = `program_images/${fileName}`;
+
+    console.log(`[FileUploadService] Uploading to path: ${filePath}`);
 
     const { error: uploadError } = await supabase.storage
       .from('program_images')
       .upload(filePath, file);
 
     if (uploadError) {
-      console.error("Image upload error:", uploadError);
+      console.error("[FileUploadService] Image upload error:", uploadError);
       return null;
     }
 
@@ -56,9 +66,10 @@ export async function uploadProgramImage(file: File): Promise<string | null> {
       .from('program_images')
       .getPublicUrl(filePath);
 
+    console.log(`[FileUploadService] Image upload successful. Public URL: ${publicUrl}`);
     return publicUrl;
   } catch (error) {
-    console.error("Image upload error:", error);
+    console.error("[FileUploadService] Image upload exception:", error);
     return null;
   }
 }
