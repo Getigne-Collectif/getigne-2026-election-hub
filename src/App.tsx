@@ -15,7 +15,6 @@ import EventDetailPage from "./pages/EventDetailPage";
 import CommitteePage from "./pages/CommitteePage";
 import SiteMapPage from "./pages/SiteMapPage";
 import JoinPage from "./pages/JoinPage";
-import AboutUsPage from "./pages/AboutUsPage";
 import AuthPage from "./pages/AuthPage";
 import LegalPage from "./pages/LegalPage";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage.tsx";
@@ -26,7 +25,6 @@ import ProfileSetupModal from "@/components/auth/ProfileSetupModal.tsx";
 import AdminNewsEditorPage from '@/pages/admin/news/AdminNewsEditorPage.tsx';
 import AdminEventsPage from '@/pages/admin/events/AdminEventsPage.tsx';
 import AdminEventEditorPage from '@/pages/admin/events/AdminEventEditorPage.tsx';
-import ObjectifPage from './pages/ObjectifPage';
 import ProjectsPage from './pages/ProjectsPage';
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage.tsx';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage.tsx';
@@ -58,8 +56,7 @@ function App() {
               <Route path="/" element={<Index />} />
 
               {/* Objectif 2026 et sous-pages */}
-              <Route path="/objectif-2026" element={<ObjectifPage />} />
-              <Route path="/objectif-2026/programme" element={<ProgramPage />} />
+              <Route path="/objectif-2026" element={<ProgramPage />} />
               <Route path="/objectif-2026/:id" element={<CommitteePage />} />
 
               {/* Nos projets */}

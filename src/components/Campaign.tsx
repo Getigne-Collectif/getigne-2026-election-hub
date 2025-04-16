@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, Heart } from 'lucide-react';
+import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, Heart, Calendar } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useAuth } from '@/context/AuthContext';
 
@@ -14,11 +14,6 @@ const Campaign = () => {
     userRoles.includes('admin') || 
     userRoles.includes('program_manager');
   
-  // Détermine le lien cible pour le CTA principal
-  const programLink = canAccessProgram 
-    ? "/objectif-2026/programme" 
-    : "/objectif-2026";
-
   return (
     <section id="campaign" className="py-24 px-4 bg-white">
       <div className="container mx-auto">
@@ -35,10 +30,10 @@ const Campaign = () => {
         <div className="bg-getigne-50 rounded-2xl p-8 md:p-12 mb-10">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-6">Une campagne collective</h3>
+              <h3 className="text-2xl md:text-3xl font-bold mb-6">Participez à une campagne collective</h3>
               <p className="text-getigne-700 mb-6">
-                Depuis mai 2024, nous travaillons à l'élaboration de notre programme pour les élections municipales. 
-                Une démarche collaborative où chaque citoyen peut apporter sa pierre à l'édifice.
+                Depuis mai 2024, nos 6 élus et l'ensemble des membres du collectif travaillent à l'élaboration d'un projet et d'un programme pour les élections municipales.
+                La démarche est positive et collaborative, chaque personne volontaire peut apporter sa pierre à l'édifice afin d'offrir un autre projet pour notre commune.
               </p>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
@@ -46,7 +41,7 @@ const Campaign = () => {
                     <CalendarCheck size={18} className="text-getigne-accent" />
                   </div>
                   <div>
-                    <h4 className="font-medium">Programme en construction</h4>
+                    <h4 className="font-medium">Le programme est en cours de construction</h4>
                     <p className="text-sm text-getigne-700">Nos commissions thématiques travaillent activement à l'élaboration des propositions.</p>
                   </div>
                 </div>
@@ -55,16 +50,16 @@ const Campaign = () => {
                     <UserPlusIcon size={18} className="text-getigne-accent" />
                   </div>
                   <div>
-                    <h4 className="font-medium">Équipe ouverte</h4>
+                    <h4 className="font-medium">L'équipe est ouverte, hétérogène et accueillante</h4>
                     <p className="text-sm text-getigne-700">Chacun peut rejoindre le collectif et participer selon ses disponibilités et compétences.</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="bg-getigne-accent/10 p-2 rounded-full mt-1">
-                    <PlusCircle size={18} className="text-getigne-accent" />
+                    <Calendar size={18} className="text-getigne-accent" />
                   </div>
                   <div>
-                    <h4 className="font-medium">Événements réguliers</h4>
+                    <h4 className="font-medium">Nous organisons des événements réguliers</h4>
                     <p className="text-sm text-getigne-700">Des rencontres, ateliers et événements pour échanger avec les habitants de Gétigné.</p>
                   </div>
                 </div>
