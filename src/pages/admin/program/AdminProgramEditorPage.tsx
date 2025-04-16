@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,13 +28,12 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Loader2, Upload } from 'lucide-react';
+import { ArrowLeft, Loader2, Upload, X } from 'lucide-react';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
 import { IconSelect } from '@/components/ui/icon-select';
 
-// Form schema for program item details
 const programItemSchema = z.object({
   title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
   description: z.string().min(10, "La description doit comporter au moins 10 caractères"),
@@ -53,7 +52,6 @@ export default function AdminProgramEditorPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // Form setup
   const form = useForm<ProgramItemFormValues>({
     resolver: zodResolver(programItemSchema),
     defaultValues: {
@@ -64,7 +62,6 @@ export default function AdminProgramEditorPage() {
     },
   });
 
-  // Fetch program item if editing
   const { data: programItem, isLoading: isLoadingItem } = useQuery({
     queryKey: ['programItem', id],
     queryFn: async () => {
@@ -86,7 +83,6 @@ export default function AdminProgramEditorPage() {
     enabled: isEditing,
   });
 
-  // Load form data when programItem is available
   useEffect(() => {
     if (programItem) {
       form.reset({
@@ -102,7 +98,6 @@ export default function AdminProgramEditorPage() {
     }
   }, [programItem, form]);
 
-  // Handle image selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -113,41 +108,41 @@ export default function AdminProgramEditorPage() {
     }
   };
 
-  // Upload image to supabase storage
-  const uploadImage = async (): Promise<string | null> => {
-    if (!imageFile) return form.getValues('image') || null;
+  const uploadImageToStorage = async (file: File): Promise<string | null> => {
+    if (!file) return null;
 
     try {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      
-      const { data, error } = await supabase.storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `sections/${fileName}`;
+
+      const { data, error: uploadError } = await supabase.storage
         .from('program_images')
-        .upload(`sections/${fileName}`, imageFile);
-        
-      if (error) throw error;
-      
-      const { data: urlData } = supabase.storage
+        .upload(filePath, file);
+
+      if (uploadError) {
+        toast.error(`Erreur lors de l'upload de l'image: ${uploadError.message}`);
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
         .from('program_images')
-        .getPublicUrl(`sections/${fileName}`);
-        
-      return urlData.publicUrl;
+        .getPublicUrl(filePath);
+
+      return publicUrl;
     } catch (error: any) {
       toast.error(`Erreur lors de l'upload de l'image: ${error.message}`);
-      console.error('Upload error:', error);
       return null;
     }
   };
 
-  // Handle form submission
   const onSubmit = async (values: ProgramItemFormValues) => {
     setIsSubmitting(true);
     
     try {
-      // Upload image if new one selected
       let imageUrl = values.image;
       if (imageFile) {
-        imageUrl = await uploadImage();
+        imageUrl = await uploadImageToStorage(imageFile);
         if (!imageUrl) {
           throw new Error("Échec de l'upload de l'image");
         }
@@ -191,8 +186,7 @@ export default function AdminProgramEditorPage() {
       setIsSubmitting(false);
     }
   };
-  
-  // Loading state
+
   if (isEditing && isLoadingItem) {
     return (
       <AdminLayout title="Chargement...">
@@ -284,7 +278,6 @@ export default function AdminProgramEditorPage() {
                     )}
                   />
                   
-                  {/* Image de section */}
                   <FormField
                     control={form.control}
                     name="image"
