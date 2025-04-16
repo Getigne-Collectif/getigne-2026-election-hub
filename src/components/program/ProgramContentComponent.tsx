@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import ProgramLikeButton from './ProgramLikeButton';
 import ProgramPointCard from './ProgramPointCard';
 import ProgramCommentsSection from './ProgramCommentsSection';
+import placeholder from '/placeholder.svg';
 
 interface ProgramContentComponentProps {
   programItemId: string;
@@ -98,15 +99,13 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         </div>
 
         {/* Image de la section si disponible */}
-        {programItem.image && (
-          <div className="mb-8">
-            <img 
-              src={programItem.image} 
-              alt={programItem.title} 
-              className="rounded-xl w-full max-h-[400px] object-cover"
-            />
-          </div>
-        )}
+        <div className="mb-8">
+          <img 
+            src={programItem.image || placeholder} 
+            alt={programItem.title} 
+            className="rounded-xl w-full max-h-[400px] object-cover"
+          />
+        </div>
 
         {/* Description avec style amélioré */}
         <div className="prose max-w-none mb-12 rich-content bg-white rounded-xl p-6 shadow-sm border border-getigne-100" dangerouslySetInnerHTML={{ __html: programItem.description }} />

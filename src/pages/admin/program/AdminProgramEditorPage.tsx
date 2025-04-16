@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui/tabs';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,6 +38,7 @@ import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/component
 import MarkdownEditor from '@/components/MarkdownEditor';
 import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
 import { IconSelect } from '@/components/ui/icon-select';
+import { uploadProgramImage } from '@/components/admin/program/points/FileUploadService';
 
 const programItemSchema = z.object({
   title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
@@ -104,35 +110,6 @@ export default function AdminProgramEditorPage() {
       setImageFile(file);
       const imageUrl = URL.createObjectURL(file);
       setImagePreview(imageUrl);
-      form.setValue('image', 'uploading...');
-    }
-  };
-
-  const uploadImageToStorage = async (file: File): Promise<string | null> => {
-    if (!file) return null;
-
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `sections/${fileName}`;
-
-      const { data, error: uploadError } = await supabase.storage
-        .from('program_images')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        toast.error(`Erreur lors de l'upload de l'image: ${uploadError.message}`);
-        return null;
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('program_images')
-        .getPublicUrl(filePath);
-
-      return publicUrl;
-    } catch (error: any) {
-      toast.error(`Erreur lors de l'upload de l'image: ${error.message}`);
-      return null;
     }
   };
 
@@ -141,11 +118,14 @@ export default function AdminProgramEditorPage() {
     
     try {
       let imageUrl = values.image;
+      
+      // Upload image if a new one was selected
       if (imageFile) {
-        imageUrl = await uploadImageToStorage(imageFile);
-        if (!imageUrl) {
+        const uploadedImageUrl = await uploadProgramImage(imageFile);
+        if (!uploadedImageUrl) {
           throw new Error("Échec de l'upload de l'image");
         }
+        imageUrl = uploadedImageUrl;
       }
       
       const programData = {
@@ -303,7 +283,7 @@ export default function AdminProgramEditorPage() {
                                   field.onChange("");
                                 }}
                               >
-                                Supprimer
+                                <X className="h-4 w-4" />
                               </Button>
                             </div>
                           )}
@@ -327,7 +307,6 @@ export default function AdminProgramEditorPage() {
                             <input 
                               type="hidden" 
                               {...field} 
-                              value={field.value || ""} 
                             />
                           </div>
                           
