@@ -725,6 +725,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_program_likes_point"
+            columns: ["program_point_id"]
+            isOneToOne: false
+            referencedRelation: "program_points"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "program_likes_program_item_id_fkey"
             columns: ["program_item_id"]
             isOneToOne: false

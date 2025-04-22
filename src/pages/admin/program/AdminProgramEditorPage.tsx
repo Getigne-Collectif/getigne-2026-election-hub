@@ -25,15 +25,15 @@ import {
 } from '@/components/ui/card';
 import { ArrowLeft, Loader2, Upload, X } from 'lucide-react';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Link } from 'react-router-dom';
 import MarkdownEditor from '@/components/MarkdownEditor';
-import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
 import { IconSelect } from '@/components/ui/icon-select';
+import ProgramPointsEditor from '@/components/admin/program/points';
 import { uploadProgramImage } from '@/components/admin/program/points/FileUploadService';
 
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'react-router-dom';
 
 const programItemSchema = z.object({
   title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
@@ -346,34 +346,34 @@ export default function AdminProgramEditorPage() {
                 </CardContent>
               </Card>
 
-                  <div className="flex justify-end gap-4">
-                    <Button 
-                      type="button" 
-                      variant="outline"
-                      onClick={() => navigate('/admin/program')}
-                    >
-                      Annuler
-                    </Button>
-                    <Button 
-                      type="submit" 
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {isEditing ? "Mise à jour..." : "Création..."}
-                        </>
-                      ) : (
-                        isEditing ? "Mettre à jour" : "Créer la section"
-                      )}
-                    </Button>
-                  </div>
+              <div className="flex justify-end gap-4">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => navigate('/admin/program')}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isEditing ? "Mise à jour..." : "Création..."}
+                    </>
+                  ) : (
+                    isEditing ? "Mettre à jour" : "Créer la section"
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
         </div>
 
-        {isEditing && id && (
-          <div className="col-span-1">
+        <div className="col-span-1">
+          {isEditing && id && (
             <Card>
               <CardHeader>
                 <CardTitle>Points du programme</CardTitle>
@@ -385,8 +385,8 @@ export default function AdminProgramEditorPage() {
                 <ProgramPointsEditor programItemId={id} />
               </CardContent>
             </Card>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </AdminLayout>
   );
