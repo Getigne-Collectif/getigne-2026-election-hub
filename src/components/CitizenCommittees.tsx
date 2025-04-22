@@ -240,7 +240,7 @@ const CitizenCommittees = () => {
 
   if (loading) {
     return (
-      <section className="py-24 px-4 bg-white">
+      <section className="">
         <div className="container mx-auto">
           <div className="text-center">Chargement des commissions citoyennes...</div>
         </div>
@@ -250,7 +250,7 @@ const CitizenCommittees = () => {
 
   if (error) {
     return (
-      <section className="py-24 px-4 bg-white">
+      <section className="">
         <div className="container mx-auto">
           <div className="text-center text-red-500">Une erreur est survenue: {error}</div>
         </div>
@@ -259,7 +259,7 @@ const CitizenCommittees = () => {
   }
 
   return (
-    <section className="py-24 px-4 bg-white">
+    <section className="">
       <div className="container mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">

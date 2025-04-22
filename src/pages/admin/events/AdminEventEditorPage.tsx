@@ -1,634 +1,686 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Helmet, HelmetProvider } from "react-helmet-async";
-import { useAuth } from '@/context/AuthContext.tsx';
-import { toast } from 'sonner';
-import Navbar from '@/components/Navbar.tsx';
-import Footer from '@/components/Footer.tsx';
-import { Calendar as CalendarIcon, CheckCheck, Clock, Copy, Globe, Lock, Plus, Send, Trash, Upload, User, Users } from 'lucide-react';
-import { addHours, format } from 'date-fns';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { Label } from "@/components/ui/label.tsx";
-import { Textarea } from "@/components/ui/textarea.tsx";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select.tsx";
-import { Calendar } from "@/components/ui/calendar.tsx";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx";
-import { cn } from "@/lib/utils.ts";
-import { da } from "date-fns/locale";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb.tsx";
-import { Home } from 'lucide-react';
-import { supabase } from "@/integrations/supabase/client.ts";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.tsx";
-import { Loader2 } from 'lucide-react';
-import { Switch } from "@/components/ui/switch.tsx";
-import { Separator } from "@/components/ui/separator.tsx";
-import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
-const formSchema = z.object({
-  title: z.string().min(3, {
-    message: "Le titre doit comporter au moins 3 caractères.",
-  }),
-  description: z.string().min(10, {
-    message: "La description doit comporter au moins 10 caractères.",
-  }),
-  date: z.date(),
-  location: z.string().optional(),
-  image: z.string().url({
-    message: "L'URL de l'image doit être valide.",
-  }).optional(),
-  registration_link: z.string().url({
-    message: "Le lien d'inscription doit être une URL valide.",
-  }).optional(),
-  max_participants: z.number().optional(),
-  is_free: z.boolean().default(true),
-  is_online: z.boolean().default(false),
-  is_featured: z.boolean().default(false),
-  is_visible: z.boolean().default(true),
-});
+import React, { useState, useEffect, useRef } from 'react';
+import {Link, useNavigate, useParams} from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { useToast } from '@/components/ui/use-toast.ts';
+import { Button } from '@/components/ui/button.tsx';
+import {Loader2, Save, Eye, ArrowLeft, Home, Upload, ImageIcon} from 'lucide-react';
+import { Input } from '@/components/ui/input.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { useAuth } from '@/context/auth';
+import MarkdownEditor from "@/components/MarkdownEditor.tsx";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList, BreadcrumbPage,
+  BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.tsx";
+import { v4 as uuidv4 } from 'uuid';
+import {Helmet, HelmetProvider} from "react-helmet-async";
+import AdminLayout from "@/components/admin/AdminLayout.tsx";
+import { Switch } from '@/components/ui/switch.tsx';
+import { sendDiscordNotification, DiscordColors, createDiscordEvent } from '@/utils/notifications.ts';
+
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+};
 
 const AdminEventEditorPage = () => {
   const { id } = useParams();
-  const { user, isAdmin, authChecked } = useAuth();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
   const navigate = useNavigate();
-  const [event, setEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [notificationSent, setNotificationSent] = useState(false);
-  const [eventCreated, setEventCreated] = useState(false);
-  const [isNewEvent, setIsNewEvent] = useState(false);
+  const { toast } = useToast();
+  const { isAdmin, isModerator, user } = useAuth();
+  const isEditMode = Boolean(id);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState('');
+  const [location, setLocation] = useState('');
+  const [description, setDescription] = useState('');
+  const [content, setContent] = useState('');
+  const [image, setImage] = useState('');
+  const [committeeId, setCommitteeId] = useState('');
+  const [status, setStatus] = useState('published');
+  const [allowRegistration, setAllowRegistration] = useState(true);
+  const [isMembersOnly, setIsMembersOnly] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [slug, setSlug] = useState('');
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [createDiscordScheduledEvent, setCreateDiscordScheduledEvent] = useState(true);
+  const [estimatedDuration, setEstimatedDuration] = useState(2);
 
-  useEffect(() => {
-    if (!authChecked) return;
+  const { data: committees = [] } = useQuery({
+    queryKey: ['committees'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('citizen_committees')
+        .select('id, title');
 
-    if (user && isAdmin) {
-      setIsAuthorized(true);
-    } else {
-      setIsAuthorized(false);
-      if (user) {
-        toast({
-          title: "Accès restreint",
-          description: "Vous n'avez pas les droits nécessaires pour accéder à cette page.",
-          variant: "destructive"
-        });
-        navigate('/');
-      } else {
-        navigate('/auth');
-      }
-    }
-    setIsChecking(false);
-  }, [user, isAdmin, authChecked, navigate]);
-
-  useEffect(() => {
-    const fetchEvent = async () => {
-      if (!id) {
-        setLoading(false);
-        setIsNewEvent(true);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-
-        const eventWithDateObj = {
-          ...data,
-          date: data.date ? new Date(data.date) : new Date()
-        };
-
-        setEvent(data);
-        form.reset(eventWithDateObj);
-      } catch (error) {
-        console.error("Erreur lors de la récupération de l'événement:", error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de récupérer l'événement.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEvent();
-  }, [id]);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      date: new Date(),
-      location: "",
-      image: "",
-      registration_link: "",
-      max_participants: undefined,
-      is_free: true,
-      is_online: false,
-      is_featured: false,
-      is_visible: true,
+      if (error) throw error;
+      return data;
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setLoading(true);
-    try {
-      if (id) {
-        const dbValues = {
-          ...values,
-          date: values.date.toISOString()
-        };
+  const { data: event, isLoading: isLoadingEvent } = useQuery({
+    queryKey: ['event', id],
+    queryFn: async () => {
+      if (!id) return null;
 
-        const { data, error } = await supabase
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        toast({
+          title: "Événement non trouvé",
+          description: "L'événement que vous essayez de modifier n'existe pas",
+          variant: "destructive"
+        });
+        navigate('/admin/events');
+        return null;
+      }
+
+      return data;
+    },
+    enabled: isEditMode,
+  });
+
+  useEffect(() => {
+    if (event) {
+      setTitle(event.title || '');
+      setDate(event.date ? new Date(event.date).toISOString().slice(0, 16) : '');
+      setLocation(event.location || '');
+      setDescription(event.description || '');
+      setContent(event.content || '');
+      setImage(event.image || '');
+      setCommitteeId(event.committee_id || '');
+      setStatus(event.status || 'published');
+      setAllowRegistration(event.allow_registration !== false);
+      setIsMembersOnly(event.is_members_only === true);
+      setSlug(event.slug || '');
+    }
+  }, [event]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setUploadedImage(e.target.files[0]);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setImage(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  const uploadImage = async (): Promise<string> => {
+    if (!uploadedImage) return image;
+
+    try {
+      const fileExt = uploadedImage.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `event-images/${fileName}`;
+
+      const { error } = await supabase.storage
+        .from('public')
+        .upload(filePath, uploadedImage);
+
+      if (error) throw error;
+
+      const { data } = supabase.storage
+        .from('public')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Erreur d'upload",
+        description: error.message || "Une erreur est survenue lors de l'upload de l'image",
+        variant: "destructive"
+      });
+      return image;
+    }
+  };
+
+  const notifyDiscord = async (eventData: any, isNew: boolean) => {
+    try {
+      const committeeInfo = committeeId 
+        ? committees.find(c => c.id === committeeId)?.title || ''
+        : '';
+      
+      const eventDate = new Date(date);
+      const formattedDate = eventDate.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      const formattedTime = eventDate.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      const message = isNew 
+        ? `**Nouvel événement créé : ${title}**\n\n` +
+          `📅 ${formattedDate} à ${formattedTime}\n` +
+          `📍 ${location}\n` +
+          (committeeInfo ? `👥 Commission: ${committeeInfo}\n` : '') +
+          `\n${description}\n\n` +
+          `${isMembersOnly ? '🔒 Réservé aux adhérents' : '🔓 Ouvert à tous'}\n` +
+          `${allowRegistration ? '✅ Inscriptions ouvertes' : '❌ Sans inscription'}`
+        : `**Événement mis à jour : ${title}**\n\n` +
+          `📅 ${formattedDate} à ${formattedTime}\n` +
+          `📍 ${location}\n` +
+          (committeeInfo ? `👥 Commission: ${committeeInfo}\n` : '') +
+          `\n${description}`;
+      
+      await sendDiscordNotification({
+        title: isNew ? "Nouvel événement" : "Événement mis à jour",
+        message,
+        color: isNew ? DiscordColors.GREEN : DiscordColors.BLUE,
+        username: "Calendrier Gétigné Collectif",
+        resourceType: "event",
+        resourceId: eventData.slug || eventData.id
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de la notification Discord:", error);
+    }
+  };
+
+  const createDiscordScheduled = async (eventData: any) => {
+    if (!createDiscordScheduledEvent) return;
+    
+    try {
+      const eventDate = new Date(date);
+      
+      const endDate = new Date(eventDate);
+      endDate.setHours(endDate.getHours() + estimatedDuration);
+      
+      const startTime = eventDate.toISOString();
+      const endTime = endDate.toISOString();
+      
+      const committeeInfo = committeeId 
+        ? committees.find(c => c.id === committeeId)?.title || ''
+        : '';
+      
+      let imageToSend = image;
+      if (uploadedImage) {
+        try {
+          imageToSend = await uploadImage();
+        } catch (error) {
+          console.error("Erreur lors de l'upload de l'image:", error);
+          imageToSend = undefined; // En cas d'erreur, ne pas envoyer d'image
+          
+          toast({
+            title: "Avertissement",
+            description: "L'événement sera créé sans image en raison d'une erreur d'upload",
+            variant: "destructive"
+          });
+        }
+      } else if (image && image.startsWith('data:') && image.length > 1024 * 1024) {
+        console.warn('Image en base64 trop volumineuse, événement créé sans image');
+        imageToSend = undefined;
+        
+        toast({
+          title: "Avertissement",
+          description: "L'image est trop volumineuse pour Discord. L'événement sera créé sans image.",
+          // Fix type error: "warning" is not a valid variant
+          variant: "default"
+        });
+      }
+      
+      const currentSlug = eventData.slug || slug;
+      
+      await createDiscordEvent({
+        name: title,
+        description: description,
+        scheduledStartTime: startTime,
+        scheduledEndTime: endTime,
+        location: location,
+        image: imageToSend,
+        committee: committeeInfo,
+        slug: currentSlug
+      });
+      
+      toast({
+        title: "Événement Discord créé",
+        description: "L'événement a été ajouté au calendrier Discord avec succès",
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de la création de l'événement Discord:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer l'événement Discord. " + (error.message || ""),
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!title || !date || !location || !description) {
+      toast({
+        title: "Formulaire incomplet",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const eventSlug = slug || generateSlug(title);
+
+      let imageUrl = image;
+      if (uploadedImage) {
+        imageUrl = await uploadImage();
+      }
+
+      if (!imageUrl) {
+        toast({
+          title: "Image manquante",
+          description: "Veuillez télécharger une image pour l'événement",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const eventData = {
+        title,
+        date,
+        location,
+        description,
+        content,
+        image: imageUrl,
+        committee_id: committeeId || null,
+        committee: committeeId ? committees.find(c => c.id === committeeId)?.title : null,
+        allow_registration: allowRegistration,
+        is_members_only: isMembersOnly,
+        status,
+        slug: eventSlug
+      };
+
+      let result;
+
+      if (isEditMode && id) {
+        const { error } = await supabase
           .from('events')
-          .update(dbValues)
+          .update(eventData)
           .eq('id', id);
 
         if (error) throw error;
 
-        toast("Événement mis à jour avec succès", {
-          description: "Les modifications ont été enregistrées",
-        });
-      } else {
-        const dbValues = {
-          ...values,
-          date: values.date.toISOString()
-        };
+        result = { id, ...eventData };
 
+        toast({
+          title: "Événement mis à jour",
+          description: "L'événement a été mis à jour avec succès",
+        });
+        
+        await notifyDiscord(result, false);
+      } else {
         const { data, error } = await supabase
           .from('events')
-          .insert([dbValues])
+          .insert(eventData)
           .select();
 
         if (error) throw error;
 
-        toast("Événement créé avec succès", {
-          description: "Le nouvel événement a été ajouté",
-        });
-        navigate('/admin/events');
+        if (!data || data.length === 0) {
+          throw new Error("Erreur lors de la création de l'événement");
+        }
 
-        if (data && data.length > 0) {
-          const newEvent = data[0];
-          sendDiscordNotification(newEvent);
-          createDiscordEvent(newEvent);
+        result = data[0];
+
+        toast({
+          title: "Événement créé",
+          description: "L'événement a été créé avec succès",
+        });
+        
+        await notifyDiscord(result, true);
+        
+        if (createDiscordScheduledEvent) {
+          await createDiscordScheduled({...result, slug: eventSlug});
         }
       }
-    } catch (error: any) {
-      console.error("Erreur lors de la sauvegarde de l'événement:", error);
-      toast("Erreur lors de la sauvegarde de l'événement", {
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleDelete = async () => {
-    if (!id) return;
-
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      toast("Événement supprimé avec succès", {
-        description: "L'événement a été supprimé définitivement",
-      });
       navigate('/admin/events');
     } catch (error: any) {
-      console.error("Erreur lors de la suppression de l'événement:", error);
-      toast("Erreur lors de la suppression de l'événement", {
-        description: error.message,
+      console.error('Error saving event:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de l'enregistrement de l'événement",
         variant: "destructive"
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  const sendDiscordNotification = async (event: any) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('discord-notify', {
-        body: {
-          content: `🎉 Nouvel événement : ${event.title} - ${new Date(event.date).toLocaleDateString('fr-FR')}`,
-          embeds: [
-            {
-              title: event.title,
-              description: event.description,
-              url: `${window.location.origin}/agenda/${event.id}`,
-              color: 5814783,
-              fields: [
-                {
-                  name: "Date",
-                  value: new Date(event.date).toLocaleDateString('fr-FR', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  }),
-                  inline: true
-                },
-                {
-                  name: "Lieu",
-                  value: event.location || "À définir",
-                  inline: true
-                }
-              ],
-              image: { url: event.image }
-            }
-          ]
-        }
-      });
-
-      if (error) throw error;
-      setNotificationSent(true);
-      toast("Notification Discord envoyée avec succès", {
-        description: "L'événement a été annoncé sur Discord",
-      });
-    } catch (error: any) {
-      console.error("Erreur lors de l'envoi de la notification Discord:", error);
-      toast("Erreur lors de l'envoi de la notification Discord", {
-        description: error.message,
-        variant: "destructive"
-      });
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
-  const createDiscordEvent = async (event: any) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('discord-create-event', {
-        body: {
-          title: event.title,
-          description: event.description,
-          start_time: new Date(event.date).toISOString(),
-          end_time: addHours(new Date(event.date), 2).toISOString(),
-          location: event.location,
-          image: event.image,
-          url: `${window.location.origin}/agenda/${event.id}`
-        }
-      });
-
-      if (error) throw error;
-      setEventCreated(true);
-      toast("Événement Discord créé avec succès", {
-        description: "L'événement a été ajouté au calendrier Discord",
-      });
-    } catch (error: any) {
-      console.error("Erreur lors de la création de l'événement Discord:", error);
-      toast("Erreur lors de la création de l'événement Discord", {
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  };
-
-  if (isChecking) {
+  if (!isAdmin && !isModerator) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p>Vérification des droits d'accès...</p>
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-grow container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold">Accès refusé</h1>
+            <p className="mt-4">Vous n'avez pas les autorisations nécessaires pour accéder à cette page.</p>
+            <Button onClick={() => navigate('/')} className="mt-6">
+              Retour à l'accueil
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
-
-  if (!isAuthorized) {
-    return null;
-  }
+  
+  const breadcrumb = <>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <Link to="/admin/events">
+        <BreadcrumbPage>Agenda</BreadcrumbPage>
+      </Link>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>{isEditMode ? "Modifier l'événement" : "Nouvel événement"}</BreadcrumbPage>
+    </BreadcrumbItem>
+  </>
 
   return (
-    <HelmetProvider>
-      <Helmet>
-        <title>{id ? `Modifier l'événement | Administration | Gétigné Collectif` : `Nouvel événement | Administration | Gétigné Collectif`}</title>
-        <meta
-          name="description"
-          content="Administration des événements du site Gétigné Collectif."
-        />
-      </Helmet>
+      <HelmetProvider>
+        <Helmet>
+          <title>{isEditMode ? "Modifier l'article" : "Créer un article"} | Admin | Gétigné Collectif</title>
+        </Helmet>
 
-      <AdminLayout title={id ? "Modifier l'événement" : "Nouvel événement"} description="Gérez les événements du site Gétigné Collectif." breadcrumb={<>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/admin/events">Événements</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>{id ? "Modifier" : "Nouveau"}</BreadcrumbPage>
-        </BreadcrumbItem>
-      </>}>
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-3xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle>{id ? "Modifier l'événement" : "Créer un événement"}</CardTitle>
-                <CardDescription>
-                  {id ? "Modifiez les informations de l'événement." : "Créez un nouvel événement pour le site."}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {loading ? (
-                  <div className="flex justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  </div>
-                ) : (
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                      <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Titre</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Titre de l'événement" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+        <AdminLayout breadcrumb={breadcrumb} backLink={<div className="flex items-center gap-4 my-4">
+          <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin/events')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour
+          </Button>
+          <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'événement" : "Créer un événement"}</h1>
+        </div>}>
 
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Description de l'événement"
-                                className="resize-none"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="date"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel>Date et heure</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                      "w-[240px] pl-3 text-left font-normal",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(field.value, "PPP HH:mm", { locale: da })
-                                    ) : (
-                                      <span>Choisir une date et une heure</span>
-                                    )}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  locale={da}
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={(date) =>
-                                    date < new Date()
-                                  }
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormDescription>
-                              Choisissez la date et l'heure de l'événement.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="location"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Lieu</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Lieu de l'événement" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Image (URL)</FormLabel>
-                            <FormControl>
-                              <Input placeholder="URL de l'image de l'événement" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="registration_link"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Lien d'inscription</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Lien pour s'inscrire à l'événement" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="max_participants"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nombre maximum de participants</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder="Nombre maximum de participants"
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="flex items-center space-x-2">
-                        <FormField
-                          control={form.control}
-                          name="is_free"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4 space-y-0">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-base">Événement gratuit</FormLabel>
-                                <FormDescription>
-                                  Indiquez si l'événement est gratuit ou payant.
-                                </FormDescription>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="is_online"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4 space-y-0">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-base">Événement en ligne</FormLabel>
-                                <FormDescription>
-                                  Indiquez si l'événement se déroule en ligne.
-                                </FormDescription>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="is_featured"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4 space-y-0">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-base">Événement mis en avant</FormLabel>
-                                <FormDescription>
-                                  Mettre en avant cet événement sur la page d'accueil.
-                                </FormDescription>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="is_visible"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4 space-y-0">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-base">Événement visible</FormLabel>
-                                <FormDescription>
-                                  Définir si l'événement est visible sur le site.
-                                </FormDescription>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
+          <div className="flex-grow container mx-auto px-4 py-8">
+            {isLoadingEvent ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="title">Titre *</Label>
+                        <Input
+                          id="title"
+                          value={title}
+                          onChange={(e) => {
+                            setTitle(e.target.value);
+                            if (!isEditMode || !slug) {
+                              setSlug(generateSlug(e.target.value));
+                            }
+                          }}
+                          placeholder="Titre de l'événement"
+                          required
                         />
                       </div>
 
-                      <Button disabled={loading} type="submit">
-                        {loading ? (
-                          <>
-                            Enregistrement...
-                            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                          </>
-                        ) : (
-                          "Enregistrer"
-                        )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="date">Date et heure *</Label>
+                          <Input
+                            id="date"
+                            type="datetime-local"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="location">Lieu *</Label>
+                          <Input
+                            id="location"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            placeholder="Lieu de l'événement"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="description">Description courte *</Label>
+                        <Textarea
+                          id="description"
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder="Courte description de l'événement"
+                          rows={3}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Contenu détaillé</Label>
+                        <div className="mt-2 border rounded-md">
+                          <MarkdownEditor
+                            value={content}
+                            onChange={setContent}
+                            contentType="event"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="flex flex-wrap gap-3 justify-end">
+                      {isEditMode && slug && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size='sm'
+                          onClick={() => window.open(`/agenda/${slug}`, '_blank')}
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          Prévisualiser
+                        </Button>
+                      )}
+                      <Button
+                        type="submit"
+                        size='sm'
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                        {isEditMode ? "Enregistrer" : "Publier"}
                       </Button>
-                    </form>
-                  </Form>
-                )}
-              </CardContent>
-              {id && (
-                <CardFooter className="flex justify-end">
-                  <Button
-                    variant="destructive"
-                    onClick={handleDelete}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        Suppression...
-                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                      </>
-                    ) : (
-                      "Supprimer"
+                    </div>
+
+                    <div className="bg-getigne-50 p-4 rounded-lg">
+                      <h3 className="font-medium mb-4">État de publication</h3>
+                      <select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value as 'draft' | 'published' | 'archived')}
+                        className="w-full border border-gray-300 rounded-md p-2"
+                      >
+                        <option value="published">Publié</option>
+                        <option value="draft">Brouillon</option>
+                        <option value="archived">Archivé</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="slug">Slug</Label>
+                      <Input
+                        id="slug"
+                        value={slug}
+                        onChange={(e) => setSlug(e.target.value)}
+                        placeholder="slug-evenement"
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Identifiant URL de l'événement (généré automatiquement si laissé vide)
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label>Image principale *</Label>
+                      <div className="mt-2 border rounded-md p-4 space-y-4">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleImageChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+
+                        {image ? (
+                          <div className="space-y-3">
+                            <div className="relative w-full h-48 rounded-md overflow-hidden">
+                              <img
+                                src={image}
+                                alt="Aperçu"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={triggerFileInput}
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Remplacer l'image
+                            </Button>
+                          </div>
+                          ) : (
+                          <div className="flex flex-col items-center justify-center h-48 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer" onClick={triggerFileInput}>
+                            <ImageIcon className="h-10 w-10 text-gray-400" />
+                            <p className="mt-2 text-sm text-gray-500">Cliquez pour ajouter une image</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="bg-getigne-50 p-4 rounded-lg">
+                      <h3 className="font-medium mb-4">Paramètres d'inscription</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label htmlFor="allow-registration" className="font-medium">Autoriser les inscriptions</Label>
+                            <p className="text-sm text-getigne-500">Activez pour permettre aux utilisateurs de s'inscrire à cet événement</p>
+                          </div>
+                          <Switch 
+                            id="allow-registration" 
+                            checked={allowRegistration} 
+                            onCheckedChange={setAllowRegistration} 
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label htmlFor="members-only" className="font-medium">Réservé aux adhérents</Label>
+                            <p className="text-sm text-getigne-500">Activez pour limiter les inscriptions aux adhérents uniquement</p>
+                          </div>
+                          <Switch 
+                            id="members-only" 
+                            checked={isMembersOnly} 
+                            onCheckedChange={setIsMembersOnly} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {!isEditMode && (
+                      <div className="bg-getigne-50 p-4 rounded-lg">
+                        <h3 className="font-medium mb-4">Paramètres Discord</h3>
+                        
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <Label htmlFor="create-discord-event" className="font-medium">Créer un événement Discord</Label>
+                              <p className="text-sm text-getigne-500">Ajouter automatiquement l'événement au serveur Discord</p>
+                            </div>
+                            <Switch 
+                              id="create-discord-event" 
+                              checked={createDiscordScheduledEvent} 
+                              onCheckedChange={setCreateDiscordScheduledEvent} 
+                            />
+                          </div>
+                          
+                          {createDiscordScheduledEvent && (
+                            <div>
+                              <Label htmlFor="duration">Durée estimée (heures)</Label>
+                              <Input
+                                id="duration"
+                                type="number"
+                                min="1"
+                                max="12"
+                                value={estimatedDuration}
+                                onChange={(e) => setEstimatedDuration(parseInt(e.target.value))}
+                              />
+                              <p className="text-sm text-getigne-500 mt-1">
+                                Durée estimée de l'événement pour le calendrier Discord
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     )}
-                  </Button>
-                </CardFooter>
-              )}
-            </Card>
+
+                    <div>
+                      <Label htmlFor="committee">Commission</Label>
+                      <select
+                        id="committee"
+                        value={committeeId}
+                        onChange={(e) => setCommitteeId(e.target.value)}
+                        className="w-full border border-gray-300 rounded-md p-2"
+                      >
+                        <option value="">-- Aucune commission --</option>
+                        {committees.map((committee) => (
+                          <option key={committee.id} value={committee.id}>
+                            {committee.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            )}
           </div>
-        </div>
-      </AdminLayout>
-    </HelmetProvider>
+        </AdminLayout>
+      </HelmetProvider>
   );
 };
 

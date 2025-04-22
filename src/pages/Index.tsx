@@ -3,7 +3,6 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
-import Program from "@/components/Program";
 import News from "@/components/News";
 import Events from "@/components/Events";
 import Team from "@/components/Team";
@@ -28,11 +27,9 @@ const Index = () => {
         <Navbar />
         <Hero />
         <Values />
-        {settings.showProgram && <Program />}
         <Campaign />
         <Events />
         <News limit={3} />
-        {/* <Team /> */}
         <Footer />
       </div>
     </HelmetProvider>

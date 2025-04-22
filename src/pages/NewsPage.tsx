@@ -420,10 +420,12 @@ const NewsPage = () => {
             </form>
 
             <div className="flex gap-2">
-              <Button onClick={handleClearFilters} variant="outline" size="sm">
-                <X size={16} className="mr-1" />
-                Réinitialiser
-              </Button>
+              {(selectedCategory !== 'all' || selectedTags.length !== 0 || searchTerm) && (
+                <Button onClick={handleClearFilters} variant="outline" size="sm">
+                  <X size={16} className="mr-1" />
+                  Réinitialiser
+                </Button>
+              )}
               <Button onClick={handleDownloadRSS} variant="outline" size="sm">
                 <Rss size={16} className="mr-1" />
                 Flux RSS
