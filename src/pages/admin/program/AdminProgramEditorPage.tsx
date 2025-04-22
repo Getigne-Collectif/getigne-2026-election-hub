@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -22,22 +23,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from '@/components/ui/tabs';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'react-router-dom';
 import { ArrowLeft, Loader2, Upload, X } from 'lucide-react';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
 import { IconSelect } from '@/components/ui/icon-select';
 import { uploadProgramImage } from '@/components/admin/program/points/FileUploadService';
+
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from 'react-router-dom';
 
 const programItemSchema = z.object({
   title: z.string().min(2, "Le titre doit comporter au moins 2 caractères"),
@@ -53,7 +49,6 @@ export default function AdminProgramEditorPage() {
   const navigate = useNavigate();
   const isEditing = !!id;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("details");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
@@ -109,7 +104,6 @@ export default function AdminProgramEditorPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // Empêcher la propagation de l'événement
     e.preventDefault();
     e.stopPropagation();
     
@@ -215,15 +209,8 @@ export default function AdminProgramEditorPage() {
       title={pageTitleText}
       description="Gérez les sections du programme politique"
     >
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="details">Détails</TabsTrigger>
-          {isEditing && (
-            <TabsTrigger value="points">Points du programme</TabsTrigger>
-          )}
-        </TabsList>
-
-        <TabsContent value="details" className="space-y-6">
+      <div className="grid grid-cols-3 gap-6">
+        <div className="col-span-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <Card>
@@ -331,13 +318,6 @@ export default function AdminProgramEditorPage() {
                           <FormDescription>
                             Ajoutez une image représentative pour cette section du programme (format recommandé: 16:9)
                           </FormDescription>
-                          
-                          <div className="text-xs text-muted-foreground mt-4 p-2 bg-muted/30 rounded-md">
-                            <p><strong>État de l'image:</strong></p>
-                            <p>Image sélectionnée: {imageFile ? 'Oui' : 'Non'}</p>
-                            <p>Image URL (champ): {field.value || 'Non définie'}</p>
-                            <p>URL téléchargée: {uploadedImageUrl || 'Non téléchargée'}</p>
-                          </div>
                         </div>
                         <FormMessage />
                       </FormItem>
@@ -366,34 +346,34 @@ export default function AdminProgramEditorPage() {
                 </CardContent>
               </Card>
 
-              <div className="flex justify-end gap-4">
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={() => navigate('/admin/program')}
-                >
-                  Annuler
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {isEditing ? "Mise à jour..." : "Création..."}
-                    </>
-                  ) : (
-                    isEditing ? "Mettre à jour" : "Créer la section"
-                  )}
-                </Button>
-              </div>
+                  <div className="flex justify-end gap-4">
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={() => navigate('/admin/program')}
+                    >
+                      Annuler
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {isEditing ? "Mise à jour..." : "Création..."}
+                        </>
+                      ) : (
+                        isEditing ? "Mettre à jour" : "Créer la section"
+                      )}
+                    </Button>
+                  </div>
             </form>
           </Form>
-        </TabsContent>
+        </div>
 
-        {isEditing && (
-          <TabsContent value="points">
+        {isEditing && id && (
+          <div className="col-span-1">
             <Card>
               <CardHeader>
                 <CardTitle>Points du programme</CardTitle>
@@ -405,9 +385,9 @@ export default function AdminProgramEditorPage() {
                 <ProgramPointsEditor programItemId={id} />
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
         )}
-      </Tabs>
+      </div>
     </AdminLayout>
   );
 }

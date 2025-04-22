@@ -706,18 +706,21 @@ export type Database = {
           created_at: string
           id: string
           program_item_id: string
+          program_point_id: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           program_item_id: string
+          program_point_id?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           program_item_id?: string
+          program_point_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -726,6 +729,13 @@ export type Database = {
             columns: ["program_item_id"]
             isOneToOne: false
             referencedRelation: "program_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_likes_program_point_id_fkey"
+            columns: ["program_point_id"]
+            isOneToOne: false
+            referencedRelation: "program_points"
             referencedColumns: ["id"]
           },
         ]
