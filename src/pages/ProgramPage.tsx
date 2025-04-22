@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft, Clock, BrainCircuit, ShieldCheck, Users, Lightbulb, Sprout, Hammer } from 'lucide-react';
+import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft, Clock, BrainCircuit, ShieldCheck, Users, Lightbulb, Sprout, Hammer, edit } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -49,7 +49,6 @@ const ProgramPage = () => {
     }));
   };
 
-  // Fetch program items for tabs
   const { data: programItems, isLoading: loadingProgramItems } = useQuery({
     queryKey: ['programItemsForTabs'],
     queryFn: async () => {
@@ -67,7 +66,6 @@ const ProgramPage = () => {
         throw error;
       }
       
-      // Set the first tab as active if we have program items and no active tab
       if (data.length > 0 && !activeTab) {
         setActiveTab(data[0].id);
       }
@@ -77,7 +75,6 @@ const ProgramPage = () => {
     enabled: settings.showProgram || isAuthorized,
   });
 
-  // Fetch program points
   const { data: programPoints, isLoading: loadingProgramPoints } = useQuery({
     queryKey: ['programPoints'],
     queryFn: async () => {
@@ -100,7 +97,6 @@ const ProgramPage = () => {
     enabled: settings.showProgram || isAuthorized,
   });
 
-  // Fetch program general presentation
   const { data: generalPresentation, isLoading: loadingPresentation } = useQuery<ProgramGeneral>({
     queryKey: ['programGeneral'],
     queryFn: async () => {
@@ -109,7 +105,7 @@ const ProgramPage = () => {
         .select('*')
         .maybeSingle();
         
-      if (error && error.code !== 'PGRST116') {  // PGRST116 is "not found"
+      if (error && error.code !== 'PGRST116') {
         toast({
           variant: "destructive",
           title: "Erreur",
@@ -126,7 +122,6 @@ const ProgramPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Handle anchor if present in URL
     const handleAnchor = () => {
       const hash = window.location.hash;
       if (hash) {
@@ -161,7 +156,6 @@ const ProgramPage = () => {
     setIsChecking(false);
   }, [user, userRoles, authChecked, toast]);
 
-  // If settings are enabled and program is visible, show program to all
   const showProgramToAll = settings.showProgram;
 
   if (loadingSettings || isChecking || (showProgramToAll && (loadingProgramItems || loadingPresentation || loadingProgramPoints))) {
@@ -187,7 +181,6 @@ const ProgramPage = () => {
       <div className="page-content">
         <Navbar />
 
-        {/* Hero Section améliorée */}
         <div className="pt-24 bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] text-white">
           <div className="container mx-auto px-4">
             <Breadcrumb className="mb-6">
@@ -227,7 +220,6 @@ const ProgramPage = () => {
             </div>
           </div>
           
-          {/* Wave separator */}
           <div className="w-full overflow-hidden -mb-1 mt-16">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
               <path 
@@ -271,7 +263,6 @@ const ProgramPage = () => {
                   )}
 
 
-                  {/* Banner avec citation ou message inspirant */}
                   <div className="mb-16 py-12 px-8 bg-gradient-to-r from-getigne-green-500 to-[#62FCD3] rounded-xl text-white text-center relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10">
                       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -292,7 +283,6 @@ const ProgramPage = () => {
                     </div>
                   </div>
 
-                  {/* Program values avec style amélioré */}
                   <div id="valeurs" className="mb-16">
                     <div className="text-center mb-10">
                       <h2 className="text-3xl font-bold mb-4">Les valeurs qui guident notre projet</h2>
@@ -348,7 +338,18 @@ const ProgramPage = () => {
                             <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:order-1' : ''} flex flex-col`}>
                               <div className="flex-grow"></div>
                               <div>
-                                <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                                <div className="flex items-center gap-2 mb-4">
+                                  <h3 className="text-2xl font-bold">{item.title}</h3>
+                                  {isProgramAdmin && (
+                                    <Link
+                                      to={`/admin/program/edit/${item.id}`}
+                                      className="ml-2"
+                                      title="Modifier cette section"
+                                    >
+                                      <edit className="h-5 w-5 text-getigne-600 hover:text-getigne-900 transition-colors" />
+                                    </Link>
+                                  )}
+                                </div>
                                 <div className="prose max-w-none rich-content">
                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                     {item.description}
@@ -433,7 +434,6 @@ const ProgramPage = () => {
 
 
                 <div className="max-w-4xl mx-auto">
-                  {/* CTA de participation */}
                   <div className="mt-16 mb-8">
                     <div className="bg-getigne-50 rounded-xl overflow-hidden shadow-md">
                       <div className="grid grid-cols-1 md:grid-cols-2">
@@ -465,7 +465,6 @@ const ProgramPage = () => {
                 </div>
               </div>
             ) : (
-              // Access restricted page with alert form for other users
               <div className="max-w-xl mx-auto">
                 <div className="bg-white rounded-xl shadow-md border border-getigne-100 p-8 mb-8">
                   <div className="flex justify-center mb-6">
@@ -493,7 +492,6 @@ const ProgramPage = () => {
                   </div>
                 </div>
 
-                {/* Formulaire d'alerte pour la sortie du programme */}
                 <ProgramAlertForm />
               </div>
             )}
