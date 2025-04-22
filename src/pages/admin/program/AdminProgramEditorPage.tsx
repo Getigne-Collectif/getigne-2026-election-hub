@@ -28,7 +28,7 @@ import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/component
 import { Link } from 'react-router-dom';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { IconSelect } from '@/components/ui/icon-select';
-import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
+import ProgramPointsEditor from '@/components/admin/program/points/ProgramPointsEditor';
 import { uploadProgramImage } from '@/components/admin/program/points/FileUploadService';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
@@ -375,7 +375,7 @@ export default function AdminProgramEditorPage() {
             <div className="p-6 h-full overflow-auto">
               <Card className="h-full">
                 <CardHeader>
-                  <CardTitle>Points du programme</CardTitle>
+                  <CardTitle>Points</CardTitle>
                   <CardDescription>
                     Ajoutez et gérez les points spécifiques de cette section du programme
                   </CardDescription>

@@ -9,16 +9,12 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft, Clock, BrainCircuit, ShieldCheck, Users, Lightbulb, Sprout, Hammer, Edit } from 'lucide-react';
+import { Home, UsersRound, ClipboardList, Scale, Heart, Clock, Edit } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProgramContentComponent from '@/components/program/ProgramContentComponent';
 import ProgramAlertForm from '@/components/program/ProgramAlertForm';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { DynamicIcon } from '@/components/ui/dynamic-icon';
-import '../styles/richTextContent.css';
 import ProgramPointPreview from '@/components/program/ProgramPointPreview';
 import CitizenCommittees from '@/components/CitizenCommittees';
 
