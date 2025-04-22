@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useNavigate, Link } from 'react-router-dom';
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft, Clock, BrainCircuit, ShieldCheck, Users, Lightbulb, Sprout, Hammer, edit } from 'lucide-react';
+import { Home, LockKeyhole, UsersRound, ClipboardList, Scale, BookOpen, Heart, ArrowLeft, Clock, BrainCircuit, ShieldCheck, Users, Lightbulb, Sprout, Hammer, Edit } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -157,6 +158,7 @@ const ProgramPage = () => {
   }, [user, userRoles, authChecked, toast]);
 
   const showProgramToAll = settings.showProgram;
+  const isProgramAdmin = userRoles.includes('admin') || userRoles.includes('program_manager');
 
   if (loadingSettings || isChecking || (showProgramToAll && (loadingProgramItems || loadingPresentation || loadingProgramPoints))) {
     return (
@@ -346,7 +348,7 @@ const ProgramPage = () => {
                                       className="ml-2"
                                       title="Modifier cette section"
                                     >
-                                      <edit className="h-5 w-5 text-getigne-600 hover:text-getigne-900 transition-colors" />
+                                      <Edit className="h-5 w-5 text-getigne-600 hover:text-getigne-900 transition-colors" />
                                     </Link>
                                   )}
                                 </div>
@@ -505,3 +507,4 @@ const ProgramPage = () => {
 };
 
 export default ProgramPage;
+

@@ -28,8 +28,9 @@ import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/component
 import { Link } from 'react-router-dom';
 import MarkdownEditor from '@/components/MarkdownEditor';
 import { IconSelect } from '@/components/ui/icon-select';
-import ProgramPointsEditor from '@/components/admin/program/points';
+import ProgramPointsEditor from '@/components/admin/program/ProgramPointsEditor';
 import { uploadProgramImage } from '@/components/admin/program/points/FileUploadService';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -209,18 +210,15 @@ export default function AdminProgramEditorPage() {
       title={pageTitleText}
       description="Gérez les sections du programme politique"
     >
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Informations de la section</CardTitle>
-                  <CardDescription>
-                    Définissez le titre et la description générale de cette section du programme
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+      {isEditing && id ? (
+        <ResizablePanelGroup 
+          direction="horizontal" 
+          className="min-h-[600px] rounded-lg border"
+        >
+          <ResizablePanel defaultSize={65} minSize={40}>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
+                <div className="space-y-6">
                   <FormField
                     control={form.control}
                     name="title"
@@ -343,51 +341,213 @@ export default function AdminProgramEditorPage() {
                       </FormItem>
                     )}
                   />
+                </div>
+
+                <div className="flex justify-end gap-4">
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => navigate('/admin/program')}
+                  >
+                    Annuler
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {isEditing ? "Mise à jour..." : "Création..."}
+                      </>
+                    ) : (
+                      isEditing ? "Mettre à jour" : "Créer la section"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle className="bg-getigne-100" />
+          
+          <ResizablePanel defaultSize={35} minSize={30}>
+            <div className="p-6 h-full overflow-auto">
+              <Card className="h-full">
+                <CardHeader>
+                  <CardTitle>Points du programme</CardTitle>
+                  <CardDescription>
+                    Ajoutez et gérez les points spécifiques de cette section du programme
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ProgramPointsEditor programItemId={id} />
                 </CardContent>
               </Card>
-
-              <div className="flex justify-end gap-4">
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={() => navigate('/admin/program')}
-                >
-                  Annuler
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {isEditing ? "Mise à jour..." : "Création..."}
-                    </>
-                  ) : (
-                    isEditing ? "Mettre à jour" : "Créer la section"
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Informations de la section</CardTitle>
+            <CardDescription>
+              Définissez le titre et la description générale de cette section du programme
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Titre</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Transition écologique" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
+                />
 
-        <div className="col-span-1">
-          {isEditing && id && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Points du programme</CardTitle>
-                <CardDescription>
-                  Ajoutez et gérez les points spécifiques de cette section du programme
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ProgramPointsEditor programItemId={id} />
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <MarkdownEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                          className="min-h-[200px]"
+                          contentType="news"
+                          disableImageUpload={true}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Décrivez l'orientation générale et l'importance de cette thématique dans votre programme
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image de la section</FormLabel>
+                      <div className="space-y-4">
+                        {imagePreview && (
+                          <div className="w-full h-40 relative rounded-md overflow-hidden border border-getigne-200">
+                            <img 
+                              src={imagePreview} 
+                              alt="Aperçu" 
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = '/placeholder.svg';
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-2 right-2"
+                              onClick={removeImage}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => document.getElementById('image-upload')?.click()}
+                          >
+                            <Upload className="mr-2 h-4 w-4" />
+                            {imagePreview ? "Changer l'image" : "Ajouter une image"}
+                          </Button>
+                          <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageChange}
+                          />
+                          <input 
+                            type="hidden" 
+                            {...field} 
+                            value={uploadedImageUrl || field.value} 
+                          />
+                          {(field.value || uploadedImageUrl) && (
+                            <span className="text-xs text-muted-foreground">
+                              Image sélectionnée
+                            </span>
+                          )}
+                        </div>
+                        
+                        <FormDescription>
+                          Ajoutez une image représentative pour cette section du programme (format recommandé: 16:9)
+                        </FormDescription>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="icon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Icône</FormLabel>
+                      <FormControl>
+                        <IconSelect 
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Choisissez une icône représentative pour cette section
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-4">
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => navigate('/admin/program')}
+                  >
+                    Annuler
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {isEditing ? "Mise à jour..." : "Création..."}
+                      </>
+                    ) : (
+                      isEditing ? "Mettre à jour" : "Créer la section"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
     </AdminLayout>
   );
 }
