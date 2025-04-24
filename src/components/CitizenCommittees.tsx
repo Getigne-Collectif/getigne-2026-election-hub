@@ -181,7 +181,7 @@ const CommitteeItem = ({ committee, index }) => {
   }, [committee.id]);
 
   return (
-    <Link to={`/objectif-2026/${committee.id}`} className="block">
+    <Link to={`/objectif-2026/commission/${committee.id}`} className="block">
       <div
         ref={ref}
         className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift transition-all duration-200 ${
@@ -279,17 +279,6 @@ const CitizenCommittees = () => {
               index={index}
             />
           ))}
-        </div>
-
-        <div className="mt-12 text-center">
-          <Button
-            asChild
-            className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
-          >
-            <Link to="/commissions">
-              Toutes les commissions
-            </Link>
-          </Button>
         </div>
       </div>
     </section>

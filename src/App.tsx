@@ -57,7 +57,7 @@ function App() {
 
               {/* Objectif 2026 et sous-pages */}
               <Route path="/objectif-2026" element={<ProgramPage />} />
-              <Route path="/objectif-2026/:id" element={<CommitteePage />} />
+              <Route path="/objectif-2026/commission/:id" element={<CommitteePage />} />
 
               {/* Nos projets */}
               <Route path="/nos-projets" element={<ProjectsPage />} />

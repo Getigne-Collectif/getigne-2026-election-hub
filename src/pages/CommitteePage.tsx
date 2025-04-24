@@ -510,7 +510,7 @@ const CommitteePage = () => {
             <div className="w-full md:w-auto">
               {prevCommittee ? (
                 <Link
-                  to={`/commissions/${prevCommittee.id}`}
+                  to={`/objectif-2026/commission/${prevCommittee.id}`}
                   className={`flex items-center hover:underline ${themeColor.text}`}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -527,7 +527,7 @@ const CommitteePage = () => {
             <div className="w-full md:w-auto text-right">
               {nextCommittee ? (
                 <Link
-                  to={`/commissions/${nextCommittee.id}`}
+                  to={`/objectif-2026/commission/${nextCommittee.id}`}
                   className={`flex items-center justify-end hover:underline ${themeColor.text}`}
                 >
                   <span>Commission {nextCommittee.title}</span>
