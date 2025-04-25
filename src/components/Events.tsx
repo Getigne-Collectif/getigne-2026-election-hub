@@ -222,7 +222,7 @@ const Events = () => {
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Nos prochains événements</h2>
           <p className="text-getigne-700 text-lg">
-            Participez à nos réunions, ateliers et moments d'échange pour contribuer à notre projet collectif.
+            Participez à nos réunions, ateliers et moments d'échanges pour contribuer à notre projet collectif.
           </p>
         </div>
 

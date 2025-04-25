@@ -232,7 +232,7 @@ const AgendaPage = () => {
         <title>Agenda | Gétigné Collectif</title>
         <meta
           name="description"
-          content="Retrouvez tous les événements à venir de Gétigné Collectif, réunions publiques, ateliers participatifs et moments d'échange."
+          content="Retrouvez tous les événements à venir de Gétigné Collectif, réunions publiques, ateliers participatifs et moments d'échanges."
         />
       </Helmet>
       
@@ -263,7 +263,7 @@ const AgendaPage = () => {
                   </span>
                   <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos prochains événements</h1>
                   <p className="text-getigne-700 text-lg mb-6">
-                    Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échange
+                    Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échanges
                     pour construire ensemble l'avenir de Gétigné.
                   </p>
                   
