@@ -78,9 +78,11 @@ const Campaign = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-getigne-900/50 to-transparent pointer-events-none"></div>
               <div className="absolute bottom-6 left-6 right-6">
-                <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg inline-block">
-                  <p className="font-medium text-getigne-900">Faites partie de l'aventure collective !</p>
-                </div>
+                <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noopener noreferrer">
+                  <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg inline-block font-medium text-getigne-900">
+                    Faites partie de l'aventure collective !
+                  </div>
+                </a>
               </div>
             </div>
           </div>

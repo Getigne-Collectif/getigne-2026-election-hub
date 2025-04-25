@@ -166,7 +166,7 @@ ${formData.message}
 
               <Button 
                 type="submit" 
-                className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+                className="w-full bg-getigne-green-500 hover:bg-getigne-green-600 text-white"
                 disabled={isSubmitting}
               >
                 <Send className="mr-2 h-4 w-4" /> {isSubmitting ? 'Envoi en cours...' : 'Envoyer'}

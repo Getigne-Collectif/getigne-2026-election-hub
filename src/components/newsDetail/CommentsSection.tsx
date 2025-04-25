@@ -15,7 +15,6 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ newsId }) => {
   useEffect(() => {
     const checkCommentsEnabled = async () => {
       try {
-        console.log('Checking if comments are enabled for news ID:', newsId);
         const { data, error } = await supabase
           .from('news')
           .select('comments_enabled')
@@ -23,11 +22,9 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ newsId }) => {
           .single();
           
         if (error) {
-          console.error('Error checking if comments are enabled:', error);
           return;
         }
         
-        console.log('Comments enabled data:', data);
         setCommentsEnabled(data.comments_enabled !== false);
       } catch (error) {
         console.error('Error in checkCommentsEnabled:', error);

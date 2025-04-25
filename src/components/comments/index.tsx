@@ -238,7 +238,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
       
       {approvedComments.length > 0 && (
         <div>
-          <h3 className="text-xl font-semibold mb-4">Commentaires</h3>
           <UserView
           comments={approvedComments}
           loading={loading}

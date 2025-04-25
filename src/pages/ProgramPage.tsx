@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Home, UsersRound, ClipboardList, Scale, Heart, Clock, Edit } from 'lucide-react';
+import { Home, UsersRound, ClipboardList, Scale, Heart, Clock, Edit, Calendar, MessageCircle } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase, TABLES, ProgramGeneral } from '@/integrations/supabase/client';
 import ProgramAlertForm from '@/components/program/ProgramAlertForm';
@@ -445,12 +445,14 @@ const ProgramPage = () => {
                           <div className="flex flex-wrap gap-3">
                             <Button asChild>
                               <Link to="/contact">
+                                <MessageCircle className="h-5 w-5 mr-2" />
                                 Nous contacter
                               </Link>
                             </Button>
                             <Button asChild variant="outline">
-                              <Link to="/objectif-2026#commissions">
-                                Rejoindre une commission
+                              <Link to="/agenda">
+                                <Calendar className="h-5 w-5 mr-2" />
+                                Voir les événements
                               </Link>
                             </Button>
                           </div>
