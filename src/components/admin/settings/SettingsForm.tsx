@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -82,33 +83,34 @@ export default function SettingsForm() {
     const fetchSettings = async () => {
       try {
         const { data, error } = await supabase
-          .from('settings')
-          .select('*')
-          .single();
+          .from('app_settings')
+          .select('*');
 
         if (error) throw error;
 
-        if (data) {
+        // Convertir les données en format attendu par le formulaire
+        const settingsMap: Record<string, any> = {};
+        data?.forEach(setting => {
+          settingsMap[setting.key] = setting.value;
+        });
+
+        if (data && data.length > 0) {
           form.reset({
-            site_name: data.site_name || '',
-            site_description: data.site_description || '',
-            contact_email: data.contact_email || '',
-            maintenance_mode: data.maintenance_mode || false,
-            maintenance_message: data.maintenance_message || '',
-            social_facebook: data.social_facebook || '',
-            social_twitter: data.social_twitter || '',
-            social_instagram: data.social_instagram || '',
-            social_linkedin: data.social_linkedin || '',
-            social_youtube: data.social_youtube || '',
+            site_name: settingsMap.site_name || '',
+            site_description: settingsMap.site_description || '',
+            contact_email: settingsMap.contact_email || '',
+            maintenance_mode: settingsMap.maintenance_mode || false,
+            maintenance_message: settingsMap.maintenance_message || '',
+            social_facebook: settingsMap.social_facebook || '',
+            social_twitter: settingsMap.social_twitter || '',
+            social_instagram: settingsMap.social_instagram || '',
+            social_linkedin: settingsMap.social_linkedin || '',
+            social_youtube: settingsMap.social_youtube || '',
           });
         }
       } catch (error) {
         console.error('Error fetching settings:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les paramètres du site.",
-          variant: "destructive"
-        });
+        toast.error("Impossible de charger les paramètres du site.");
       } finally {
         setIsLoading(false);
       }
@@ -120,27 +122,45 @@ export default function SettingsForm() {
   const onSubmit = async (values: SettingsFormValues) => {
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('settings')
-        .update(values)
-        .eq('id', 1);
+      // Convertir les valeurs en format app_settings
+      const updates = Object.entries(values).map(([key, value]) => ({
+        key,
+        value,
+        description: getDescriptionForKey(key)
+      }));
 
-      if (error) throw error;
+      // Mettre à jour ou insérer chaque paramètre
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('app_settings')
+          .upsert(update, { onConflict: 'key' });
 
-      toast({
-        title: "Paramètres enregistrés",
-        description: "Les paramètres du site ont été mis à jour avec succès."
-      });
+        if (error) throw error;
+      }
+
+      toast.success("Les paramètres du site ont été mis à jour avec succès.");
     } catch (error) {
       console.error('Error saving settings:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'enregistrer les paramètres du site.",
-        variant: "destructive"
-      });
+      toast.error("Impossible d'enregistrer les paramètres du site.");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const getDescriptionForKey = (key: string): string => {
+    const descriptions: Record<string, string> = {
+      site_name: 'Nom du site',
+      site_description: 'Description du site',
+      contact_email: 'Email de contact',
+      maintenance_mode: 'Mode maintenance',
+      maintenance_message: 'Message de maintenance',
+      social_facebook: 'URL Facebook',
+      social_twitter: 'URL Twitter',
+      social_instagram: 'URL Instagram',
+      social_linkedin: 'URL LinkedIn',
+      social_youtube: 'URL YouTube'
+    };
+    return descriptions[key] || key;
   };
 
   if (isLoading) {
