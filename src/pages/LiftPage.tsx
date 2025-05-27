@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Users, Car, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
@@ -19,10 +21,22 @@ const LiftPage = () => {
   const [loading, setLoading] = useState(true);
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [showPastEvents, setShowPastEvents] = useState(false);
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [showPastEvents]);
+
+  const isPostPast = (post: any) => {
+    const today = new Date();
+    const postDate = new Date(post.date);
+    
+    if (post.recurrence === 'once') {
+      return postDate < today;
+    }
+    // Pour les événements récurrents, on ne les considère jamais comme passés
+    return false;
+  };
 
   const fetchPosts = async () => {
     try {
@@ -34,8 +48,12 @@ const LiftPage = () => {
 
       if (error) throw error;
 
-      setOffers(data.filter(post => post.type === 'offer'));
-      setRequests(data.filter(post => post.type === 'request'));
+      const filteredData = showPastEvents 
+        ? data 
+        : data.filter(post => !isPostPast(post));
+
+      setOffers(filteredData.filter(post => post.type === 'offer'));
+      setRequests(filteredData.filter(post => post.type === 'request'));
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -53,12 +71,12 @@ const LiftPage = () => {
         
         <LiftLayout>
           <div className="max-w-2xl mx-auto text-center">
-            <Card className="border-orange-200">
+            <Card className="border-blue-200">
               <CardHeader>
-                <div className="mx-auto mb-4 p-4 bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center">
-                  <Users className="w-8 h-8 text-orange-600" />
+                <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center">
+                  <Users className="w-8 h-8 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl text-orange-900">
+                <CardTitle className="text-2xl text-blue-900">
                   Bienvenue sur Lift
                 </CardTitle>
                 <CardDescription className="text-lg">
@@ -73,13 +91,13 @@ const LiftPage = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link to="/auth">
-                    <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                       <UserPlus className="mr-2 w-4 h-4" />
                       Créer un compte
                     </Button>
                   </Link>
                   <Link to="/auth">
-                    <Button variant="outline" className="border-orange-300 text-orange-700">
+                    <Button variant="outline" className="border-blue-300 text-blue-700">
                       Se connecter
                     </Button>
                   </Link>
@@ -102,7 +120,7 @@ const LiftPage = () => {
       <LiftLayout>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-orange-900 mb-2">
+            <h1 className="text-3xl font-bold text-blue-900 mb-2">
               Partageons nos trajets quotidiens
             </h1>
             <p className="text-gray-700 text-lg">
@@ -111,27 +129,38 @@ const LiftPage = () => {
           </div>
 
           <Tabs defaultValue="offers" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 bg-orange-100">
-              <TabsTrigger value="offers" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-blue-100">
+              <TabsTrigger value="offers" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 <Car className="mr-2 w-4 h-4" />
                 Propositions de trajet ({offers.length})
               </TabsTrigger>
-              <TabsTrigger value="requests" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+              <TabsTrigger value="requests" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 <Users className="mr-2 w-4 h-4" />
                 Demandes de covoiturage ({requests.length})
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="offers" className="space-y-6">
-              <div className="flex justify-center">
+              <div className="flex justify-between items-center">
                 <Button 
                   onClick={() => setShowOfferForm(true)}
                   size="lg"
-                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Car className="mr-2 w-5 h-5" />
                   Proposer un trajet
                 </Button>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="show-past-offers"
+                    checked={showPastEvents}
+                    onCheckedChange={setShowPastEvents}
+                  />
+                  <Label htmlFor="show-past-offers" className="text-sm">
+                    Afficher les événements passés
+                  </Label>
+                </div>
               </div>
 
               {loading ? (
@@ -156,15 +185,26 @@ const LiftPage = () => {
             </TabsContent>
 
             <TabsContent value="requests" className="space-y-6">
-              <div className="flex justify-center">
+              <div className="flex justify-between items-center">
                 <Button 
                   onClick={() => setShowRequestForm(true)}
                   size="lg"
-                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Users className="mr-2 w-5 h-5" />
                   Faire une demande
                 </Button>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="show-past-requests"
+                    checked={showPastEvents}
+                    onCheckedChange={setShowPastEvents}
+                  />
+                  <Label htmlFor="show-past-requests" className="text-sm">
+                    Afficher les événements passés
+                  </Label>
+                </div>
               </div>
 
               {loading ? (

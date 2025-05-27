@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Calendar, Edit } from 'lucide-react';
+import { Calendar, Clock, Edit } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { useAuth } from '@/context/auth';
 import LiftPostForm from './LiftPostForm';
 import LiftMessageModal from './LiftMessageModal';
@@ -27,21 +29,28 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
     return timeStart;
   };
 
-  const getRecurrenceText = (recurrence: string) => {
+  const getRecurrenceText = (recurrence: string, date: string) => {
+    if (recurrence === 'once') return null;
+    
     switch (recurrence) {
       case 'daily': return 'Tous les jours';
-      case 'weekly': return 'Toutes les semaines';
-      case 'once': return 'Une fois';
+      case 'weekly': 
+        const dayName = format(new Date(date), 'EEEE', { locale: fr });
+        return `Chaque ${dayName}`;
       default: return recurrence;
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    return format(new Date(dateStr), 'd MMMM yyyy', { locale: fr });
+  };
+
   return (
     <>
-      <Card className="border-orange-200 hover:shadow-md transition-shadow">
+      <Card className="border-blue-200 hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
-            <CardTitle className="text-lg text-orange-900">
+            <CardTitle className="text-lg text-blue-900">
               {post.departure_location} → {post.arrival_location}
             </CardTitle>
             {isOwner && (
@@ -49,7 +58,7 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowEditForm(true)}
-                className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
               >
                 <Edit size={16} className="mr-1" />
                 Modifier
@@ -60,17 +69,19 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
 
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="text-orange-700 border-orange-300">
+            <Badge variant="outline" className="text-blue-700 border-blue-300">
               <Calendar size={12} className="mr-1" />
-              {post.day}
+              {formatDate(post.date)}
             </Badge>
-            <Badge variant="outline" className="text-orange-700 border-orange-300">
+            <Badge variant="outline" className="text-blue-700 border-blue-300">
               <Clock size={12} className="mr-1" />
               {post.time_start ? formatTime(post.time_start, post.time_end, post.is_flexible_time) : 'Horaire flexible'}
             </Badge>
-            <Badge variant="outline" className="text-orange-700 border-orange-300">
-              {getRecurrenceText(post.recurrence)}
-            </Badge>
+            {getRecurrenceText(post.recurrence, post.date) && (
+              <Badge variant="outline" className="text-blue-700 border-blue-300">
+                {getRecurrenceText(post.recurrence, post.date)}
+              </Badge>
+            )}
           </div>
 
           {post.description && (
@@ -82,7 +93,7 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
           {!isOwner && (
             <Button
               onClick={() => setShowMessageModal(true)}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
             >
               {post.type === 'offer' ? "Ça m'intéresse" : "Je propose un covoit"}
             </Button>
