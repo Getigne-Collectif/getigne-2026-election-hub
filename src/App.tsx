@@ -17,6 +17,7 @@ import SiteMapPage from "./pages/SiteMapPage";
 import JoinPage from "./pages/JoinPage";
 import AuthPage from "./pages/AuthPage";
 import LegalPage from "./pages/LegalPage";
+import LiftPage from "./pages/LiftPage";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage.tsx";
 import AdminNewsPage from "@/pages/admin/news/AdminNewsPage.tsx";
 import ProfilePage from "@/pages/ProfilePage.tsx";
@@ -64,6 +65,9 @@ function App() {
 
               {/* Contact */}
               <Route path="/contact" element={<ContactPage />} />
+
+              {/* Lift - Module de covoiturage */}
+              <Route path="/lift" element={<LiftPage />} />
 
               {/* Routes existantes */}
               <Route path="/actualites" element={<NewsPage />} />

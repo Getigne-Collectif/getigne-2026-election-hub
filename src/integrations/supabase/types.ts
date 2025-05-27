@@ -323,6 +323,89 @@ export type Database = {
         }
         Relationships: []
       }
+      lift_messages: {
+        Row: {
+          created_at: string
+          id: string
+          lift_post_id: string
+          message: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lift_post_id: string
+          message: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lift_post_id?: string
+          message?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lift_messages_lift_post_id_fkey"
+            columns: ["lift_post_id"]
+            isOneToOne: false
+            referencedRelation: "lift_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lift_posts: {
+        Row: {
+          arrival_location: string
+          created_at: string
+          day: string
+          departure_location: string
+          description: string | null
+          id: string
+          is_flexible_time: boolean | null
+          recurrence: string
+          status: string
+          time_end: string | null
+          time_start: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          arrival_location: string
+          created_at?: string
+          day: string
+          departure_location: string
+          description?: string | null
+          id?: string
+          is_flexible_time?: boolean | null
+          recurrence: string
+          status?: string
+          time_end?: string | null
+          time_start?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          arrival_location?: string
+          created_at?: string
+          day?: string
+          departure_location?: string
+          description?: string | null
+          id?: string
+          is_flexible_time?: boolean | null
+          recurrence?: string
+          status?: string
+          time_end?: string | null
+          time_start?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           created_at: string

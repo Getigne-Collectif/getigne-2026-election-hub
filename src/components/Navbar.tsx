@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, Settings, FileText } from 'lucide-react';
+import { Menu, ChevronDown, Settings, FileText, Car } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from './AuthButton';
@@ -83,6 +84,14 @@ const Navbar = () => {
           Agenda
         </Link>
       </li>
+      {user && (
+        <li>
+          <Link to="/lift" className={isActive('/lift')}>
+            <Car className="inline-block w-4 h-4 mr-1" />
+            Lift
+          </Link>
+        </li>
+      )}
       <li>
         <Link to="/adherer" className={isActive('/adherer')}>
           Adhérer
