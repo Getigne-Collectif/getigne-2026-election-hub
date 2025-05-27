@@ -222,7 +222,7 @@ const ProgramPage = () => {
                       <CardTitle className="text-2xl">Présentation générale</CardTitle>
                     </CardHeader>
                     <CardContent className="p-8">
-                      <ProgramContentComponent content={programGeneral.content} />
+                      <div dangerouslySetInnerHTML={{ __html: programGeneral.content }} />
                     </CardContent>
                   </Card>
                 </div>
@@ -244,7 +244,6 @@ const ProgramPage = () => {
                           <div className="flex items-center space-x-4">
                             <div className="p-3 bg-white rounded-lg shadow-sm">
                               <div className="w-8 h-8 text-getigne-600">
-                                {/* Ici on pourrait afficher l'icône selon item.icon */}
                                 <Target className="w-full h-full" />
                               </div>
                             </div>
@@ -255,9 +254,8 @@ const ProgramPage = () => {
                           </div>
                           <div className="flex items-center space-x-3">
                             <ProgramLikeButton
-                              programItemId={item.id}
+                              programId={item.id}
                               isLiked={isLiked}
-                              size="sm"
                             />
                             {isExpanded ? (
                               <ChevronDown className="w-6 h-6 text-getigne-600" />
@@ -272,7 +270,7 @@ const ProgramPage = () => {
                         <CardContent className="p-8 bg-white">
                           {item.content && (
                             <div className="mb-8">
-                              <ProgramContentComponent content={item.content} />
+                              <div dangerouslySetInnerHTML={{ __html: item.content }} />
                             </div>
                           )}
 
@@ -284,15 +282,12 @@ const ProgramPage = () => {
                               {item.program_points.map((point: any) => {
                                 const pointLikes = userLikes?.filter(like => like.program_point_id === point.id) || [];
                                 const isPointLiked = pointLikes.length > 0;
-                                const isPointExpanded = expandedPoints.includes(point.id);
 
                                 return (
                                   <ProgramPointCard
                                     key={point.id}
                                     point={point}
-                                    isExpanded={isPointExpanded}
                                     isLiked={isPointLiked}
-                                    onToggleExpansion={() => togglePointExpansion(point.id)}
                                     programItemId={item.id}
                                   />
                                 );
