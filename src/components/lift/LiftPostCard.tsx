@@ -42,7 +42,12 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
   };
 
   const formatDate = (dateStr: string) => {
-    return format(new Date(dateStr), 'd MMMM yyyy', { locale: fr });
+    try {
+      return format(new Date(dateStr), 'd MMMM yyyy', { locale: fr });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateStr;
+    }
   };
 
   return (
@@ -71,7 +76,7 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-blue-700 border-blue-300">
               <Calendar size={12} className="mr-1" />
-              {formatDate(post.date)}
+              {post.date ? formatDate(post.date) : 'Date non définie'}
             </Badge>
             <Badge variant="outline" className="text-blue-700 border-blue-300">
               <Clock size={12} className="mr-1" />

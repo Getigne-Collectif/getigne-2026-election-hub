@@ -359,6 +359,7 @@ export type Database = {
         Row: {
           arrival_location: string
           created_at: string
+          date: string
           day: string
           departure_location: string
           description: string | null
@@ -375,6 +376,7 @@ export type Database = {
         Insert: {
           arrival_location: string
           created_at?: string
+          date: string
           day: string
           departure_location: string
           description?: string | null
@@ -391,6 +393,7 @@ export type Database = {
         Update: {
           arrival_location?: string
           created_at?: string
+          date?: string
           day?: string
           departure_location?: string
           description?: string | null

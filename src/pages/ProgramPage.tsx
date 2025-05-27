@@ -12,13 +12,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ProgramCommentsSection from '@/components/program/ProgramCommentsSection';
 import ProgramLikeButton from '@/components/program/ProgramLikeButton';
 import ProgramPointCard from '@/components/program/ProgramPointCard';
-import ProgramContentComponent from '@/components/program/ProgramContentComponent';
 import { useAppSettings } from '@/hooks/useAppSettings';
 
 const ProgramPage = () => {
   const { user, isAdmin, userRoles } = useAuth();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [expandedPoints, setExpandedPoints] = useState<string[]>([]);
   const { settings } = useAppSettings();
 
   const canAccessProgram = 
@@ -35,14 +33,6 @@ const ProgramPage = () => {
       prev.includes(itemId) 
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
-    );
-  };
-
-  const togglePointExpansion = (pointId: string) => {
-    setExpandedPoints(prev => 
-      prev.includes(pointId) 
-        ? prev.filter(id => id !== pointId)
-        : [...prev, pointId]
     );
   };
 
@@ -255,7 +245,6 @@ const ProgramPage = () => {
                           <div className="flex items-center space-x-3">
                             <ProgramLikeButton
                               programId={item.id}
-                              isLiked={isLiked}
                             />
                             {isExpanded ? (
                               <ChevronDown className="w-6 h-6 text-getigne-600" />
@@ -287,7 +276,6 @@ const ProgramPage = () => {
                                   <ProgramPointCard
                                     key={point.id}
                                     point={point}
-                                    isLiked={isPointLiked}
                                     programItemId={item.id}
                                   />
                                 );

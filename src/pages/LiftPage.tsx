@@ -28,8 +28,12 @@ const LiftPage = () => {
   }, [showPastEvents]);
 
   const isPostPast = (post: any) => {
+    if (!post.date) return false;
+    
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const postDate = new Date(post.date);
+    postDate.setHours(0, 0, 0, 0);
     
     if (post.recurrence === 'once') {
       return postDate < today;

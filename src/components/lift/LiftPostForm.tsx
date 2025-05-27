@@ -30,7 +30,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 
 interface LiftPostFormProps {
   type: 'offer' | 'request';
@@ -75,6 +74,26 @@ const LiftPostForm: React.FC<LiftPostFormProps> = ({
     return null;
   };
 
+  const sendDiscordNotification = async (postData: any) => {
+    try {
+      const actionText = type === 'offer' ? 'proposé un trajet' : 'fait une demande de covoiturage';
+      const recurrenceText = formData.recurrence === 'once' ? '' : ` (${formData.recurrence === 'weekly' ? 'hebdomadaire' : 'quotidien'})`;
+      
+      const message = `📍 **${formData.departureLocation}** → **${formData.arrivalLocation}**\n🗓️ ${format(selectedDate!, 'EEEE d MMMM yyyy', { locale: fr })}${recurrenceText}\n⏰ ${formData.timeStart ? (isFlexibleTime && formData.timeEnd ? `${formData.timeStart} - ${formData.timeEnd}` : formData.timeStart) : 'Horaire flexible'}\n\n${formData.description ? `💬 ${formData.description}` : ''}`;
+
+      await supabase.functions.invoke('discord-notify', {
+        body: {
+          title: `Nouveau ${type === 'offer' ? 'trajet proposé' : 'demande de covoiturage'}`,
+          message: message,
+          color: 0x00aff5, // Bleu #00aff5
+          username: 'Lift - Covoiturage',
+        }
+      });
+    } catch (error) {
+      console.error('Erreur envoi Discord:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !selectedDate) return;
@@ -112,19 +131,7 @@ const LiftPostForm: React.FC<LiftPostFormProps> = ({
 
       // Envoyer notification Discord pour les nouvelles annonces
       if (!editPost) {
-        try {
-          const actionText = type === 'offer' ? 'proposé un trajet' : 'fait une demande de covoiturage';
-          const recurrenceText = formData.recurrence === 'once' ? '' : ` (${formData.recurrence === 'weekly' ? 'hebdomadaire' : 'quotidien'})`;
-          
-          await sendDiscordNotification({
-            title: `Nouveau ${type === 'offer' ? 'trajet proposé' : 'demande de covoiturage'}`,
-            message: `📍 **${formData.departureLocation}** → **${formData.arrivalLocation}**\n🗓️ ${format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}${recurrenceText}\n⏰ ${formData.timeStart ? (isFlexibleTime && formData.timeEnd ? `${formData.timeStart} - ${formData.timeEnd}` : formData.timeStart) : 'Horaire flexible'}\n\n${formData.description ? `💬 ${formData.description}` : ''}`,
-            color: DiscordColors.BLUE,
-            username: 'Lift - Covoiturage',
-          });
-        } catch (error) {
-          console.error('Erreur envoi Discord:', error);
-        }
+        await sendDiscordNotification(postData);
       }
 
       toast({
