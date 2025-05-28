@@ -34,13 +34,18 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
     dateTo: '',
     departureSearch: '',
     arrivalSearch: '',
-    recurrence: '',
+    recurrence: 'all',
     timeFrom: '',
     timeTo: '',
   });
 
   const handleApplyFilters = () => {
-    onApplyFilters(filters);
+    // Convert "all" back to empty string for the filter logic
+    const processedFilters = {
+      ...filters,
+      recurrence: filters.recurrence === 'all' ? '' : filters.recurrence,
+    };
+    onApplyFilters(processedFilters);
     onClose();
   };
 
@@ -50,12 +55,17 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
       dateTo: '',
       departureSearch: '',
       arrivalSearch: '',
-      recurrence: '',
+      recurrence: 'all',
       timeFrom: '',
       timeTo: '',
     };
     setFilters(resetFilters);
-    onApplyFilters(resetFilters);
+    // Convert "all" back to empty string for the filter logic
+    const processedFilters = {
+      ...resetFilters,
+      recurrence: '',
+    };
+    onApplyFilters(processedFilters);
   };
 
   if (!isOpen) return null;
@@ -118,7 +128,7 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
                   <SelectValue placeholder="Tous les types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tous les types</SelectItem>
+                  <SelectItem value="all">Tous les types</SelectItem>
                   <SelectItem value="once">Une fois</SelectItem>
                   <SelectItem value="daily">Quotidien</SelectItem>
                   <SelectItem value="weekly">Hebdomadaire</SelectItem>
