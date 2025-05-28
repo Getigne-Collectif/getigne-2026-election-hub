@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Edit } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Calendar, Clock, Edit, ChevronDown, ChevronUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useAuth } from '@/context/auth';
+import { supabase } from '@/integrations/supabase/client';
 import LiftPostForm from './LiftPostForm';
 import LiftMessageModal from './LiftMessageModal';
 
@@ -19,8 +21,29 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
   const { user } = useAuth();
   const [showEditForm, setShowEditForm] = useState(false);
   const [showMessageModal, setShowMessageModal] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   const isOwner = user?.id === post.user_id;
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, [post.user_id]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, avatar_url')
+        .eq('id', post.user_id)
+        .single();
+
+      if (error) throw error;
+      setUserProfile(data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
 
   const formatTime = (timeStart: string, timeEnd: string, isFlexible: boolean) => {
     if (isFlexible && timeEnd) {
@@ -50,9 +73,17 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
     }
   };
 
+  const getUserInitials = (firstName: string, lastName: string) => {
+    return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase();
+  };
+
+  const getUserDisplayName = (firstName: string, lastName: string) => {
+    return `${firstName || ''} ${lastName || ''}`.trim() || 'Utilisateur';
+  };
+
   return (
     <>
-      <Card className="border-blue-200 hover:shadow-md transition-shadow">
+      <Card className="border-blue-200 hover:shadow-md transition-shadow w-full">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
             <CardTitle className="text-lg text-blue-900">
@@ -72,7 +103,24 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={userProfile?.avatar_url} />
+              <AvatarFallback className="bg-blue-100 text-blue-700">
+                {userProfile ? getUserInitials(userProfile.first_name, userProfile.last_name) : '?'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                {userProfile ? getUserDisplayName(userProfile.first_name, userProfile.last_name) : 'Chargement...'}
+              </p>
+              <p className="text-xs text-gray-600">
+                {post.type === 'offer' ? 'Propose un trajet' : 'Cherche un covoiturage'}
+              </p>
+            </div>
+          </div>
+
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-blue-700 border-blue-300">
               <Calendar size={12} className="mr-1" />
@@ -90,9 +138,33 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
           </div>
 
           {post.description && (
-            <p className="text-gray-700 text-sm line-clamp-3">
-              {post.description}
-            </p>
+            <div className="space-y-2">
+              <div className="text-gray-700 text-sm">
+                {isExpanded ? (
+                  <p className="whitespace-pre-wrap">{post.description}</p>
+                ) : (
+                  <p className="line-clamp-2">{post.description}</p>
+                )}
+              </div>
+              {post.description.length > 100 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-blue-600 hover:text-blue-700 p-0 h-auto"
+                >
+                  {isExpanded ? (
+                    <>
+                      Réduire <ChevronUp size={16} className="ml-1" />
+                    </>
+                  ) : (
+                    <>
+                      Voir plus <ChevronDown size={16} className="ml-1" />
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           )}
 
           {!isOwner && (

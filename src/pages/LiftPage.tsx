@@ -3,9 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Users, Car, UserPlus } from 'lucide-react';
+import { Users, Car, UserPlus, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +11,7 @@ import { useAuth } from '@/context/auth';
 import LiftLayout from '@/components/lift/LiftLayout';
 import LiftPostForm from '@/components/lift/LiftPostForm';
 import LiftPostCard from '@/components/lift/LiftPostCard';
+import LiftFilters from '@/components/lift/LiftFilters';
 
 const LiftPage = () => {
   const { user } = useAuth();
@@ -22,10 +21,12 @@ const LiftPage = () => {
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [showPastEvents, setShowPastEvents] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({});
 
   useEffect(() => {
     fetchPosts();
-  }, [showPastEvents]);
+  }, [showPastEvents, appliedFilters]);
 
   const isPostPast = (post: any) => {
     if (!post.date) return false;
@@ -38,8 +39,56 @@ const LiftPage = () => {
     if (post.recurrence === 'once') {
       return postDate < today;
     }
-    // Pour les événements récurrents, on ne les considère jamais comme passés
     return false;
+  };
+
+  const applyFilters = (posts: any[], filters: any) => {
+    return posts.filter(post => {
+      // Filtre par date
+      if (filters.dateFrom) {
+        const postDate = new Date(post.date);
+        const filterDate = new Date(filters.dateFrom);
+        if (postDate < filterDate) return false;
+      }
+      
+      if (filters.dateTo) {
+        const postDate = new Date(post.date);
+        const filterDate = new Date(filters.dateTo);
+        if (postDate > filterDate) return false;
+      }
+
+      // Filtre par récurrence
+      if (filters.recurrence && post.recurrence !== filters.recurrence) {
+        return false;
+      }
+
+      // Filtre par horaire
+      if (filters.timeFrom && post.time_start) {
+        if (post.time_start < filters.timeFrom) return false;
+      }
+      
+      if (filters.timeTo && post.time_start) {
+        if (post.time_start > filters.timeTo) return false;
+      }
+
+      // Filtre par lieu de départ (recherche de mots-clés)
+      if (filters.departureSearch) {
+        const searchTerms = filters.departureSearch.toLowerCase().split(' ').filter(term => term.length > 0);
+        const departureText = post.departure_location.toLowerCase();
+        const hasAllTerms = searchTerms.every(term => departureText.includes(term));
+        if (!hasAllTerms) return false;
+      }
+
+      // Filtre par lieu d'arrivée (recherche de mots-clés)
+      if (filters.arrivalSearch) {
+        const searchTerms = filters.arrivalSearch.toLowerCase().split(' ').filter(term => term.length > 0);
+        const arrivalText = post.arrival_location.toLowerCase();
+        const hasAllTerms = searchTerms.every(term => arrivalText.includes(term));
+        if (!hasAllTerms) return false;
+      }
+
+      return true;
+    });
   };
 
   const fetchPosts = async () => {
@@ -52,9 +101,12 @@ const LiftPage = () => {
 
       if (error) throw error;
 
-      const filteredData = showPastEvents 
+      let filteredData = showPastEvents 
         ? data 
         : data.filter(post => !isPostPast(post));
+
+      // Appliquer les filtres
+      filteredData = applyFilters(filteredData, appliedFilters);
 
       setOffers(filteredData.filter(post => post.type === 'offer'));
       setRequests(filteredData.filter(post => post.type === 'request'));
@@ -63,6 +115,10 @@ const LiftPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleApplyFilters = (filters: any) => {
+    setAppliedFilters(filters);
   };
 
   if (!user) {
@@ -155,22 +211,20 @@ const LiftPage = () => {
                   Proposer un trajet
                 </Button>
                 
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="show-past-offers"
-                    checked={showPastEvents}
-                    onCheckedChange={setShowPastEvents}
-                  />
-                  <Label htmlFor="show-past-offers" className="text-sm">
-                    Afficher les événements passés
-                  </Label>
-                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters(true)}
+                  className="border-blue-300 text-blue-700"
+                >
+                  <Filter className="mr-2 w-4 h-4" />
+                  Filtrer les résultats
+                </Button>
               </div>
 
               {loading ? (
                 <div className="text-center py-8">Chargement...</div>
               ) : offers.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-4">
                   {offers.map((offer) => (
                     <LiftPostCard
                       key={offer.id}
@@ -199,22 +253,20 @@ const LiftPage = () => {
                   Faire une demande
                 </Button>
                 
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="show-past-requests"
-                    checked={showPastEvents}
-                    onCheckedChange={setShowPastEvents}
-                  />
-                  <Label htmlFor="show-past-requests" className="text-sm">
-                    Afficher les événements passés
-                  </Label>
-                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters(true)}
+                  className="border-blue-300 text-blue-700"
+                >
+                  <Filter className="mr-2 w-4 h-4" />
+                  Filtrer les résultats
+                </Button>
               </div>
 
               {loading ? (
                 <div className="text-center py-8">Chargement...</div>
               ) : requests.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-4">
                   {requests.map((request) => (
                     <LiftPostCard
                       key={request.id}
@@ -247,6 +299,15 @@ const LiftPage = () => {
           isOpen={showRequestForm}
           onClose={() => setShowRequestForm(false)}
           onSuccess={fetchPosts}
+        />
+
+        {/* Système de filtres */}
+        <LiftFilters
+          isOpen={showFilters}
+          onClose={() => setShowFilters(false)}
+          onApplyFilters={handleApplyFilters}
+          showPastEvents={showPastEvents}
+          onTogglePastEvents={setShowPastEvents}
         />
       </LiftLayout>
     </HelmetProvider>
