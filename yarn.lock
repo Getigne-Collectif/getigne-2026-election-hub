@@ -777,6 +777,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lottiefiles/dotlottie-react@npm:^0.13.5":
+  version: 0.13.5
+  resolution: "@lottiefiles/dotlottie-react@npm:0.13.5"
+  dependencies:
+    "@lottiefiles/dotlottie-web": 0.44.0
+  peerDependencies:
+    react: ^17 || ^18 || ^19
+  checksum: f1fc478ffc08f0070016edece041bbba57cdaaeab64d68bbee6abe44e17ca23abaec431757d402b6e42cc0b29b3a20bb412f91b2b9dc8d913c47a88c0092b8f0
+  languageName: node
+  linkType: hard
+
+"@lottiefiles/dotlottie-web@npm:0.44.0":
+  version: 0.44.0
+  resolution: "@lottiefiles/dotlottie-web@npm:0.44.0"
+  checksum: 28172f4d45a7cd41844df6fdb2a17610aa57a899cd0e2b52202b71c2ac4131e58ecdad80b1eaa98ce610e1b8eda820d762837aedec2a67895e1b930bff322222
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -4384,6 +4402,7 @@ __metadata:
     "@eslint/js": ^9.9.0
     "@hello-pangea/dnd": ^18.0.1
     "@hookform/resolvers": ^3.9.0
+    "@lottiefiles/dotlottie-react": ^0.13.5
     "@radix-ui/react-accordion": ^1.2.0
     "@radix-ui/react-alert-dialog": ^1.1.1
     "@radix-ui/react-aspect-ratio": ^1.1.0

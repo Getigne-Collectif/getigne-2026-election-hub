@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Car, UserPlus } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/auth';
-import LiftLayout from '@/components/lift/LiftLayout';
-import LiftPostForm from '@/components/lift/LiftPostForm';
-import LiftPostCard from '@/components/lift/LiftPostCard';
 import LiftFilters from '@/components/lift/LiftFilters';
+import LiftLayout from '@/components/lift/LiftLayout';
+import LiftPostCard from '@/components/lift/LiftPostCard';
+import LiftPostForm from '@/components/lift/LiftPostForm';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/context/auth';
+import { supabase } from '@/integrations/supabase/client';
+import { Car, UserPlus, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 
 const LiftPage = () => {
   const { user } = useAuth();
@@ -141,7 +141,7 @@ const LiftPage = () => {
                 <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center">
                   <Users className="w-8 h-8 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl text-blue-900 font-playwrite">
+                <CardTitle className="text-2xl text-blue-900">
                   Bienvenue sur Lift
                 </CardTitle>
                 <CardDescription className="text-lg">
@@ -185,7 +185,7 @@ const LiftPage = () => {
       <LiftLayout>
         <div className="max-w-6xl mx-auto pb-20">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-blue-900 mb-2 font-playwrite">
+            <h1 className="text-3xl font-bold text-blue-900 mb-2">
               Partageons nos trajets quotidiens
             </h1>
             <p className="text-gray-700 text-lg">

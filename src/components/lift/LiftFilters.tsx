@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -42,37 +41,62 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
     availableSeats: '',
   });
 
-  const [drawerHeight, setDrawerHeight] = useState(400); // hauteur par défaut en px
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartY, setDragStartY] = useState(0);
-  const [dragStartHeight, setDragStartHeight] = useState(0);
+  const [drawerHeight, setDrawerHeight] = useState(400);
+  const isDraggingRef = useRef(false);
+  const dragStartYRef = useRef(0);
+  const dragStartHeightRef = useRef(0);
+
+  // Réinitialiser la hauteur quand le drawer est ouvert
+  useEffect(() => {
+    if (isOpen) {
+      setDrawerHeight(400);
+    }
+  }, [isOpen]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStartY(e.clientY);
-    setDragStartHeight(drawerHeight);
+    e.preventDefault();
+    console.log('MouseDown event triggered');
+    isDraggingRef.current = true;
+    dragStartYRef.current = e.clientY;
+    dragStartHeightRef.current = drawerHeight;
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
+    if (!isDraggingRef.current) return;
+    console.log('MouseMove event triggered', { isDragging: isDraggingRef.current, clientY: e.clientY });
     
-    const deltaY = dragStartY - e.clientY; // inversé car on va vers le haut
-    const newHeight = Math.max(50, Math.min(window.innerHeight * 0.8, dragStartHeight + deltaY));
+    const deltaY = dragStartYRef.current - e.clientY;
+    const newHeight = Math.max(30, Math.min(window.innerHeight * 0.8, dragStartHeightRef.current + deltaY));
     
-    if (newHeight <= 50) {
+    if (newHeight <= 30) {
+      console.log('Closing drawer due to minimum height');
       onClose();
+      isDraggingRef.current = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     } else {
       setDrawerHeight(newHeight);
     }
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
+    console.log('MouseUp event triggered', { isDragging: isDraggingRef.current });
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    }
   };
+
+  // Nettoyage des event listeners
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   const handleApplyFilters = () => {
     // Convert "all" back to empty string for the filter logic
@@ -110,7 +134,7 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-40">
           <Button
             onClick={onOpen}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-t-lg rounded-b-none px-6 py-3 shadow-lg font-playwrite"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-t-lg rounded-b-none px-6 py-3 shadow-lg"
           >
             <Filter className="mr-2" size={18} />
             Filtres
@@ -130,12 +154,12 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
             onMouseDown={handleMouseDown}
             className="w-full h-2 bg-blue-100 cursor-row-resize flex items-center justify-center hover:bg-blue-200 transition-colors"
           >
-            <div className="w-12 h-1 bg-blue-400 rounded-full"></div>
+            <div className="w-16 h-1.5 bg-blue-400 rounded-full hover:h-4 transition-all"></div>
           </div>
 
           <Card className="border-none rounded-none h-full flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between bg-blue-50 border-b py-3 px-6">
-              <CardTitle className="text-blue-900 flex items-center text-lg font-playwrite">
+              <CardTitle className="text-blue-900 flex items-center text-lg">
                 <Filter className="mr-2" size={18} />
                 Filtres
               </CardTitle>

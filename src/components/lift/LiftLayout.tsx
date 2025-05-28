@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { ArrowLeft, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 interface LiftLayoutProps {
   children: React.ReactNode;
@@ -26,15 +26,25 @@ const LiftLayout: React.FC<LiftLayoutProps> = ({ children }) => {
             
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
+                <div className="text-center h-[50px] w-[100px] hidden sm:block">
+                  <div className="h-[100px] absolute top-0 right-[220px]">
+                    <DotLottieReact
+                        src="https://lottie.host/3aee0219-fba1-4a2e-ad29-559619be88a8/7dGpLBzuzE.lottie"
+                        loop
+                        autoplay
+                      />
+                  </div>
+                </div>
                 <div className="p-2 bg-blue-100 rounded-full">
                   <Users className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-blue-900" style={{ fontFamily: 'Georgia, serif' }}>
+                  <h1 className="text-2xl font-bold text-blue-900 font-playwrite">
                     Lift
                   </h1>
                   <p className="text-xs text-blue-600">Covoiturage solidaire</p>
                 </div>
+                
               </div>
             </div>
           </div>
