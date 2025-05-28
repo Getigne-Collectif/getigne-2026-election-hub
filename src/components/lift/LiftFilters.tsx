@@ -12,11 +12,12 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, Filter } from 'lucide-react';
+import { X, Filter, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface LiftFiltersProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpen: () => void;
   onApplyFilters: (filters: any) => void;
   showPastEvents: boolean;
   onTogglePastEvents: (show: boolean) => void;
@@ -25,6 +26,7 @@ interface LiftFiltersProps {
 const LiftFilters: React.FC<LiftFiltersProps> = ({
   isOpen,
   onClose,
+  onOpen,
   onApplyFilters,
   showPastEvents,
   onTogglePastEvents,
@@ -68,132 +70,149 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
     onApplyFilters(processedFilters);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end justify-center">
-      <Card className="w-full max-w-4xl m-4 max-h-[80vh] overflow-y-auto animate-in slide-in-from-bottom-4">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-blue-900 flex items-center">
-            <Filter className="mr-2" size={20} />
-            Filtres de recherche
-          </CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X size={20} />
+    <>
+      {/* Poignée/Bouton persistant en bas */}
+      {!isOpen && (
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-40">
+          <Button
+            onClick={onOpen}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-t-lg rounded-b-none px-6 py-3 shadow-lg"
+          >
+            <Filter className="mr-2" size={18} />
+            Filtres
+            <ChevronUp className="ml-2" size={16} />
           </Button>
-        </CardHeader>
+        </div>
+      )}
 
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label>Période</Label>
-              <div className="space-y-2">
-                <Input
-                  type="date"
-                  placeholder="Date de début"
-                  value={filters.dateFrom}
-                  onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
-                />
-                <Input
-                  type="date"
-                  placeholder="Date de fin"
-                  value={filters.dateTo}
-                  onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Horaires</Label>
-              <div className="space-y-2">
-                <Input
-                  type="time"
-                  placeholder="Heure de début"
-                  value={filters.timeFrom}
-                  onChange={(e) => setFilters(prev => ({ ...prev, timeFrom: e.target.value }))}
-                />
-                <Input
-                  type="time"
-                  placeholder="Heure de fin"
-                  value={filters.timeTo}
-                  onChange={(e) => setFilters(prev => ({ ...prev, timeTo: e.target.value }))}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Type de récurrence</Label>
-              <Select value={filters.recurrence} onValueChange={(value) => setFilters(prev => ({ ...prev, recurrence: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tous les types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les types</SelectItem>
-                  <SelectItem value="once">Une fois</SelectItem>
-                  <SelectItem value="daily">Quotidien</SelectItem>
-                  <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="departure-search">Lieu de départ</Label>
-              <Input
-                id="departure-search"
-                placeholder="ex: gare clisson, gétigné..."
-                value={filters.departureSearch}
-                onChange={(e) => setFilters(prev => ({ ...prev, departureSearch: e.target.value }))}
-              />
-              <p className="text-xs text-gray-500">
-                Recherche dans les lieux de départ (mots-clés séparés par des espaces)
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="arrival-search">Lieu d'arrivée</Label>
-              <Input
-                id="arrival-search"
-                placeholder="ex: nantes, cholet..."
-                value={filters.arrivalSearch}
-                onChange={(e) => setFilters(prev => ({ ...prev, arrivalSearch: e.target.value }))}
-              />
-              <p className="text-xs text-gray-500">
-                Recherche dans les lieux d'arrivée (mots-clés séparés par des espaces)
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="show-past-events"
-                checked={showPastEvents}
-                onCheckedChange={onTogglePastEvents}
-              />
-              <Label htmlFor="show-past-events">
-                Afficher les événements passés
-              </Label>
-            </div>
-          </div>
-
-          <div className="flex justify-between pt-4">
-            <Button variant="outline" onClick={handleResetFilters}>
-              Réinitialiser
+      {/* Drawer en bas */}
+      <div className={`fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-blue-200 shadow-2xl transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-y-0' : 'translate-y-full'
+      }`}>
+        <Card className="border-none rounded-none">
+          <CardHeader className="flex flex-row items-center justify-between bg-blue-50 border-b">
+            <CardTitle className="text-blue-900 flex items-center">
+              <Filter className="mr-2" size={20} />
+              Filtres de recherche
+            </CardTitle>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <ChevronDown size={20} />
             </Button>
-            <div className="space-x-2">
-              <Button variant="outline" onClick={onClose}>
-                Annuler
-              </Button>
-              <Button onClick={handleApplyFilters} className="bg-blue-600 hover:bg-blue-700">
-                Appliquer les filtres
-              </Button>
+          </CardHeader>
+
+          <CardContent className="space-y-6 max-h-[70vh] overflow-y-auto p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Période</Label>
+                <div className="space-y-2">
+                  <Input
+                    type="date"
+                    placeholder="Date de début"
+                    value={filters.dateFrom}
+                    onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+                  />
+                  <Input
+                    type="date"
+                    placeholder="Date de fin"
+                    value={filters.dateTo}
+                    onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Horaires</Label>
+                <div className="space-y-2">
+                  <Input
+                    type="time"
+                    placeholder="Heure de début"
+                    value={filters.timeFrom}
+                    onChange={(e) => setFilters(prev => ({ ...prev, timeFrom: e.target.value }))}
+                  />
+                  <Input
+                    type="time"
+                    placeholder="Heure de fin"
+                    value={filters.timeTo}
+                    onChange={(e) => setFilters(prev => ({ ...prev, timeTo: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Type de récurrence</Label>
+                <Select value={filters.recurrence} onValueChange={(value) => setFilters(prev => ({ ...prev, recurrence: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Tous les types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les types</SelectItem>
+                    <SelectItem value="once">Une fois</SelectItem>
+                    <SelectItem value="daily">Quotidien</SelectItem>
+                    <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="departure-search">Lieu de départ</Label>
+                <Input
+                  id="departure-search"
+                  placeholder="ex: gare clisson, gétigné..."
+                  value={filters.departureSearch}
+                  onChange={(e) => setFilters(prev => ({ ...prev, departureSearch: e.target.value }))}
+                />
+                <p className="text-xs text-gray-500">
+                  Recherche dans les lieux de départ (mots-clés séparés par des espaces)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="arrival-search">Lieu d'arrivée</Label>
+                <Input
+                  id="arrival-search"
+                  placeholder="ex: nantes, cholet..."
+                  value={filters.arrivalSearch}
+                  onChange={(e) => setFilters(prev => ({ ...prev, arrivalSearch: e.target.value }))}
+                />
+                <p className="text-xs text-gray-500">
+                  Recherche dans les lieux d'arrivée (mots-clés séparés par des espaces)
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="show-past-events"
+                  checked={showPastEvents}
+                  onCheckedChange={onTogglePastEvents}
+                />
+                <Label htmlFor="show-past-events">
+                  Afficher les événements passés
+                </Label>
+              </div>
+            </div>
+
+            <div className="flex justify-between pt-4 border-t">
+              <Button variant="outline" onClick={handleResetFilters}>
+                Réinitialiser
+              </Button>
+              <div className="space-x-2">
+                <Button variant="outline" onClick={onClose}>
+                  Fermer
+                </Button>
+                <Button onClick={handleApplyFilters} className="bg-blue-600 hover:bg-blue-700">
+                  Appliquer les filtres
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
   );
 };
 

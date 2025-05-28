@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Car, UserPlus, Filter } from 'lucide-react';
+import { Users, Car, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
@@ -178,7 +177,7 @@ const LiftPage = () => {
       </Helmet>
       
       <LiftLayout>
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto pb-20">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-blue-900 mb-2">
               Partageons nos trajets quotidiens
@@ -201,7 +200,7 @@ const LiftPage = () => {
             </TabsList>
 
             <TabsContent value="offers" className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-start">
                 <Button 
                   onClick={() => setShowOfferForm(true)}
                   size="lg"
@@ -209,15 +208,6 @@ const LiftPage = () => {
                 >
                   <Car className="mr-2 w-5 h-5" />
                   Proposer un trajet
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(true)}
-                  className="border-blue-300 text-blue-700"
-                >
-                  <Filter className="mr-2 w-4 h-4" />
-                  Filtrer les résultats
                 </Button>
               </div>
 
@@ -243,7 +233,7 @@ const LiftPage = () => {
             </TabsContent>
 
             <TabsContent value="requests" className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-start">
                 <Button 
                   onClick={() => setShowRequestForm(true)}
                   size="lg"
@@ -251,15 +241,6 @@ const LiftPage = () => {
                 >
                   <Users className="mr-2 w-5 h-5" />
                   Faire une demande
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(true)}
-                  className="border-blue-300 text-blue-700"
-                >
-                  <Filter className="mr-2 w-4 h-4" />
-                  Filtrer les résultats
                 </Button>
               </div>
 
@@ -301,10 +282,11 @@ const LiftPage = () => {
           onSuccess={fetchPosts}
         />
 
-        {/* Système de filtres */}
+        {/* Système de filtres en drawer */}
         <LiftFilters
           isOpen={showFilters}
           onClose={() => setShowFilters(false)}
+          onOpen={() => setShowFilters(true)}
           onApplyFilters={handleApplyFilters}
           showPastEvents={showPastEvents}
           onTogglePastEvents={setShowPastEvents}
