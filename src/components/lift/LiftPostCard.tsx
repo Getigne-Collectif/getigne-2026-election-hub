@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Calendar, Clock, Edit, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, Edit, ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useAuth } from '@/context/auth';
@@ -130,6 +129,12 @@ const LiftPostCard: React.FC<LiftPostCardProps> = ({ post, onUpdate }) => {
               <Clock size={12} className="mr-1" />
               {post.time_start ? formatTime(post.time_start, post.time_end, post.is_flexible_time) : 'Horaire flexible'}
             </Badge>
+            {post.available_seats && (
+              <Badge variant="outline" className="text-blue-700 border-blue-300">
+                <Users size={12} className="mr-1" />
+                {post.available_seats} place{post.available_seats > 1 ? 's' : ''}
+              </Badge>
+            )}
             {getRecurrenceText(post.recurrence, post.date) && (
               <Badge variant="outline" className="text-blue-700 border-blue-300">
                 {getRecurrenceText(post.recurrence, post.date)}

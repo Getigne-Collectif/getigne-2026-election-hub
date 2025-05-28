@@ -86,6 +86,12 @@ const LiftPage = () => {
         if (!hasAllTerms) return false;
       }
 
+      // Filtre par nombre de places
+      if (filters.availableSeats) {
+        const requiredSeats = parseInt(filters.availableSeats);
+        if (post.available_seats < requiredSeats) return false;
+      }
+
       return true;
     });
   };
@@ -135,7 +141,7 @@ const LiftPage = () => {
                 <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center">
                   <Users className="w-8 h-8 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl text-blue-900">
+                <CardTitle className="text-2xl text-blue-900 font-playwrite">
                   Bienvenue sur Lift
                 </CardTitle>
                 <CardDescription className="text-lg">
@@ -179,7 +185,7 @@ const LiftPage = () => {
       <LiftLayout>
         <div className="max-w-6xl mx-auto pb-20">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">
+            <h1 className="text-3xl font-bold text-blue-900 mb-2 font-playwrite">
               Partageons nos trajets quotidiens
             </h1>
             <p className="text-gray-700 text-lg">

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,6 +47,7 @@ const LiftPostForm: React.FC<LiftPostFormProps> = ({
     departureLocation: editPost?.departure_location || '',
     arrivalLocation: editPost?.arrival_location || '',
     description: editPost?.description || '',
+    availableSeats: editPost?.available_seats || 1,
   });
 
   const getRecurrenceMessage = () => {
@@ -102,6 +102,7 @@ const LiftPostForm: React.FC<LiftPostFormProps> = ({
         departure_location: formData.departureLocation,
         arrival_location: formData.arrivalLocation,
         description: formData.description,
+        available_seats: parseInt(formData.availableSeats) || 1,
         status: 'published'
       };
 
@@ -273,6 +274,21 @@ const LiftPostForm: React.FC<LiftPostFormProps> = ({
                 id="arrival"
                 value={formData.arrivalLocation}
                 onChange={(e) => setFormData(prev => ({ ...prev, arrivalLocation: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="seats">
+                {type === 'offer' ? 'Places disponibles' : 'Places nécessaires'}
+              </Label>
+              <Input
+                id="seats"
+                type="number"
+                min="1"
+                max="8"
+                value={formData.availableSeats}
+                onChange={(e) => setFormData(prev => ({ ...prev, availableSeats: e.target.value }))}
                 required
               />
             </div>
