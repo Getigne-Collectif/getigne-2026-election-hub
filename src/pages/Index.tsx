@@ -8,6 +8,7 @@ import Events from "@/components/Events";
 import Team from "@/components/Team";
 import Values from "@/components/Values";
 import Campaign from "@/components/Campaign";
+import FloatingMenu from "@/components/FloatingMenu";
 import { useAppSettings } from "@/hooks/useAppSettings";
 
 const Index = () => {
@@ -31,6 +32,7 @@ const Index = () => {
         <Events />
         <News limit={3} />
         <Footer />
+        <FloatingMenu />
       </div>
     </HelmetProvider>
   );

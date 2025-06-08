@@ -358,6 +358,7 @@ export type Database = {
       lift_posts: {
         Row: {
           arrival_location: string
+          available_seats: number
           created_at: string
           date: string
           day: string
@@ -375,6 +376,7 @@ export type Database = {
         }
         Insert: {
           arrival_location: string
+          available_seats?: number
           created_at?: string
           date: string
           day: string
@@ -392,6 +394,7 @@ export type Database = {
         }
         Update: {
           arrival_location?: string
+          available_seats?: number
           created_at?: string
           date?: string
           day?: string
