@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Star, Car, Users, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
@@ -7,9 +7,24 @@ import { useAuth } from '@/context/auth';
 const FloatingMenu = () => {
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Ne pas afficher le menu si l'utilisateur n'est pas connecté
   if (!user) return null;
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setIsExpanded(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsExpanded(false);
+    }, 300); // Délai de 300ms pour permettre de cliquer
+  };
 
   const menuItems = [
     {
@@ -31,8 +46,8 @@ const FloatingMenu = () => {
   return (
     <div 
       className="fixed bottom-6 left-6 z-50"
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Menu items - apparaissent au survol */}
       <div className={`
