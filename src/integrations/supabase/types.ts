@@ -296,6 +296,48 @@ export type Database = {
           },
         ]
       }
+      galaxy_items: {
+        Row: {
+          baseline: string
+          color: string | null
+          created_at: string
+          icon: string
+          id: string
+          is_external: boolean
+          link: string
+          name: string
+          position: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          baseline: string
+          color?: string | null
+          created_at?: string
+          icon: string
+          id?: string
+          is_external?: boolean
+          link: string
+          name: string
+          position?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          baseline?: string
+          color?: string | null
+          created_at?: string
+          icon?: string
+          id?: string
+          is_external?: boolean
+          link?: string
+          name?: string
+          position?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invited_users: {
         Row: {
           created_at: string | null

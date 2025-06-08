@@ -1,81 +1,138 @@
-
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Separator } from "@/components/ui/separator";
-import { cn } from '@/lib/utils';
-import {FileText, Home, Menu as MenuIcon} from 'lucide-react';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.tsx";
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Calendar, 
+  Users, 
+  Pages,
+  Menu,
+  Star,
+  BookOpen,
+  FolderOpen,
+  Settings,
+  ArrowLeft
+} from 'lucide-react';
 
 interface AdminLayoutProps {
-  breadcrumb?: ReactNode;
-  title?: ReactNode;
-  description?: ReactNode;
-  backLink?: ReactNode;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ breadcrumb, title, description, backLink, children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
 
+  const menuItems = [
+    {
+      title: 'Vue d\'ensemble',
+      href: '/admin',
+      icon: LayoutDashboard,
+    },
+    {
+      title: 'Actualités',
+      href: '/admin/news',
+      icon: FileText,
+    },
+    {
+      title: 'Événements',
+      href: '/admin/events',
+      icon: Calendar,
+    },
+    {
+      title: 'Utilisateurs',
+      href: '/admin/users',
+      icon: Users,
+    },
+    {
+      title: 'Pages',
+      href: '/admin/pages',
+      icon: Pages,
+    },
+    {
+      title: 'Menu',
+      href: '/admin/menu',
+      icon: Menu,
+    },
+    {
+      title: 'Galaxy',
+      href: '/admin/galaxy',
+      icon: Star,
+    },
+    {
+      title: 'Comités citoyens',
+      href: '/admin/committees',
+      icon: Users,
+    },
+    {
+      title: 'Programme',
+      href: '/admin/program',
+      icon: BookOpen,
+    },
+    {
+      title: 'Projets',
+      href: '/admin/projects',
+      icon: FolderOpen,
+    },
+    {
+      title: 'Paramètres',
+      href: '/admin/settings',
+      icon: Settings,
+    },
+  ];
+
   return (
-      <div>
-        <div className="min-h-screen">
-          <Navbar />
-
-          <div className="pt-24 pb-12 bg-getigne-50">
-            <div className="container mx-auto px-4">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">
-                    <Home className="h-4 w-4 mr-1" />
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <Link to="/admin">
-                    <BreadcrumbPage>Administration</BreadcrumbPage>
-                  </Link>
-                </BreadcrumbItem>
-                {breadcrumb}
-              </BreadcrumbList>
-              {backLink}
-
-              {title &&
-                <div className="max-w-3xl mx-auto text-center">
-                  <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
-                    Administration
-                  </span>
-                  <div className="text-center my-4">
-                    <h1 className="text-4xl md:text-5xl font-bold">{title}</h1>
-                  </div>
-                  <p className="text-getigne-700 text-lg mb-6">
-                    {description}
-                  </p>
-                </div>
-              }
-            </div>
-          </div>
-
-          <section className="py-16">
-            <div className="container mx-auto px-4">
-              <div className="flex flex-col md:flex-row gap-8">
-                <div className="flex-1">
-                  {children}
-                </div>
-              </div>
-            </div>
-          </section>
-          <Footer />
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-sm border-r">
+        <div className="p-6">
+          <Link to="/" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+            <ArrowLeft size={16} />
+            Retour au site
+          </Link>
+          <h2 className="text-xl font-bold text-gray-900 mt-4">Administration</h2>
         </div>
+        
+        <ScrollArea className="h-[calc(100vh-120px)]">
+          <div className="px-3 pb-6">
+            <nav className="space-y-1">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.href || 
+                  (item.href !== '/admin' && location.pathname.startsWith(item.href));
+                
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={`
+                      flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors
+                      ${isActive 
+                        ? 'bg-getigne-green-100 text-getigne-green-700 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                      }
+                    `}
+                  >
+                    <Icon size={18} />
+                    {item.title}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        </ScrollArea>
       </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 overflow-auto">
+          <div className="container mx-auto px-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
   );
 };
 

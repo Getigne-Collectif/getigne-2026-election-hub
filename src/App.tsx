@@ -1,124 +1,123 @@
-
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+import { AuthProvider } from "@/context/auth";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import ProgramPage from "./pages/ProgramPage";
-import NewsPage from "./pages/NewsPage";
-import NewsDetailPage from "./pages/NewsDetailPage";
-import AgendaPage from "./pages/AgendaPage";
-import EventDetailPage from "./pages/EventDetailPage";
-import CommitteePage from "./pages/CommitteePage";
-import SiteMapPage from "./pages/SiteMapPage";
-import JoinPage from "./pages/JoinPage";
-import AuthPage from "./pages/AuthPage";
-import LegalPage from "./pages/LegalPage";
-import LiftPage from "./pages/LiftPage";
-import AdminUsersPage from "@/pages/admin/AdminUsersPage.tsx";
-import AdminNewsPage from "@/pages/admin/news/AdminNewsPage.tsx";
-import ProfilePage from "@/pages/ProfilePage.tsx";
-import ResetPasswordPage from "@/pages/ResetPasswordPage.tsx";
-import ProfileSetupModal from "@/components/auth/ProfileSetupModal.tsx";
-import AdminNewsEditorPage from '@/pages/admin/news/AdminNewsEditorPage.tsx';
-import AdminEventsPage from '@/pages/admin/events/AdminEventsPage.tsx';
-import AdminEventEditorPage from '@/pages/admin/events/AdminEventEditorPage.tsx';
-import ProjectsPage from './pages/ProjectsPage';
-import AdminSettingsPage from '@/pages/admin/AdminSettingsPage.tsx';
-import AdminDashboardPage from '@/pages/admin/AdminDashboardPage.tsx';
-import AdminPagesPage from '@/pages/admin/pages/AdminPagesPage.tsx';
-import AdminPageEditorPage from '@/pages/admin/pages/AdminPageEditorPage.tsx';
-import AdminMenuPage from '@/pages/admin/AdminMenuPage.tsx';
-import DynamicPage from './pages/DynamicPage';
-import ContactPage from './pages/ContactPage';
-import AdminProjectsPage from "@/pages/admin/projects/AdminProjectsPage";
-import AdminProjectEditorPage from "@/pages/admin/projects/AdminProjectEditorPage";
-import AuthCallbackPage from "./pages/AuthCallbackPage";
-import AdminCommitteesPage from "@/pages/admin/committees/AdminCommitteesPage";
-import AdminCommitteeEditorPage from "@/pages/admin/committees/AdminCommitteeEditorPage";
-import AdminProgramPage from "@/pages/admin/program/AdminProgramPage";
-import AdminProgramEditorPage from "@/pages/admin/program/AdminProgramEditorPage";
+
+// Lazy load admin pages for better performance
+const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage"));
+const AdminNewsPage = lazy(() => import("./pages/admin/news/AdminNewsPage"));
+const AdminNewsEditorPage = lazy(() => import("./pages/admin/news/AdminNewsEditorPage"));
+const AdminEventsPage = lazy(() => import("./pages/admin/events/AdminEventsPage"));
+const AdminEventEditorPage = lazy(() => import("./pages/admin/events/AdminEventEditorPage"));
+const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
+const AdminPagesPage = lazy(() => import("./pages/admin/pages/AdminPagesPage"));
+const AdminPageEditorPage = lazy(() => import("./pages/admin/pages/AdminPageEditorPage"));
+const AdminCommitteesPage = lazy(() => import("./pages/admin/committees/AdminCommitteesPage"));
+const AdminCommitteeEditorPage = lazy(() => import("./pages/admin/committees/AdminCommitteeEditorPage"));
+const AdminMenuPage = lazy(() => import("./pages/admin/AdminMenuPage"));
+const AdminGalaxyPage = lazy(() => import("./pages/admin/AdminGalaxyPage"));
+const AdminGalaxyEditorPage = lazy(() => import("./pages/admin/AdminGalaxyEditorPage"));
+const AdminProgramPage = lazy(() => import("./pages/admin/program/AdminProgramPage"));
+const AdminProgramEditorPage = lazy(() => import("./pages/admin/program/AdminProgramEditorPage"));
+const AdminProjectsPage = lazy(() => import("./pages/admin/projects/AdminProjectsPage"));
+const AdminProjectEditorPage = lazy(() => import("./pages/admin/projects/AdminProjectEditorPage"));
+const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
+
+// Other pages
+const NewsPage = lazy(() => import("./pages/NewsPage"));
+const NewsDetailPage = lazy(() => import("./pages/NewsDetailPage"));
+const AgendaPage = lazy(() => import("./pages/AgendaPage"));
+const EventDetailPage = lazy(() => import("./pages/EventDetailPage"));
+const TeamPage = lazy(() => import("./pages/TeamPage"));
+const CommitteePage = lazy(() => import("./pages/CommitteePage"));
+const CommitteeDetail = lazy(() => import("./pages/committee/CommitteeDetail"));
+const ProgramPage = lazy(() => import("./pages/ProgramPage"));
+const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
+const JoinPage = lazy(() => import("./pages/JoinPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const LegalPage = lazy(() => import("./pages/LegalPage"));
+const SiteMapPage = lazy(() => import("./pages/SiteMapPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const DynamicPage = lazy(() => import("./pages/DynamicPage"));
+const LiftPage = lazy(() => import("./pages/LiftPage"));
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <ProfileSetupModal />
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
+      <HelmetProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/news" element={<NewsPage />} />
+                  <Route path="/news/:slug" element={<NewsDetailPage />} />
+                  <Route path="/agenda" element={<AgendaPage />} />
+                  <Route path="/events/:slug" element={<EventDetailPage />} />
+                  <Route path="/equipe" element={<TeamPage />} />
+                  <Route path="/comites" element={<CommitteePage />} />
+                  <Route path="/comites/:id" element={<CommitteeDetail />} />
+                  <Route path="/programme" element={<ProgramPage />} />
+                  <Route path="/projets" element={<ProjectsPage />} />
+                  <Route path="/nous-rejoindre" element={<JoinPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/mentions-legales" element={<LegalPage />} />
+                  <Route path="/plan-du-site" element={<SiteMapPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                  <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/lift" element={<LiftPage />} />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminDashboardPage />} />
+                  <Route path="/admin/news" element={<AdminNewsPage />} />
+                  <Route path="/admin/news/new" element={<AdminNewsEditorPage />} />
+                  <Route path="/admin/news/:id/edit" element={<AdminNewsEditorPage />} />
+                  <Route path="/admin/events" element={<AdminEventsPage />} />
+                  <Route path="/admin/events/new" element={<AdminEventEditorPage />} />
+                  <Route path="/admin/events/:id/edit" element={<AdminEventEditorPage />} />
+                  <Route path="/admin/users" element={<AdminUsersPage />} />
+                  <Route path="/admin/pages" element={<AdminPagesPage />} />
+                  <Route path="/admin/pages/new" element={<AdminPageEditorPage />} />
+                  <Route path="/admin/pages/:id/edit" element={<AdminPageEditorPage />} />
+                  <Route path="/admin/committees" element={<AdminCommitteesPage />} />
+                  <Route path="/admin/committees/new" element={<AdminCommitteeEditorPage />} />
+                  <Route path="/admin/committees/:id/edit" element={<AdminCommitteeEditorPage />} />
+                  <Route path="/admin/menu" element={<AdminMenuPage />} />
+                  <Route path="/admin/galaxy" element={<AdminGalaxyPage />} />
+                  <Route path="/admin/galaxy/new" element={<AdminGalaxyEditorPage />} />
+                  <Route path="/admin/galaxy/:id/edit" element={<AdminGalaxyEditorPage />} />
+                  <Route path="/admin/program" element={<AdminProgramPage />} />
+                  <Route path="/admin/program/:id/edit" element={<AdminProgramEditorPage />} />
+                  <Route path="/admin/projects" element={<AdminProjectsPage />} />
+                  <Route path="/admin/projects/new" element={<AdminProjectEditorPage />} />
+                  <Route path="/admin/projects/:id/edit" element={<AdminProjectEditorPage />} />
+                  <Route path="/admin/settings" element={<AdminSettingsPage />} />
 
-              {/* Objectif 2026 et sous-pages */}
-              <Route path="/objectif-2026" element={<ProgramPage />} />
-              <Route path="/objectif-2026/commission/:id" element={<CommitteePage />} />
-
-              {/* Nos projets */}
-              <Route path="/nos-projets" element={<ProjectsPage />} />
-
-              {/* Contact */}
-              <Route path="/contact" element={<ContactPage />} />
-
-              {/* Lift - Module de covoiturage */}
-              <Route path="/lift" element={<LiftPage />} />
-
-              {/* Routes existantes */}
-              <Route path="/actualites" element={<NewsPage />} />
-              <Route path="/actualites/:slug" element={<NewsDetailPage />} />
-              <Route path="/agenda" element={<AgendaPage />} />
-              <Route path="/agenda/:id" element={<EventDetailPage />} />
-              <Route path="/agenda/:slug" element={<EventDetailPage />} />
-              <Route path="/plan-du-site" element={<SiteMapPage />} />
-              <Route path="/adherer" element={<JoinPage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/mentions-legales" element={<LegalPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/auth/callback" element={<AuthCallbackPage />} />
-
-              {/* Routes pour les pages dynamiques - supporter la hiérarchie de pages */}
-              <Route path="/pages/:slug" element={<DynamicPage />} />
-              <Route path="/pages/:parent/:slug" element={<DynamicPage />} />
-              <Route path="/pages/:grandparent/:parent/:slug" element={<DynamicPage />} />
-              <Route path="/pages/:greatgrandparent/:grandparent/:parent/:slug" element={<DynamicPage />} />
-              <Route path="/pages/:level1/:level2/:level3/:level4/:slug" element={<DynamicPage />} />
-              <Route path="/pages/:level1/:level2/:level3/:level4/:level5/:slug" element={<DynamicPage />} />
-
-              {/* Routes d'administration */}
-              <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/admin/users" element={<AdminUsersPage />} />
-              <Route path="/admin/news" element={<AdminNewsPage />} />
-              <Route path="/admin/news/new" element={<AdminNewsEditorPage />} />
-              <Route path="/admin/news/edit/:id" element={<AdminNewsEditorPage />} />
-              <Route path="/admin/events" element={<AdminEventsPage />} />
-              <Route path="/admin/events/new" element={<AdminEventEditorPage />} />
-              <Route path="/admin/events/edit/:id" element={<AdminEventEditorPage />} />
-              <Route path="/admin/projects" element={<AdminProjectsPage />} />
-              <Route path="/admin/projects/new" element={<AdminProjectEditorPage />} />
-              <Route path="/admin/projects/edit/:id" element={<AdminProjectEditorPage />} />
-              <Route path="/admin/committees" element={<AdminCommitteesPage />} />
-              <Route path="/admin/committees/new" element={<AdminCommitteeEditorPage />} />
-              <Route path="/admin/committees/edit/:id" element={<AdminCommitteeEditorPage />} />
-              <Route path="/admin/program" element={<AdminProgramPage />} />
-              <Route path="/admin/program/edit" element={<AdminProgramEditorPage />} />
-              <Route path="/admin/program/edit/:id" element={<AdminProgramEditorPage />} />
-              <Route path="/admin/pages" element={<AdminPagesPage />} />
-              <Route path="/admin/pages/new" element={<AdminPageEditorPage />} />
-              <Route path="/admin/pages/edit/:id" element={<AdminPageEditorPage />} />
-              <Route path="/admin/menu" element={<AdminMenuPage />} />
-              <Route path="/admin/settings" element={<AdminSettingsPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
+                  {/* Dynamic pages - this should be last */}
+                  <Route path="/:slug" element={<DynamicPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </HelmetProvider>
     </QueryClientProvider>
   );
 }

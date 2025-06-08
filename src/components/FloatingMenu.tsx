@@ -1,16 +1,52 @@
 
-import React, { useState, useRef } from 'react';
-import { Star, Car, Users, ExternalLink } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Star, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
+import { supabase } from '@/integrations/supabase/client';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
+
+interface GalaxyItem {
+  id: string;
+  name: string;
+  baseline: string;
+  link: string;
+  icon: string;
+  color: string | null;
+  is_external: boolean;
+  position: number;
+}
 
 const FloatingMenu = () => {
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [menuItems, setMenuItems] = useState<GalaxyItem[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Ne pas afficher le menu si l'utilisateur n'est pas connecté
   if (!user) return null;
+
+  useEffect(() => {
+    fetchMenuItems();
+  }, []);
+
+  const fetchMenuItems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('galaxy_items')
+        .select('*')
+        .eq('status', 'active')
+        .order('position');
+
+      if (error) throw error;
+
+      setMenuItems(data || []);
+    } catch (error) {
+      console.error('Error fetching galaxy items:', error);
+      // Fallback vers les éléments par défaut en cas d'erreur
+      setMenuItems([]);
+    }
+  };
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
@@ -25,23 +61,6 @@ const FloatingMenu = () => {
       setIsExpanded(false);
     }, 300); // Délai de 300ms pour permettre de cliquer
   };
-
-  const menuItems = [
-    {
-      label: 'Lift',
-      href: '/lift',
-      icon: Car,
-      isExternal: false,
-      description: 'Covoiturage solidaire'
-    },
-    {
-      label: 'Communo',
-      href: 'https://communo.app/communities/getigne-collectif',
-      icon: Users,
-      isExternal: true,
-      description: 'Communauté en ligne'
-    }
-  ];
 
   return (
     <div 
@@ -59,7 +78,7 @@ const FloatingMenu = () => {
       `}>
         {menuItems.map((item, index) => (
           <div
-            key={item.label}
+            key={item.id}
             className={`
               transform transition-all duration-300 ease-out
               ${isExpanded 
@@ -71,33 +90,39 @@ const FloatingMenu = () => {
               transitionDelay: isExpanded ? `${index * 50}ms` : '0ms' 
             }}
           >
-            {item.isExternal ? (
+            {item.is_external ? (
               <a
-                href={item.href}
+                href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 bg-white hover:bg-getigne-green-100 p-3 rounded-lg shadow-lg border border-gray-200 transition-colors group min-w-48"
               >
-                <div className="p-2 bg-getigne-green-500 text-white rounded-lg group-hover:bg-getigne-green-600 transition-colors">
-                  <item.icon size={20} />
+                <div 
+                  className="p-2 text-white rounded-lg group-hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: item.color || '#22c55e' }}
+                >
+                  <DynamicIcon name={item.icon} size={20} />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">{item.label}</div>
-                  <div className="text-xs text-gray-500">{item.description}</div>
+                  <div className="font-medium text-gray-900">{item.name}</div>
+                  <div className="text-xs text-gray-500">{item.baseline}</div>
                 </div>
                 <ExternalLink size={16} className="text-gray-400" />
               </a>
             ) : (
               <Link
-                to={item.href}
+                to={item.link}
                 className="flex items-center gap-3 bg-white hover:bg-getigne-green-100 p-3 rounded-lg shadow-lg border border-gray-200 transition-colors group min-w-48"
               >
-                <div className="p-2 bg-getigne-green-500 text-white rounded-lg group-hover:bg-getigne-green-600 transition-colors">
-                  <item.icon size={20} />
+                <div 
+                  className="p-2 text-white rounded-lg group-hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: item.color || '#22c55e' }}
+                >
+                  <DynamicIcon name={item.icon} size={20} />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">{item.label}</div>
-                  <div className="text-xs text-gray-500">{item.description}</div>
+                  <div className="font-medium text-gray-900">{item.name}</div>
+                  <div className="text-xs text-gray-500">{item.baseline}</div>
                 </div>
               </Link>
             )}
