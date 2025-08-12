@@ -8,7 +8,6 @@ import {
   FileText, 
   Calendar, 
   Users, 
-  Pages,
   Menu,
   Star,
   BookOpen,
@@ -19,9 +18,13 @@ import {
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  title?: string;
+  description?: string;
+  breadcrumb?: React.ReactNode;
+  backLink?: React.ReactNode;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description, breadcrumb, backLink }) => {
   const location = useLocation();
 
   const menuItems = [
@@ -48,7 +51,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     {
       title: 'Pages',
       href: '/admin/pages',
-      icon: Pages,
+      icon: FileText,
     },
     {
       title: 'Menu',
@@ -128,6 +131,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto">
           <div className="container mx-auto px-6">
+            {(backLink || title || description || breadcrumb) && (
+              <header className="py-6">
+                {backLink && <div className="mb-4">{backLink}</div>}
+                {breadcrumb && <nav aria-label="Breadcrumb" className="mb-2">{breadcrumb}</nav>}
+                {title && <h1 className="text-2xl font-bold">{title}</h1>}
+                {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+              </header>
+            )}
             {children}
           </div>
         </main>
