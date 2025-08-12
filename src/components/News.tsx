@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from '@/components/ui/use-toast';
+import { Routes, generateRoutes } from '@/routes';
 import { 
   Pagination, 
   PaginationContent, 
@@ -43,8 +44,8 @@ const NewsCard = ({ article, index }) => {
   }, []);
 
   const articleUrl = article.slug 
-    ? `/actualites/${article.slug}`
-    : `/actualites/${article.id}`;
+    ? generateRoutes.newsDetail(article.slug)
+    : generateRoutes.newsDetail(article.id);
 
   return (
     <Link to={articleUrl} className="block h-full">
@@ -205,7 +206,7 @@ const News = ({ limit, showPagination = false }) => {
               asChild
               className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
             >
-              <Link to="/actualites">
+              <Link to={Routes.NEWS}>
                 Voir toutes nos actualités
               </Link>
             </Button>
@@ -339,7 +340,7 @@ const News = ({ limit, showPagination = false }) => {
             asChild
             className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
           >
-            <Link to="/actualites">
+            <Link to={Routes.NEWS}>
               Toutes nos actualités
             </Link>
           </Button>

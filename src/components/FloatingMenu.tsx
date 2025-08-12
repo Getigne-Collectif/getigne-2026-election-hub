@@ -23,12 +23,11 @@ const FloatingMenu = () => {
   const [menuItems, setMenuItems] = useState<GalaxyItem[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Ne pas afficher le menu si l'utilisateur n'est pas connecté
-  if (!user) return null;
-
   useEffect(() => {
-    fetchMenuItems();
-  }, []);
+    if (user) {
+      fetchMenuItems();
+    }
+  }, [user]);
 
   const fetchMenuItems = async () => {
     try {

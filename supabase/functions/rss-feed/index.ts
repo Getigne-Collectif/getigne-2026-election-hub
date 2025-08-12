@@ -15,6 +15,7 @@ serve(async (req: Request) => {
   }
 
   try {
+    const websiteUrl = Deno.env.get("VITE_WEBSITE_URL") || "";
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const supabase = createClient(supabaseUrl, supabaseServiceRole);
@@ -46,8 +47,8 @@ serve(async (req: Request) => {
     }
 
     // Prepare base URL for article links
-    const baseUrl = supabaseUrl.replace(".supabase.co", "");
-    const basePageUrl = `${baseUrl}/actualites`;
+    const baseUrl = websiteUrl;
+    const basePageUrl = `${websiteUrl}/news`;
 
     // Start building RSS content
     let rss = `<?xml version="1.0" encoding="UTF-8" ?>

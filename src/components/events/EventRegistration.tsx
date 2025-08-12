@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import { Loader2, Check, X, Users } from 'lucide-react';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
+import { Routes } from '@/routes';
 
 interface EventRegistrationProps {
   eventId: string;
@@ -263,7 +264,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           asChild
           className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
         >
-          <Link to="/adherer">Devenir adhérent</Link>
+          <Link to={Routes.JOIN}>Devenir adhérent</Link>
         </Button>
       </div>
     );

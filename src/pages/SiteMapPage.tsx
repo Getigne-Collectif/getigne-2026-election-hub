@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { Routes } from '@/routes';
 
 const SiteMapPage = () => {
   useEffect(() => {
@@ -32,49 +33,49 @@ const SiteMapPage = () => {
                 <h2 className="text-xl font-semibold mb-4 border-b pb-2">Principales pages</h2>
                 <ul className="space-y-3">
                   <li>
-                    <Link to="/" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.HOME} className="text-getigne-accent hover:underline">
                       Accueil
                     </Link>
                   </li>
                   <li>
-                    <Link to="/objectif-2026" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.PROGRAM} className="text-getigne-accent hover:underline">
                       Objectif 2026
                     </Link>
                     <ul className="ml-5 mt-2 space-y-2">
                       <li>
-                        <Link to="/objectif-2026/programme" className="text-getigne-700 hover:text-getigne-accent">
+                        <Link to={Routes.PROGRAM} className="text-getigne-700 hover:text-getigne-accent">
                           Programme
                         </Link>
                       </li>
                       <li>
-                        <Link to="/objectif-2026#commissions" className="text-getigne-700 hover:text-getigne-accent">
+                        <Link to={Routes.COMMITTEES} className="text-getigne-700 hover:text-getigne-accent">
                           Commissions citoyennes
                         </Link>
                       </li>
                     </ul>
                   </li>
                   <li>
-                    <Link to="/nos-projets" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.PROJECTS} className="text-getigne-accent hover:underline">
                       Nos projets
                     </Link>
                   </li>
                   <li>
-                    <Link to="/actualites" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.NEWS} className="text-getigne-accent hover:underline">
                       Actualités
                     </Link>
                   </li>
                   <li>
-                    <Link to="/agenda" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.AGENDA} className="text-getigne-accent hover:underline">
                       Agenda
                     </Link>
                   </li>
                   <li>
-                    <Link to="/contact" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.CONTACT} className="text-getigne-accent hover:underline">
                       Contact
                     </Link>
                   </li>
                   <li>
-                    <Link to="/adherer" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.JOIN} className="text-getigne-accent hover:underline">
                       Adhérer
                     </Link>
                   </li>
@@ -85,12 +86,12 @@ const SiteMapPage = () => {
                 <h2 className="text-xl font-semibold mb-4 border-b pb-2">Actualités et Agenda</h2>
                 <ul className="space-y-3">
                   <li>
-                    <Link to="/actualites" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.NEWS} className="text-getigne-accent hover:underline">
                       Toutes les actualités
                     </Link>
                   </li>
                   <li>
-                    <Link to="/agenda" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.AGENDA} className="text-getigne-accent hover:underline">
                       Tous les événements
                     </Link>
                   </li>
@@ -101,7 +102,7 @@ const SiteMapPage = () => {
                 <h2 className="text-xl font-semibold mb-4 border-b pb-2">Informations légales</h2>
                 <ul className="space-y-3">
                   <li>
-                    <Link to="/mentions-legales" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.LEGAL} className="text-getigne-accent hover:underline">
                       Mentions légales
                     </Link>
                   </li>
@@ -112,12 +113,12 @@ const SiteMapPage = () => {
                 <h2 className="text-xl font-semibold mb-4 border-b pb-2">Espace membre</h2>
                 <ul className="space-y-3">
                   <li>
-                    <Link to="/auth" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.AUTH} className="text-getigne-accent hover:underline">
                       Connexion / Inscription
                     </Link>
                   </li>
                   <li>
-                    <Link to="/profile" className="text-getigne-accent hover:underline">
+                    <Link to={Routes.PROFILE} className="text-getigne-accent hover:underline">
                       Mon profil
                     </Link>
                   </li>

@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from './AuthButton';
 import { useAuth } from '@/context/AuthContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { Routes } from '@/routes';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -57,48 +58,47 @@ const Navbar = () => {
   const NavLinks = () => (
     <>
       <li>
-        <Link to="/" className={isActive('/')}>
+        <Link to={Routes.HOME} className={isActive(Routes.HOME)}>
           Accueil
         </Link>
       </li>
       <li>
         <Link
-          to="/objectif-2026"
+          to={Routes.PROGRAM}
           className={
-            isActive('/objectif-2026') ||
-            isActive('/objectif-2026/programme')
+            isActive(Routes.PROGRAM)
               ? 'text-getigne-accent'
               : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
           }
         >
-          Objectif 2026
+          Le programme
         </Link>
       </li>
       <li>
-        <Link to="/actualites" className={isActive('/actualites')}>
+        <Link to={Routes.NEWS} className={isActive(Routes.NEWS)}>
           Actualités
         </Link>
       </li>
       <li>
-        <Link to="/agenda" className={isActive('/agenda')}>
+        <Link to={Routes.AGENDA} className={isActive(Routes.AGENDA)}>
           Agenda
         </Link>
       </li>
       {user && (
         <li>
-          <Link to="/lift" className={isActive('/lift')}>
+          <Link to={Routes.LIFT} className={isActive(Routes.LIFT)}>
             <Car className="inline-block w-4 h-4 mr-1" />
             Lift
           </Link>
         </li>
       )}
       <li>
-        <Link to="/adherer" className={isActive('/adherer')}>
+        <Link to={Routes.JOIN} className={isActive(Routes.JOIN)}>
           Adhérer
         </Link>
       </li>
       <li>
-        <Link to="/contact" className={isActive('/contact')}>
+        <Link to={Routes.CONTACT} className={isActive(Routes.CONTACT)}>
           Contact
         </Link>
       </li>
@@ -114,17 +114,17 @@ const Navbar = () => {
           <span className="text-sm text-muted-foreground">Administration</span>
         </li>
         <li>
-          <Link to="/admin" className={isActive('/admin')}>
+          <Link to={Routes.ADMIN} className={isActive(Routes.ADMIN)}>
             Dashboard
           </Link>
         </li>
         <li>
-          <Link to="/admin/pages" className={isActive('/admin/pages')}>
+          <Link to={Routes.ADMIN_PAGES} className={isActive(Routes.ADMIN_PAGES)}>
             Pages
           </Link>
         </li>
         <li>
-          <Link to="/admin/menu" className={isActive('/admin/menu')}>
+          <Link to={Routes.ADMIN_MENU} className={isActive(Routes.ADMIN_MENU)}>
             Menu
           </Link>
         </li>
@@ -140,7 +140,7 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center">
+          <Link to={Routes.HOME} className="flex items-center">
             <img
               src="/images/getigne-collectif-logo.png"
               alt="Gétigné Collectif"

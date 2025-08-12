@@ -13,6 +13,8 @@ import ProgramCommentsSection from '@/components/program/ProgramCommentsSection'
 import ProgramLikeButton from '@/components/program/ProgramLikeButton';
 import ProgramPointCard from '@/components/program/ProgramPointCard';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const ProgramPage = () => {
   const { user, isAdmin, userRoles } = useAuth();
@@ -207,12 +209,14 @@ const ProgramPage = () => {
 
               {programGeneral && (
                 <div className="mb-12">
-                  <Card className="border-getigne-200 shadow-lg">
-                    <CardHeader className="bg-gradient-to-r from-getigne-500 to-getigne-600 text-white">
+                  <Card className="border-getigne-accent shadow-lg">
+                    <CardHeader className="bg-gradient-to-r from-getigne-accent to-cyan-500 text-white">
                       <CardTitle className="text-2xl">Présentation générale</CardTitle>
                     </CardHeader>
                     <CardContent className="p-8">
-                      <div dangerouslySetInnerHTML={{ __html: programGeneral.content }} />
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {programGeneral.content || ''}
+                      </ReactMarkdown>
                     </CardContent>
                   </Card>
                 </div>

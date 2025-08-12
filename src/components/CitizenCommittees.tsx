@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Bike, Utensils, Music, Leaf, Users as UsersIcon } from 'lucide-react';
 import { getMemberCount } from './CommitteeMembers';
+import { generateRoutes } from '@/routes';
 
 // Map pour les icônes
 const iconMap = {
@@ -181,7 +182,7 @@ const CommitteeItem = ({ committee, index }) => {
   }, [committee.id]);
 
   return (
-    <Link to={`/objectif-2026/commission/${committee.id}`} className="block">
+    <Link to={generateRoutes.objectif2026CommissionDetail(committee.id)} className="block">
       <div
         ref={ref}
         className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift transition-all duration-200 ${

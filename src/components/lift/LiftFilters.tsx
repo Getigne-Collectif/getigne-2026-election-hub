@@ -55,7 +55,6 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log('MouseDown event triggered');
     isDraggingRef.current = true;
     dragStartYRef.current = e.clientY;
     dragStartHeightRef.current = drawerHeight;
@@ -65,13 +64,11 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDraggingRef.current) return;
-    console.log('MouseMove event triggered', { isDragging: isDraggingRef.current, clientY: e.clientY });
     
     const deltaY = dragStartYRef.current - e.clientY;
     const newHeight = Math.max(30, Math.min(window.innerHeight * 0.8, dragStartHeightRef.current + deltaY));
     
     if (newHeight <= 30) {
-      console.log('Closing drawer due to minimum height');
       onClose();
       isDraggingRef.current = false;
       document.removeEventListener('mousemove', handleMouseMove);
@@ -82,7 +79,6 @@ const LiftFilters: React.FC<LiftFiltersProps> = ({
   };
 
   const handleMouseUp = () => {
-    console.log('MouseUp event triggered', { isDragging: isDraggingRef.current });
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
       document.removeEventListener('mousemove', handleMouseMove);

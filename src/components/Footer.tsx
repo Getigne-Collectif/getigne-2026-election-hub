@@ -6,6 +6,7 @@ import { subscribeToNewsletter, NewsletterSubscription } from '../utils/newslett
 import { toast } from 'sonner';
 import {DiscordLogoIcon} from "@radix-ui/react-icons";
 import FacebookIcon from '@/components/icons/facebook.svg?react';
+import { Routes } from '@/routes';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -67,37 +68,37 @@ const Footer = () => {
             <h3 className="text-xl font-medium mb-4">Navigation</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.HOME} className="text-getigne-100 hover:text-white transition-colors">
                   Accueil
                 </Link>
               </li>
               <li>
-                <Link to="/objectif-2026" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.PROGRAM} className="text-getigne-100 hover:text-white transition-colors">
                   Objectif 2026
                 </Link>
               </li>
               <li>
-                <Link to="/nos-projets" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.PROJECTS} className="text-getigne-100 hover:text-white transition-colors">
                   Nos projets
                 </Link>
               </li>
               <li>
-                <Link to="/actualites" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.NEWS} className="text-getigne-100 hover:text-white transition-colors">
                   Actualités
                 </Link>
               </li>
               <li>
-                <Link to="/agenda" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.AGENDA} className="text-getigne-100 hover:text-white transition-colors">
                   Événements
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.CONTACT} className="text-getigne-100 hover:text-white transition-colors">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link to="/plan-du-site" className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.SITEMAP} className="text-getigne-100 hover:text-white transition-colors">
                   Plan du site
                 </Link>
               </li>
@@ -154,7 +155,7 @@ const Footer = () => {
 
         <div className="border-t border-getigne-800 mt-12 pt-8 text-center text-getigne-400 text-sm">
           <div className="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 mb-2">
-            <Link to="/mentions-legales" className="hover:text-white transition-colors">
+            <Link to={Routes.LEGAL} className="hover:text-white transition-colors">
               Mentions légales
             </Link>
           </div>

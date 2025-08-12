@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, generatePath } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext.tsx';
 import { supabase } from '@/integrations/supabase/client.ts';
 import Navbar from '@/components/Navbar.tsx';
@@ -47,6 +47,7 @@ import {
 import { cn } from '@/lib/utils.ts';
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
+import { Routes } from '@/routes';
 
 interface NewsFormValues {
   title: string;
@@ -409,7 +410,7 @@ const AdminNewsEditorPage = () => {
         if (status === 'published' && data && data.length > 0) {
           const articleData = data[0];
           const articleSlug = articleData.slug || articleData.id;
-          const redirectUrl = `/actualites/${articleSlug}`;
+          const redirectUrl = generatePath(Routes.NEWS_DETAIL, { slug: articleSlug });
           navigate(redirectUrl);
           return;
         }
@@ -470,7 +471,7 @@ const AdminNewsEditorPage = () => {
         if (status === 'published' && data && data.length > 0) {
           const articleData = data[0];
           const articleSlug = articleData.slug || articleData.id;
-          const redirectUrl = `/actualites/${articleSlug}`;
+          const redirectUrl = generatePath(Routes.NEWS_DETAIL, { slug: articleSlug });
           navigate(redirectUrl);
           return;
         }

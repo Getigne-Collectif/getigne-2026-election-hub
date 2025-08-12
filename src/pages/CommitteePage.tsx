@@ -9,6 +9,7 @@ import CommitteeContactForm from '@/components/CommitteeContactForm';
 import { type Tables } from '@/integrations/supabase/types';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { Routes, generateRoutes } from '@/routes';
 import {
   Lightbulb,
   Bike,
@@ -338,7 +339,7 @@ const CommitteePage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/objectif-2026">Objectif 2026</BreadcrumbLink>
+                <BreadcrumbLink href={Routes.OBJECTIF_2026}>Objectif 2026</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -510,7 +511,7 @@ const CommitteePage = () => {
             <div className="w-full md:w-auto">
               {prevCommittee ? (
                 <Link
-                  to={`/objectif-2026/commission/${prevCommittee.id}`}
+                  to={generateRoutes.objectif2026CommissionDetail(prevCommittee.id)}
                   className={`flex items-center hover:underline ${themeColor.text}`}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -527,7 +528,7 @@ const CommitteePage = () => {
             <div className="w-full md:w-auto text-right">
               {nextCommittee ? (
                 <Link
-                  to={`/objectif-2026/commission/${nextCommittee.id}`}
+                  to={generateRoutes.objectif2026CommissionDetail(nextCommittee.id)}
                   className={`flex items-center justify-end hover:underline ${themeColor.text}`}
                 >
                   <span>Commission {nextCommittee.title}</span>

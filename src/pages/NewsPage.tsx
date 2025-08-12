@@ -19,6 +19,7 @@ import {
   PaginationPrevious
 } from '@/components/ui/pagination';
 import { toast } from '@/components/ui/use-toast';
+import { Routes } from '@/routes';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -243,7 +244,7 @@ const NewsPage = () => {
     setSelectedTags([]);
     setSearchTerm('');
     setCurrentPage(1);
-    navigate('/actualites');
+    navigate(Routes.NEWS);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -289,7 +290,7 @@ const NewsPage = () => {
 
     const queryString = queryParams.toString();
     navigate({
-      pathname: '/actualites',
+      pathname: Routes.NEWS,
       search: queryString ? `?${queryString}` : ''
     });
   };

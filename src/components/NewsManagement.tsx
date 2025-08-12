@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
+import { Routes } from '@/routes';
 
 const generateSlug = (title: string): string => {
   return title
@@ -290,7 +291,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
 
               return (
                 <TableRow key={article.id}>
-                  <TableCell className="font-medium"><Link to={article.status === 'draft' ? '#' : generatePath('/actualites/:slug', {
+                  <TableCell className="font-medium"><Link to={article.status === 'draft' ? '#' : generatePath(Routes.NEWS_DETAIL, {
                     slug: article.slug || article.id
                   })}>{article.title}</Link></TableCell>
                   <TableCell>{categoryName}</TableCell>

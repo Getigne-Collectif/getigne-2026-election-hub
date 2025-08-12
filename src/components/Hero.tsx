@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { Routes } from '@/routes';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -58,7 +59,7 @@ const Hero = () => {
             className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <Link to="/objectif-2026">
+              <Link to={Routes.PROGRAM}>
                 Découvez notre projet pour 2026
               </Link>
             </Button>

@@ -19,6 +19,7 @@ import { Home } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Json } from '@/integrations/supabase/types';
+import { generateRoutes, Routes } from '@/routes';
 
 interface NewsArticle {
   id: string;
@@ -56,8 +57,8 @@ interface RelatedArticleProps {
 
 const RelatedArticleCard = ({ article }: RelatedArticleProps) => {
   const articleUrl = article.slug
-    ? `/actualites/${article.slug}`
-    : `/actualites/${article.id}`;
+    ? generateRoutes.newsDetail(article.slug)
+    : generateRoutes.newsDetail(article.id);
 
   return (
     <Link to={articleUrl} className="block">
@@ -343,7 +344,7 @@ const NewsDetailPage = () => {
             <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate('/actualites')}
+                onClick={() => navigate(Routes.NEWS)}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retour aux actualités
@@ -400,7 +401,7 @@ const NewsDetailPage = () => {
                   {tags.map((tag, index) => (
                     <Link
                       key={index}
-                      to={`/actualites?tags=${tag}`}
+                      to={`${Routes.NEWS}?tags=${tag}`}
                       className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-sm hover:bg-getigne-100 transition-colors"
                     >
                       {tag}
@@ -430,7 +431,7 @@ const NewsDetailPage = () => {
               <Button
                 variant="outline"
                 className="border-getigne-200"
-                onClick={() => navigate('/actualites')}
+                onClick={() => navigate(Routes.NEWS)}
               >
                 <ArrowLeft size={16} className="mr-2" />
                 Retour aux actualités

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 import {GearIcon} from "@radix-ui/react-icons";
+import { Routes } from '@/routes';
 
 const AdminDashboardPage = () => {
   const { user, isAdmin, authChecked } = useAuth();
@@ -151,7 +152,7 @@ const AdminDashboardPage = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
 
-              <Link to="/admin/users">
+              <Link to={Routes.ADMIN_USERS}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -166,7 +167,7 @@ const AdminDashboardPage = () => {
                 </Card>
               </Link>
 
-              <Link to="/admin/news">
+              <Link to={Routes.ADMIN_NEWS}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -181,7 +182,7 @@ const AdminDashboardPage = () => {
                 </Card>
               </Link>
 
-              <Link to="/admin/events">
+              <Link to={Routes.ADMIN_EVENTS}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -209,7 +210,7 @@ const AdminDashboardPage = () => {
                 </CardContent>
               </Card>
 
-              <Link to="/admin/pages">
+              <Link to={Routes.ADMIN_PAGES}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -224,7 +225,7 @@ const AdminDashboardPage = () => {
                 </Card>
               </Link>
 
-              <Link to="/admin/projects">
+              <Link to={Routes.ADMIN_PROJECTS}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -239,7 +240,7 @@ const AdminDashboardPage = () => {
                 </Card>
               </Link>
 
-              <Link to="/admin/committees">
+              <Link to={Routes.ADMIN_COMMITTEES}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -254,7 +255,7 @@ const AdminDashboardPage = () => {
                 </Card>
               </Link>
 
-              <Link to="/admin/program">
+              <Link to={Routes.ADMIN_PROGRAM}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -269,7 +270,7 @@ const AdminDashboardPage = () => {
                 </Card>
               </Link>
 
-              <Link to="/admin/settings">
+              <Link to={Routes.ADMIN_SETTINGS}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">
@@ -283,7 +284,7 @@ const AdminDashboardPage = () => {
                 </Card>
               </Link>
 
-              <Link to="/admin/menu">
+              <Link to={Routes.ADMIN_MENU}>
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl flex items-center">

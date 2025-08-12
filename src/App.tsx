@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/context/auth";
+import { Routes as AppRoutes } from "./routes";
 import Index from "./pages/Index";
 
 // Lazy load admin pages for better performance
@@ -63,55 +64,55 @@ function App() {
             <BrowserRouter>
               <Suspense fallback={<div>Loading...</div>}>
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/news" element={<NewsPage />} />
-                  <Route path="/news/:slug" element={<NewsDetailPage />} />
-                  <Route path="/agenda" element={<AgendaPage />} />
-                  <Route path="/events/:slug" element={<EventDetailPage />} />
-                  <Route path="/equipe" element={<TeamPage />} />
-                  <Route path="/comites" element={<CommitteePage />} />
-                  <Route path="/comites/:id" element={<CommitteeDetail />} />
-                  <Route path="/programme" element={<ProgramPage />} />
-                  <Route path="/projets" element={<ProjectsPage />} />
-                  <Route path="/nous-rejoindre" element={<JoinPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/mentions-legales" element={<LegalPage />} />
-                  <Route path="/plan-du-site" element={<SiteMapPage />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                  <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/lift" element={<LiftPage />} />
+                  <Route path={AppRoutes.HOME} element={<Index />} />
+                  <Route path={AppRoutes.NEWS} element={<NewsPage />} />
+                  <Route path={AppRoutes.NEWS_DETAIL} element={<NewsDetailPage />} />
+                  <Route path={AppRoutes.AGENDA} element={<AgendaPage />} />
+                  <Route path={AppRoutes.EVENT_DETAIL} element={<EventDetailPage />} />
+                  <Route path={AppRoutes.TEAM} element={<TeamPage />} />
+                  <Route path={AppRoutes.COMMITTEES} element={<CommitteePage />} />
+                  <Route path={AppRoutes.COMMITTEE_DETAIL} element={<CommitteeDetail />} />
+                  <Route path={AppRoutes.PROGRAM} element={<ProgramPage />} />
+                  <Route path={AppRoutes.PROJECTS} element={<ProjectsPage />} />
+                  <Route path={AppRoutes.JOIN} element={<JoinPage />} />
+                  <Route path={AppRoutes.CONTACT} element={<ContactPage />} />
+                  <Route path={AppRoutes.LEGAL} element={<LegalPage />} />
+                  <Route path={AppRoutes.SITEMAP} element={<SiteMapPage />} />
+                  <Route path={AppRoutes.AUTH} element={<AuthPage />} />
+                  <Route path={AppRoutes.AUTH_CALLBACK} element={<AuthCallbackPage />} />
+                  <Route path={AppRoutes.AUTH_RESET_PASSWORD} element={<ResetPasswordPage />} />
+                  <Route path={AppRoutes.PROFILE} element={<ProfilePage />} />
+                  <Route path={AppRoutes.LIFT} element={<LiftPage />} />
                   
                   {/* Admin Routes */}
-                  <Route path="/admin" element={<AdminDashboardPage />} />
-                  <Route path="/admin/news" element={<AdminNewsPage />} />
-                  <Route path="/admin/news/new" element={<AdminNewsEditorPage />} />
-                  <Route path="/admin/news/:id/edit" element={<AdminNewsEditorPage />} />
-                  <Route path="/admin/events" element={<AdminEventsPage />} />
-                  <Route path="/admin/events/new" element={<AdminEventEditorPage />} />
-                  <Route path="/admin/events/:id/edit" element={<AdminEventEditorPage />} />
-                  <Route path="/admin/users" element={<AdminUsersPage />} />
-                  <Route path="/admin/pages" element={<AdminPagesPage />} />
-                  <Route path="/admin/pages/new" element={<AdminPageEditorPage />} />
-                  <Route path="/admin/pages/:id/edit" element={<AdminPageEditorPage />} />
-                  <Route path="/admin/committees" element={<AdminCommitteesPage />} />
-                  <Route path="/admin/committees/new" element={<AdminCommitteeEditorPage />} />
-                  <Route path="/admin/committees/:id/edit" element={<AdminCommitteeEditorPage />} />
-                  <Route path="/admin/menu" element={<AdminMenuPage />} />
-                  <Route path="/admin/galaxy" element={<AdminGalaxyPage />} />
-                  <Route path="/admin/galaxy/new" element={<AdminGalaxyEditorPage />} />
-                  <Route path="/admin/galaxy/:id/edit" element={<AdminGalaxyEditorPage />} />
-                  <Route path="/admin/program" element={<AdminProgramPage />} />
-                  <Route path="/admin/program/:id/edit" element={<AdminProgramEditorPage />} />
-                  <Route path="/admin/projects" element={<AdminProjectsPage />} />
-                  <Route path="/admin/projects/new" element={<AdminProjectEditorPage />} />
-                  <Route path="/admin/projects/:id/edit" element={<AdminProjectEditorPage />} />
-                  <Route path="/admin/settings" element={<AdminSettingsPage />} />
+                  <Route path={AppRoutes.ADMIN} element={<AdminDashboardPage />} />
+                  <Route path={AppRoutes.ADMIN_NEWS} element={<AdminNewsPage />} />
+                  <Route path={AppRoutes.ADMIN_NEWS_NEW} element={<AdminNewsEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_NEWS_EDIT} element={<AdminNewsEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_EVENTS} element={<AdminEventsPage />} />
+                  <Route path={AppRoutes.ADMIN_EVENTS_NEW} element={<AdminEventEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_EVENTS_EDIT} element={<AdminEventEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_USERS} element={<AdminUsersPage />} />
+                  <Route path={AppRoutes.ADMIN_PAGES} element={<AdminPagesPage />} />
+                  <Route path={AppRoutes.ADMIN_PAGES_NEW} element={<AdminPageEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_PAGES_EDIT} element={<AdminPageEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_COMMITTEES} element={<AdminCommitteesPage />} />
+                  <Route path={AppRoutes.ADMIN_COMMITTEES_NEW} element={<AdminCommitteeEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_COMMITTEES_EDIT} element={<AdminCommitteeEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_MENU} element={<AdminMenuPage />} />
+                  <Route path={AppRoutes.ADMIN_GALAXY} element={<AdminGalaxyPage />} />
+                  <Route path={AppRoutes.ADMIN_GALAXY_NEW} element={<AdminGalaxyEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_GALAXY_EDIT} element={<AdminGalaxyEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_PROGRAM} element={<AdminProgramPage />} />
+                  <Route path={AppRoutes.ADMIN_PROGRAM_EDIT} element={<AdminProgramEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_PROJECTS} element={<AdminProjectsPage />} />
+                  <Route path={AppRoutes.ADMIN_PROJECTS_NEW} element={<AdminProjectEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_PROJECTS_EDIT} element={<AdminProjectEditorPage />} />
+                  <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />
 
                   {/* Dynamic pages - this should be last */}
-                  <Route path="/:slug" element={<DynamicPage />} />
-                  <Route path="*" element={<NotFound />} />
+                  <Route path={AppRoutes.DYNAMIC_PAGE} element={<DynamicPage />} />
+                  <Route path={AppRoutes.NOT_FOUND} element={<NotFound />} />
                 </Routes>
               </Suspense>
             </BrowserRouter>

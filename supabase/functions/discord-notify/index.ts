@@ -59,13 +59,13 @@ serve(async (req) => {
     if (!contextUrl && resourceId && resourceType) {
       switch(resourceType) {
         case 'news':
-          contextUrl = `${PUBLIC_URL}/actualites/${resourceId}`;
+          contextUrl = `${PUBLIC_URL}/news/${resourceId}`;
           break;
         case 'event':
-          contextUrl = `${PUBLIC_URL}/agenda/${resourceId}`;
+          contextUrl = `${PUBLIC_URL}/events/${resourceId}`;
           break;
         case 'committee':
-          contextUrl = `${PUBLIC_URL}/commissions/${resourceId}`;
+          contextUrl = `${PUBLIC_URL}/comites/${resourceId}`;
           break;
         default:
           contextUrl = PUBLIC_URL;

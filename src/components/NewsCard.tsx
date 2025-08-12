@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, ChevronRight, User } from 'lucide-react';
+import { generateRoutes } from '@/routes';
 
 interface NewsCardProps {
   article: {
@@ -53,8 +54,8 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
 
   // Déterminer l'URL de l'article - utiliser le slug s'il existe, sinon utiliser l'ID
   const articleUrl = article.slug 
-    ? `/actualites/${article.slug}`
-    : `/actualites/${article.id}`;
+    ? generateRoutes.newsDetail(article.slug)
+    : generateRoutes.newsDetail(article.id);
     
   // Format de l'auteur
   const authorName = article.author 

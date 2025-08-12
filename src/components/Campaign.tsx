@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, Heart, Calendar } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useAuth } from '@/context/AuthContext';
+import { Routes } from '@/routes';
 
 const Campaign = () => {
   const { settings } = useAppSettings();
@@ -66,7 +67,7 @@ const Campaign = () => {
               </div>
               <div className="mt-8">
                 <Button asChild>
-                  <Link to={"/objectif-2026"}> Découvrez notre projet pour 2026</Link>
+                  <Link to={Routes.PROGRAM}> Découvrez notre projet pour 2026</Link>
                 </Button>
               </div>
             </div>
@@ -108,7 +109,7 @@ const Campaign = () => {
               Intégrez l'une de nos commissions de travail selon vos centres d'intérêt et compétences.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/objectif-2026#commissions">Découvrir</Link>
+              <Link to={Routes.COMMITTEES}>Découvrir</Link>
             </Button>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
@@ -119,7 +120,7 @@ const Campaign = () => {
               Consultez l'agenda de nos prochaines rencontres et événements à Gétigné.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <Link to="/agenda">Agenda</Link>
+              <Link to={Routes.AGENDA}>Agenda</Link>
             </Button>
           </div>
         </div>

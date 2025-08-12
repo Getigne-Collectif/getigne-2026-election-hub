@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
 import {LogIn, LogOut, User, Shield, Newspaper, UserCog, Calendar, Users, Settings} from 'lucide-react';
+import { Routes } from '@/routes';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,18 +38,18 @@ const AuthButton = () => {
   };
 
   const handleProfileClick = () => {
-    navigate('/profile');
+    navigate(Routes.PROFILE);
   };
 
   const handleAdminClick = () => {
-    navigate('/admin');
+    navigate(Routes.ADMIN);
   };
 
   // Pas d'utilisateur - afficher bouton connexion
   if (!user) {
     return (
       <Button asChild variant="outline" size="sm" className="flex items-center gap-2">
-        <Link to="/auth">
+        <Link to={Routes.AUTH}>
           <LogIn className="h-4 w-4" />
           <span className="hidden sm:inline">Se connecter</span>
         </Link>
