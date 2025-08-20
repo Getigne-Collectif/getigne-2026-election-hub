@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -335,8 +336,16 @@ const NewsDetailPage = () => {
     : '';
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <HelmetProvider>
+      <Helmet>
+        <title>{`${article.title} | Gétigné Collectif`}</title>
+        {article.excerpt && (
+          <meta name="description" content={article.excerpt} />
+        )}
+      </Helmet>
+
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
 
       <div className="pt-24 pb-4 bg-getigne-50">
         <div className="container mx-auto px-4">
@@ -387,8 +396,6 @@ const NewsDetailPage = () => {
             </div>
 
             <div className="prose prose-lg max-w-none mx-auto">
-              <div className="text-xl text-getigne-700 mb-8">{article.excerpt}</div>
-
               <div className="rich-content">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {article.content}
@@ -441,8 +448,9 @@ const NewsDetailPage = () => {
         </div>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </HelmetProvider>
   );
 };
 

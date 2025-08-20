@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import {
   ChevronRight,
   Edit,
@@ -35,6 +35,7 @@ import {
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import type { Project, ProjectWithLikes } from '@/types/projects.types';
+import { Routes } from '@/routes';
 
 export default function AdminProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,7 +96,7 @@ export default function AdminProjectsPage() {
       return;
     }
 
-    toast.success("Projet mis en avant avec succès");
+    toast.success("Statut mis à jour");
     refetch();
   };
 
@@ -245,7 +246,7 @@ export default function AdminProjectsPage() {
                           <Construction className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="icon" asChild>
-                          <Link to={`/admin/projects/edit/${project.id}`}>
+                          <Link to={generatePath(Routes.ADMIN_PROJECTS_EDIT, { id: project.id })}>
                             <Edit className="h-4 w-4" />
                           </Link>
                         </Button>

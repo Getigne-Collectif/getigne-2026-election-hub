@@ -46,6 +46,7 @@ export enum Routes {
   ADMIN_GALAXY_NEW = "/admin/galaxy/new",
   ADMIN_GALAXY_EDIT = "/admin/galaxy/:id/edit",
   ADMIN_PROGRAM = "/admin/program",
+  ADMIN_PROGRAM_SECTIONS_INDEX = "/admin/program/edit",
   ADMIN_PROGRAM_EDIT = "/admin/program/:id/edit",
   ADMIN_PROJECTS = "/admin/projects",
   ADMIN_PROJECTS_NEW = "/admin/projects/new",

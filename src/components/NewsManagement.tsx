@@ -326,7 +326,7 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/admin/news/edit/${article.id}`)}
+                        onClick={() => navigate(generatePath(Routes.ADMIN_NEWS_EDIT, { id: article.id }))}
                       >
                         <FileEdit className="h-4 w-4" />
                       </Button>

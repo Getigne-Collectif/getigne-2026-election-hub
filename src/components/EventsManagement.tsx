@@ -26,6 +26,7 @@ import { Link, useNavigate, generatePath } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Routes } from '@/routes';
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -236,7 +237,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/admin/events/edit/${event.id}`)}
+                      onClick={() => navigate(generatePath(Routes.ADMIN_EVENTS_EDIT, { id: event.id }))}
                     >
                       <FileEdit className="h-4 w-4" />
                     </Button>

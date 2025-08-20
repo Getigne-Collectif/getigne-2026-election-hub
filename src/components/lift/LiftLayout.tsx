@@ -1,13 +1,17 @@
 import React from 'react';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useAuth } from '@/context/auth';
+import UserAvatar from '@/components/UserAvatar';
 
 interface LiftLayoutProps {
   children: React.ReactNode;
 }
 
 const LiftLayout: React.FC<LiftLayoutProps> = ({ children }) => {
+  const { user, profile } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
       {/* Header spécial Lift */}
@@ -26,17 +30,8 @@ const LiftLayout: React.FC<LiftLayoutProps> = ({ children }) => {
             
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <div className="text-center h-[50px] w-[100px] hidden sm:block">
-                  <div className="h-[100px] absolute top-0 right-[220px]">
-                    <DotLottieReact
-                        src="https://lottie.host/3aee0219-fba1-4a2e-ad29-559619be88a8/7dGpLBzuzE.lottie"
-                        loop
-                        autoplay
-                      />
-                  </div>
-                </div>
                 <div className="p-2 bg-blue-100 rounded-full">
-                  <Users className="w-6 h-6 text-blue-600" />
+                  <UserAvatar user={user} profile={profile} size="md" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-blue-900 font-playwrite">

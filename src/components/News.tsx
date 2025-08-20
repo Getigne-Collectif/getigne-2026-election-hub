@@ -71,7 +71,6 @@ const NewsCard = ({ article, index }) => {
             <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
           </div>
           <h3 className="font-medium text-xl mb-2">{article.title}</h3>
-          <p className="text-getigne-700 mb-4">{article.excerpt}</p>
           <div className="text-getigne-accent flex items-center text-sm font-medium group">
             Lire la suite
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />

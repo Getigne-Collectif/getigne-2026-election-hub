@@ -84,14 +84,7 @@ const Navbar = () => {
           Agenda
         </Link>
       </li>
-      {user && (
-        <li>
-          <Link to={Routes.LIFT} className={isActive(Routes.LIFT)}>
-            <Car className="inline-block w-4 h-4 mr-1" />
-            Lift
-          </Link>
-        </li>
-      )}
+      
       <li>
         <Link to={Routes.JOIN} className={isActive(Routes.JOIN)}>
           Adhérer

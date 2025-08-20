@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,12 +14,15 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, ArrowLeft, Star } from 'lucide-react';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
+import { Textarea } from '@/components/ui/textarea';
 
 const ICON_OPTIONS = [
   'Car', 'Users', 'Home', 'Calendar', 'MessageCircle', 'Settings', 
   'Heart', 'Book', 'Camera', 'Music', 'MapPin', 'Phone', 'Mail',
   'Globe', 'Shield', 'Zap', 'Coffee', 'Gamepad2', 'Palette'
 ];
+
+const CUSTOM_SVG_VALUE = '__custom_svg__';
 
 const AdminGalaxyEditorPage = () => {
   const { isAdmin, authChecked } = useAuth();
@@ -39,6 +42,83 @@ const AdminGalaxyEditorPage = () => {
     is_external: false,
     status: 'active'
   });
+  const [customIconSvg, setCustomIconSvg] = useState('');
+  const [customIconFgColor, setCustomIconFgColor] = useState('#000000');
+
+  const sanitizeSvg = (raw: string): string => {
+    let svg = raw;
+    svg = svg.replace(/fill=("|')(?!none)([^"']*)(\1)/gi, 'fill="currentColor"');
+    svg = svg.replace(/stroke=("|')(?!none)([^"']*)(\1)/gi, 'stroke="currentColor"');
+    svg = svg.replace(/style=("|')(.*?)\1/gi, (_m, q, content) => {
+      const updated = content
+        .replace(/fill:\s*(?!none)[^;"']+/gi, 'fill: currentColor')
+        .replace(/stroke:\s*(?!none)[^;"']+/gi, 'stroke: currentColor');
+      return `style=${q}${updated}${q}`;
+    });
+    return svg;
+  };
+
+  const fetchItem = useCallback(async (itemId: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('galaxy_items')
+        .select('*')
+        .eq('id', itemId)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        let iconValue: string = data.icon || 'Star';
+        let parsedSvg = '';
+        let parsedFg = '#000000';
+        if (typeof data.icon === 'string') {
+          const trimmed = data.icon.trim();
+          if (trimmed.startsWith('{')) {
+            try {
+              const parsed = JSON.parse(trimmed);
+              if (parsed?.type === 'svg' && typeof parsed.svg === 'string') {
+                iconValue = CUSTOM_SVG_VALUE;
+                parsedSvg = parsed.svg;
+                if (typeof parsed.fg === 'string') parsedFg = parsed.fg;
+              }
+            } catch (e) {
+              // ignore JSON parse errors
+            }
+          } else if (trimmed.startsWith('<svg')) {
+            iconValue = CUSTOM_SVG_VALUE;
+            parsedSvg = trimmed;
+          }
+        }
+
+        if (iconValue === CUSTOM_SVG_VALUE) {
+          setCustomIconSvg(parsedSvg);
+          setCustomIconFgColor(parsedFg);
+        }
+
+        setFormData({
+          name: data.name,
+          baseline: data.baseline,
+          link: data.link,
+          icon: iconValue,
+          color: data.color || '#22c55e',
+          is_external: data.is_external,
+          status: data.status
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching item:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de récupérer l\'élément.',
+        variant: 'destructive',
+      });
+      navigate('/admin/galaxy');
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate, toast]);
 
   useEffect(() => {
     if (!authChecked) return;
@@ -56,48 +136,29 @@ const AdminGalaxyEditorPage = () => {
     if (isEditing && id) {
       fetchItem(id);
     }
-  }, [authChecked, isAdmin, navigate, toast, isEditing, id]);
+  }, [authChecked, isAdmin, navigate, toast, isEditing, id, fetchItem]);
 
-  const fetchItem = async (itemId: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('galaxy_items')
-        .select('*')
-        .eq('id', itemId)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        setFormData({
-          name: data.name,
-          baseline: data.baseline,
-          link: data.link,
-          icon: data.icon,
-          color: data.color || '#22c55e',
-          is_external: data.is_external,
-          status: data.status
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching item:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de récupérer l\'élément.',
-        variant: 'destructive',
-      });
-      navigate('/admin/galaxy');
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
     try {
+      const iconToSave = formData.icon === CUSTOM_SVG_VALUE
+        ? JSON.stringify({ type: 'svg', svg: customIconSvg, fg: customIconFgColor })
+        : formData.icon;
+
+      if (formData.icon === CUSTOM_SVG_VALUE && !customIconSvg.trim()) {
+        toast({
+          title: 'Icône manquante',
+          description: 'Veuillez coller le code SVG ou choisissez une icône prédéfinie.',
+          variant: 'destructive',
+        });
+        setSaving(false);
+        return;
+      }
+
       if (isEditing && id) {
         const { error } = await supabase
           .from('galaxy_items')
@@ -105,8 +166,9 @@ const AdminGalaxyEditorPage = () => {
             name: formData.name,
             baseline: formData.baseline,
             link: formData.link,
-            icon: formData.icon,
+            icon: iconToSave,
             color: formData.color,
+            icon_fg: formData.icon === CUSTOM_SVG_VALUE ? customIconFgColor : null,
             is_external: formData.is_external,
             status: formData.status,
             updated_at: new Date().toISOString()
@@ -132,8 +194,9 @@ const AdminGalaxyEditorPage = () => {
             name: formData.name,
             baseline: formData.baseline,
             link: formData.link,
-            icon: formData.icon,
+            icon: iconToSave,
             color: formData.color,
+            icon_fg: formData.icon === CUSTOM_SVG_VALUE ? customIconFgColor : null,
             is_external: formData.is_external,
             status: formData.status,
             position: nextPosition
@@ -238,16 +301,26 @@ const AdminGalaxyEditorPage = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="icon">Icône *</Label>
-                    <Select value={formData.icon} onValueChange={(value) => setFormData({ ...formData, icon: value })}>
+                    <Select
+                      value={formData.icon}
+                      onValueChange={(value) => setFormData({ ...formData, icon: value })}
+                    >
                       <SelectTrigger>
                         <SelectValue>
-                          <div className="flex items-center gap-2">
-                            <DynamicIcon name={formData.icon} size={16} />
-                            {formData.icon}
-                          </div>
+                          {formData.icon === CUSTOM_SVG_VALUE ? (
+                            <span>Valeur personnalisée (svg)</span>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <DynamicIcon name={formData.icon} size={16} />
+                              {formData.icon}
+                            </div>
+                          )}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value={CUSTOM_SVG_VALUE}>
+                          Valeur personnalisée (svg)
+                        </SelectItem>
                         {ICON_OPTIONS.map((icon) => (
                           <SelectItem key={icon} value={icon}>
                             <div className="flex items-center gap-2">
@@ -258,6 +331,37 @@ const AdminGalaxyEditorPage = () => {
                         ))}
                       </SelectContent>
                     </Select>
+
+                    {formData.icon === CUSTOM_SVG_VALUE && (
+                      <div className="mt-2 space-y-1">
+                        <Label htmlFor="customIconSvg">Code SVG</Label>
+                        <Textarea
+                          id="customIconSvg"
+                          value={customIconSvg}
+                          onChange={(e) => setCustomIconSvg(e.target.value)}
+                          placeholder="Collez ici votre code <svg>...</svg>"
+                          className="min-h-[140px] font-mono text-sm"
+                        />
+                        <div className="mt-3 space-y-2">
+                          <Label htmlFor="customIconFgColor">Couleur de l'icône (hex)</Label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              id="customIconFgColor"
+                              type="color"
+                              value={customIconFgColor}
+                              onChange={(e) => setCustomIconFgColor(e.target.value)}
+                              className="w-12 h-10 rounded border border-gray-300 cursor-pointer"
+                            />
+                            <Input
+                              value={customIconFgColor}
+                              onChange={(e) => setCustomIconFgColor(e.target.value)}
+                              placeholder="#ffffff"
+                              className="flex-1"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -309,7 +413,15 @@ const AdminGalaxyEditorPage = () => {
                       className="p-2 text-white rounded-lg"
                       style={{ backgroundColor: formData.color }}
                     >
-                      <DynamicIcon name={formData.icon} size={20} />
+                      {formData.icon === CUSTOM_SVG_VALUE ? (
+                        <span
+                          className="inline-grid place-items-center [&>svg]:block [&>svg]:w-full [&>svg]:h-full [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:fill-current [&>svg]:stroke-current [&_*]:fill-current [&_*]:stroke-current"
+                          style={{ width: '20px', height: '20px', color: customIconFgColor }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeSvg(customIconSvg?.trim?.() || '') }}
+                        />
+                      ) : (
+                        <DynamicIcon name={formData.icon} size={20} />
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-gray-900">{formData.name || 'Nom'}</div>

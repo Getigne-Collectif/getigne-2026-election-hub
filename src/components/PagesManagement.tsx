@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Routes } from '@/routes';
 
 interface Page {
   id: string;
@@ -210,7 +211,7 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
             {filteredPages.map((page) => (
               <TableRow key={page.id}>
                 <TableCell className="font-medium">
-                  <Link to={`/admin/pages/edit/${page.id}`}>
+                  <Link to={generatePath(Routes.ADMIN_PAGES_EDIT, { id: page.id })}>
                     {page.title}
                   </Link>
                 </TableCell>
@@ -240,7 +241,7 @@ const PagesManagement: React.FC<PagesManagementProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/admin/pages/edit/${page.id}`)}
+                      onClick={() => navigate(generatePath(Routes.ADMIN_PAGES_EDIT, { id: page.id }))}
                       title="Modifier"
                     >
                       <FileEdit className="h-4 w-4" />

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Upload, X, FileDown } from 'lucide-react';
 import { supabase, ProgramGeneral, asTable } from '@/integrations/supabase/client';
 import MarkdownEditor from '@/components/MarkdownEditor';
 
@@ -11,6 +11,9 @@ export default function GeneralPresentationEditor() {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [filePath, setFilePath] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,6 +32,8 @@ export default function GeneralPresentationEditor() {
 
         if (data) {
           setContent(data.content || '');
+          setFileUrl((data as any).file || null);
+          setFilePath((data as any).file_path || null);
         }
       } catch (error) {
         console.error('Error fetching presentation:', error);
@@ -65,6 +70,8 @@ export default function GeneralPresentationEditor() {
           .from('program_general')
           .update({ 
             content,
+            file: fileUrl,
+            file_path: filePath,
             updated_at: new Date().toISOString()
           })
           .eq('id', existingData[0].id);
@@ -76,6 +83,8 @@ export default function GeneralPresentationEditor() {
           .from('program_general')
           .insert({ 
             content,
+            file: fileUrl,
+            file_path: filePath,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
@@ -101,6 +110,37 @@ export default function GeneralPresentationEditor() {
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `program-${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('program_files')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: file.type || 'application/pdf',
+        });
+      if (error) throw error;
+      const { data: publicUrl } = supabase.storage.from('program_files').getPublicUrl(data.path);
+      setFileUrl(publicUrl.publicUrl);
+      setFilePath(data.path);
+      toast({ title: 'Fichier téléversé', description: 'Le PDF a été téléversé avec succès.' });
+    } catch (err: any) {
+      toast({ variant: 'destructive', title: 'Erreur', description: err.message || 'Échec du téléversement' });
+    } finally {
+      setIsUploading(false);
+      e.currentTarget.value = '';
+    }
+  };
+
+  const removeFile = () => {
+    setFileUrl(null);
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -124,7 +164,7 @@ export default function GeneralPresentationEditor() {
           Ce texte apparaîtra en haut de la page programme, avant les sections thématiques.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
           <div className="markdown-editor-container">
             <MarkdownEditor
@@ -142,6 +182,41 @@ export default function GeneralPresentationEditor() {
               participative avec les citoyens.
             </p>
           </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Fichier PDF du programme</p>
+              <p className="text-sm text-muted-foreground">Téléversez la version téléchargeable (PDF).</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <input id="program-pdf" type="file" accept="application/pdf" className="hidden" onChange={handleFileChange} />
+              <Button variant="outline" size="sm" onClick={() => document.getElementById('program-pdf')?.click()} disabled={isUploading}>
+                {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+                {isUploading ? 'Téléversement...' : 'Téléverser PDF'}
+              </Button>
+              {fileUrl && (
+                <Button variant="ghost" size="sm" asChild>
+                  <a href={fileUrl} target="_blank" rel="noopener noreferrer">
+                    <FileDown className="h-4 w-4 mr-2" /> Voir le PDF
+                  </a>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {fileUrl && (
+            <div className="flex items-center justify-between p-3 border rounded-md bg-muted/30">
+              <div className="flex items-center gap-2 text-sm">
+                <FileDown className="h-4 w-4" />
+                <span className="truncate max-w-[420px]">{fileUrl}</span>
+              </div>
+              <Button variant="ghost" size="icon" onClick={removeFile}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
         
         <div className="flex justify-end">

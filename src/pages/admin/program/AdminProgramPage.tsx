@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -36,6 +36,7 @@ import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/component
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GeneralPresentationEditor from '@/components/admin/program/GeneralPresentationEditor';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
+import { Routes } from '@/routes';
 
 export default function AdminProgramPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -87,7 +88,7 @@ export default function AdminProgramPage() {
 
       toast.success("Section du programme supprimée avec succès");
       refetch();
-    } catch (error: any) {
+    } catch (error) {
       toast.error(`Erreur lors de la suppression: ${error.message}`);
       console.error("Delete error:", error);
     } finally {
@@ -118,7 +119,7 @@ export default function AdminProgramPage() {
           
           {activeTab === "sections" && (
             <Button asChild>
-              <Link to="/admin/program/edit">
+              <Link to={'/admin/program/edit'}>
                 <Plus className="mr-2 h-4 w-4" />
                 Nouvelle Section
               </Link>
@@ -187,7 +188,7 @@ export default function AdminProgramPage() {
                               size="icon" 
                               asChild
                             >
-                              <Link to={`/admin/program/edit/${item.id}`}>
+                              <Link to={generatePath(Routes.ADMIN_PROGRAM_EDIT, { id: item.id })}>
                                 <Edit className="h-4 w-4" />
                                 <span className="sr-only">Modifier</span>
                               </Link>

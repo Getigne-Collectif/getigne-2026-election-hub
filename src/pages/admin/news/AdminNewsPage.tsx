@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { generatePath, Link, useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client.ts';
 import { Button } from '@/components/ui/button.tsx';
@@ -45,6 +45,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
+import { Routes } from '@/routes';
 
 interface NewsArticle {
   id: string;
@@ -491,7 +492,7 @@ const AdminNewsPage = () => {
                         </TableCell>
                         <TableCell className="font-medium">
                           <Link
-                            to={`/admin/news/edit/${article.id}`}
+                            to={generatePath(Routes.ADMIN_NEWS_EDIT, { id: article.id })}
                             className="hover:underline"
                           >
                             {article.title}
@@ -533,7 +534,7 @@ const AdminNewsPage = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem asChild>
-                                <Link to={`/admin/news/edit/${article.id}`}>
+                                <Link to={generatePath(Routes.ADMIN_NEWS_EDIT, { id: article.id })}>
                                   Modifier
                                 </Link>
                               </DropdownMenuItem>

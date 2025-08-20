@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, User, Shield, Newspaper, UserCog, Calendar, Users, Settings} from 'lucide-react';
+import {LogIn, LogOut, UserCog, Settings} from 'lucide-react';
 import { Routes } from '@/routes';
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/use-toast';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar, { getUserNames } from '@/components/UserAvatar';
 
 const AuthButton = () => {
   const { user, profile, signOut, isAdmin, isInvitedUser } = useAuth();
@@ -57,44 +57,13 @@ const AuthButton = () => {
     );
   }
 
-  // Déterminer le nom à afficher
-  let displayName = user.email || '';
-  let firstName = '';
-  let lastName = '';
-
-  if (profile) {
-    // Utiliser les données du profil si disponibles
-    firstName = profile.first_name || '';
-    lastName = profile.last_name || '';
-    displayName = firstName || displayName;
-  } else if (user.user_metadata) {
-    // Fallback sur les métadonnées utilisateur
-    firstName = user.user_metadata.first_name || '';
-    lastName = user.user_metadata.last_name || '';
-    if (firstName) {
-      displayName = firstName;
-    }
-  }
-
-  // Obtenir les initiales pour l'avatar
-  const getInitials = () => {
-    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
-    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
-    return firstInitial + lastInitial || displayName.charAt(0).toUpperCase();
-  };
+  const { firstName, lastName, displayName } = getUserNames(user, profile);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-2">
-          {profile?.avatar_url ? (
-            <Avatar className="h-6 w-6">
-              <AvatarImage src={profile.avatar_url} alt={displayName} />
-              <AvatarFallback>{getInitials()}</AvatarFallback>
-            </Avatar>
-          ) : (
-            <User className="h-4 w-4" />
-          )}
+          <UserAvatar user={user} profile={profile} size="sm" />
           <span className="hidden sm:inline">
             {displayName}
           </span>

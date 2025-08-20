@@ -78,8 +78,8 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
       <CardContent className="p-4">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
-            {icon && <DynamicIcon name={icon} size={20} className="text-getigne-600" />}
-            <h3 className="text-lg font-semibold text-getigne-800">{point.title}</h3>
+            <h3 className="text-lg font-semibold text-getigne-800 cursor-pointer" 
+              onClick={() => setShowContent(!showContent)}>{point.title}</h3>
           </div>
           <div className="flex items-center gap-3">
             {/* Show counts */}
@@ -102,8 +102,12 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
           </div>
         </div>
         
-        {showContent && (
-          <>
+        <div
+          className={`grid transition-all duration-300 ease-in-out ${
+            showContent ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="overflow-hidden">
             <div className="prose max-w-none rich-content mb-4">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {point.content || "Contenu en cours d'élaboration"}
@@ -133,7 +137,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                 </div>
               </div>
             )}
-            
+
             <div className="flex justify-between items-center mt-4">
               <ProgramLikeButton 
                 programId={programItemId}
@@ -141,15 +145,17 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
               />
             </div>
 
-            {/* Display comments directly when content is expanded */}
-            <div className="mt-4 pt-4 border-t border-getigne-100">
-              <Comments 
-                programItemId={programItemId} 
-                programPointId={point.id}
-              />
-            </div>
-          </>
-        )}
+            {/* Commentaires affichés seulement en mode ouvert pour limiter le coût */}
+            {showContent && (
+              <div className="mt-4 pt-4 border-t border-getigne-100">
+                <Comments 
+                  programItemId={programItemId} 
+                  programPointId={point.id}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

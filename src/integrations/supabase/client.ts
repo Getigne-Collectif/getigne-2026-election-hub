@@ -49,6 +49,8 @@ export type CommitteeWork = {
 export interface ProgramGeneral {
   id: string;
   content: string;
+  file?: string | null;
+  file_path?: string | null;
   created_at: string;
   updated_at: string;
 }
