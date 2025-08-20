@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/context/auth";
 import { Routes as AppRoutes } from "./routes";
+import { SpeedInsights } from "@vercel/speed-insights/react"
+import { Analytics } from "@vercel/analytics/react"
 import Index from "./pages/Index";
 
 // Lazy load admin pages for better performance
@@ -59,6 +61,8 @@ function App() {
       <HelmetProvider>
         <TooltipProvider>
           <AuthProvider>
+            <SpeedInsights />
+            <Analytics />
             <Toaster />
             <Sonner />
             <BrowserRouter>
