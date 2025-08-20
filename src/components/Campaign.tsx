@@ -8,6 +8,7 @@ import { Routes } from '@/routes';
 const Campaign = () => {
   const { settings } = useAppSettings();
   const { isAdmin, userRoles } = useAuth();
+  const HELLOASSO_JOIN_URL = import.meta.env.VITE_HELLOASSO_JOIN_URL as string;
   
   // Détermine si l'utilisateur peut accéder au programme
   const canAccessProgram = 
@@ -79,7 +80,7 @@ const Campaign = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-getigne-900/50 to-transparent pointer-events-none"></div>
               <div className="absolute bottom-6 left-6 right-6">
-                <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noopener noreferrer">
+                <a href={HELLOASSO_JOIN_URL} target="_blank" rel="noopener noreferrer">
                   <div className="bg-white/90 backdrop-blur-sm p-4 rounded-lg inline-block font-medium text-getigne-900">
                     Faites partie de l'aventure collective !
                   </div>
@@ -98,7 +99,7 @@ const Campaign = () => {
               Adhérez ou faites un don pour financer la campagne.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noopener noreferrer">Adhérer ou faire un don</a>
+              <a href={HELLOASSO_JOIN_URL} target="_blank" rel="noopener noreferrer">Adhérer ou faire un don</a>
             </Button>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">

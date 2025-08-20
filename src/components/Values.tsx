@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const Values = () => {
+  const HELLOASSO_JOIN_URL = import.meta.env.VITE_HELLOASSO_JOIN_URL as string;
   return (
     <section className="relative py-16 md:py-24 px-4 bg-getigne-50">
       <div className="container mx-auto">
@@ -102,7 +103,7 @@ const Values = () => {
                     size="lg"
                     className="bg-getigne-accent hover:bg-getigne-accent/90 text-white"
                   >
-                    <a href="https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025" target="_blank" rel="noopener noreferrer">
+                    <a href={HELLOASSO_JOIN_URL} target="_blank" rel="noopener noreferrer">
                     Adhérer
                     </a>
                   </Button>

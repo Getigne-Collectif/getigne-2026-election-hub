@@ -27,3 +27,5 @@ supabase/.temp/
 
 .yarn/
 .qodo
+
+.env

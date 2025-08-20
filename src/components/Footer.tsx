@@ -12,6 +12,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +58,7 @@ const Footer = () => {
               <a href="#" aria-label="Facebook">
                 <FacebookIcon />
               </a>
-              <a href="https://discord.gg/ePHjxJssex" className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+              <a href={DISCORD_INVITE_URL} className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
                 <DiscordLogoIcon />
               </a>
             </div>

@@ -24,6 +24,7 @@ export async function downloadFileFromUrl(url: string, fileName?: string): Promi
 
 export async function downloadFromSupabasePath(bucket: string, path: string, fileName?: string): Promise<void> {
   // Use the public URL approach if bucket is public; else use signed URL fetch
-  const publicUrl = `https://jqpivqdwblrccjzicnxn.supabase.co/storage/v1/object/public/${bucket}/${path}`;
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+  const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
   return downloadFileFromUrl(publicUrl, fileName);
 }

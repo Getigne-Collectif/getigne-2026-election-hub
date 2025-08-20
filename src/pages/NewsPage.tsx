@@ -219,7 +219,7 @@ const NewsPage = () => {
   };
 
   const handleDownloadRSS = () => {
-    const baseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://jqpivqdwblrccjzicnxn.supabase.co';
+    const baseUrl = import.meta.env.VITE_SUPABASE_URL as string;
     window.open(`${baseUrl}/functions/v1/rss-feed`, '_blank');
   };
 
@@ -272,19 +272,19 @@ const NewsPage = () => {
     });
 
     // Si un paramètre n'est pas dans params, conserver sa valeur actuelle
-    if (!params.hasOwnProperty('category') && selectedCategory !== 'all') {
+    if (!Object.prototype.hasOwnProperty.call(params, 'category') && selectedCategory !== 'all') {
       queryParams.set('category', selectedCategory);
     }
 
-    if (!params.hasOwnProperty('tags') && selectedTags.length > 0) {
+    if (!Object.prototype.hasOwnProperty.call(params, 'tags') && selectedTags.length > 0) {
       queryParams.set('tags', selectedTags.join(','));
     }
 
-    if (!params.hasOwnProperty('search') && searchTerm) {
+    if (!Object.prototype.hasOwnProperty.call(params, 'search') && searchTerm) {
       queryParams.set('search', searchTerm);
     }
 
-    if (!params.hasOwnProperty('page') && currentPage > 1) {
+    if (!Object.prototype.hasOwnProperty.call(params, 'page') && currentPage > 1) {
       queryParams.set('page', currentPage.toString());
     }
 
@@ -314,7 +314,7 @@ const NewsPage = () => {
 
     // Déterminer quelles pages afficher
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
     // Ajuster si on est proche de la fin
     if (endPage - startPage < maxVisiblePages - 1) {

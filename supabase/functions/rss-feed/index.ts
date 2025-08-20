@@ -15,7 +15,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    const websiteUrl = Deno.env.get("VITE_WEBSITE_URL") || "";
+    const websiteUrl = Deno.env.get("WEBSITE_URL") || "";
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const supabase = createClient(supabaseUrl, supabaseServiceRole);

@@ -72,6 +72,7 @@ const JoinPage = () => {
     }, 1000);
   };
 
+  const HELLOASSO_JOIN_URL = import.meta.env.VITE_HELLOASSO_JOIN_URL as string;
   return (
     <HelmetProvider>
       <Helmet>
@@ -198,7 +199,7 @@ const JoinPage = () => {
                         <Button
                           size="lg"
                           className="bg-getigne-accent hover:bg-getigne-accent/90 text-white"
-                          onClick={() => window.open('https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025', '_blank')}
+                          onClick={() => window.open(HELLOASSO_JOIN_URL, '_blank')}
                         >
                           Adhérer en ligne
                         </Button>
@@ -206,7 +207,7 @@ const JoinPage = () => {
                           variant="outline"
                           size="lg"
                           className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5"
-                          onClick={() => window.open('https://www.helloasso.com/associations/getigne-collectif/adhesions/adhesion-2025', '_blank')}
+                          onClick={() => window.open(HELLOASSO_JOIN_URL, '_blank')}
                         >
                           Faire un don
                         </Button>
