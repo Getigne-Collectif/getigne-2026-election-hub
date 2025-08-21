@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase, Committee } from '@/integrations/supabase/client';
@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Home } from 'lucide-react';
 import {toast} from "sonner";
-import { getColorTheme } from '@/components/CitizenCommittees';
+import CitizenCommittees, { getColorTheme } from '@/components/CitizenCommittees';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useAuth } from '@/context/AuthContext';
 
@@ -62,12 +62,12 @@ const getIconComponent = (iconName: string) => {
 };
 
 const CommitteePage = () => {
-  const { id } = useParams();
-  const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'>>(undefined);
+  const { id } = useParams<{ id: string }>();
+  const [selectedWork, setSelectedWork] = useState<Tables<'committee_works'> | null>(null);
   const [teamPhotoUrl, setTeamPhotoUrl] = useState<string | null>(null);
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [otherCommittees, setOtherCommittees] = useState<any[]>([]);
+  const [otherCommittees, setOtherCommittees] = useState<Committee[]>([]);
   const [currentCommitteeIndex, setCurrentCommitteeIndex] = useState<number>(-1);
   const [isCommitteeMember, setIsCommitteeMember] = useState(false);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('view');
@@ -121,10 +121,11 @@ const CommitteePage = () => {
 
       return data as Member[];
     },
+    enabled: Boolean(id),
   });
 
   // Fetch committee works
-  const fetchCommitteeWorks = async () => {
+  const fetchCommitteeWorks = useCallback(async () => {
     if (!id) return;
 
     try {
@@ -140,7 +141,7 @@ const CommitteePage = () => {
       console.error('Erreur lors du chargement des comptes-rendus:', error);
       toast.error("Impossible de charger les comptes-rendus");
     }
-  };
+  }, [id]);
 
   const committeeQuery = useQuery({
     queryKey: ['committee', id],
@@ -156,6 +157,7 @@ const CommitteePage = () => {
 
       return data as Committee[];
     },
+    enabled: Boolean(id),
   });
 
   const allCommitteesQuery = useQuery({
@@ -215,7 +217,9 @@ const CommitteePage = () => {
       }
     };
 
-    if (!isLoading && committeeQuery.data) {
+    if (!id) {
+      setLoading(false);
+    } else if (!isLoading && committeeQuery.data) {
       fetchCommitteeImages();
     }
   }, [id, committeeQuery.data, isLoading]);
@@ -235,7 +239,7 @@ const CommitteePage = () => {
     if (committee) {
       fetchCommitteeWorks();
     }
-  }, [committee, id]);
+  }, [committee, fetchCommitteeWorks]);
 
   const getPrevCommittee = () => {
     if (currentCommitteeIndex <= 0 || otherCommittees.length === 0) return null;
@@ -249,6 +253,22 @@ const CommitteePage = () => {
 
   const prevCommittee = getPrevCommittee();
   const nextCommittee = getNextCommittee();
+
+  // Si aucune id n'est fournie, on affiche la liste des commissions
+  if (!id) {
+    return (
+      <>
+        <Navbar />
+        <div className="container py-8 mt-20 space-y-8">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold">Commissions citoyennes</h1>
+          </div>
+          <CitizenCommittees />
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   if (loading || isLoading) {
     return (
@@ -339,7 +359,7 @@ const CommitteePage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href={Routes.OBJECTIF_2026}>Objectif 2026</BreadcrumbLink>
+                <BreadcrumbLink href={Routes.COMMITTEES}>Commissions</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -511,7 +531,7 @@ const CommitteePage = () => {
             <div className="w-full md:w-auto">
               {prevCommittee ? (
                 <Link
-                  to={generateRoutes.objectif2026CommissionDetail(prevCommittee.id)}
+                  to={generateRoutes.committeeDetail(prevCommittee.id)}
                   className={`flex items-center hover:underline ${themeColor.text}`}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -528,7 +548,7 @@ const CommitteePage = () => {
             <div className="w-full md:w-auto text-right">
               {nextCommittee ? (
                 <Link
-                  to={generateRoutes.objectif2026CommissionDetail(nextCommittee.id)}
+                  to={generateRoutes.committeeDetail(nextCommittee.id)}
                   className={`flex items-center justify-end hover:underline ${themeColor.text}`}
                 >
                   <span>Commission {nextCommittee.title}</span>
@@ -547,8 +567,8 @@ const CommitteePage = () => {
         <CommitteeWorkModal
           committeeId={id!}
           work={selectedWork}
-          open={selectedWork !== undefined}
-          onOpenChange={(open) => !open && setSelectedWork(undefined)}
+          open={selectedWork !== null}
+          onOpenChange={(open) => !open && setSelectedWork(null)}
           onSuccess={fetchCommitteeWorks}
           mode={mode}
         />

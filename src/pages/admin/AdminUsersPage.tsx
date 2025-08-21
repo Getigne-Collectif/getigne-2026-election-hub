@@ -288,12 +288,7 @@ const AdminUsersPage = () => {
           />
         </Helmet>
 
-        <AdminLayout title="Utilisateurs" description="Gérez les utilisateurs et leurs rôles." breadcrumb={<>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Utilisateurs</BreadcrumbPage>
-          </BreadcrumbItem>
-        </>}>
+        <AdminLayout title="Utilisateurs" description="Gérez les utilisateurs et leurs rôles.">
 
           <section className="py-16">
           <div className="container mx-auto px-4">

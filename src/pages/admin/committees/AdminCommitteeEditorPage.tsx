@@ -59,20 +59,6 @@ export default function AdminCommitteeEditorPage() {
 
   return (
     <AdminLayout
-      breadcrumb={
-        <>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/committees">Commissions</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink>
-              {isEditMode ? 'Modifier' : 'Créer'}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </>
-      }
       title={isEditMode ? "Modifier la commission" : "Créer une commission"}
       description={isEditMode 
         ? "Modifiez les détails de la commission et gérez ses membres"

@@ -140,14 +140,6 @@ export default function AdminProjectsPage() {
 
   return (
     <AdminLayout
-      breadcrumb={
-        <>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/projects">Projets</BreadcrumbLink>
-          </BreadcrumbItem>
-        </>
-      }
       title="Gestion des projets"
       description="Créez et gérez les projets affichés sur le site"
     >

@@ -399,26 +399,13 @@ const AdminEventEditorPage = () => {
     );
   }
   
-  const breadcrumb = <>
-    <BreadcrumbSeparator />
-    <BreadcrumbItem>
-      <Link to="/admin/events">
-        <BreadcrumbPage>Agenda</BreadcrumbPage>
-      </Link>
-    </BreadcrumbItem>
-    <BreadcrumbSeparator />
-    <BreadcrumbItem>
-      <BreadcrumbPage>{isEditMode ? "Modifier l'événement" : "Nouvel événement"}</BreadcrumbPage>
-    </BreadcrumbItem>
-  </>
-
   return (
       <HelmetProvider>
         <Helmet>
           <title>{isEditMode ? "Modifier l'article" : "Créer un article"} | Admin | Gétigné Collectif</title>
         </Helmet>
 
-        <AdminLayout breadcrumb={breadcrumb} backLink={<div className="flex items-center gap-4 my-4">
+        <AdminLayout backLink={<div className="flex items-center gap-4 my-4">
           <Button
               variant="outline"
               size="sm"

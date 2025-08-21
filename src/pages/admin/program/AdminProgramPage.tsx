@@ -101,14 +101,6 @@ export default function AdminProgramPage() {
     <AdminLayout
       title="Gestion du Programme"
       description="Créez et gérez le contenu du programme politique"
-      breadcrumb={
-        <>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink>Programme</BreadcrumbLink>
-          </BreadcrumbItem>
-        </>
-      }
     >
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex justify-between items-center mb-6">

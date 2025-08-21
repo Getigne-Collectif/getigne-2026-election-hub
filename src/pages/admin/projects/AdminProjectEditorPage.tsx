@@ -243,18 +243,6 @@ export default function AdminProjectEditorPage() {
   
   return (
     <AdminLayout
-      breadcrumb={
-        <>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/projects">Projets</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink>{isEditing ? 'Modifier' : 'Nouveau'}</BreadcrumbLink>
-          </BreadcrumbItem>
-        </>
-      }
       backLink={
         <Button variant="outline" size="sm" className="mb-6" asChild>
           <Link to="/admin/projects">

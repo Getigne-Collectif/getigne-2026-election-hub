@@ -150,12 +150,7 @@ const AdminEventsPage = () => {
           <title>Gestion de l'agenda | Admin</title>
         </Helmet>
 
-        <AdminLayout title="Gestion de l'agenda" description="Organisez les événements de Gétigné Collectif." breadcrumb={<>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Agenda</BreadcrumbPage>
-          </BreadcrumbItem>
-        </>}>
+        <AdminLayout title="Gestion de l'agenda" description="Organisez les événements de Gétigné Collectif.">
 
           <section className="py-16">
             <div className="container mx-auto px-4">

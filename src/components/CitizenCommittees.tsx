@@ -2,11 +2,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Bike, Utensils, Music, Leaf, Users as UsersIcon } from 'lucide-react';
 import { getMemberCount } from './CommitteeMembers';
-import { generateRoutes } from '@/routes';
+import { generateRoutes, Routes } from '@/routes';
 
 // Map pour les icônes
 const iconMap = {
@@ -182,7 +182,7 @@ const CommitteeItem = ({ committee, index }) => {
   }, [committee.id]);
 
   return (
-    <Link to={generateRoutes.objectif2026CommissionDetail(committee.id)} className="block">
+    <Link to={generatePath(Routes.COMMITTEE_DETAIL, { id: committee.id })} className="block">
       <div
         ref={ref}
         className={`bg-white shadow-sm border ${themeColor.border} rounded-xl p-6 hover-lift transition-all duration-200 ${

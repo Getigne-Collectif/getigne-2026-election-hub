@@ -58,7 +58,7 @@ serve(async (req) => {
       if (url) {
         contextUrl = url;
       } else if (isCommittee && committeeId) {
-        contextUrl = `${PUBLIC_URL}/commissions/${committeeId}`;
+        contextUrl = `${PUBLIC_URL}/comites/${committeeId}`;
       } else {
         contextUrl = `${PUBLIC_URL}/contact`;
       }

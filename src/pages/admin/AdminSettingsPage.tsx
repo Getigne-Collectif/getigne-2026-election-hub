@@ -67,12 +67,7 @@ const AdminSettingsPage = () => {
         />
       </Helmet>
 
-        <AdminLayout title="Paramètrage du site" description="Gérez les paramètres généraux du site Gétigné Collectif." breadcrumb={<>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Paramètres</BreadcrumbPage>
-          </BreadcrumbItem>
-        </>}>
+        <AdminLayout title="Paramètrage du site" description="Gérez les paramètres généraux du site Gétigné Collectif.">
 
 
 

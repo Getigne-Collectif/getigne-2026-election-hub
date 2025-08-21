@@ -350,12 +350,7 @@ const AdminNewsPage = () => {
         <title>Gestion des actualités | Admin</title>
       </Helmet>
 
-      <AdminLayout title="Gestion des actualités" description="Tenez au courant les citoyens et sympathisans de Gétigné Collectif." breadcrumb={<>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Actualités</BreadcrumbPage>
-          </BreadcrumbItem>
-      </>}>
+      <AdminLayout title="Gestion des actualités" description="Tenez au courant les citoyens et sympathisans de Gétigné Collectif.">
         <div className="py-8">
           <div className="flex justify-between items-center mb-6">
             <Tabs defaultValue="all" className="mb-6" onValueChange={setActiveTab}>

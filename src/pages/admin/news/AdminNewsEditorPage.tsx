@@ -489,18 +489,6 @@ const AdminNewsEditorPage = () => {
       setIsSubmitting(false);
     }
   };
-  const breadcrumb = <>
-    <BreadcrumbSeparator />
-    <BreadcrumbItem>
-      <Link to="/admin/news">
-        <BreadcrumbPage>Actualités</BreadcrumbPage>
-      </Link>
-    </BreadcrumbItem>
-    <BreadcrumbSeparator />
-    <BreadcrumbItem>
-      <BreadcrumbPage>{isEditMode ? "Modifier l'article" : "Nouvel article"}</BreadcrumbPage>
-    </BreadcrumbItem>
-  </>
 
   return (
       <HelmetProvider>
@@ -508,7 +496,7 @@ const AdminNewsEditorPage = () => {
           <title>{isEditMode ? "Modifier l'article" : "Créer un article"} | Admin | Gétigné Collectif</title>
         </Helmet>
 
-        <AdminLayout breadcrumb={breadcrumb} backLink={<div className="flex items-center gap-4 my-4">
+        <AdminLayout backLink={<div className="flex items-center gap-4 my-4">
           <Button
               variant="outline"
               size="sm"

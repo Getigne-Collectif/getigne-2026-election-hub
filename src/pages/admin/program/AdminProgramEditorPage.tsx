@@ -167,7 +167,7 @@ export default function AdminProgramEditorPage() {
       toast.success(isEditing ? "Section du programme mise à jour" : "Section du programme créée");
       navigate('/admin/program');
       
-    } catch (error: any) {
+    } catch (error) {
       toast.error(`Erreur: ${error.message}`);
     } finally {
       setIsSubmitting(false);
@@ -188,18 +188,6 @@ export default function AdminProgramEditorPage() {
 
   return (
     <AdminLayout
-      breadcrumb={
-        <>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/program">Programme</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink>{isEditing ? 'Modifier' : 'Ajouter'}</BreadcrumbLink>
-          </BreadcrumbItem>
-        </>
-      }
       backLink={
         <Button variant="outline" size="sm" className="mb-6" asChild>
           <Link to="/admin/program">

@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import { Plus, ChevronRight, Edit, Trash2, Search, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,6 +28,7 @@ import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/component
 import CommitteeMembers, { getMemberCount } from '@/components/CommitteeMembers';
 import { Badge } from '@/components/ui/badge';
 import { getColorTheme } from '@/components/CitizenCommittees';
+import { Routes } from '@/routes';
 
 // Type pour les commissions
 type Committee = {
@@ -113,14 +114,6 @@ export default function AdminCommitteesPage() {
 
   return (
     <AdminLayout
-      breadcrumb={
-        <>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/committees">Commissions</BreadcrumbLink>
-          </BreadcrumbItem>
-        </>
-      }
       title="Gestion des commissions"
       description="Créez et gérez les commissions citoyennes et leurs membres"
     >
@@ -197,7 +190,7 @@ export default function AdminCommitteesPage() {
                         <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex justify-end items-center gap-2">
                             <Button variant="outline" size="icon" asChild>
-                              <Link to={`/admin/committees/edit/${committee.id}`}>
+                              <Link to={generatePath(Routes.ADMIN_COMMITTEES_EDIT, { id: committee.id })}>
                                 <Edit className="h-4 w-4" />
                               </Link>
                             </Button>

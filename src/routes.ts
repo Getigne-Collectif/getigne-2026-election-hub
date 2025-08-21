@@ -65,7 +65,6 @@ export const generateRoutes = {
   newsDetail: (slug: string) => `/news/${slug}`,
   eventDetail: (slug: string) => `/events/${slug}`,
   committeeDetail: (id: string) => `/comites/${id}`,
-  objectif2026CommissionDetail: (id: string) => `/objectif-2026/commission/${id}`,
   adminNewsEdit: (id: string) => `/admin/news/${id}/edit`,
   adminEventsEdit: (id: string) => `/admin/events/${id}/edit`,
   adminPagesEdit: (id: string) => `/admin/pages/${id}/edit`,

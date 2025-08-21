@@ -157,12 +157,7 @@ const AdminPagesPage = () => {
         <title>Gestion des pages | Admin</title>
       </Helmet>
 
-      <AdminLayout title={"Gestion des pages" } description={"Créez, modifiez et supprimer les pages du site."} breadcrumb={<>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Pages</BreadcrumbPage>
-        </BreadcrumbItem>
-      </>}>
+      <AdminLayout title={"Gestion des pages" } description={"Créez, modifiez et supprimer les pages du site."}>
         <div className="py-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Gestion des pages</h1>
