@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Loader2, Plus } from 'lucide-react';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
-import { ProgramPoint } from '@/types/program.types';
+import { ProgramPoint, ProgramPointStatus } from '@/types/program.types';
+import { StatusBadge } from '@/components/ui/status-badge';
 import PointList from './PointList';
 import AddPointDialog from './AddPointDialog';
 import EditPointDialog from './EditPointDialog';
@@ -31,10 +32,11 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
         throw error;
       }
       
-      // Convert the files from Json to string[] if needed
+      // Convert the files from Json to string[] if needed and ensure status exists
       const transformedData = data?.map(point => ({
         ...point,
-        files: Array.isArray(point.files) ? point.files : []
+        files: Array.isArray(point.files) ? point.files : [],
+        status: point.status || 'draft'
       })) as ProgramPoint[];
       
       setPoints(transformedData || []);
@@ -65,6 +67,36 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
     } catch (error: any) {
       toast.error(`Erreur: ${error.message}`);
       console.error("Delete error:", error);
+    }
+  };
+
+  const handleStatusChange = async (pointId: string, newStatus: ProgramPointStatus) => {
+    try {
+      const { error } = await supabase
+        .from('program_points')
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', pointId);
+        
+      if (error) throw error;
+      
+      // Mettre à jour l'état local immédiatement pour un feedback instantané
+      setPoints(prevPoints => 
+        prevPoints.map(point => 
+          point.id === pointId 
+            ? { ...point, status: newStatus }
+            : point
+        )
+      );
+      
+      toast.success(`Statut mis à jour vers "${newStatus === 'draft' ? 'Brouillon' : newStatus === 'pending' ? 'À valider' : 'Validé'}"`);
+    } catch (error: any) {
+      toast.error(`Erreur lors de la mise à jour du statut: ${error.message}`);
+      console.error("Status change error:", error);
+      // En cas d'erreur, rafraîchir depuis la base
+      refetch();
     }
   };
 
@@ -117,6 +149,12 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
     return points.find(point => point.id === currentPointId) || null;
   };
 
+  // Calculer les statistiques des statuts
+  const statusStats = points.reduce((acc, point) => {
+    acc[point.status] = (acc[point.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -126,6 +164,33 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
           Ajouter un point
         </Button>
       </div>
+
+      {/* Résumé des statuts */}
+      {points.length > 0 && (
+        <div className="flex gap-2 text-sm">
+          <span className="text-muted-foreground">Statuts :</span>
+          <div className="flex gap-2">
+            {statusStats.draft && (
+              <div className="flex items-center gap-1">
+                <StatusBadge status="draft" className="text-xs" disabled />
+                <span className="text-muted-foreground">({statusStats.draft})</span>
+              </div>
+            )}
+            {statusStats.pending && (
+              <div className="flex items-center gap-1">
+                <StatusBadge status="pending" className="text-xs" disabled />
+                <span className="text-muted-foreground">({statusStats.pending})</span>
+              </div>
+            )}
+            {statusStats.validated && (
+              <div className="flex items-center gap-1">
+                <StatusBadge status="validated" className="text-xs" disabled />
+                <span className="text-muted-foreground">({statusStats.validated})</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {points.length === 0 ? (
         <div className="text-center py-8 bg-muted/20 rounded-lg">
@@ -140,6 +205,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
             points={points} 
             onEdit={handleEditClick} 
             onDelete={handleDeletePoint} 
+            onStatusChange={handleStatusChange}
             isReordering={isReordering}
           />
         </DragDropContext>

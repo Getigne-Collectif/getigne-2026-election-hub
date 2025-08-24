@@ -55,6 +55,7 @@ export default function AddPointDialog({
           content: values.content,
           files: fileUrls,
           position: nextPosition,
+          status: 'draft',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }]);

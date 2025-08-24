@@ -203,7 +203,7 @@ export default function AdminProgramEditorPage() {
           direction="horizontal" 
           className="min-h-[600px] rounded-lg border"
         >
-          <ResizablePanel defaultSize={65} minSize={40}>
+          <ResizablePanel defaultSize={35} minSize={25}>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
                 <div className="space-y-6">
@@ -359,7 +359,7 @@ export default function AdminProgramEditorPage() {
           
           <ResizableHandle withHandle className="bg-getigne-100" />
           
-          <ResizablePanel defaultSize={35} minSize={30}>
+          <ResizablePanel defaultSize={65} minSize={45}>
             <div className="p-6 h-full overflow-auto">
               <Card className="h-full">
                 <CardHeader>

@@ -10,6 +10,7 @@ import { Routes as AppRoutes } from "./routes";
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { Analytics } from "@vercel/analytics/react"
 import Index from "./pages/Index";
+import LoadingSpinner from "@/components/ui/loading";
 
 // Lazy load admin pages for better performance
 const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage"));
@@ -65,7 +66,7 @@ function App() {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
                   <Route path={AppRoutes.HOME} element={<Index />} />
                   <Route path={AppRoutes.NEWS} element={<NewsPage />} />

@@ -75,7 +75,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to={Routes.PROGRAM} className="text-getigne-100 hover:text-white transition-colors">
-                  Objectif 2026
+                  Élections 2026
                 </Link>
               </li>
               <li>

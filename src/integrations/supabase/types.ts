@@ -821,6 +821,7 @@ export type Database = {
           icon: string
           id: string
           image: string | null
+          position: number
           title: string
           updated_at: string
         }
@@ -831,6 +832,7 @@ export type Database = {
           icon: string
           id?: string
           image?: string | null
+          position?: number
           title: string
           updated_at?: string
         }
@@ -841,6 +843,7 @@ export type Database = {
           icon?: string
           id?: string
           image?: string | null
+          position?: number
           title?: string
           updated_at?: string
         }
@@ -900,6 +903,7 @@ export type Database = {
           id: string
           position: number
           program_item_id: string
+          status: string
           title: string
           updated_at: string
         }
@@ -910,6 +914,7 @@ export type Database = {
           id?: string
           position: number
           program_item_id: string
+          status?: string
           title?: string
           updated_at?: string
         }
@@ -920,6 +925,7 @@ export type Database = {
           id?: string
           position?: number
           program_item_id?: string
+          status?: string
           title?: string
           updated_at?: string
         }

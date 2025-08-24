@@ -1,17 +1,19 @@
 import { Droppable, Draggable } from '@hello-pangea/dnd';
-import { ProgramPoint } from '@/types/program.types';
+import { ProgramPoint, ProgramPointStatus } from '@/types/program.types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Pencil, Trash2 } from 'lucide-react';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 interface PointListProps {
   points: ProgramPoint[];
   onEdit: (point: ProgramPoint) => void;
   onDelete: (pointId: string) => void;
+  onStatusChange: (pointId: string, newStatus: ProgramPointStatus) => void;
   isReordering: boolean;
 }
 
-export default function PointList({ points, onEdit, onDelete, isReordering }: PointListProps) {
+export default function PointList({ points, onEdit, onDelete, onStatusChange, isReordering }: PointListProps) {
   return (
     <Droppable droppableId="program-points">
       {(provided) => (
@@ -43,7 +45,14 @@ export default function PointList({ points, onEdit, onDelete, isReordering }: Po
                         <GripVertical className="h-6 w-6" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-getigne-800 mb-2">{point.title}</h4>
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-medium text-getigne-800">{point.title}</h4>
+                          <StatusBadge 
+                            status={point.status} 
+                            onStatusChange={(newStatus) => onStatusChange(point.id, newStatus)}
+                            className="ml-2"
+                          />
+                        </div>
                         <div 
                           className="prose prose-sm max-w-none text-muted-foreground line-clamp-2" 
                         >

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown } from 'lucide-react';
+import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar } from 'lucide-react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -21,10 +21,61 @@ import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
 import CtaBanner from '@/components/ui/cta-banner';
 import type { Tables } from '@/integrations/supabase/types';
 import type { ProgramPoint } from '@/types/program.types';
+import ProgramAlertForm from '@/components/program/ProgramAlertForm';
+import ProgramTimeline from '@/components/program/ProgramTimeline';
+import { Routes } from '@/routes';
+import { DiscordLogoIcon } from '@radix-ui/react-icons';
 
 type ProgramItemWithPoints = Tables<'program_items'> & {
   program_points: Tables<'program_points'>[];
 };
+
+const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
+
+const steps = [
+  {
+    id: 'commissions',
+    title: 'Travaux des commissions',
+    description: '5 commissions thématiques, 20+ personnes, 1+ an de travail',
+    period: 'Mai 2024 - Mai 2025',
+    status: 'completed' as const,
+    details: [
+      'Commission Environnement & Transition écologique',
+      'Commission Social & Solidarité',
+      'Commission Économie & Emploi',
+      'Commission Démocratie participative',
+      'Commission Aménagement & Urbanisme'
+    ]
+  },
+  {
+    id: 'synthese',
+    title: 'Synthèse et cohérence',
+    description: 'Analyse et harmonisation des propositions',
+    period: 'Printemps / Été 2025',
+    status: 'completed' as const,
+    details: [
+      'Analyse des propositions des commissions',
+      'Harmonisation et cohérence globale',
+      'Validation des orientations politiques',
+      'Rédaction de la première version du programme',
+      'Création du site web et des contenus de communication'
+    ]
+  },
+  {
+    id: 'publication-evolution',
+    title: 'Campagne',
+    description: 'Présentation et enrichissement continu',
+    period: 'Septembre 2025 - Mars 2026',
+    status: 'current' as const,
+    details: [
+      'Programme complet publié',
+      'Réunions de présentation publiques',
+      'Amendements lors des événements de démocratie participative',
+      'Enrichissement fréquents',
+      'Programme vivant et adaptatif jusqu\'aux élections'
+    ]
+  }
+]
 
 const ProgramPage = () => {
   const { user, isAdmin, userRoles } = useAuth();
@@ -76,10 +127,12 @@ const ProgramPage = () => {
             content,
             position,
             files,
-            program_item_id
+            program_item_id,
+            status
           )
         `)
-        .order('created_at');
+        .order('position', { ascending: true })
+        .order('title', { ascending: true });
 
       if (error) throw error;
 
@@ -87,6 +140,7 @@ const ProgramPage = () => {
         ...item,
         program_points:
           ((item as unknown as { program_points?: Tables<'program_points'>[] | null }).program_points
+            ?.filter(point => point.status === 'validated')
             ?.sort((a, b) => a.position - b.position)) || [],
       }));
     },
@@ -145,37 +199,83 @@ const ProgramPage = () => {
           
           <div className="pt-20 pb-16">
             <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto text-center">
-                <div className="bg-white rounded-lg shadow-lg p-8">
-                  <div className="mb-6">
-                    <Target className="w-16 h-16 mx-auto text-getigne-accent mb-4" />
-                    <h1 className="text-3xl font-bold text-getigne-900 mb-4">
-                      Programme Objectif 2026
-                    </h1>
-                    <p className="text-lg text-gray-600">
-                      Le programme de Gétigné Collectif est en cours de finalisation et sera bientôt disponible.
+              <div className="max-w-5xl mx-auto">
+                {/* En-tête principal avec illustration */}
+                <div className="text-center mb-12">
+                  <div className="inline-flex items-center justify-center w-24 h-24 bg-getigne-accent/10 rounded-full mb-6">
+                    <Clock className="w-12 h-12 text-getigne-accent" />
+                  </div>
+                  <h1 className="text-4xl md:text-5xl font-bold text-getigne-900 mb-4">
+                    Tic... Tac...
+                  </h1>
+                  <p className="text-xl text-getigne-700 max-w-4xl mx-auto leading-relaxed mb-6">
+                    L'équipe programme finalise actuellement la synthèse des travaux de nos 5 commissions thématiques, 
+                    composées d'une vingtaine de personnes qui travaillent depuis plus d'un an sur des propositions concrètes 
+                    pour l'avenir de Gétigné.
+                  </p>
+                  
+                  {/* Aperçu du timing */}
+                  <div className="inline-flex items-center gap-4 bg-getigne-accent/10 text-getigne-700 px-6 py-3 rounded-full text-sm font-medium">
+                    <span>📅 Mai 2024 - Mai 2025 : Travaux des commissions</span>
+                    <span>•</span>
+                    <span>📝 Printemps/Été 2025 : Synthèse</span>
+                    <span>•</span>
+                    <span>🚀 Sept. 2025 - Mars 2026 : Publication & amélioration</span>
+                  </div>
+                </div>
+
+                {/* Frise chronologique du processus */}
+                <div className="bg-white rounded-xl shadow-lg border border-getigne-100 p-6 mb-8">
+                  <div className="text-center mb-6">
+                    <h2 className="text-xl font-bold text-getigne-900 mb-2">Notre processus de travail</h2>
+                    <p className="text-getigne-700 text-sm">
+                      Découvrez comment nous élaborons ensemble ce programme, étape par étape.
                     </p>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-center space-x-2 text-getigne-700">
-                      <Users className="w-5 h-5" />
-                      <span>Élaboré de manière participative</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-2 text-getigne-700">
-                      <BookOpen className="w-5 h-5" />
-                      <span>Basé sur vos contributions</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-2 text-getigne-700">
-                      <Target className="w-5 h-5" />
-                      <span>Orienté vers l'action concrète</span>
-                    </div>
+                  <ProgramTimeline 
+                    compact={true}
+                    showToggle={true}
+                    steps={steps}
+                  />
+                </div>
+
+                {/* Grille de contenu */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                  {/* Formulaire d'alerte sur 2 colonnes */}
+                  <div className="lg:col-span-2">
+
+                      <ProgramAlertForm />
                   </div>
-                  
-                  <div className="mt-8 p-4 bg-getigne-50 rounded-lg">
-                    <p className="text-sm text-getigne-800">
-                      Restez informé de l'avancement et de la publication du programme en vous abonnant à notre newsletter.
-                    </p>
+
+                  {/* Carte : Rejoignez-nous sur 1 colonne */}
+                  <div className="lg:col-span-1">
+                    <div className="bg-gradient-to-br from-getigne-accent to-cyan-500 text-white rounded-xl shadow-lg p-6 text-center h-full flex flex-col gap-4">
+                      <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold">Rencontrons-nous !</h3>
+                      <p className="text-white/90 mb-4">
+                        Participez à nos événements et rencontres pour découvrir notre projet et échanger avec nous en direct ou virtuellement en rejoignant notre Discord.
+                      </p>
+                      <Button 
+                        asChild 
+                        className="bg-white text-getigne-900 hover:bg-white/90"
+                      >
+                        <a href={Routes.AGENDA}>Voir nos événements</a>
+                      </Button>
+                      {DISCORD_INVITE_URL && (
+                      <Button 
+                        asChild 
+                        className="bg-indigo-400 text-white hover:bg-indigo-400/90 border-2 border-solid border-indigo-500"
+                      >
+                        <a href={DISCORD_INVITE_URL}><DiscordLogoIcon className="w-4 h-4 mr-2 text-white"/>Rejoignez le Discord</a>
+                      </Button>
+                      )}
+                      <p className="text-white/90">
+                        Ou échangeons tout simplement par téléphone : <a href="tel:+33666777520" className="text-white/90 hover:text-white/70 font-bold">06 66 77 75 20</a>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -413,6 +513,7 @@ const ProgramPage = () => {
                                   content: point.content as unknown as string,
                                   position: point.position,
                                   program_item_id: point.program_item_id,
+                                  status: (point.status as 'draft' | 'pending' | 'validated') || 'validated',
                                   files: Array.isArray(point.files) ? (point.files as string[]) : [],
                                   created_at: point.created_at,
                                   updated_at: point.updated_at,
@@ -446,6 +547,22 @@ const ProgramPage = () => {
                   ))}
 
                 </main>
+              </div>
+
+              {/* Frise chronologique du processus (version publique) */}
+              <div className="my-12">
+                <Card className="border-getigne-100 shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-white to-gray-100">
+                    <CardTitle className="text-2xl text-getigne-900">Comment ce programme est été élaboré</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                  <ProgramTimeline 
+                    mini={false}
+                    showToggle={false}
+                    steps={steps}
+                  />
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>

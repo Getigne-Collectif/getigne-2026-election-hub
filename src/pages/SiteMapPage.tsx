@@ -39,7 +39,7 @@ const SiteMapPage = () => {
                   </li>
                   <li>
                     <Link to={Routes.PROGRAM} className="text-getigne-accent hover:underline">
-                      Objectif 2026
+                      Élections 2026
                     </Link>
                     <ul className="ml-5 mt-2 space-y-2">
                       <li>
