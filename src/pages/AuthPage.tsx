@@ -14,7 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/auth';
 import { Separator } from '@/components/ui/separator';
-import FacebookIcon from '@/components/icons/facebook.svg?react';
 import GoogleIcon from '@/components/icons/google.svg?react';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
@@ -154,7 +153,7 @@ const AuthPage = () => {
     }
   };
 
-  const handleSsoSignIn = async (provider: 'discord' | 'facebook' | 'google') => {
+  const handleSsoSignIn = async (provider: 'discord' | 'google') => {
     try {
       setSsoLoading(provider);
       await signInWithProvider(provider);
@@ -246,7 +245,7 @@ const AuthPage = () => {
                       </div>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-3 gap-2">
+                    <div className="mt-6 grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         onClick={() => handleSsoSignIn('discord')}
@@ -254,14 +253,6 @@ const AuthPage = () => {
                         className="w-full"
                       >
                         {ssoLoading === 'discord' ? 'Chargement...' : <DiscordLogoIcon className="h-5 w-5" />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => handleSsoSignIn('facebook')}
-                        disabled={!!ssoLoading}
-                        className="w-full"
-                      >
-                        {ssoLoading === 'facebook' ? 'Chargement...' : <span className="h-5 w-5 hover:text-white"><FacebookIcon /></span>}
                       </Button>
                       <Button
                         variant="outline"
@@ -352,7 +343,7 @@ const AuthPage = () => {
                       </div>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-3 gap-2">
+                    <div className="mt-6 grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         onClick={() => handleSsoSignIn('discord')}
@@ -360,14 +351,6 @@ const AuthPage = () => {
                         className="w-full"
                       >
                         {ssoLoading === 'discord' ? 'Chargement...' : <DiscordLogoIcon className="h-5 w-5" />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => handleSsoSignIn('facebook')}
-                        disabled={!!ssoLoading}
-                        className="w-full"
-                      >
-                        {ssoLoading === 'facebook' ? 'Chargement...' : <FacebookIcon className="h-5 w-5" />}
                       </Button>
                       <Button
                         variant="outline"
