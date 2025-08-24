@@ -61,10 +61,10 @@ const ProjectsPage = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>Nos projets | Gétigné Collectif</title>
+        <title>Nos projets citoyens | Gétigné Collectif</title>
         <meta
           name="description"
-          content="Découvrez nos projets concrets pour Gétigné : potager collectif, plateforme d'entraide, lieu de partage et fabrication."
+          content="Découvrez nos projets citoyens portés et soutenus par le collectif : potager collectif, plateforme d'entraide, lieu de partage et fabrication."
         />
       </Helmet>
 
@@ -77,10 +77,10 @@ const ProjectsPage = () => {
               <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
                 Initiatives locales
               </span>
-              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos projets</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos projets citoyens</h1>
               <p className="text-getigne-700 text-lg">
                 Des initiatives concrètes pour une commune plus solidaire, écologique et participative.
-                Découvrez nos projets et rejoignez-nous !
+                Découvrez nos projets citoyens portés et soutenus par le collectif et rejoignez-nous !
               </p>
             </div>
 

@@ -260,9 +260,16 @@ const CommitteePage = () => {
       <>
         <Navbar />
         <div className="container py-8 mt-20 space-y-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Commissions citoyennes</h1>
-          </div>
+          
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+            Démocratie participative
+          </span>
+          <h2 className="text-4xl font-bold mt-4 mb-6">Nos commissions citoyennes</h2>
+          <p className="text-getigne-700 text-lg">
+            Depuis mai 2024, des commissions citoyennes travaillent en lien avec nos élus sur des thématiques essentielles pour l'avenir de notre commune.
+          </p>
+        </div>
           <CitizenCommittees />
         </div>
         <Footer />

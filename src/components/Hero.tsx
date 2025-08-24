@@ -51,8 +51,8 @@ const Hero = () => {
           <p
             className={`text-lg md:text-xl text-white/90 mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
-            Déployons la force du collectif pour faire de Gétigné une commune plus forte,
-            plus résiliente au service de toutes et tous.
+            Déployons la force du collectif pour faire de Gétigné une commune plus forte 
+            et dynamique au service de toutes et tous.
           </p>
 
           <div

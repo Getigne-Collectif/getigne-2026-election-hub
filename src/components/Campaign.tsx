@@ -35,7 +35,7 @@ const Campaign = () => {
               <h3 className="text-2xl md:text-3xl font-bold mb-6">Participez à une campagne collective</h3>
               <p className="text-getigne-700 mb-6">
                 Depuis mai 2024, nos 6 élus et l'ensemble des membres du collectif travaillent à l'élaboration d'un projet et d'un programme pour les élections municipales.
-                La démarche est positive et collaborative, chaque personne volontaire peut apporter sa pierre à l'édifice afin d'offrir un autre projet pour notre commune.
+                La démarche est positive et collaborative, chaque personne volontaire peut apporter sa pierre à l'édifice afin d'offrir un autre projet à notre commune.
               </p>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">

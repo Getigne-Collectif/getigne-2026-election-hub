@@ -80,7 +80,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to={Routes.PROJECTS} className="text-getigne-100 hover:text-white transition-colors">
-                  Nos projets
+                  Nos projets citoyens
                 </Link>
               </li>
               <li>
