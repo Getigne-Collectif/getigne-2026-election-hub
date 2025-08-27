@@ -7,6 +7,14 @@
   margin: 1.5rem 0;
 }
 
+.rich-content h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 2rem 0 1.5rem;
+  line-height: 1.2;
+  color: #1f2937;
+}
+
 .rich-content h2 {
   font-size: 1.75rem;
   font-weight: 700;
@@ -20,8 +28,17 @@
 }
 
 .rich-content p {
-  margin: 1rem 0;
-  line-height: 1.7;
+  margin: 1.5rem 0;
+  line-height: 1.8;
+  color: #374151;
+}
+
+.rich-content p:first-child {
+  margin-top: 0;
+}
+
+.rich-content p:last-child {
+  margin-bottom: 0;
 }
 
 .rich-content ul, 
@@ -44,4 +61,24 @@
 .rich-content a {
   color: #1d4ed8;
   text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.rich-content a:hover {
+  color: #1e40af;
+}
+
+/* Gestion des sauts de ligne dans le markdown */
+.rich-content br {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+/* Amélioration de l'espacement général */
+.rich-content > * + * {
+  margin-top: 1.5rem;
+}
+
+.rich-content > *:first-child {
+  margin-top: 0;
 }

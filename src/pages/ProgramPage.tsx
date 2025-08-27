@@ -40,11 +40,11 @@ const steps = [
     period: 'Mai 2024 - Mai 2025',
     status: 'completed' as const,
     details: [
-      'Commission Environnement & Transition écologique',
-      'Commission Social & Solidarité',
-      'Commission Économie & Emploi',
-      'Commission Démocratie participative',
-      'Commission Aménagement & Urbanisme'
+      'Commission Biodiversité',
+      'Commission Vie locale',
+      'Commission Mobilité',
+      'Commission Énergie',
+      'Commission Alimentation'
     ]
   },
   {
@@ -348,9 +348,11 @@ const ProgramPage = () => {
                       <CardTitle className="text-2xl">Présentation générale</CardTitle>
                     </CardHeader>
                     <CardContent className="p-8">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {programGeneral.content || ''}
-                      </ReactMarkdown>
+                      <div className="rich-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {programGeneral.content || ''}
+                        </ReactMarkdown>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
