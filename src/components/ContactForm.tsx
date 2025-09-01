@@ -1,0 +1,426 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Send, MessageCircle, CheckCircle, Facebook, Instagram, ArrowLeftIcon } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
+import { DiscordLogoIcon } from '@radix-ui/react-icons';
+
+interface ContactFormProps {
+  showParticipation?: boolean;
+  showNewsletter?: boolean;
+  className?: string;
+}
+
+const DiscordUrl = import.meta.env.VITE_DISCORD_INVITE_URL as string;
+const ContactForm = ({ 
+  showParticipation = true, 
+  showNewsletter = true, 
+  className = "" 
+}: ContactFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { toast } = useToast();
+  
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
+  const [participationData, setParticipationData] = useState({
+    wantsToParticipate: true,
+    participationTypes: [] as string[],
+    otherParticipation: ''
+  });
+
+  const [newsletterSubscription, setNewsletterSubscription] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleParticipationChange = (checked: boolean) => {
+    setParticipationData(prev => ({ 
+      ...prev, 
+      wantsToParticipate: checked,
+      participationTypes: checked ? prev.participationTypes : [],
+      otherParticipation: checked ? prev.otherParticipation : ''
+    }));
+  };
+
+  const handleParticipationTypeChange = (type: string, checked: boolean) => {
+    setParticipationData(prev => ({
+      ...prev,
+      participationTypes: checked 
+        ? [...prev.participationTypes, type]
+        : prev.participationTypes.filter(t => t !== type)
+    }));
+  };
+
+  const handleOtherParticipationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setParticipationData(prev => ({ ...prev, otherParticipation: e.target.value }));
+  };
+
+  const handleNewsletterChange = (checked: boolean) => {
+    setNewsletterSubscription(checked);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.message) {
+      toast({
+        title: "Formulaire incomplet",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      let participationInfo = '';
+      if (showParticipation && participationData.wantsToParticipate) {
+        participationInfo = `
+**Participation souhaitée**: Oui
+**Types de participation**:
+${participationData.participationTypes.length > 0 
+  ? participationData.participationTypes.map(type => `• ${type}`).join('\n')
+  : '• Aucun type sélectionné'
+}${participationData.otherParticipation ? `\n**Autre**: ${participationData.otherParticipation}` : ''}`;
+      } else if (showParticipation) {
+        participationInfo = '\n**Participation souhaitée**: Non';
+      }
+
+      // Ajouter l'information de la newsletter
+      const newsletterInfo = showNewsletter ? `\n**Newsletter**: ${newsletterSubscription ? 'Oui' : 'Non'}` : '';
+
+      // Envoyer notification Discord
+      await sendDiscordNotification({
+        title: `📬 Nouveau message de contact : ${formData.subject || 'Sans sujet'}`,
+        message: `
+**De**: ${formData.firstName} ${formData.lastName} (${formData.email})
+
+**Message**:
+${formData.message}${participationInfo}${newsletterInfo}
+        `,
+        color: DiscordColors.BLUE,
+        username: "Formulaire de Contact"
+      });
+      
+      // Réinitialiser le formulaire
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+      
+      if (showParticipation) {
+        setParticipationData({
+          wantsToParticipate: true,
+          participationTypes: [],
+          otherParticipation: ''
+        });
+      }
+      
+      if (showNewsletter) {
+        setNewsletterSubscription(false);
+      }
+      
+      // Afficher la page de succès au lieu du toast
+      setIsSubmitted(true);
+      
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du message:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Si le formulaire a été soumis avec succès, afficher le message de confirmation
+  if (!isSubmitted) {
+    return (
+      <div className={`space-y-6 ${className}`}>
+        {/* Message de succès */}
+        <div className="text-center py-8">
+          <div className="w-20 h-20 bg-getigne-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-12 h-12 text-getigne-green-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-getigne-900 mb-2">
+            Message envoyé avec succès ! 🎉
+          </h3>
+          <p className="text-getigne-700 mb-6">
+            Merci pour votre message, {formData.firstName} ! Nous vous répondrons dans les plus brefs délais.
+          </p>
+          
+          {/* Bouton retour au formulaire */}
+          <Button
+            onClick={() => setIsSubmitted(false)}
+            variant="outline"
+            className="border-getigne-green-300 text-getigne-green-700 hover:bg-getigne-green-50"
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            Retour au formulaire
+          </Button>
+        </div>
+
+        {/* Bannières côte à côte - Discord et Réseaux sociaux */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Bannière Discord - affichée seulement si participation souhaitée */}
+          {showParticipation && participationData.wantsToParticipate && (
+            <div className="relative overflow-hidden bg-gradient-to-r from-getigne-green-500 to-purple-600 rounded-xl border border-getigne-green-200/20 shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-r from-getigne-green-500/90 to-purple-600/90"></div>
+              <div className="relative p-4 text-white">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0">
+                    <DiscordLogoIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold mb-1">
+                      Rejoignez notre Discord !
+                    </h3>
+                    <p className="text-white/90 text-xs mb-2">
+                      Connectez-vous avec notre communauté en temps réel.
+                    </p>
+                    <a
+                      href={DiscordUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-white font-medium text-xs transition-all duration-200 hover:scale-105"
+                    >
+                      Rejoindre
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Bloc réseaux sociaux */}
+          <div className="rounded-xl p-4 border border-getigne-200 bg-gradient-to-br from-blue-500 to-green-200 shadow-lg">
+            <h3 className="text-base text-white font-semibold text-getigne-900 mb-3 text-center">
+              Suivez-nous sur les réseaux sociaux
+            </h3>
+            <div className="flex justify-center space-x-2">
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105"
+              >
+                <Facebook className="w-4 h-4" />
+                <span className="font-medium text-xs">Facebook</span>
+              </a>
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all duration-200 hover:scale-105"
+              >
+                <Instagram className="w-4 h-4" />
+                <span className="font-medium text-xs">Instagram</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form className={`space-y-4 md:space-y-6 ${className}`} onSubmit={handleSubmit}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="firstName" className="text-getigne-800">
+            Prénom <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="text"
+            id="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+            placeholder="Votre prénom"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="lastName" className="text-getigne-800">
+            Nom <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="text"
+            id="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+            placeholder="Votre nom"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email" className="text-getigne-800">
+          Email <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          type="email"
+          id="email"
+          value={formData.email}
+          onChange={handleChange}
+          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+          placeholder="votre.email@exemple.com"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="subject" className="text-getigne-800">
+          Sujet
+        </Label>
+        <Input
+          type="text"
+          id="subject"
+          value={formData.subject}
+          onChange={handleChange}
+          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+          placeholder="Objet de votre message"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="message" className="text-getigne-800">
+          Message <span className="text-red-500">*</span>
+        </Label>
+        <Textarea
+          id="message"
+          rows={6}
+          value={formData.message}
+          onChange={handleChange}
+          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500 resize-none"
+          placeholder="Décrivez votre demande, question ou suggestion..."
+          required
+        />
+      </div>
+
+      {/* Section Participation */}
+      {showParticipation && (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-3">
+            <Checkbox
+              id="wantsToParticipate"
+              checked={participationData.wantsToParticipate}
+              onCheckedChange={handleParticipationChange}
+              className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500"
+            />
+            <Label htmlFor="wantsToParticipate" className="text-getigne-900 font-semibold text-base cursor-pointer">
+              Je souhaite participer au collectif
+            </Label>
+          </div>
+
+          {participationData.wantsToParticipate && (
+            <div className="ml-9 space-y-4">
+              <p className="text-sm font-medium text-getigne-800">
+                <strong>Super !</strong> 🎉 Comment souhaitez-vous participer ? (plusieurs choix possibles)
+              </p>
+              
+              <div className="space-y-3">
+                {[
+                  'Bénévolat ponctuel (logistique, accueil, affichage)',
+                  'Partage d\'expertise',
+                  'Équipe campagne (écrire, analyser, rencontrer, organiser...)',
+                  'Relais local (accueillir une mini-réunion locale chez moi)'
+                ].map((option) => (
+                  <div key={option} className="flex items-start space-x-3">
+                    <Checkbox
+                      id={`participation-${option}`}
+                      checked={participationData.participationTypes.includes(option)}
+                      onCheckedChange={(checked) => handleParticipationTypeChange(option, checked as boolean)}
+                      className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500 mt-0.5"
+                    />
+                    <Label htmlFor={`participation-${option}`} className="text-sm text-getigne-700 cursor-pointer leading-relaxed">
+                      {option}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-3 border-t border-getigne-green-200/50">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="participation-other"
+                    checked={participationData.participationTypes.includes('Autre')}
+                    onCheckedChange={(checked) => handleParticipationTypeChange('Autre', checked as boolean)}
+                    className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500 mt-0.5"
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="participation-other" className="text-sm text-getigne-700 cursor-pointer">
+                      Autre
+                    </Label>
+                    
+                    {participationData.participationTypes.includes('Autre') && (
+                      <div className="mt-2">
+                        <Input
+                          type="text"
+                          value={participationData.otherParticipation}
+                          onChange={handleOtherParticipationChange}
+                          className="w-full border-getigne-green-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+                          placeholder="Précisez votre souhait de participation..."
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+
+
+      {/* Section Newsletter */}
+      {showNewsletter && (
+        <div className="flex items-center space-x-3">
+          <Checkbox
+            id="newsletter"
+            checked={newsletterSubscription}
+            onCheckedChange={handleNewsletterChange}
+            className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500"
+          />
+          <Label htmlFor="newsletter" className="text-getigne-800 cursor-pointer">
+            Je souhaite m'abonner à la newsletter pour recevoir les actualités du collectif
+          </Label>
+        </div>
+      )}
+
+      <Button 
+        type="submit" 
+        className="w-full bg-getigne-green-500 hover:bg-getigne-green-600 text-white py-3 text-base font-medium transition-all duration-200 transform hover:scale-[1.02]"
+        disabled={isSubmitting}
+      >
+        <Send className="mr-2 h-4 w-4" /> 
+        {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
+      </Button>
+    </form>
+  );
+};
+
+export default ContactForm;
