@@ -3,10 +3,9 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Users, Heart, Zap, Landmark, LayoutList, PiggyBank, Home, Send } from 'lucide-react';
-import { useToast } from "@/components/ui/use-toast";
+import { Users, Heart, Zap, Landmark, LayoutList, PiggyBank, Home } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,18 +14,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
+import ContactForm from "@/components/ContactForm";
 
 const JoinPage = () => {
   const location = useLocation();
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -41,36 +32,6 @@ const JoinPage = () => {
       }, 500);
     }
   }, [location]);
-
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Here you would typically send the form data to your backend
-    // For now, we'll just simulate a successful submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Message envoyé !",
-        description: "Nous avons bien reçu votre message et vous répondrons dans les plus brefs délais.",
-      });
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-    }, 1000);
-  };
 
   const HELLOASSO_JOIN_URL = import.meta.env.VITE_HELLOASSO_JOIN_URL as string;
   return (
@@ -250,88 +211,7 @@ const JoinPage = () => {
               </div>
 
               <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-8">
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium text-getigne-800 mb-1">
-                        Prénom
-                      </label>
-                      <input
-                        type="text"
-                        id="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="lastName" className="block text-sm font-medium text-getigne-800 mb-1">
-                        Nom
-                      </label>
-                      <input
-                        type="text"
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-getigne-800 mb-1">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-getigne-800 mb-1">
-                      Sujet
-                    </label>
-                    <input
-                      type="text"
-                      id="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-getigne-800 mb-1">
-                      Message
-                    </label>
-                    <textarea
-                      id="message"
-                      rows={5}
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-getigne-200 rounded-md focus:outline-none focus:ring-2 focus:ring-getigne-green-500"
-                      required
-                    ></textarea>
-                  </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-teal-600 hover:bg-teal-700 text-white"
-                    disabled={isSubmitting}
-                  >
-                    <Send className="mr-2 h-4 w-4" /> 
-                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer'}
-                  </Button>
-                </form>
+                <ContactForm showParticipation={true} showNewsletter={true} />
               </div>
             </div>
           </section>
