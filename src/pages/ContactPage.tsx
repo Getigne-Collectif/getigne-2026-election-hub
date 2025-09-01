@@ -1,87 +1,13 @@
 
-import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Send, Mail, Phone, MapPin, Clock, MessageCircle, Users, Heart } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
+import { MessageCircle, Users, Heart } from 'lucide-react';
+import ContactForm from '@/components/ContactForm';
 
 const ContactPage = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.message) {
-      toast({
-        title: "Formulaire incomplet",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      // Envoyer notification Discord
-      await sendDiscordNotification({
-        title: `📬 Nouveau message de contact : ${formData.subject || 'Sans sujet'}`,
-        message: `
-**De**: ${formData.firstName} ${formData.lastName} (${formData.email})
-
-**Message**:
-${formData.message}
-        `,
-        color: DiscordColors.BLUE,
-        username: "Formulaire de Contact"
-      });
-      
-      // Réinitialiser le formulaire
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-      
-      toast({
-        title: "Message envoyé",
-        description: "Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.",
-      });
-      
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi du message:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="page-content">
@@ -94,23 +20,23 @@ ${formData.message}
             <MessageCircle className="w-4 h-4 mr-2" />
             Contact & Support
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-getigne-900">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-getigne-900">
             Contactez-nous
           </h1>
-          <p className="text-xl text-getigne-700 max-w-3xl mx-auto leading-relaxed">
-            Vous avez des questions, des suggestions ou souhaitez rejoindre notre collectif ? 
-            Nous sommes là pour vous écouter et vous accompagner.
+          <p className="text-lg md:text-xl text-getigne-700 max-w-3xl mx-auto leading-relaxed">
+            <span className="hidden md:inline">Vous avez des questions, des suggestions ou souhaitez rejoindre notre collectif ? Nous sommes là pour vous écouter et vous accompagner.</span>
+            <span className="md:hidden">Questions, suggestions ou envie de nous rejoindre ? Nous sommes là pour vous.</span>
           </p>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="py-16 px-4">
+      <section className="py-8 md:py-16 px-4">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
             
             {/* Informations de contact */}
-            <div className="lg:col-span-1 space-y-6">
+            <div className="lg:col-span-1 space-y-6 hidden lg:block">
               <Card className="border-getigne-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center text-getigne-900">
@@ -141,104 +67,25 @@ ${formData.message}
 
             </div>
 
+
             {/* Formulaire de contact */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 lg:col-start-2">
+
+            <div className="flex flex-col items-center justify-center mb-8">
+              <h2 className="text-center text-xl md:text-2xl text-getigne-900 font-bold">Envoyez-nous un message</h2>
+              <div className="text-sm md:text-base">
+                <span className="hidden md:inline">Remplissez le formulaire ci-dessous et nous vous répondrons rapidement</span>
+                <span className="md:hidden">Remplissez le formulaire et nous vous répondrons rapidement</span>
+              </div>
+            </div>
               <Card className="border-getigne-200 shadow-sm">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl text-getigne-900">
-                    Envoyez-nous un message
+                <CardHeader className="text-center p-4 md:p-6">
+                  <CardTitle >
+                    
                   </CardTitle>
-                  <CardDescription>
-                    Remplissez le formulaire ci-dessous et nous vous répondrons rapidement
-                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-getigne-800">
-                          Prénom <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          type="text"
-                          id="firstName"
-                          value={formData.firstName}
-                          onChange={handleChange}
-                          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
-                          placeholder="Votre prénom"
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-getigne-800">
-                          Nom <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          type="text"
-                          id="lastName"
-                          value={formData.lastName}
-                          onChange={handleChange}
-                          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
-                          placeholder="Votre nom"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-getigne-800">
-                        Email <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        type="email"
-                        id="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
-                        placeholder="votre.email@exemple.com"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="subject" className="text-getigne-800">
-                        Sujet
-                      </Label>
-                      <Input
-                        type="text"
-                        id="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
-                        placeholder="Objet de votre message"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="message" className="text-getigne-800">
-                        Message <span className="text-red-500">*</span>
-                      </Label>
-                      <Textarea
-                        id="message"
-                        rows={6}
-                        value={formData.message}
-                        onChange={handleChange}
-                        className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500 resize-none"
-                        placeholder="Décrivez votre demande, question ou suggestion..."
-                        required
-                      />
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-getigne-green-500 hover:bg-getigne-green-600 text-white py-3 text-base font-medium transition-all duration-200 transform hover:scale-[1.02]"
-                      disabled={isSubmitting}
-                    >
-                      <Send className="mr-2 h-4 w-4" /> 
-                      {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
-                    </Button>
-                  </form>
+                <CardContent className="p-4 md:p-6">
+                  <ContactForm />
                 </CardContent>
               </Card>
             </div>
