@@ -4,10 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Send, MessageCircle, CheckCircle, Facebook, Instagram, ArrowLeftIcon } from 'lucide-react';
+import { Send, CheckCircle, ArrowLeftIcon } from 'lucide-react';
+
+import FacebookIcon from '@/components/icons/facebook.svg?react';
+import InstagramIcon from '@/components/icons/instagram.svg?react';
 import { useToast } from '@/components/ui/use-toast';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
-import { DiscordLogoIcon } from '@radix-ui/react-icons';
+import { DiscordLogoIcon, InstagramLogoIcon } from '@radix-ui/react-icons';
 
 interface ContactFormProps {
   showParticipation?: boolean;
@@ -15,7 +18,10 @@ interface ContactFormProps {
   className?: string;
 }
 
-const DiscordUrl = import.meta.env.VITE_DISCORD_INVITE_URL as string;
+const DISCORD_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
+const FACEBOOK_URL = import.meta.env.VITE_FACEBOOK_URL as string;
+const INSTAGRAM_URL = import.meta.env.VITE_INSTAGRAM_URL as string;
+
 const ContactForm = ({ 
   showParticipation = true, 
   showNewsletter = true, 
@@ -153,7 +159,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
   };
 
   // Si le formulaire a été soumis avec succès, afficher le message de confirmation
-  if (!isSubmitted) {
+  if (isSubmitted) {
     return (
       <div className={`space-y-6 ${className}`}>
         {/* Message de succès */}
@@ -198,7 +204,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
                       Connectez-vous avec notre communauté en temps réel.
                     </p>
                     <a
-                      href={DiscordUrl}
+                      href={DISCORD_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-white font-medium text-xs transition-all duration-200 hover:scale-105"
@@ -212,31 +218,37 @@ ${formData.message}${participationInfo}${newsletterInfo}
           )}
 
           {/* Bloc réseaux sociaux */}
-          <div className="rounded-xl p-4 border border-getigne-200 bg-gradient-to-br from-blue-500 to-green-200 shadow-lg">
-            <h3 className="text-base text-white font-semibold text-getigne-900 mb-3 text-center">
-              Suivez-nous sur les réseaux sociaux
-            </h3>
-            <div className="flex justify-center space-x-2">
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105"
-              >
-                <Facebook className="w-4 h-4" />
-                <span className="font-medium text-xs">Facebook</span>
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all duration-200 hover:scale-105"
-              >
-                <Instagram className="w-4 h-4" />
-                <span className="font-medium text-xs">Instagram</span>
-              </a>
+          {FACEBOOK_URL || INSTAGRAM_URL && (
+            <div className="rounded-xl p-4 border border-getigne-200 bg-gradient-to-br from-blue-500 to-green-200 shadow-lg">
+              <h3 className="text-base text-white font-semibold text-getigne-900 mb-3 text-center">
+                Suivez-nous sur les réseaux sociaux
+              </h3>
+              <div className="flex justify-center space-x-2">
+                {FACEBOOK_URL && (
+                <a
+                  href={FACEBOOK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105"
+                >
+                  <FacebookIcon className="w-4 h-4" />
+                  <span className="font-medium text-xs">Facebook</span>
+                </a>
+                )}
+                {INSTAGRAM_URL && (
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-all duration-200 hover:scale-105"
+                >
+                  <InstagramLogoIcon className="w-4 h-4" />
+                    <span className="font-medium text-xs">Instagram</span>
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );

@@ -6,6 +6,7 @@ import { subscribeToNewsletter, NewsletterSubscription } from '../utils/newslett
 import { toast } from 'sonner';
 import {DiscordLogoIcon} from "@radix-ui/react-icons";
 import FacebookIcon from '@/components/icons/facebook.svg?react';
+import InstagramIcon from '@/components/icons/instagram.svg?react';
 import { Routes } from '@/routes';
 
 const Footer = () => {
@@ -13,6 +14,8 @@ const Footer = () => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
+  const FACEBOOK_URL = import.meta.env.VITE_FACEBOOK_URL as string;
+  const INSTAGRAM_URL = import.meta.env.VITE_INSTAGRAM_URL as string;
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,12 +58,21 @@ const Footer = () => {
               Ensemble, construisons une commune plus solidaire, écologique et participative.
             </p>
             <div className="flex space-x-4">
-              <a href="#" aria-label="Facebook">
-                <FacebookIcon />
-              </a>
-              <a href={DISCORD_INVITE_URL} className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
-                <DiscordLogoIcon />
-              </a>
+              {FACEBOOK_URL && (
+                <a href={FACEBOOK_URL} aria-label="Facebook" target="_blank" rel="noopener noreferrer" className="text-getigne-100 hover:text-white transition-colors">
+                  <FacebookIcon />
+                </a>
+              )}
+              {DISCORD_INVITE_URL && (
+                <a href={DISCORD_INVITE_URL} className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+                  <DiscordLogoIcon />
+                </a>
+              )}
+              {INSTAGRAM_URL && (
+                <a href={INSTAGRAM_URL} aria-label="Instagram" target="_blank" rel="noopener noreferrer" className="text-getigne-100 hover:text-white transition-colors">
+                  <InstagramIcon />
+                </a>
+              )}
             </div>
           </div>
 
