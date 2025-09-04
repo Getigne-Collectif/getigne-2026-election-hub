@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import {Link, useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client.ts';
 import { useToast } from '@/components/ui/use-toast.ts';
@@ -11,13 +11,6 @@ import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { useAuth } from '@/context/auth';
 import MarkdownEditor from "@/components/MarkdownEditor.tsx";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.tsx";
 import { v4 as uuidv4 } from 'uuid';
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
@@ -100,10 +93,25 @@ const AdminEventEditorPage = () => {
     enabled: isEditMode,
   });
 
+  // Fonction pour convertir une date avec fuseau horaire en format datetime-local
+  const formatDateForInput = (dateStr: string): string => {
+    if (!dateStr) return '';
+    
+    // Si la date contient un fuseau horaire, on l'extrait directement
+    // Format attendu: "2025-09-18T20:00:00+02:00" ou "2025-09-18 20:00:00+02"
+    const match = dateStr.match(/(\d{4}-\d{2}-\d{2})[T\s](\d{2}:\d{2})/);
+    if (match) {
+      return `${match[1]}T${match[2]}`;
+    }
+    
+    // Fallback: utiliser la méthode traditionnelle si le format est différent
+    return new Date(dateStr).toISOString().slice(0, 16);
+  };
+
   useEffect(() => {
     if (event) {
       setTitle(event.title || '');
-      setDate(event.date ? new Date(event.date).toISOString().slice(0, 16) : '');
+      setDate(formatDateForInput(event.date || ''));
       setLocation(event.location || '');
       setDescription(event.description || '');
       setContent(event.content || '');

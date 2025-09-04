@@ -31,7 +31,7 @@ const Hero = () => {
 
       <div className="container mx-auto relative z-10">
         <div
-          className={`max-w-4xl mx-auto text-center transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+          className={` mx-auto text-center transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           <div className={`mb-4 inline-block transform transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
             <span className="text-white bg-getigne-green-500/30 px-5 py-2 rounded-full text-base font-medium">
@@ -40,19 +40,19 @@ const Hero = () => {
           </div>
 
           <h1
-            className={`text-5xl md:text-7xl font-bold mb-6 tracking-tight transform transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'} text-white`}
+            className={`text-4xl md:text-7xl font-bold mb-6 tracking-tight transform transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'} text-white`}
           >
-            Ensemble, construire
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-getigne-green-100 block">
-              l'avenir de Gétigné
+            Vivre dans une commune<br/>
+            <span className="bg-clip-text text-transparent bg-gradient-to-br from-white to-yellow-300 block">
+            dynamique, engagée et démocratique
             </span>
+            ça vous tente ?
           </h1>
 
           <p
-            className={`text-lg md:text-xl text-white/90 mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
+            className={`text-lg font-bold md:text-xl text-white mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
-            Déployons la force du collectif pour faire de Gétigné une commune plus forte 
-            et dynamique au service de toutes et tous.
+            Déployons la force du collectif pour faire de Gétigné <br/>une commune plus engagée, au service de toutes et tous.
           </p>
 
           <div
