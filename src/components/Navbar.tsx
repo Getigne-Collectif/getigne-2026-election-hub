@@ -1,9 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, Settings, FileText, Car } from 'lucide-react';
+import { Menu, ChevronDown, Settings, FileText, Car, Coffee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import AuthButton from './AuthButton';
 import { useAuth } from '@/context/AuthContext';
 import { useAppSettings } from '@/hooks/useAppSettings';
@@ -79,10 +85,34 @@ const Navbar = () => {
           Actualités
         </Link>
       </li>
-      <li>
-        <Link to={Routes.AGENDA} className={isActive(Routes.AGENDA)}>
-          Agenda
-        </Link>
+      <li className="relative">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button 
+              className={`flex items-center ${
+                location.pathname === Routes.AGENDA || location.pathname === Routes.NEIGHBORHOOD_EVENTS 
+                  ? 'text-getigne-accent' 
+                  : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200'
+              }`}
+            >
+              Agenda
+              <ChevronDown className="ml-1 h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuItem asChild>
+              <Link to={Routes.AGENDA} className="w-full flex items-center">
+                Tous les événements
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to={Routes.NEIGHBORHOOD_EVENTS} className="w-full flex items-center">
+                <Coffee className="mr-2 h-4 w-4" />
+                Cafés de quartier
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </li>
       
       <li>

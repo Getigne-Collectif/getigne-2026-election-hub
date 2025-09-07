@@ -9,6 +9,7 @@ import EventsManagement from '@/components/EventsManagement.tsx';
 import { useAuth } from '@/context/auth';
 import {Link, useNavigate} from 'react-router-dom';
 import { Button } from '@/components/ui/button.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,7 +17,7 @@ import {
   BreadcrumbList, BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
-import {Home} from "lucide-react";
+import {Home, Coffee, Calendar} from "lucide-react";
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
@@ -26,7 +27,7 @@ const AdminEventsPage = () => {
   const navigate = useNavigate();
 
   // Query to fetch events
-  const { data: events = [], isLoading: isLoadingEvents, refetch: refetchEvents } = useQuery({
+  const { data: allEvents = [], isLoading: isLoadingEvents, refetch: refetchEvents } = useQuery({
     queryKey: ['admin-events'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,6 +39,10 @@ const AdminEventsPage = () => {
       return data;
     },
   });
+
+  // Séparer les événements réguliers et de voisinage
+  const regularEvents = allEvents.filter(event => event.event_type !== 'neighborhood');
+  const neighborhoodEvents = allEvents.filter(event => event.event_type === 'neighborhood');
 
   // Query to fetch committees for the dropdown
   const { data: committees = [] } = useQuery({
@@ -154,14 +159,59 @@ const AdminEventsPage = () => {
 
           <section className="py-16">
             <div className="container mx-auto px-4">
-            <EventsManagement
-              events={events}
-              loading={isLoadingEvents}
-              committees={committees}
-              onCreateEvent={handleCreateEvent}
-              onUpdateEvent={handleUpdateEvent}
-              onDeleteEvent={handleDeleteEvent}
-            />
+              <Tabs defaultValue="regular" className="space-y-6">
+                <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+                  <TabsTrigger value="regular" className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Événements réguliers
+                  </TabsTrigger>
+                  <TabsTrigger value="neighborhood" className="flex items-center gap-2">
+                    <Coffee className="w-4 h-4" />
+                    Cafés de quartier
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="regular" className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Événements réguliers</h2>
+                    <Button asChild>
+                      <Link to="/admin/events/new?type=regular">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Nouvel événement
+                      </Link>
+                    </Button>
+                  </div>
+                  <EventsManagement
+                    events={regularEvents}
+                    loading={isLoadingEvents}
+                    committees={committees}
+                    onCreateEvent={handleCreateEvent}
+                    onUpdateEvent={handleUpdateEvent}
+                    onDeleteEvent={handleDeleteEvent}
+                  />
+                </TabsContent>
+
+                <TabsContent value="neighborhood" className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Cafés de quartier</h2>
+                    <Button asChild>
+                      <Link to="/admin/events/new?type=neighborhood">
+                        <Coffee className="w-4 h-4 mr-2" />
+                        Nouvel événement
+                      </Link>
+                    </Button>
+                  </div>
+                  <EventsManagement
+                    events={neighborhoodEvents}
+                    loading={isLoadingEvents}
+                    committees={committees}
+                    onCreateEvent={handleCreateEvent}
+                    onUpdateEvent={handleUpdateEvent}
+                    onDeleteEvent={handleDeleteEvent}
+                    isNeighborhoodEvents={true}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
           </section>
         </AdminLayout>

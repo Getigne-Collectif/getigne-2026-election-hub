@@ -248,10 +248,17 @@ export type Database = {
           created_at: string
           date: string
           description: string
+          event_type: string | null
           id: string
           image: string
           is_members_only: boolean | null
+          kit_provided: boolean | null
+          latitude: number | null
           location: string
+          longitude: number | null
+          member_present: boolean | null
+          organizer_contact: string | null
+          organizer_name: string | null
           slug: string | null
           status: string | null
           title: string
@@ -265,10 +272,17 @@ export type Database = {
           created_at?: string
           date: string
           description: string
+          event_type?: string | null
           id?: string
           image: string
           is_members_only?: boolean | null
+          kit_provided?: boolean | null
+          latitude?: number | null
           location: string
+          longitude?: number | null
+          member_present?: boolean | null
+          organizer_contact?: string | null
+          organizer_name?: string | null
           slug?: string | null
           status?: string | null
           title: string
@@ -282,10 +296,17 @@ export type Database = {
           created_at?: string
           date?: string
           description?: string
+          event_type?: string | null
           id?: string
           image?: string
           is_members_only?: boolean | null
+          kit_provided?: boolean | null
+          latitude?: number | null
           location?: string
+          longitude?: number | null
+          member_present?: boolean | null
+          organizer_contact?: string | null
+          organizer_name?: string | null
           slug?: string | null
           status?: string | null
           title?: string

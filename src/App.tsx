@@ -37,6 +37,7 @@ const NewsPage = lazy(() => import("./pages/NewsPage"));
 const NewsDetailPage = lazy(() => import("./pages/NewsDetailPage"));
 const AgendaPage = lazy(() => import("./pages/AgendaPage"));
 const EventDetailPage = lazy(() => import("./pages/EventDetailPage"));
+const NeighborhoodEventsPage = lazy(() => import("./pages/NeighborhoodEventsPage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
 const CommitteePage = lazy(() => import("./pages/CommitteePage"));
 const ProgramPage = lazy(() => import("./pages/ProgramPage"));
@@ -73,6 +74,7 @@ function App() {
                   <Route path={AppRoutes.NEWS_DETAIL} element={<NewsDetailPage />} />
                   <Route path={AppRoutes.AGENDA} element={<AgendaPage />} />
                   <Route path={AppRoutes.EVENT_DETAIL} element={<EventDetailPage />} />
+                  <Route path={AppRoutes.NEIGHBORHOOD_EVENTS} element={<NeighborhoodEventsPage />} />
                   <Route path={AppRoutes.TEAM} element={<TeamPage />} />
                   <Route path={AppRoutes.COMMITTEES} element={<CommitteePage />} />
                   <Route path={AppRoutes.COMMITTEE_DETAIL} element={<CommitteePage />} />

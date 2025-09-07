@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import {Calendar, MapPin, Clock, Users, ChevronRight, Home} from 'lucide-react';
+import {Calendar, MapPin, Clock, Users, ChevronRight, Home, Coffee, Filter} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,9 @@ import Footer from '@/components/Footer';
 import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
 import CalendarSync from '@/components/events/CalendarSync';
 import { useAuth } from '@/context/auth';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -159,12 +162,20 @@ const EventCard = ({ event, index }) => {
             <span>{event.location}</span>
           </div>
 
-          {event.is_members_only && (
-            <div className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-xs inline-flex items-center mb-4">
-              <Users size={12} className="mr-1" />
-              Réservé aux adhérents
-            </div>
-          )}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {event.is_members_only && (
+              <div className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-xs inline-flex items-center">
+                <Users size={12} className="mr-1" />
+                Réservé aux adhérents
+              </div>
+            )}
+            {event.event_type === 'neighborhood' && (
+              <div className="bg-getigne-accent/10 text-getigne-accent px-3 py-1 rounded-full text-xs inline-flex items-center">
+                <Coffee size={12} className="mr-1" />
+                Café de quartier
+              </div>
+            )}
+          </div>
 
           <div className="text-getigne-accent flex items-center text-sm font-medium group mt-4">
             En savoir plus
@@ -181,6 +192,7 @@ const AgendaPage = () => {
   const [pastEvents, setPastEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showNeighborhoodEvents, setShowNeighborhoodEvents] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -191,6 +203,7 @@ const AgendaPage = () => {
         const { data, error } = await supabase
           .from('events')
           .select('*')
+          .eq('status', 'published')
           .order('date', { ascending: true });
 
         if (error) throw error;
@@ -225,6 +238,17 @@ const AgendaPage = () => {
 
     fetchEvents();
   }, []);
+
+  // Filter events based on the neighborhood events toggle
+  const filterEvents = (events) => {
+    if (!showNeighborhoodEvents) {
+      return events.filter(event => event.event_type !== 'neighborhood');
+    }
+    return events;
+  };
+
+  const filteredUpcomingEvents = filterEvents(upcomingEvents);
+  const filteredPastEvents = filterEvents(pastEvents);
 
   return (
     <HelmetProvider>
@@ -275,6 +299,45 @@ const AgendaPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Filter section */}
+            <div className="border-t border-getigne-100 pt-8">
+              <div className="container mx-auto px-4">
+                <div className="max-w-4xl mx-auto">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-center space-x-4">
+                          <Filter className="w-5 h-5 text-getigne-700" />
+                          <span className="font-medium text-getigne-900">Filtres</span>
+                        </div>
+                        <div className="flex items-center space-x-6">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="neighborhood-events"
+                              checked={showNeighborhoodEvents}
+                              onCheckedChange={(checked) => setShowNeighborhoodEvents(checked === true)}
+                            />
+                            <label
+                              htmlFor="neighborhood-events"
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex items-center"
+                            >
+                              <Coffee className="w-4 h-4 mr-1 text-getigne-accent" />
+                              Voir les cafés de quartier
+                            </label>
+                          </div>
+                          <Button asChild variant="outline" size="sm">
+                            <Link to="/cafes-de-quartier">
+                              Découvrir les cafés de quartier
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Events content */}
@@ -286,23 +349,39 @@ const AgendaPage = () => {
               <div className="text-center py-8 text-red-500">Une erreur est survenue: {error}</div>
             ) : (
               <>
-                {upcomingEvents.length > 0 ? (
+                {filteredUpcomingEvents.length > 0 ? (
                   <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {upcomingEvents.map((event, index) => (
+                    {filteredUpcomingEvents.map((event, index) => (
                       <EventCard key={event.id} event={event} index={index} />
                     ))}
                   </div>
-                ) : (
+                ) : !showNeighborhoodEvents ? (
                   <div className="text-center py-8 bg-getigne-50 rounded-lg">
                     <h3 className="text-xl font-medium mb-2">Aucun événement à venir</h3>
-                    <p className="text-getigne-700">Revenez bientôt pour découvrir nos futurs événements</p>
+                    <p className="text-getigne-700 mb-4">Revenez bientôt pour découvrir nos futurs événements</p>
+                    <p className="text-sm text-getigne-600">
+                      💡 Cochez "Voir les cafés de quartier" pour découvrir les rencontres de voisinage
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 bg-getigne-50 rounded-lg">
+                    <Coffee className="w-12 h-12 mx-auto mb-4 text-getigne-300" />
+                    <h3 className="text-xl font-medium mb-2">Aucun café de quartier à venir</h3>
+                    <p className="text-getigne-700 mb-4">
+                      Les prochaines rencontres de voisinage seront bientôt programmées
+                    </p>
+                    <Button asChild variant="outline">
+                      <Link to="/cafes-de-quartier">
+                        Organiser un café de quartier
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </>
             )}
 
             {/* Past Events Section */}
-            {!loading && !error && pastEvents.length > 0 && (
+            {!loading && !error && filteredPastEvents.length > 0 && (
               <div className="mt-24">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                   <span className="bg-getigne-700/10 text-getigne-700 font-medium px-4 py-1 rounded-full text-sm">
@@ -315,7 +394,7 @@ const AgendaPage = () => {
                 </div>
 
                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                  {pastEvents.map((event, index) => (
+                  {filteredPastEvents.map((event, index) => (
                     <EventCard key={event.id} event={event} index={index} />
                   ))}
                 </div>

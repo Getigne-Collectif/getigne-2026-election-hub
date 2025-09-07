@@ -50,7 +50,7 @@ const Hero = () => {
           </h1>
 
           <p
-            className={`text-lg font-bold md:text-xl text-white mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
+            className={`hidden md:inline text-lg font-bold md:text-xl text-white mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             Déployons la force du collectif pour faire de Gétigné <br/>une commune plus engagée, au service de toutes et tous.
           </p>
@@ -60,7 +60,7 @@ const Hero = () => {
           >
             <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <Link to={Routes.PROGRAM}>
-                Découvez notre projet pour 2026
+                Découvrez notre projet <span className="hidden md:inline">pour 2026</span>
               </Link>
             </Button>
           </div>

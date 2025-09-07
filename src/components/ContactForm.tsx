@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,6 +31,7 @@ const ContactForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -44,6 +46,61 @@ const ContactForm = ({
     participationTypes: [] as string[],
     otherParticipation: ''
   });
+
+  // Effet pour traiter les paramètres URL
+  useEffect(() => {
+    const subject = searchParams.get('subject');
+    const type = searchParams.get('type');
+    
+    if (subject) {
+      setFormData(prev => ({ ...prev, subject: decodeURIComponent(subject) }));
+    }
+    
+    if (type === 'organizer') {
+      const messageTemplate = `Bonjour,
+
+Je souhaite organiser un café de quartier chez moi et j'aimerais recevoir le kit d'organisation ainsi que l'accompagnement d'un membre du collectif.
+
+Voici les informations que je peux déjà vous communiquer :
+
+📍 LOCALISATION :
+• Adresse : [Votre adresse complète]
+• Quartier/secteur : [Précisez le secteur de Gétigné]
+
+📅 DATES POSSIBLES :
+• Date souhaitée : [Ex: Samedi 15 février 2025]
+• Créneaux alternatifs : [Ex: Dimanche 16 ou Samedi 22 février]
+• Horaire préféré : [Ex: 14h30-16h30]
+
+🏠 LOGISTIQUE :
+• Nombre de personnes max accueillies : [Ex: 8-10 personnes]
+• Espace disponible : [Ex: salon, jardin selon météo]
+• Accès PMR : [Oui/Non]
+
+📞 CONTACT :
+• Téléphone : [Votre numéro]
+• Disponibilité pour un appel : [Ex: en semaine après 18h]
+
+💭 MOTIVATIONS :
+• Pourquoi organiser ce café : [Ex: rencontrer mes voisins, créer du lien social...]
+• Sujets d'échange souhaités : [Ex: vie de quartier, projets locaux...]
+
+N'hésitez pas à me contacter pour organiser ensemble cette belle initiative !
+
+Cordialement,`;
+
+      setFormData(prev => ({ 
+        ...prev, 
+        message: messageTemplate
+      }));
+      
+      setParticipationData(prev => ({
+        ...prev,
+        wantsToParticipate: true,
+        participationTypes: ['Relais local (accueillir une mini-réunion locale chez moi)']
+      }));
+    }
+  }, [searchParams]);
 
   const [newsletterSubscription, setNewsletterSubscription] = useState(false);
 

@@ -52,7 +52,6 @@ export const useEventDetails = (
         .from('events')
         .select('id')
         .eq('slug', slugToUse)
-        .eq('status', 'published')
         .maybeSingle();
       
       if (error) {
@@ -84,7 +83,6 @@ export const useEventDetails = (
         .from('events')
         .select('*')
         .eq('id', eventId)
-        .eq('status', 'published')
         .maybeSingle();
       
       if (error) {

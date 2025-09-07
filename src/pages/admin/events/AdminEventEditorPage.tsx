@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client.ts';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { Button } from '@/components/ui/button.tsx';
-import {Loader2, Save, Eye, ArrowLeft, Home, Upload, ImageIcon} from 'lucide-react';
+import {Loader2, Save, Eye, ArrowLeft, Home, Upload, ImageIcon, Coffee, MapPin, Package, UserCheck, User, Phone, Mail, Calendar} from 'lucide-react';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
@@ -30,10 +30,13 @@ const generateSlug = (title: string): string => {
 
 const AdminEventEditorPage = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAdmin, isModerator, user } = useAuth();
   const isEditMode = Boolean(id);
+  const initialEventType = searchParams.get('type') || 'regular';
+  const [eventType, setEventType] = useState<'regular' | 'neighborhood'>(initialEventType as 'regular' | 'neighborhood');
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
@@ -48,7 +51,36 @@ const AdminEventEditorPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slug, setSlug] = useState('');
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  
+  // Champs spécifiques aux événements de voisinage
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [organizerName, setOrganizerName] = useState('');
+  const [organizerContact, setOrganizerContact] = useState('');
+  const [kitProvided, setKitProvided] = useState(true);
+  const [memberPresent, setMemberPresent] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Réinitialiser les champs spécifiques lors du changement de type d'événement
+  const handleEventTypeChange = (newType: 'regular' | 'neighborhood') => {
+    setEventType(newType);
+    
+    // Si on passe à "regular", on réinitialise les champs de voisinage
+    if (newType === 'regular') {
+      setLatitude('');
+      setLongitude('');
+      setOrganizerName('');
+      setOrganizerContact('');
+      setKitProvided(true);
+      setMemberPresent(true);
+    }
+    
+    // Si on passe à "neighborhood", on peut désactiver l'inscription par défaut
+    if (newType === 'neighborhood') {
+      setAllowRegistration(false);
+      setIsMembersOnly(false);
+    }
+  };
   
   const [createDiscordScheduledEvent, setCreateDiscordScheduledEvent] = useState(true);
   const [estimatedDuration, setEstimatedDuration] = useState(2);
@@ -121,6 +153,17 @@ const AdminEventEditorPage = () => {
       setAllowRegistration(event.allow_registration !== false);
       setIsMembersOnly(event.is_members_only === true);
       setSlug(event.slug || '');
+      
+      // Type d'événement
+      setEventType(event.event_type === 'neighborhood' ? 'neighborhood' : 'regular');
+      
+      // Champs spécifiques aux événements de voisinage
+      setLatitude(event.latitude?.toString() || '');
+      setLongitude(event.longitude?.toString() || '');
+      setOrganizerName(event.organizer_name || '');
+      setOrganizerContact(event.organizer_contact || '');
+      setKitProvided(event.kit_provided !== false);
+      setMemberPresent(event.member_present !== false);
     }
   }, [event]);
 
@@ -325,7 +368,17 @@ const AdminEventEditorPage = () => {
         allow_registration: allowRegistration,
         is_members_only: isMembersOnly,
         status,
-        slug: eventSlug
+        slug: eventSlug,
+        event_type: eventType,
+        // Champs spécifiques aux événements de voisinage
+        ...(eventType === 'neighborhood' && {
+          latitude: latitude ? parseFloat(latitude) : null,
+          longitude: longitude ? parseFloat(longitude) : null,
+          organizer_name: organizerName || null,
+          organizer_contact: organizerContact || null,
+          kit_provided: kitProvided,
+          member_present: memberPresent
+        })
       };
 
       let result;
@@ -410,7 +463,12 @@ const AdminEventEditorPage = () => {
   return (
       <HelmetProvider>
         <Helmet>
-          <title>{isEditMode ? "Modifier l'article" : "Créer un article"} | Admin | Gétigné Collectif</title>
+          <title>
+            {isEditMode 
+              ? `Modifier l'${eventType === 'neighborhood' ? 'événement de voisinage' : 'événement'}`
+              : `Créer un ${eventType === 'neighborhood' ? 'café de quartier' : 'événement'}`
+            } | Admin | Gétigné Collectif
+          </title>
         </Helmet>
 
         <AdminLayout backLink={<div className="flex items-center gap-4 my-4">
@@ -422,7 +480,12 @@ const AdminEventEditorPage = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour
           </Button>
-          <h1 className="text-2xl font-bold">{isEditMode ? "Modifier l'événement" : "Créer un événement"}</h1>
+          <h1 className="text-2xl font-bold">
+            {isEditMode 
+              ? `Modifier l'${eventType === 'neighborhood' ? 'événement de voisinage' : 'événement'}`
+              : `Créer un ${eventType === 'neighborhood' ? 'café de quartier' : 'événement'}`
+            }
+          </h1>
         </div>}>
 
           <div className="flex-grow container mx-auto px-4 py-8">
@@ -449,6 +512,67 @@ const AdminEventEditorPage = () => {
                           placeholder="Titre de l'événement"
                           required
                         />
+                      </div>
+
+                      {/* Sélecteur de type d'événement */}
+                      <div className="bg-gray-50 p-4 rounded-lg border">
+                        <Label htmlFor="event-type" className="text-base font-medium">Type d'événement *</Label>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Choisissez le type d'événement pour adapter les options disponibles
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <label className={`cursor-pointer border-2 rounded-lg p-4 transition-all ${
+                            eventType === 'regular' 
+                              ? 'border-getigne-accent bg-getigne-accent/5' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="event-type"
+                              value="regular"
+                              checked={eventType === 'regular'}
+                              onChange={(e) => handleEventTypeChange(e.target.value as 'regular' | 'neighborhood')}
+                              className="sr-only"
+                            />
+                            <div className="flex items-center gap-3">
+                              <Calendar className={`w-5 h-5 ${
+                                eventType === 'regular' ? 'text-getigne-accent' : 'text-gray-400'
+                              }`} />
+                              <div>
+                                <div className="font-medium">Événement régulier</div>
+                                <div className="text-sm text-gray-600">
+                                  Réunion publique, atelier, conférence...
+                                </div>
+                              </div>
+                            </div>
+                          </label>
+
+                          <label className={`cursor-pointer border-2 rounded-lg p-4 transition-all ${
+                            eventType === 'neighborhood' 
+                              ? 'border-getigne-accent bg-getigne-accent/5' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="event-type"
+                              value="neighborhood"
+                              checked={eventType === 'neighborhood'}
+                              onChange={(e) => handleEventTypeChange(e.target.value as 'regular' | 'neighborhood')}
+                              className="sr-only"
+                            />
+                            <div className="flex items-center gap-3">
+                              <Coffee className={`w-5 h-5 ${
+                                eventType === 'neighborhood' ? 'text-getigne-accent' : 'text-gray-400'
+                              }`} />
+                              <div>
+                                <div className="font-medium">Café de quartier</div>
+                                <div className="text-sm text-gray-600">
+                                  Rencontre de voisinage, échange local
+                                </div>
+                              </div>
+                            </div>
+                          </label>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -496,6 +620,91 @@ const AdminEventEditorPage = () => {
                           />
                         </div>
                       </div>
+
+                      {/* Champs spécifiques aux événements de voisinage */}
+                      {eventType === 'neighborhood' && (
+                        <div className="space-y-4 p-4 bg-getigne-accent/5 rounded-lg border border-getigne-accent/20">
+                          <div className="flex items-center gap-2 text-getigne-accent font-medium">
+                            <Coffee className="w-5 h-5" />
+                            Informations café de quartier
+                          </div>
+
+                          {/* Organisateur */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="organizer-name">Nom de l'organisateur</Label>
+                              <Input
+                                id="organizer-name"
+                                value={organizerName}
+                                onChange={(e) => setOrganizerName(e.target.value)}
+                                placeholder="Jean Dupont"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="organizer-contact">Contact organisateur</Label>
+                              <Input
+                                id="organizer-contact"
+                                value={organizerContact}
+                                onChange={(e) => setOrganizerContact(e.target.value)}
+                                placeholder="email@example.com ou 06 12 34 56 78"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Coordonnées GPS */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="latitude">Latitude</Label>
+                              <Input
+                                id="latitude"
+                                value={latitude}
+                                onChange={(e) => setLatitude(e.target.value)}
+                                placeholder="47.0847"
+                                type="number"
+                                step="any"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="longitude">Longitude</Label>
+                              <Input
+                                id="longitude"
+                                value={longitude}
+                                onChange={(e) => setLongitude(e.target.value)}
+                                placeholder="-1.2614"
+                                type="number"
+                                step="any"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Options */}
+                          <div className="space-y-3">
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="kit-provided"
+                                checked={kitProvided}
+                                onCheckedChange={setKitProvided}
+                              />
+                              <Label htmlFor="kit-provided" className="flex items-center gap-2">
+                                <Package className="w-4 h-4 text-getigne-accent" />
+                                Kit d'organisation fourni
+                              </Label>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id="member-present"
+                                checked={memberPresent}
+                                onCheckedChange={setMemberPresent}
+                              />
+                              <Label htmlFor="member-present" className="flex items-center gap-2">
+                                <UserCheck className="w-4 h-4 text-getigne-accent" />
+                                Membre du collectif présent
+                              </Label>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -590,29 +799,44 @@ const AdminEventEditorPage = () => {
                       <h3 className="font-medium mb-4">Paramètres d'inscription</h3>
                       
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="allow-registration" className="font-medium">Autoriser les inscriptions</Label>
-                            <p className="text-sm text-getigne-500">Activez pour permettre aux utilisateurs de s'inscrire à cet événement</p>
+                        {eventType === 'regular' ? (
+                          <>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <Label htmlFor="allow-registration" className="font-medium">Autoriser les inscriptions</Label>
+                                <p className="text-sm text-getigne-500">Activez pour permettre aux utilisateurs de s'inscrire à cet événement</p>
+                              </div>
+                              <Switch 
+                                id="allow-registration" 
+                                checked={allowRegistration} 
+                                onCheckedChange={setAllowRegistration} 
+                              />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <Label htmlFor="members-only" className="font-medium">Réservé aux adhérents</Label>
+                                <p className="text-sm text-getigne-500">Activez pour limiter les inscriptions aux adhérents uniquement</p>
+                              </div>
+                              <Switch 
+                                id="members-only" 
+                                checked={isMembersOnly} 
+                                onCheckedChange={setIsMembersOnly} 
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-sm text-getigne-600 bg-getigne-accent/10 p-3 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Coffee className="w-4 h-4 text-getigne-accent" />
+                              <span className="font-medium">Café de quartier</span>
+                            </div>
+                            <p>
+                              Les cafés de quartier sont des événements ouverts à tous les habitants du secteur. 
+                              L'inscription n'est généralement pas requise pour ce type de rencontre conviviale.
+                            </p>
                           </div>
-                          <Switch 
-                            id="allow-registration" 
-                            checked={allowRegistration} 
-                            onCheckedChange={setAllowRegistration} 
-                          />
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="members-only" className="font-medium">Réservé aux adhérents</Label>
-                            <p className="text-sm text-getigne-500">Activez pour limiter les inscriptions aux adhérents uniquement</p>
-                          </div>
-                          <Switch 
-                            id="members-only" 
-                            checked={isMembersOnly} 
-                            onCheckedChange={setIsMembersOnly} 
-                          />
-                        </div>
+                        )}
                       </div>
                     </div>
                     

@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, MapPin, ChevronRight, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, ChevronRight, Users, Coffee, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Bike, Utensils, Music, Leaf } from 'lucide-react';
+import { Routes } from '@/routes';
+import NeighborhoodEventsMap from '@/components/maps/NeighborhoodEventsMap';
 
 // Map committee names to colors
 const committeeColors = {
@@ -108,21 +110,21 @@ const EventCard = ({ event, index }) => {
     <Link to={eventUrl} className="block hover:no-underline">
       <article 
         ref={ref}
-        className={`flex flex-col md:flex-row bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
+        className={`flex flex-col bg-white rounded-xl overflow-hidden shadow-sm ${borderClass} hover-lift ${
           isVisible 
             ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
             : 'opacity-0 translate-y-10'
         }`}
         style={{ transitionDelay: `${index * 100}ms` }}
       >
-        <div className="md:w-1/3 h-48 md:h-auto relative overflow-hidden">
+        <div className="w-full h-48 relative overflow-hidden">
           <img 
             src={event.image} 
             alt={event.title}
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
         </div>
-        <div className="md:w-2/3 p-6">
+        <div className="p-6">
           <div className="flex flex-wrap gap-3 mb-3">
             {committeeData && (
               <div className={`flex items-center text-sm px-3 py-1 rounded-full ${committeeColor ? committeeColor.replace('border', 'bg').replace('getigne', 'getigne') : 'bg-getigne-50'} text-getigne-700`}>
@@ -164,23 +166,41 @@ const EventCard = ({ event, index }) => {
 };
 
 const Events = () => {
-  const [eventsData, setEventsData] = useState([]);
+  const [regularEvents, setRegularEvents] = useState([]);
+  const [neighborhoodEvents, setNeighborhoodEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const { data, error } = await supabase
+        // Récupérer les événements réguliers (non-neighborhood)
+        const { data: regularData, error: regularError } = await supabase
           .from('events')
           .select('*')
           .eq('status', 'published')
+          .neq('event_type', 'neighborhood')
+          .gte('date', new Date().toISOString())
           .order('date', { ascending: true })
           .limit(2);
         
-        if (error) throw error;
+        if (regularError) throw regularError;
+
+        // Récupérer les cafés de quartier
+        const { data: neighborhoodData, error: neighborhoodError } = await supabase
+          .from('events')
+          .select('*')
+          .eq('status', 'published')
+          .eq('event_type', 'neighborhood')
+          .gte('date', new Date().toISOString())
+          .order('date', { ascending: true })
+          .limit(2);
         
-        setEventsData(data);
+        if (neighborhoodError) throw neighborhoodError;
+        
+        setRegularEvents(regularData || []);
+        setNeighborhoodEvents(neighborhoodData || []);
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
@@ -225,19 +245,88 @@ const Events = () => {
           </p>
         </div>
 
-        <div className="flex flex-col gap-8">
-          {eventsData.map((event, index) => (
-            <EventCard key={event.id} event={event} index={index} />
-          ))}
-        </div>
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Événements réguliers */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-semibold text-getigne-900">Événements</h3>
+              <Link 
+                to={Routes.AGENDA}
+                className="text-getigne-accent hover:text-getigne-accent/80 transition-colors text-sm font-medium inline-flex items-center"
+              >
+                Voir tout
+                <ArrowUpRight className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+            
+            <div className="space-y-6">
+              {regularEvents.length > 0 ? (
+                regularEvents.map((event, index) => (
+                  <EventCard key={event.id} event={event} index={index} />
+                ))
+              ) : (
+                <div className="text-center py-8 bg-getigne-50 rounded-lg">
+                  <Calendar className="mx-auto h-12 w-12 text-getigne-300 mb-4" />
+                  <p className="text-getigne-600">Aucun événement à venir</p>
+                </div>
+              )}
+            </div>
+          </div>
 
-        <div className="mt-12 text-center">
-          <Link 
-            to="/agenda"
-            className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90 px-4 py-2 inline-flex items-center"
-          >
-            Voir tous les événements
-          </Link>
+          {/* Cafés de quartier */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-semibold text-getigne-900 flex items-center">
+                <Coffee className="mr-2 h-6 w-6 text-getigne-accent" />
+                Cafés de quartier
+              </h3>
+            </div>
+            
+            <div className="space-y-6">
+              {loading ? (
+                <div className="bg-getigne-50 rounded-lg h-80 flex items-center justify-center">
+                  <p className="text-getigne-600">Chargement de la carte...</p>
+                </div>
+              ) : neighborhoodEvents.length > 0 ? (
+                <>
+                  <div className="rounded-lg overflow-hidden shadow-lg">
+                    <NeighborhoodEventsMap
+                      events={neighborhoodEvents}
+                      selectedEvent={selectedEvent}
+                      onEventSelect={setSelectedEvent}
+                      center={{ lat: 47.0847, lng: -1.2614 }}
+                    />
+                  </div>
+                  <div className="text-center">
+                    <Link 
+                      to={Routes.NEIGHBORHOOD_EVENTS}
+                      className="inline-flex items-center bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <Coffee className="mr-2 h-5 w-5" />
+                      Découvrir les cafés de quartier
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-center py-12 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg border border-amber-100">
+                    <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                      <Coffee className="w-8 h-8 text-amber-600" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-getigne-900 mb-2">Aucun café de quartier programmé</h4>
+                    <p className="text-getigne-600 mb-4">Soyez le premier à organiser une rencontre conviviale !</p>
+                    <Link 
+                      to="/contact?type=organizer&subject=Je%20souhaite%20organiser%20un%20caf%C3%A9%20de%20quartier%20chez%20moi"
+                      className="inline-flex items-center bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      <Coffee className="mr-2 h-4 w-4" />
+                      Organiser un café de quartier
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>

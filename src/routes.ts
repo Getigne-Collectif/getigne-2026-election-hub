@@ -9,6 +9,7 @@ export enum Routes {
   NEWS_DETAIL = "/news/:slug",
   AGENDA = "/agenda",
   EVENT_DETAIL = "/agenda/:slug",
+  NEIGHBORHOOD_EVENTS = "/cafes-de-quartier",
   TEAM = "/equipe",
   COMMITTEES = "/comites",
   COMMITTEE_DETAIL = "/comites/:id",
@@ -63,7 +64,7 @@ export enum Routes {
  */
 export const generateRoutes = {
   newsDetail: (slug: string) => `/news/${slug}`,
-  eventDetail: (slug: string) => `/events/${slug}`,
+  eventDetail: (slug: string) => `/agenda/${slug}`,
   committeeDetail: (id: string) => `/comites/${id}`,
   adminNewsEdit: (id: string) => `/admin/news/${id}/edit`,
   adminEventsEdit: (id: string) => `/admin/events/${id}/edit`,

@@ -78,6 +78,7 @@ interface EventsManagementProps {
   onCreateEvent: (formData: EventFormData, status: 'draft' | 'published' | 'archived') => Promise<any>;
   onUpdateEvent: (id: string, formData: Partial<EventFormData>, status?: string) => Promise<void>;
   onDeleteEvent: (id: string) => Promise<void>;
+  isNeighborhoodEvents?: boolean;
 }
 
 const EventsManagement: React.FC<EventsManagementProps> = ({
@@ -87,6 +88,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
   onCreateEvent,
   onUpdateEvent,
   onDeleteEvent,
+  isNeighborhoodEvents = false,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -174,13 +176,6 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button
-          onClick={() => navigate('/admin/events/new')}
-          className="gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Créer un événement
-        </Button>
       </div>
 
       {loading ? (

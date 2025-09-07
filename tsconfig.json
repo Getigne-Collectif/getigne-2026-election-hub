@@ -15,6 +15,6 @@
     "allowJs": true,
     "noUnusedLocals": false,
     "strictNullChecks": false,
-    "types": ["vite/client", "node", "jest", "vite-plugin-svgr/client"]
+    "types": ["vite/client", "node", "jest", "vite-plugin-svgr/client", "google.maps"]
   }
 }

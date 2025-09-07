@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, Clock, MapPin, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Coffee, Package, UserCheck, Mail, Phone } from 'lucide-react';
 import EventRegistration from '@/components/events/EventRegistration';
 
 interface EventSidebarProps {
@@ -64,8 +64,51 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
               </div>
             </li>
           )}
+          {event.organizer_name && (
+            <li className="flex">
+              <Users className="mr-3 h-5 w-5 text-getigne-600 flex-shrink-0" />
+              <div>
+                <span className="font-medium">Organisateur:</span> {event.organizer_name}
+              </div>
+            </li>
+          )}
         </ul>
       </div>
+
+      {/* Special section for neighborhood events */}
+      {event.event_type === 'neighborhood' && (
+        <>
+          {/* Contact information for organizer */}
+          {event.organizer_contact && (
+            <div className="bg-getigne-accent/5 p-6 rounded-lg mt-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center">
+                <Coffee className="mr-2 h-5 w-5 text-getigne-accent" />
+                Contact
+              </h2>
+              <div className="space-y-2">
+                <div className="flex items-center text-sm text-getigne-700">
+                  {event.organizer_contact.includes('@') ? (
+                    <>
+                      <Mail className="mr-2 h-4 w-4 text-getigne-accent" />
+                      <a href={`mailto:${event.organizer_contact}`} className="hover:text-getigne-accent">
+                        {event.organizer_contact}
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <Phone className="mr-2 h-4 w-4 text-getigne-accent" />
+                      <a href={`tel:${event.organizer_contact}`} className="hover:text-getigne-accent">
+                        {event.organizer_contact}
+                      </a>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+        </>
+      )}
     </div>
   );
 };
