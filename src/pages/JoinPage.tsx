@@ -168,7 +168,7 @@ const JoinPage = () => {
                           variant="outline"
                           size="lg"
                           className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5"
-                          onClick={() => window.open(HELLOASSO_JOIN_URL, '_blank')}
+                          onClick={() => window.open('https://www.helloasso.com/beta/associations/getigne-collectif/formulaires/2', '_blank')}
                         >
                           Faire un don
                         </Button>
