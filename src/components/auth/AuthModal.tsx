@@ -65,17 +65,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setLoading(true);
     try {
       await signUp(values.email, values.password, values.first_name, values.last_name);
-      toast({
-        title: 'Compte créé avec succès',
-        description: 'Vérifiez votre e-mail pour confirmer votre compte.',
-      });
+      // Le message toast est déjà géré dans le hook useAuth
       onClose();
     } catch (error: any) {
-      toast({
-        title: 'Erreur lors de l\'inscription',
-        description: error.message || 'Une erreur est survenue',
-        variant: 'destructive'
-      });
+      // Le message d'erreur est déjà géré dans le hook useAuth
     } finally {
       setLoading(false);
     }

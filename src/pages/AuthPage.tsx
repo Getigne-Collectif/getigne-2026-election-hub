@@ -85,12 +85,13 @@ const AuthPage = () => {
         throw error;
       }
 
-      if (data?.user) {
-        setUser(data.user);
+      // Déconnecter l'utilisateur s'il a été connecté automatiquement
+      // car sa session ne sera pas persistante sans confirmation d'email
+      await supabase.auth.signOut();
 
-        await sendDiscordNotification({
-          title: `👤 Nouvel utilisateur inscrit`,
-          message: `
+      await sendDiscordNotification({
+        title: `👤 Nouvel utilisateur inscrit`,
+        message: `
 **Nom**: ${values.first_name} ${values.last_name}
 **Email**: ${values.email}
 **Date**: ${new Date().toLocaleDateString('fr-FR', {
@@ -100,17 +101,16 @@ const AuthPage = () => {
   hour: '2-digit',
   minute: '2-digit'
 })}
-          `,
-          color: DiscordColors.ORANGE,
-          username: "Système d'Authentication"
-        });
+        `,
+        color: DiscordColors.ORANGE,
+        username: "Système d'Authentication"
+      });
 
-        toast({
-          title: 'Compte créé avec succès',
-          description: 'Votre compte a été créé avec succès.',
-        });
-        navigate('/');
-      }
+      toast({
+        title: 'Inscription presque terminée !',
+        description: 'Vérifiez votre boîte mail et cliquez sur le lien de confirmation pour activer votre compte.',
+        duration: 8000,
+      });
     } catch (error: any) {
       toast({
         title: 'Erreur lors de l\'inscription',

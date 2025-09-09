@@ -41,11 +41,11 @@ const SignUpForm = ({ onSuccess }: SignUpFormProps) => {
     setIsLoading(true);
     try {
       await signUp(data.email, data.password, data.firstName, data.lastName);
-      toast.success('Compte créé avec succès ! Veuillez vérifier votre email pour confirmer votre compte.');
+      // Le message toast est déjà géré dans le hook useAuth
       if (onSuccess) onSuccess();
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
-      toast.error(error.message || "Erreur lors de l'inscription");
+      // Le message d'erreur est déjà géré dans le hook useAuth
     } finally {
       setIsLoading(false);
     }

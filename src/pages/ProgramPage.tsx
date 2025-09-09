@@ -52,7 +52,7 @@ const steps = [
     title: 'Synthèse et cohérence',
     description: 'Analyse et harmonisation des propositions',
     period: 'Printemps / Été 2025',
-    status: 'completed' as const,
+    status: 'current' as const,
     details: [
       'Analyse des propositions des commissions',
       'Harmonisation et cohérence globale',
@@ -555,7 +555,7 @@ const ProgramPage = () => {
               <div className="my-12">
                 <Card className="border-getigne-100 shadow-lg">
                   <CardHeader className="bg-gradient-to-r from-white to-gray-100">
-                    <CardTitle className="text-2xl text-getigne-900">Comment ce programme est été élaboré</CardTitle>
+                    <CardTitle className="text-2xl text-getigne-900">Les étapes de l'élaboration de ce programme</CardTitle>
                   </CardHeader>
                   <CardContent className="p-8">
                   <ProgramTimeline 

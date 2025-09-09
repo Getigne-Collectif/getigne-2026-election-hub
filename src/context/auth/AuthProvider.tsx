@@ -137,9 +137,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
+      // Déconnecter l'utilisateur s'il a été connecté automatiquement
+      // car sa session ne sera pas persistante sans confirmation d'email
+      await supabase.auth.signOut();
+
       toast({
-        title: 'Compte créé avec succès',
-        description: 'Vérifiez votre e-mail pour confirmer votre compte.',
+        title: 'Inscription presque terminée !',
+        description: 'Vérifiez votre boîte mail et cliquez sur le lien de confirmation pour activer votre compte.',
+        duration: 8000,
       });
     } catch (error: any) {
       toast({
