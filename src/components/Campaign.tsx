@@ -74,8 +74,8 @@ const Campaign = () => {
             </div>
             <div className="relative h-64 md:h-96 rounded-xl overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-                alt="Groupe d'amis discutant ensemble" 
+                src="/images/GC-group1.jpg" 
+                alt="Quelques membres du collectif" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-getigne-900/50 to-transparent pointer-events-none"></div>
