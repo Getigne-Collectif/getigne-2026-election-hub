@@ -69,7 +69,7 @@ const NeighborhoodEventsPage = () => {
         .select('*')
         .eq('event_type', 'neighborhood')
         .eq('status', 'published')
-        .order('date', { ascending: false }); // Plus récents en premier
+        .order('date', { ascending: true }); // Plus récents en premier
 
       console.log('[NeighborhoodEvents] Neighborhood events query result:', { data, error });
       
