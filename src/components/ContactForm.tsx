@@ -404,7 +404,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
           rows={6}
           value={formData.message}
           onChange={handleChange}
-          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500 resize-none"
+          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
           placeholder="Décrivez votre demande, question ou suggestion..."
           required
         />

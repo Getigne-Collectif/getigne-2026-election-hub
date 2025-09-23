@@ -37,7 +37,7 @@ const LegalPage = () => {
               </p>
 
               <p className="mt-4">
-                <strong>Hébergement du site :</strong> Ce site est hébergé par la société [Nom de l'hébergeur], [Adresse de l'hébergeur], [Téléphone de l'hébergeur].
+                <strong>Hébergement du site :</strong> Ce site est hébergé sur la plateforme Vercel.
               </p>
             </section>
 

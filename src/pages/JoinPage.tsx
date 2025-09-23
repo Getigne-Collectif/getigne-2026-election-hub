@@ -15,9 +15,11 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.tsx";
 import ContactForm from "@/components/ContactForm";
+import { usePostHog } from "@/hooks/usePostHog";
 
 const JoinPage = () => {
   const location = useLocation();
+  const { capture } = usePostHog();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -34,6 +36,26 @@ const JoinPage = () => {
   }, [location]);
 
   const HELLOASSO_JOIN_URL = import.meta.env.VITE_HELLOASSO_JOIN_URL as string;
+
+  const handleJoinClick = () => {
+    // Track HelloAsso join click in PostHog
+    capture('helloasso_join_click', {
+      source: 'join_page',
+      url: HELLOASSO_JOIN_URL,
+      timestamp: new Date().toISOString()
+    });
+    window.open(HELLOASSO_JOIN_URL, '_blank');
+  };
+
+  const handleDonationClick = () => {
+    // Track donation click in PostHog
+    capture('donation_click', {
+      source: 'join_page',
+      url: 'https://www.helloasso.com/beta/associations/getigne-collectif/formulaires/2',
+      timestamp: new Date().toISOString()
+    });
+    window.open('https://www.helloasso.com/beta/associations/getigne-collectif/formulaires/2', '_blank');
+  };
   return (
     <HelmetProvider>
       <Helmet>
@@ -160,7 +182,7 @@ const JoinPage = () => {
                         <Button
                           size="lg"
                           className="bg-getigne-accent hover:bg-getigne-accent/90 text-white"
-                          onClick={() => window.open(HELLOASSO_JOIN_URL, '_blank')}
+                          onClick={handleJoinClick}
                         >
                           Adhérer en ligne
                         </Button>
@@ -168,7 +190,7 @@ const JoinPage = () => {
                           variant="outline"
                           size="lg"
                           className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5"
-                          onClick={() => window.open('https://www.helloasso.com/beta/associations/getigne-collectif/formulaires/2', '_blank')}
+                          onClick={handleDonationClick}
                         >
                           Faire un don
                         </Button>

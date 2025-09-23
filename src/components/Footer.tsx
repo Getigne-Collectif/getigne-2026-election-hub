@@ -65,7 +65,7 @@ const Footer = () => {
             </div>
             <p className="text-getigne-100 mb-6">
               Collectif citoyen engagé pour les élections municipales depuis 2020 à Gétigné.
-              Ensemble, construisons une commune plus solidaire, écologique et participative.
+              Ensemble, construisons une commune plus dynamique, engagée et démocratique.
             </p>
             <div className="flex space-x-4">
               {FACEBOOK_URL && (

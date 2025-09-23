@@ -4,10 +4,12 @@ import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, Heart, 
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useAuth } from '@/context/AuthContext';
 import { Routes } from '@/routes';
+import { usePostHog } from '@/hooks/usePostHog';
 
 const Campaign = () => {
   const { settings } = useAppSettings();
   const { isAdmin, userRoles } = useAuth();
+  const { capture } = usePostHog();
   const HELLOASSO_JOIN_URL = import.meta.env.VITE_HELLOASSO_JOIN_URL as string;
   
   // Détermine si l'utilisateur peut accéder au programme
@@ -15,6 +17,15 @@ const Campaign = () => {
     settings.showProgram || 
     userRoles.includes('admin') || 
     userRoles.includes('program_manager');
+
+  const handleHelloAssoClick = () => {
+    // Track HelloAsso click in PostHog
+    capture('helloasso_join_click', {
+      source: 'campaign_page',
+      url: HELLOASSO_JOIN_URL,
+      timestamp: new Date().toISOString()
+    });
+  };
   
   return (
     <section id="campaign" className="py-24 px-4 bg-white">
@@ -99,7 +110,7 @@ const Campaign = () => {
               Adhérez ou faites un don pour financer la campagne.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <a href={HELLOASSO_JOIN_URL} target="_blank" rel="noopener noreferrer">Adhérer ou faire un don</a>
+              <a href={HELLOASSO_JOIN_URL} target="_blank" rel="noopener noreferrer" onClick={handleHelloAssoClick}>Adhérer ou faire un don</a>
             </Button>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">

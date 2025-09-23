@@ -5,6 +5,7 @@ import { useToast } from '@/components/ui/use-toast';
 import AuthContext from './AuthContext';
 import { Profile, IAuthContext } from './types';
 import { fetchUserRoles, fetchUserProfile } from './utils';
+import { usePostHog } from '@/hooks/usePostHog';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -15,6 +16,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authChecked, setAuthChecked] = useState(false);
   const [isInvitedUser, setIsInvitedUser] = useState(false);
   const { toast } = useToast();
+  const { capture } = usePostHog();
 
   const refreshUserRoles = async () => {
     if (!user) {
@@ -50,6 +52,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
         setIsInvitedUser(isNewInvitedUser);
+        
+        // Track user login in PostHog
+        const loginMethod = session.user.app_metadata?.provider || 'email';
+        capture('user_login', {
+          user_id: session.user.id,
+          email: session.user.email,
+          is_new_user: isNewInvitedUser,
+          login_method: loginMethod,
+          timestamp: new Date().toISOString()
+        });
         
         setLoading(false);
         setAuthChecked(true);
@@ -137,6 +149,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
+      // Track user registration in PostHog
+      capture('user_registration', {
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+        registration_method: 'email',
+        timestamp: new Date().toISOString()
+      });
+
       // Déconnecter l'utilisateur s'il a été connecté automatiquement
       // car sa session ne sera pas persistante sans confirmation d'email
       await supabase.auth.signOut();
@@ -171,6 +192,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google') => {
     try {
+      // Track OAuth login attempt in PostHog
+      capture('oauth_login_attempt', {
+        provider: provider,
+        timestamp: new Date().toISOString()
+      });
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
