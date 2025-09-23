@@ -187,6 +187,9 @@ ${formData.message}${participationInfo}${newsletterInfo}
         try {
           await subscribeToNewsletter({
             email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            source: 'contact_form',
           });
           
           // Track newsletter subscription in PostHog

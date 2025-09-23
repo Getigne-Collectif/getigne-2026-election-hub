@@ -14,7 +14,8 @@ import { usePostHog } from '@/hooks/usePostHog';
 
 // Schéma de validation pour le formulaire
 const formSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
+  firstName: z.string().min(2, { message: 'Le prénom doit contenir au moins 2 caractères' }),
+  lastName: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
   email: z.string().email({ message: 'Adresse email invalide' }),
   newsletter: z.boolean().optional(),
 });
@@ -29,7 +30,8 @@ const ProgramAlertForm = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       newsletter: true,
     },
@@ -41,7 +43,7 @@ const ProgramAlertForm = () => {
       // Envoyer une notification Discord
       await sendDiscordNotification({
         title: "Alerte programme - Nouvel inscrit",
-        message: `Nom: ${data.name}\nEmail: ${data.email}\nNewsletter: ${data.newsletter ? 'Oui' : 'Non'}`,
+        message: `Prénom: ${data.firstName}\nNom: ${data.lastName}\nEmail: ${data.email}\nNewsletter: ${data.newsletter ? 'Oui' : 'Non'}`,
         color: DiscordColors.BLUE,
         username: "Programme Bot",
         resourceType: 'user'
@@ -51,6 +53,9 @@ const ProgramAlertForm = () => {
       if (data.newsletter) {
         await subscribeToNewsletter({
           email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          source: 'program_alert_form',
         });
         
         // Track newsletter subscription in PostHog
@@ -63,7 +68,8 @@ const ProgramAlertForm = () => {
       
       // Track program alert subscription in PostHog
       capture('program_alert_subscription', {
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
         email: data.email,
         newsletter_subscribed: data.newsletter,
         timestamp: new Date().toISOString()
@@ -102,24 +108,45 @@ const ProgramAlertForm = () => {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm">Nom</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Input placeholder="Votre nom" {...field} className="pl-9 h-10" />
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-getigne-500">
-                      <BookOpen className="h-4 w-4" />
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">Prénom</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input placeholder="Votre prénom" {...field} className="pl-9 h-10" />
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-getigne-500">
+                        <BookOpen className="h-4 w-4" />
+                      </div>
                     </div>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">Nom</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input placeholder="Votre nom" {...field} className="pl-9 h-10" />
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-getigne-500">
+                        <BookOpen className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           
           <FormField
             control={form.control}

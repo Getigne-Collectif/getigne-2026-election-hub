@@ -30,7 +30,10 @@ const Footer = () => {
     setIsSubmitting(true);
 
     try {
-      const subscription: NewsletterSubscription = { email };
+      const subscription: NewsletterSubscription = { 
+        email,
+        source: 'footer'
+      };
       await subscribeToNewsletter(subscription);
       
       // Track newsletter subscription in PostHog
