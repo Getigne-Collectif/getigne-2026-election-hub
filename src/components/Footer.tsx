@@ -8,11 +8,13 @@ import {DiscordLogoIcon} from "@radix-ui/react-icons";
 import FacebookIcon from '@/components/icons/facebook.svg?react';
 import InstagramIcon from '@/components/icons/instagram.svg?react';
 import { Routes } from '@/routes';
+import { usePostHog } from '@/hooks/usePostHog';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { capture } = usePostHog();
   const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
   const FACEBOOK_URL = import.meta.env.VITE_FACEBOOK_URL as string;
   const INSTAGRAM_URL = import.meta.env.VITE_INSTAGRAM_URL as string;
@@ -30,6 +32,14 @@ const Footer = () => {
     try {
       const subscription: NewsletterSubscription = { email };
       await subscribeToNewsletter(subscription);
+      
+      // Track newsletter subscription in PostHog
+      capture('newsletter_subscription', {
+        email: email,
+        source: 'footer',
+        timestamp: new Date().toISOString()
+      });
+      
       toast.success("Merci de votre inscription à notre newsletter !");
       setEmail(''); // Réinitialiser le champ email
     } catch (error) {

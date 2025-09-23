@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Loader2, Check, X, Users } from 'lucide-react';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 import { Routes } from '@/routes';
+import { usePostHog } from '@/hooks/usePostHog';
 
 interface EventRegistrationProps {
   eventId: string;
@@ -25,6 +26,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
 }) => {
   const { user, isMember } = useAuth();
   const { toast } = useToast();
+  const { capture } = usePostHog();
   const [isRegistered, setIsRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
@@ -154,6 +156,17 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           variant: 'default'
         });
         
+        // Track event registration in PostHog
+        capture('event_registration', {
+          event_id: eventId,
+          event_title: eventData?.title,
+          event_date: eventData?.date,
+          user_id: user.id,
+          is_member: isMember,
+          is_members_only: isMembersOnly,
+          participant_count: participantCount + 1
+        });
+        
         setIsRegistered(true);
         fetchParticipantCount();
         onRegistrationChange();
@@ -188,11 +201,30 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           variant: 'destructive'
         });
       } else {
+        // Get event data for tracking
+        const { data: eventData } = await supabase
+          .from('events')
+          .select('title, date')
+          .eq('id', eventId)
+          .single();
+        
         toast({
           title: 'Désinscription confirmée',
           description: 'Vous n\'êtes plus inscrit à cet événement',
           variant: 'default'
         });
+        
+        // Track event unregistration in PostHog
+        capture('event_unregistration', {
+          event_id: eventId,
+          event_title: eventData?.title,
+          event_date: eventData?.date,
+          user_id: user.id,
+          is_member: isMember,
+          is_members_only: isMembersOnly,
+          participant_count: participantCount - 1
+        });
+        
         setIsRegistered(false);
         fetchParticipantCount();
         onRegistrationChange();

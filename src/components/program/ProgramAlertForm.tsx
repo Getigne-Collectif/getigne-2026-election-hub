@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { subscribeToNewsletter } from '@/utils/newsletter';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 import { BookOpen, Mail, Bell } from 'lucide-react';
+import { usePostHog } from '@/hooks/usePostHog';
 
 // Schéma de validation pour le formulaire
 const formSchema = z.object({
@@ -23,6 +24,7 @@ type FormValues = z.infer<typeof formSchema>;
 const ProgramAlertForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { capture } = usePostHog();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -50,7 +52,22 @@ const ProgramAlertForm = () => {
         await subscribeToNewsletter({
           email: data.email,
         });
+        
+        // Track newsletter subscription in PostHog
+        capture('newsletter_subscription', {
+          email: data.email,
+          source: 'program_alert_form',
+          timestamp: new Date().toISOString()
+        });
       }
+      
+      // Track program alert subscription in PostHog
+      capture('program_alert_subscription', {
+        name: data.name,
+        email: data.email,
+        newsletter_subscribed: data.newsletter,
+        timestamp: new Date().toISOString()
+      });
       
       toast({
         title: "Inscription réussie",

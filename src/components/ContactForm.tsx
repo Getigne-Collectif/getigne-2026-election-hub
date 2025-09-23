@@ -12,6 +12,8 @@ import InstagramIcon from '@/components/icons/instagram.svg?react';
 import { useToast } from '@/components/ui/use-toast';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 import { DiscordLogoIcon, InstagramLogoIcon } from '@radix-ui/react-icons';
+import { usePostHog } from '@/hooks/usePostHog';
+import { subscribeToNewsletter } from '@/utils/newsletter';
 
 interface ContactFormProps {
   showParticipation?: boolean;
@@ -31,6 +33,7 @@ const ContactForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
+  const { capture } = usePostHog();
   const [searchParams] = useSearchParams();
   
   const [formData, setFormData] = useState({
@@ -178,6 +181,24 @@ ${formData.message}${participationInfo}${newsletterInfo}
         color: DiscordColors.BLUE,
         username: "Formulaire de Contact"
       });
+      
+      // Si l'utilisateur a coché la case newsletter, l'inscrire à la newsletter
+      if (showNewsletter && newsletterSubscription) {
+        try {
+          await subscribeToNewsletter({
+            email: formData.email,
+          });
+          
+          // Track newsletter subscription in PostHog
+          capture('newsletter_subscription', {
+            email: formData.email,
+            source: 'contact_form',
+            timestamp: new Date().toISOString()
+          });
+        } catch (error) {
+          console.error('Erreur lors de l\'inscription à la newsletter:', error);
+        }
+      }
       
       // Réinitialiser le formulaire
       setFormData({

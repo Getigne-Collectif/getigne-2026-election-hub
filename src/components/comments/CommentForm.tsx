@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 import { ResourceType, Comment, CommentStatus } from '@/types/comments.types';
+import { usePostHog } from '@/hooks/usePostHog';
 
 interface CommentFormProps {
   newsId?: string;
@@ -26,6 +27,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
   const [content, setContent] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { toast } = useToast();
+  const { capture } = usePostHog();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +107,17 @@ const CommentForm: React.FC<CommentFormProps> = ({
         } as Comment;
 
         onCommentAdded(newComment);
+        
+        // Track article comment in PostHog
+        capture('article_comment', {
+          comment_id: commentData.id,
+          news_id: newsId,
+          user_id: user.id,
+          comment_length: content.length,
+          is_moderator: isModerator,
+          status: initialStatus,
+          resource_type: 'news'
+        });
       } else {
         console.log('Adding comment to program:', programItemId, 'program point:', programPointId);
         
@@ -158,6 +171,18 @@ const CommentForm: React.FC<CommentFormProps> = ({
         } as Comment;
 
         onCommentAdded(newComment);
+        
+        // Track program comment in PostHog
+        capture('program_comment', {
+          comment_id: insertedComment.id,
+          program_item_id: programItemId,
+          program_point_id: programPointId,
+          user_id: user.id,
+          comment_length: content.length,
+          is_moderator: isModerator,
+          status: initialStatus,
+          resource_type: 'program'
+        });
       }
 
       setContent('');
