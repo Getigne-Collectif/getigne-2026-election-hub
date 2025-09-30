@@ -48,6 +48,12 @@ const EventDetails: React.FC<EventDetailsProps> = ({
               <span>{event.committee}</span>
             </div>
           )}
+          {event.max_participants && (
+            <div className="flex items-center text-getigne-700">
+              <Users className="mr-3 h-5 w-5 text-getigne-accent" />
+              <span>Maximum {event.max_participants} participants</span>
+            </div>
+          )}
           {event.organizer_name && (
             <div className="flex items-center text-getigne-700">
               <Users className="mr-3 h-5 w-5 text-getigne-accent" />

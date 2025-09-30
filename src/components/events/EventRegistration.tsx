@@ -15,6 +15,7 @@ interface EventRegistrationProps {
   allowRegistration: boolean;
   isPastEvent: boolean;
   onRegistrationChange: () => void;
+  event?: any; // Ajouter l'événement complet pour accéder à max_participants
 }
 
 export const EventRegistration: React.FC<EventRegistrationProps> = ({
@@ -22,7 +23,8 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
   isMembersOnly,
   allowRegistration,
   isPastEvent,
-  onRegistrationChange
+  onRegistrationChange,
+  event
 }) => {
   const { user, isMember } = useAuth();
   const { toast } = useToast();
@@ -96,6 +98,16 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
       toast({
         title: 'Événement réservé aux adhérents',
         description: 'Seuls les adhérents peuvent s\'inscrire à cet événement',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Vérifier si le maximum de participants est atteint
+    if (event?.max_participants && participantCount >= event.max_participants) {
+      toast({
+        title: 'Événement complet',
+        description: `Le nombre maximum de participants (${event.max_participants}) est atteint`,
         variant: 'destructive'
       });
       return;
@@ -329,14 +341,22 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           </Button>
         </div>
       ) : (
-        <Button 
-          className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
-          onClick={handleRegister}
-          disabled={registering}
-        >
-          {registering ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-          S'inscrire
-        </Button>
+        <div>
+          {event?.max_participants && participantCount >= event.max_participants ? (
+            <div className="flex items-center gap-2 mb-3 text-sm text-red-600 bg-red-50 p-2 rounded">
+              <X size={16} />
+              <span>Événement complet ({participantCount}/{event.max_participants} participants)</span>
+            </div>
+          ) : null}
+          <Button 
+            className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
+            onClick={handleRegister}
+            disabled={registering || (event?.max_participants && participantCount >= event.max_participants)}
+          >
+            {registering ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+            S'inscrire
+          </Button>
+        </div>
       )}
     </div>
   );

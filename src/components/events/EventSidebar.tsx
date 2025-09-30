@@ -31,6 +31,7 @@ const EventSidebar: React.FC<EventSidebarProps> = ({
             allowRegistration={event.allow_registration}
             isPastEvent={isPastEvent}
             onRegistrationChange={onRegistrationChange}
+            event={event}
           />
         </div>
       )}

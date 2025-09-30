@@ -44,6 +44,7 @@ interface NeighborhoodEvent {
   slug?: string;
   status?: string;
   event_type?: string;
+  max_participants?: number;
 }
 
 const NeighborhoodEventsPage = () => {
@@ -170,6 +171,12 @@ const NeighborhoodEventsPage = () => {
                 <span className="bg-getigne-green-500/10 text-getigne-green-700 px-2 py-1 rounded-full text-xs flex items-center">
                   <UserCheck className="w-3 h-3 mr-1" />
                   Membre présent
+                </span>
+              )}
+              {event.max_participants && (
+                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs flex items-center">
+                  <Users className="w-3 h-3 mr-1" />
+                  Max {event.max_participants} participants
                 </span>
               )}
             </div>

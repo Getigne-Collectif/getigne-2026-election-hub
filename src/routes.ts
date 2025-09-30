@@ -10,6 +10,7 @@ export enum Routes {
   AGENDA = "/agenda",
   EVENT_DETAIL = "/agenda/:slug",
   NEIGHBORHOOD_EVENTS = "/cafes-de-quartier",
+  NEIGHBORHOOD_KIT = "/cafes-de-quartier/kit",
   TEAM = "/equipe",
   COMMITTEES = "/comites",
   COMMITTEE_DETAIL = "/comites/:id",

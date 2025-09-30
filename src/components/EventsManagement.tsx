@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, FileEdit, Trash2, Plus, Calendar, MapPin, Users } from 'lucide-react';
+import { Search, FileEdit, Trash2, Plus, Calendar, MapPin, Users, Package } from 'lucide-react';
 import { Link, useNavigate, generatePath } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
@@ -54,6 +54,7 @@ interface Event {
   is_members_only?: boolean;
   status?: string;
   slug?: string;
+  event_type?: string;
   created_at: string;
   updated_at: string;
 }
@@ -236,6 +237,18 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
                     >
                       <FileEdit className="h-4 w-4" />
                     </Button>
+                    {event.event_type === 'neighborhood' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        title="Voir le kit d'organisation"
+                      >
+                        <Link to={`/cafes-de-quartier/kit?id=${event.id}`}>
+                          <Package className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    )}
                     <select
                       value={event.status || 'published'}
                       onChange={(e) => handleToggleStatus(event, e.target.value)}
