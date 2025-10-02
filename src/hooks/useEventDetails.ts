@@ -11,15 +11,6 @@ export const useEventDetails = (
   refreshRegistrations: boolean
 ) => {
   const [eventId, setEventId] = useState<string | null>(null);
-  
-  // Fonction de log pour le débogage
-  const logDebug = (message: string, data?: any) => {
-    if (data) {
-      console.log(`[useEventDetails] ${message}:`, data);
-    } else {
-      console.log(`[useEventDetails] ${message}`);
-    }
-  };
 
   // Détermine si nous avons un ID ou un slug
   useEffect(() => {
@@ -29,17 +20,11 @@ export const useEventDetails = (
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
       
       if (isUuid) {
-        logDebug("Setting event ID from UUID param", id);
         setEventId(id);
-      } else {
-        // Si ce n'est pas un UUID, c'est probablement un slug
-        logDebug("ID param is not a UUID, treating as slug", id);
       }
     }
   }, [id]);
-
-  logDebug('Params received', { id, slug });
-  
+ 
   // Si nous avons un slug, récupérer d'abord l'ID réel
   const { data: slugData, isLoading: isLoadingSlug, error: slugError } = useQuery({
     queryKey: ['event-slug', id, slug],
@@ -47,7 +32,6 @@ export const useEventDetails = (
       const slugToUse = slug || (!eventId ? id : null);
       if (!slugToUse) return null;
       
-      logDebug("Fetching event by slug", slugToUse);
       const { data, error } = await supabase
         .from('events')
         .select('id')
@@ -55,11 +39,9 @@ export const useEventDetails = (
         .maybeSingle();
       
       if (error) {
-        logDebug("Error fetching event by slug", error);
         throw error;
       }
       
-      logDebug("Found event by slug", data);
       return data;
     },
     enabled: !!slug || (!!id && !eventId),
@@ -68,7 +50,6 @@ export const useEventDetails = (
   // Une fois que nous avons l'ID (soit directement, soit à partir du slug), récupérer les détails de l'événement
   useEffect(() => {
     if (slugData && slugData.id) {
-      logDebug("Setting event ID from slug data", slugData.id);
       setEventId(slugData.id);
     }
   }, [slugData]);
@@ -78,7 +59,6 @@ export const useEventDetails = (
     queryFn: async () => {
       if (!eventId) return null;
       
-      logDebug("Fetching event details by ID", eventId);
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -86,11 +66,9 @@ export const useEventDetails = (
         .maybeSingle();
       
       if (error) {
-        logDebug("Error fetching event details", error);
         throw error;
       }
       
-      logDebug("Found event details", data);
       return data;
     },
     enabled: !!eventId,

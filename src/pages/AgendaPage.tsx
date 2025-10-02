@@ -366,13 +366,13 @@ const AgendaPage = () => {
                 ) : (
                   <div className="text-center py-8 bg-getigne-50 rounded-lg">
                     <Coffee className="w-12 h-12 mx-auto mb-4 text-getigne-300" />
-                    <h3 className="text-xl font-medium mb-2">Aucun café de quartier à venir</h3>
+                    <h3 className="text-xl font-medium mb-2">Aucun Café de quartier à venir</h3>
                     <p className="text-getigne-700 mb-4">
                       Les prochaines rencontres de voisinage seront bientôt programmées
                     </p>
                     <Button asChild variant="outline">
                       <Link to="/cafes-de-quartier">
-                        Organiser un café de quartier
+                        Organiser un Café de quartier
                       </Link>
                     </Button>
                   </div>

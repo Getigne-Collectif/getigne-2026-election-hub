@@ -223,7 +223,7 @@ const NeighborhoodEventsMap: React.FC<NeighborhoodEventsMapProps> = ({
           </div>
         ) : (
           <div className="mt-4 text-sm text-getigne-500">
-            <p>Aucun café de quartier à afficher sur la carte</p>
+            <p>Aucun Café de quartier à afficher sur la carte</p>
           </div>
         )}
       </div>

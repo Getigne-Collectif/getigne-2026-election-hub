@@ -326,7 +326,7 @@ const NeighborhoodEventsPage = () => {
                         <p>
                           Que vous souhaitiez organiser une rencontre dans votre jardin, votre salon ou un lieu 
                           public, nous vous accompagnons avec un kit d'organisation et la présence d'un membre 
-                          du collectif si vous le souhaitez.
+                          du collectif.
                         </p>
                       </div>
                     </div>
@@ -335,10 +335,10 @@ const NeighborhoodEventsPage = () => {
                     <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl p-6 border border-amber-200">
                       <h4 className="font-semibold text-amber-900 mb-2 flex items-center">
                         <Users className="w-5 h-5 mr-2" />
-                        Envie d'organiser ?
+                        Envie de vous lancer ?
                       </h4>
                       <p className="text-amber-800 text-sm mb-4">
-                        Contactez-nous pour recevoir votre kit d'organisation et planifier votre café de quartier
+                        Contactez-nous pour planifier votre Café de quartier et recevoir votre kit
                       </p>
                       <Link 
                         to="/contact?type=organizer&subject=Je%20souhaite%20organiser%20un%20caf%C3%A9%20de%20quartier%20chez%20moi" 
@@ -471,7 +471,7 @@ const NeighborhoodEventsPage = () => {
                           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
                             <Coffee className="w-10 h-10 text-amber-600" />
                           </div>
-                          <h3 className="text-2xl font-semibold mb-3 text-getigne-900">Aucun café de quartier programmé</h3>
+                          <h3 className="text-2xl font-semibold mb-3 text-getigne-900">Aucun Café de quartier programmé</h3>
                           <p className="text-getigne-700 mb-6 leading-relaxed">
                             Soyez le <span className="font-semibold text-amber-700">premier</span> à organiser une rencontre conviviale dans votre voisinage !
                           </p>

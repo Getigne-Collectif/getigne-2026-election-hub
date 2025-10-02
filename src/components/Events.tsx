@@ -313,14 +313,14 @@ const Events = () => {
                     <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                       <Coffee className="w-8 h-8 text-amber-600" />
                     </div>
-                    <h4 className="text-lg font-semibold text-getigne-900 mb-2">Aucun café de quartier programmé</h4>
+                    <h4 className="text-lg font-semibold text-getigne-900 mb-2">Aucun Café de quartier programmé</h4>
                     <p className="text-getigne-600 mb-4">Soyez le premier à organiser une rencontre conviviale !</p>
                     <Link 
                       to="/contact?type=organizer&subject=Je%20souhaite%20organiser%20un%20caf%C3%A9%20de%20quartier%20chez%20moi"
                       className="inline-flex items-center bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                     >
                       <Coffee className="mr-2 h-4 w-4" />
-                      Organiser un café de quartier
+                      Organiser un Café de quartier
                     </Link>
                   </div>
                 </>

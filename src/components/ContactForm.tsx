@@ -62,7 +62,7 @@ const ContactForm = ({
     if (type === 'organizer') {
       const messageTemplate = `Bonjour,
 
-Je souhaite organiser un café de quartier chez moi et j'aimerais recevoir le kit d'organisation ainsi que l'accompagnement d'un membre du collectif.
+Je souhaite organiser un Café de quartier chez moi et j'aimerais recevoir le kit d'organisation ainsi que l'accompagnement d'un membre du collectif.
 
 Voici les informations que je peux déjà vous communiquer :
 

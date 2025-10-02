@@ -353,7 +353,7 @@ const NeighborhoodKitPage = () => {
     {
       id: 2,
       stepId: 'digital_communication',
-      title: "Si pertinent, communiquez avec les outils numériques",
+      title: "Si pertinent, communiquez avec les outils numériques.",
       description: "Si vous avez un groupe WhatsApp, Facebook, ou que vous avez l'habitude d'échanger par mail ou autre au sein de votre quartier, profitez-en pour partager l'invitation le plus rapidement possible. Rapide et efficace.",
       icon: Share2,
       color: "bg-cyan-500"
@@ -361,7 +361,7 @@ const NeighborhoodKitPage = () => {
     {
       id: 3,
       stepId: 'flyers_prepare',
-      title: "Téléchargez et imprimez le flyer",
+      title: "Téléchargez et imprimez le flyer.",
       description: "Le flyer est déjà personnalisé avec vos informations - il suffit de l'imprimer ! Nous recommandons de le faire au moins 7-10 jours avant l'événement.",
       icon: FileText,
       color: "bg-green-500"
@@ -369,7 +369,7 @@ const NeighborhoodKitPage = () => {
     {
       id: 4,
       stepId: 'flyers_distribute',
-      title: "Distribuez les flyers",
+      title: "Distribuez les flyers.",
       description: "Idéalement en porte-à-porte, sinon dans les boîtes aux lettres. À faire au moins 5-7 jours avant l'événement.",
       icon: Mail,
       color: "bg-purple-500"
@@ -377,16 +377,16 @@ const NeighborhoodKitPage = () => {
     {
       id: 5,
       stepId: 'structure_preparation',
-      title: "Prenez connaissance de la structure-type et appropriez-vous la",
-      description: "Accueil, jeu brise-glace, présentation du collectif, temps d'échange et projection",
+      title: "Prenez connaissance du déroulé que nous vous proposons ci dessous.",
+      description: "Accueil, jeu brise-glace, présentation du collectif, temps d'échange et projection.",
       icon: Users,
       color: "bg-pink-500"
     },
     {
       id: 6,
       stepId: 'food_drinks',
-      title: "Préparez un petit quelque chose à boire et à manger",
-      description: "Café, thé, jus, biscuits, ou un apéritif simple pour accueillir les gens. Pas besoin de grand chose mais ça fait toujours plaisir ! N'hésitez pas à faire appel au collectif, on peut aussi vous assister sur ce point.",
+      title: "Préparez un petit pot convivial.",
+      description: "Proposez une boisson chaude et/ou fraiche et/ou un petit grignotage pour accueillir les gens : un petit geste pour rendre la rencontre encore plus conviviale ! N'hésitez pas à faire appel aux membre de Gétigné Collectif pour vous assister sur ce point.",
       icon: Coffee,
       color: "bg-amber-500"
     }
@@ -408,9 +408,9 @@ const NeighborhoodKitPage = () => {
       color: "bg-yellow-100 text-yellow-700"
     },
     {
-      phase: "Présentation du collectif",
+      phase: "Présentation de Gétigné Collectif",
       duration: "10-15 min",
-      description: "Un·e membre du collectif présentera nos actions et répondra aux questions.",
+      description: "Un·e membre de Gétigné Collectif présentera nos actions et répondra aux questions.",
       icon: Users,
       color: "bg-blue-100 text-blue-700"
     },
@@ -480,7 +480,7 @@ const NeighborhoodKitPage = () => {
         <title>Kit d'organisation - Cafés de quartier | Gétigné Collectif</title>
         <meta
           name="description"
-          content="Kit complet pour organiser un café de quartier dans votre voisinage. Guide pas à pas, modèles de flyers et conseils pratiques."
+          content="Kit complet pour organiser un Café de quartier dans votre voisinage. Guide pas à pas, modèles de flyers et conseils pratiques."
         />
       </Helmet>
       
@@ -615,7 +615,7 @@ const NeighborhoodKitPage = () => {
                     Checklist pour organiser votre Café de Quartier
                   </h2>
                   <p className="text-lg text-getigne-700 max-w-3xl mx-auto">
-                    Suivez ces étapes dans l'ordre pour préparer au mieux votre rencontre de voisinage
+                    Suivez ces étapes dans l'ordre pour préparer au mieux votre rencontre de voisinage.
                   </p>
                 </div>
 
@@ -692,10 +692,10 @@ const NeighborhoodKitPage = () => {
               <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                   <h2 className="text-3xl font-bold text-getigne-900 mb-4">
-                    Structure type de l'événement
+                    Déroulé de l'événement
                   </h2>
                   <p className="text-lg text-getigne-700 max-w-3xl mx-auto">
-                    Un déroulé testé et approuvé pour un événement réussi
+                    Une proposition de déroulé testée et approuvée pour un événement réussi.
                   </p>
                 </div>
 
@@ -741,10 +741,10 @@ const NeighborhoodKitPage = () => {
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
                   <h2 className="text-3xl font-bold text-getigne-900 mb-4">
-                    Conseils pour organiser ce "café de quartier"
+                    Conseils pour organiser votre Café de quartier
                   </h2>
                   <p className="text-lg text-getigne-700">
-                    Quelques astuces pour que tout se passe bien
+                    Quelques astuces pour que tout se passe bien.
                   </p>
                 </div>
 
@@ -756,7 +756,7 @@ const NeighborhoodKitPage = () => {
                       </div>
                       <h3 className="text-lg font-semibold mb-3 text-getigne-900">Rassurez-vous</h3>
                       <p className="text-getigne-700 text-sm leading-relaxed">
-                        Votre rôle est avant tout d'accueillir les gens. Pas besoin d'être un·e animateur·rice professionnel·le.
+                        <strong>Vous n'êtes pas seul·e</strong>. Une personne de Gétigné Collectif sera présente pour vous accompagner. Votre rôle est avant tout d'accueillir les gens.
                       </p>
                     </CardContent>
                   </Card>
@@ -768,7 +768,7 @@ const NeighborhoodKitPage = () => {
                       </div>
                       <h3 className="text-lg font-semibold mb-3 text-getigne-900">Soyez à l'écoute</h3>
                       <p className="text-getigne-700 text-sm leading-relaxed">
-                        Laissez la parole circuler et encouragez chacun·e à s'exprimer.
+                        Laissez la parole circuler et encouragez chacun·e à s'exprimer, à partager ses idées et ses besoins.
                       </p>
                     </CardContent>
                   </Card>
@@ -798,7 +798,7 @@ const NeighborhoodKitPage = () => {
                     Supports de communication
                   </h2>
                   <p className="text-lg text-getigne-700 max-w-3xl mx-auto">
-                    Téléchargez votre flyer prêt à imprimer avec toutes vos informations, plus des messages pour les réseaux sociaux
+                    Téléchargez votre flyer prêt à imprimer avec toutes vos informations, plus des messages pour les réseaux sociaux.
                   </p>
                 </div>
 
@@ -962,7 +962,7 @@ const NeighborhoodKitPage = () => {
                                 onClick={() => copyToClipboard(
                                  `Bonjour chers voisins, chères voisines ! 👋
 
-Nous organisons un Café de Quartier organisé par le collectif citoyen Gétigné Collectif
+J'organise un Café de Quartier, une démarche impulsée par le collectif citoyen Gétigné Collectif
 
 📅 ${event?.date ? new Date(event.date).toLocaleDateString('fr-FR') : '[Date]'}
 📍 ${event?.location || '[Lieu]'}
@@ -983,7 +983,7 @@ Au plaisir de vous y retrouver ! 😊
                           </div>
                             <div className="bg-white rounded border p-3 text-sm leading-relaxed">
                               <p className="mb-2">Bonjour chers voisins, chères voisines ! 👋</p>
-                              <p className="mb-2">Nous organisons un Café de Quartier organisé par le collectif citoyen Gétigné Collectif</p>
+                              <p className="mb-2">J'organise un Café de Quartier, une démarche impulsée par le collectif citoyen Gétigné Collectif.</p>
                               <p className="mb-2">📅 {event?.date ? new Date(event.date).toLocaleDateString('fr-FR') : '[Date]'}</p>
                               <p className="mb-2">📍 {event?.location || '[Lieu]'}</p>
                               <p className="mb-2">C'est l'occasion de faire connaissance, d'échanger des idées et de renforcer les liens dans notre quartier. Le collectif porte un projet intéressant pour les élections municipales de mars 2026 et souhaite échanger avec nous, les habitants, sur nos attentes et idées pour la commune et notre quartier.</p>

@@ -466,7 +466,7 @@ const AdminEventEditorPage = () => {
           <title>
             {isEditMode 
               ? `Modifier l'${eventType === 'neighborhood' ? 'événement de voisinage' : 'événement'}`
-              : `Créer un ${eventType === 'neighborhood' ? 'café de quartier' : 'événement'}`
+              : `Créer un ${eventType === 'neighborhood' ? 'Café de quartier' : 'événement'}`
             } | Admin | Gétigné Collectif
           </title>
         </Helmet>
@@ -483,7 +483,7 @@ const AdminEventEditorPage = () => {
           <h1 className="text-2xl font-bold">
             {isEditMode 
               ? `Modifier l'${eventType === 'neighborhood' ? 'événement de voisinage' : 'événement'}`
-              : `Créer un ${eventType === 'neighborhood' ? 'café de quartier' : 'événement'}`
+              : `Créer un ${eventType === 'neighborhood' ? 'Café de quartier' : 'événement'}`
             }
           </h1>
         </div>}>
@@ -626,7 +626,7 @@ const AdminEventEditorPage = () => {
                         <div className="space-y-4 p-4 bg-getigne-accent/5 rounded-lg border border-getigne-accent/20">
                           <div className="flex items-center gap-2 text-getigne-accent font-medium">
                             <Coffee className="w-5 h-5" />
-                            Informations café de quartier
+                            Informations Café de quartier
                           </div>
 
                           {/* Organisateur */}

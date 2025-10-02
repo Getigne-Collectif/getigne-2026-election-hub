@@ -23,7 +23,7 @@ INSERT INTO public.events (
 ) VALUES (
   'Café de quartier - Centre-ville',
   'Venez échanger autour d''un café dans une ambiance conviviale ! Parlons de nos projets pour améliorer la vie de quartier.',
-  '## Bienvenue au café de quartier du centre-ville !
+  '## Bienvenue au Café de quartier du centre-ville !
 
 Rejoignez-nous pour un moment d''échange convivial autour des enjeux de notre quartier. Cette rencontre est l''occasion de :
 
@@ -135,7 +135,7 @@ INSERT INTO public.events (
   'Café de quartier spécial parents d''élèves. Parlons éducation, transport scolaire et sécurité aux abords de l''école.',
   '## Café des parents - Secteur école
 
-Un café de quartier pensé pour les parents d''élèves et les familles du secteur de l''école primaire.
+Un Café de quartier pensé pour les parents d''élèves et les familles du secteur de l''école primaire.
 
 ### Au programme
 - **Sécurité** aux abords de l''école
