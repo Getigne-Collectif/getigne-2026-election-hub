@@ -79,7 +79,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
       icon: FolderOpen,
     },
     {
-      title: 'Paramètres',
+      title: 'Administration',
       href: '/admin/settings',
       icon: Settings,
     },

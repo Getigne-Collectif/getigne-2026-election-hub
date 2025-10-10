@@ -20,7 +20,8 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge } from "@/components/ui/badge.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
-import MarkdownEditor from '@/components/MarkdownEditor.tsx';
+import EditorJSComponent from '@/components/EditorJSComponent.tsx';
+import { OutputData } from '@editorjs/editorjs';
 import {
   Form,
   FormControl,
@@ -52,7 +53,7 @@ import { Routes } from '@/routes';
 interface NewsFormValues {
   title: string;
   excerpt: string;
-  content: string;
+  content: string | OutputData;
   category_id: string;
   image: string | File;
   tags: string[];
@@ -64,7 +65,14 @@ interface NewsFormValues {
 const newsFormSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères"),
   excerpt: z.string().min(10, "Le résumé doit contenir au moins 10 caractères"),
-  content: z.string().min(50, "Le contenu doit contenir au moins 50 caractères"),
+  content: z.union([
+    z.string().min(50, "Le contenu doit contenir au moins 50 caractères"),
+    z.object({
+      time: z.number().optional(),
+      blocks: z.array(z.any()).min(1, "Le contenu doit contenir au moins un bloc"),
+      version: z.string().optional()
+    })
+  ]),
   category_id: z.string().min(2, "La catégorie est requise"),
   image: z.any(),
   tags: z.array(z.string()).default([]),
@@ -178,10 +186,23 @@ const AdminNewsEditorPage = () => {
       setImagePreview(data.image);
       setSelectedTags(articleTags);
 
+      let contentValue: string | OutputData = data.content;
+      
+      if (typeof data.content === 'string') {
+        try {
+          const parsed = JSON.parse(data.content);
+          if (parsed.blocks && Array.isArray(parsed.blocks)) {
+            contentValue = parsed;
+          }
+        } catch (e) {
+          contentValue = data.content;
+        }
+      }
+
       form.reset({
         title: data.title,
         excerpt: data.excerpt,
-        content: data.content,
+        content: contentValue,
         category_id: data.category_id || "",
         image: data.image,
         tags: articleTags,
@@ -335,10 +356,14 @@ const AdminNewsEditorPage = () => {
 
       const slug = generateSlug(values.title);
 
+      const contentString = typeof values.content === 'string' 
+        ? values.content 
+        : JSON.stringify(values.content);
+
       const formData: any = {
         title: values.title,
         excerpt: values.excerpt,
-        content: values.content,
+        content: contentString,
         category_id: values.category_id,
         category: categories.find(cat => cat.id === values.category_id)?.name || '',
         image: imageUrl,
@@ -538,8 +563,8 @@ const AdminNewsEditorPage = () => {
                     <FormItem>
                       <FormLabel className="text-xl font-bold">Contenu</FormLabel>
                       <FormControl>
-                        <MarkdownEditor
-                          value={field.value}
+                        <EditorJSComponent
+                          value={field.value as string | OutputData}
                           onChange={field.onChange}
                           className="min-h-[600px]"
                         />
@@ -602,7 +627,7 @@ const AdminNewsEditorPage = () => {
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner une catégorie" />
@@ -669,7 +694,7 @@ const AdminNewsEditorPage = () => {
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner un auteur" />

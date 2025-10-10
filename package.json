@@ -11,6 +11,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@editorjs/checklist": "^1.6.0",
+    "@editorjs/code": "^2.9.3",
+    "@editorjs/delimiter": "^1.4.2",
+    "@editorjs/editorjs": "^2.31.0",
+    "@editorjs/embed": "^2.7.6",
+    "@editorjs/header": "^2.8.8",
+    "@editorjs/image": "^2.10.3",
+    "@editorjs/inline-code": "^1.5.2",
+    "@editorjs/link": "^2.6.2",
+    "@editorjs/list": "^2.0.8",
+    "@editorjs/marker": "^1.4.0",
+    "@editorjs/paragraph": "^2.11.7",
+    "@editorjs/quote": "^2.7.6",
+    "@editorjs/table": "^2.4.5",
+    "@editorjs/warning": "^1.4.1",
     "@googlemaps/react-wrapper": "^1.2.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.9.0",
@@ -52,6 +67,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
+    "editorjs-react-renderer": "^3.5.1",
     "embla-carousel-react": "^8.3.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
@@ -61,6 +77,7 @@
     "react": "^18.3.1",
     "react-day-picker": "^9.6.7",
     "react-dom": "^18.3.1",
+    "react-editor-js": "^2.1.0",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.56.0",
     "react-markdown": "^8.0.7",
@@ -75,7 +92,8 @@
     "uuid": "^9.0.1",
     "vaul": "^0.9.3",
     "vite-plugin-svgr": "^4.3.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

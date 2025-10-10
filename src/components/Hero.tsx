@@ -50,13 +50,13 @@ const Hero = () => {
           </h1>
 
           <p
-            className={`hidden md:inline text-lg font-bold md:text-xl text-white mb-10 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
+            className={`hidden md:inline text-lg font-bold md:text-xl text-white mb-12 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             Déployons la force du collectif pour faire de Gétigné <br/>une commune plus engagée, au service de toutes et tous.
           </p>
 
           <div
-            className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
+            className={`flex flex-col mt-8 sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
             <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <Link to={Routes.PROGRAM}>

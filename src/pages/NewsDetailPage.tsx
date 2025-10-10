@@ -17,10 +17,9 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
 import { Home } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { Json } from '@/integrations/supabase/types';
 import { generateRoutes, Routes } from '@/routes';
+import EditorJSRenderer from '@/components/EditorJSRenderer';
 
 interface NewsArticle {
   id: string;
@@ -396,11 +395,7 @@ const NewsDetailPage = () => {
             </div>
 
             <div className="prose prose-lg max-w-none mx-auto">
-              <div className="rich-content">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {article.content}
-                </ReactMarkdown>
-              </div>
+              <EditorJSRenderer data={article.content} />
 
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-8">

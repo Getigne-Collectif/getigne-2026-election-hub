@@ -99,7 +99,7 @@ const AuthButton = () => {
         {isAdmin && (
           <DropdownMenuItem onClick={handleAdminClick} className="flex items-center">
             <Settings className="h-4 w-4 mr-2" />
-            Paramètres
+            Administration
         </DropdownMenuItem>
         )}
 
