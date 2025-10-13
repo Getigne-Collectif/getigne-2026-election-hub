@@ -57,9 +57,12 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
           : 'list-disc list-inside mb-4 space-y-2';
         return (
           <ListTag key={index} className={listClass}>
-            {block.data.items.map((item: string, i: number) => (
-              <li key={i} className="text-gray-700" dangerouslySetInnerHTML={{ __html: item }} />
-            ))}
+            {block.data.items.map((item: string | { content: string; meta: any; items: any[] }, i: number) => {
+              const content = typeof item === 'string' ? item : item.content;
+              return (
+                <li key={i} className="text-gray-700" dangerouslySetInnerHTML={{ __html: content }} />
+              );
+            })}
           </ListTag>
         );
 
@@ -215,4 +218,6 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
 };
 
 export default EditorJSRenderer;
+
+
 

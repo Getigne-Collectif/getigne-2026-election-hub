@@ -212,7 +212,8 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       
       if (newData.blocks && newData.blocks.length > 0) {
         isUpdating.current = true;
-        editorRef.current.render(newData)
+        editorRef.current.clear()
+          .then(() => editorRef.current!.render(newData))
           .then(() => {
             lastValueRef.current = valueString;
             isUpdating.current = false;

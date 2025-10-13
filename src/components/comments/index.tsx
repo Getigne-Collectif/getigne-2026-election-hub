@@ -247,7 +247,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
       {user && (
         <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">Ajouter un commentaire</h3>
+          <h3 className="text-xl font-semibold mb-4">Ajoutez un commentaire</h3>
           <CommentForm
             newsId={newsId}
             programItemId={programItemId}

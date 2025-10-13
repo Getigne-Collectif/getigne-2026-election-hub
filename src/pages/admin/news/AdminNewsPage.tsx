@@ -29,7 +29,7 @@ import {
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useAuth } from '@/context/AuthContext.tsx';
 import AdminLayout from '@/components/admin/AdminLayout.tsx';
-import {Home, Loader2, MoreHorizontal, Plus, Search} from 'lucide-react';
+import {Home, Loader2, MoreHorizontal, Plus, Search, Eye} from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge.tsx';
@@ -531,6 +531,15 @@ const AdminNewsPage = () => {
                               <DropdownMenuItem asChild>
                                 <Link to={generatePath(Routes.ADMIN_NEWS_EDIT, { id: article.id })}>
                                   Modifier
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link 
+                                  to={generatePath(Routes.NEWS_DETAIL, { slug: article.slug || article.id })}
+                                  className="flex items-center"
+                                >
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  Aperçu
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem

@@ -5,16 +5,8 @@ import { supabase } from '@/integrations/supabase/client.ts';
 import Navbar from '@/components/Navbar.tsx';
 import Footer from '@/components/Footer.tsx';
 import { toast } from '@/components/ui/use-toast.ts';
-import { setupNewsImagesBucket } from '@/utils/setupNewsImages.ts';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.tsx";
-import { Home, ArrowLeft, Save, Send, Image, Calendar, Tag, MessageSquare, X } from "lucide-react";
+
+import { Home, ArrowLeft, Save, Send, Image, Calendar, Tag, MessageSquare, X, Eye } from "lucide-react";
 import { Input } from '@/components/ui/input.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
@@ -52,6 +44,7 @@ import { Routes } from '@/routes';
 
 interface NewsFormValues {
   title: string;
+  slug: string;
   excerpt: string;
   content: string | OutputData;
   category_id: string;
@@ -64,6 +57,7 @@ interface NewsFormValues {
 
 const newsFormSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères"),
+  slug: z.string().min(3, "Le slug doit contenir au moins 3 caractères").regex(/^[a-z0-9-]+$/, "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets"),
   excerpt: z.string().min(10, "Le résumé doit contenir au moins 10 caractères"),
   content: z.union([
     z.string().min(50, "Le contenu doit contenir au moins 50 caractères"),
@@ -105,12 +99,16 @@ const AdminNewsEditorPage = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [availableTags, setAvailableTags] = useState<{id: string, name: string}[]>([]);
+  const [currentStatus, setCurrentStatus] = useState<'draft' | 'published'>('draft');
+  const [articleSlug, setArticleSlug] = useState<string>('');
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const isEditMode = !!id;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(newsFormSchema),
     defaultValues: {
       title: "",
+      slug: "",
       excerpt: "",
       content: "",
       category_id: "",
@@ -185,6 +183,8 @@ const AdminNewsEditorPage = () => {
 
       setImagePreview(data.image);
       setSelectedTags(articleTags);
+      setCurrentStatus((data.status === 'published' ? 'published' : 'draft') as 'draft' | 'published');
+      setArticleSlug(data.slug || data.id);
 
       let contentValue: string | OutputData = data.content;
       
@@ -201,6 +201,7 @@ const AdminNewsEditorPage = () => {
 
       form.reset({
         title: data.title,
+        slug: data.slug || generateSlug(data.title),
         excerpt: data.excerpt,
         content: contentValue,
         category_id: data.category_id || "",
@@ -210,6 +211,7 @@ const AdminNewsEditorPage = () => {
         publication_date: data.publication_date ? new Date(data.publication_date) : new Date(),
         comments_enabled: data.comments_enabled !== false,
       });
+      setIsDataLoaded(true);
     } catch (error) {
       console.error('Erreur lors de la récupération de l\'article:', error);
       toast({
@@ -244,9 +246,8 @@ const AdminNewsEditorPage = () => {
       return;
     }
 
-    setupNewsImagesBucket().catch(err => {
-      console.error('Erreur lors de la configuration du bucket news_images:', err);
-    });
+    // Ne charger les données qu'une seule fois
+    if (isDataLoaded) return;
 
     fetchCategories();
     fetchUsers();
@@ -257,6 +258,7 @@ const AdminNewsEditorPage = () => {
     } else {
       form.reset({
         title: "",
+        slug: "",
         excerpt: "",
         content: "",
         category_id: "",
@@ -269,7 +271,9 @@ const AdminNewsEditorPage = () => {
       setImagePreview(null);
       setSelectedTags([]);
     }
-  }, [user, isAdmin, authChecked, navigate, id, isEditMode]);
+    
+    setIsDataLoaded(true);
+  }, [user, isAdmin, authChecked, navigate, id, isEditMode, isDataLoaded]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -345,6 +349,13 @@ const AdminNewsEditorPage = () => {
     await handleSubmit(values, 'published');
   };
 
+  const handlePreview = () => {
+    if (isEditMode && articleSlug) {
+      const previewUrl = generatePath(Routes.NEWS_DETAIL, { slug: articleSlug });
+      navigate(previewUrl);
+    }
+  };
+
   const handleSubmit = async (values: FormValues, status: 'draft' | 'published') => {
     setIsSubmitting(true);
     try {
@@ -353,8 +364,6 @@ const AdminNewsEditorPage = () => {
       if (values.image instanceof File) {
         imageUrl = await uploadImage(values.image);
       }
-
-      const slug = generateSlug(values.title);
 
       const contentString = typeof values.content === 'string' 
         ? values.content 
@@ -370,7 +379,7 @@ const AdminNewsEditorPage = () => {
         author_id: values.author_id || user?.id,
         publication_date: values.publication_date ? format(values.publication_date, 'yyyy-MM-dd') : undefined,
         comments_enabled: values.comments_enabled,
-        slug: slug,
+        slug: values.slug,
         status
       };
 
@@ -431,6 +440,11 @@ const AdminNewsEditorPage = () => {
             ? "L'article a été publié avec succès"
             : "L'article a été enregistré comme brouillon",
         });
+
+        setCurrentStatus(status);
+        if (data && data.length > 0) {
+          setArticleSlug(data[0].slug || data[0].id);
+        }
 
         if (status === 'published' && data && data.length > 0) {
           const articleData = data[0];
@@ -493,6 +507,11 @@ const AdminNewsEditorPage = () => {
             : "L'article a été enregistré comme brouillon",
         });
 
+        setCurrentStatus(status);
+        if (data && data.length > 0) {
+          setArticleSlug(data[0].slug || data[0].id);
+        }
+
         if (status === 'published' && data && data.length > 0) {
           const articleData = data[0];
           const articleSlug = articleData.slug || articleData.id;
@@ -549,8 +568,34 @@ const AdminNewsEditorPage = () => {
                           placeholder="Titre de l'article"
                           className="text-lg p-3"
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (!isEditMode || !form.getValues('slug')) {
+                              form.setValue('slug', generateSlug(e.target.value));
+                            }
+                          }}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="slug"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Slug (URL)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="slug-de-larticle"
+                          {...field}
+                        />
+                      </FormControl>
+                      <p className="text-sm text-gray-500 mt-1">
+                        URL de l'article : /news/{field.value || 'slug-de-larticle'}
+                      </p>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -564,6 +609,7 @@ const AdminNewsEditorPage = () => {
                       <FormLabel className="text-xl font-bold">Contenu</FormLabel>
                       <FormControl>
                         <EditorJSComponent
+                          key={id || 'new'}
                           value={field.value as string | OutputData}
                           onChange={field.onChange}
                           className="min-h-[600px]"
@@ -577,24 +623,58 @@ const AdminNewsEditorPage = () => {
 
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg border border-getigne-100 p-6 space-y-6 sticky top-24">
-                  <div className="flex justify-between items-center">
+                  <div className="space-y-4">
                     <h3 className="font-bold text-lg">Paramètres de publication</h3>
-                    <div className="flex gap-2">
+                    
+                    {currentStatus === 'draft' && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                        <p className="text-sm text-yellow-800">
+                          Cet article est en brouillon et n'est pas visible publiquement.
+                        </p>
+                      </div>
+                    )}
+                    
+                    {currentStatus === 'published' && (
+                      <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                        <p className="text-sm text-green-800">
+                          Cet article est publié et visible publiquement.
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-col gap-2">
                       <Button
-                        variant="outline"
-                        onClick={form.handleSubmit(handleSaveAsDraft)}
+                        onClick={form.handleSubmit(currentStatus === 'draft' ? handleSaveAsDraft : handlePublish)}
                         disabled={isSubmitting}
+                        className="w-full"
                       >
                         <Save className="mr-2 h-4 w-4" />
-                        Brouillon
+                        {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
                       </Button>
-                      <Button
-                        onClick={form.handleSubmit(handlePublish)}
-                        disabled={isSubmitting}
-                      >
-                        <Send className="mr-2 h-4 w-4" />
-                        Publier
-                      </Button>
+                      
+                      {currentStatus === 'draft' && (
+                        <Button
+                          onClick={form.handleSubmit(handlePublish)}
+                          disabled={isSubmitting}
+                          variant="default"
+                          className="w-full bg-green-600 hover:bg-green-700"
+                        >
+                          <Send className="mr-2 h-4 w-4" />
+                          Publier l'article
+                        </Button>
+                      )}
+                      
+                      {isEditMode && articleSlug && (
+                        <Button
+                          type="button"
+                          onClick={handlePreview}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          Aperçu
+                        </Button>
+                      )}
                     </div>
                   </div>
 
@@ -627,7 +707,7 @@ const AdminNewsEditorPage = () => {
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner une catégorie" />
@@ -694,7 +774,7 @@ const AdminNewsEditorPage = () => {
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner un auteur" />

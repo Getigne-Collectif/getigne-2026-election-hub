@@ -57,7 +57,15 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const DynamicPage = lazy(() => import("./pages/DynamicPage"));
 const LiftPage = lazy(() => import("./pages/LiftPage"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 function App() {
   return (

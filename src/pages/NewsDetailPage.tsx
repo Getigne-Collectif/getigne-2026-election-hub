@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, Tag, ArrowLeft, User } from 'lucide-react';
+import { useParams, Link, useNavigate, generatePath } from 'react-router-dom';
+import { Calendar, Tag, ArrowLeft, User, Edit, Send, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -20,6 +20,8 @@ import { Home } from 'lucide-react';
 import { Json } from '@/integrations/supabase/types';
 import { generateRoutes, Routes } from '@/routes';
 import EditorJSRenderer from '@/components/EditorJSRenderer';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface NewsArticle {
   id: string;
@@ -49,6 +51,7 @@ interface NewsArticle {
   } | null;
   slug?: string;
   comments_enabled?: boolean;
+  status?: string;
 }
 
 interface RelatedArticleProps {
@@ -89,6 +92,8 @@ const RelatedArticleCard = ({ article }: RelatedArticleProps) => {
 const NewsDetailPage = () => {
   const { slug } = useParams<{slug: string}>();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
+  const { toast } = useToast();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,8 +112,11 @@ const NewsDetailPage = () => {
             news_to_tags(
               news_tags(name)
             )
-          `)
-          .eq('status', 'published');
+          `);
+
+        if (!isAdmin) {
+          query = query.eq('status', 'published');
+        }
 
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug || '');
 
@@ -308,7 +316,46 @@ const NewsDetailPage = () => {
     };
 
     fetchArticle();
-  }, [slug]);
+  }, [slug, isAdmin]);
+
+  const handlePublish = async () => {
+    if (!article || !isAdmin) return;
+
+    try {
+      const { error } = await supabase
+        .from('news')
+        .update({
+          status: 'published',
+          published_at: new Date().toISOString(),
+        })
+        .eq('id', article.id);
+
+      if (error) throw error;
+
+      setArticle({
+        ...article,
+        status: 'published',
+      });
+
+      toast({
+        title: 'Article publié',
+        description: "L'article a été publié avec succès",
+      });
+    } catch (error) {
+      console.error('Error publishing article:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de publier l\'article.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleEdit = () => {
+    if (!article) return;
+    const editUrl = generatePath(Routes.ADMIN_NEWS_EDIT, { id: article.id });
+    navigate(editUrl);
+  };
 
   if (loading) {
     return (
@@ -345,6 +392,40 @@ const NewsDetailPage = () => {
 
       <div className="min-h-screen flex flex-col">
         <Navbar />
+
+        {isAdmin && article.status === 'draft' && (
+          <div className="bg-yellow-500 text-white py-4 px-4 shadow-md  mt-[70px]">
+            <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Eye className="h-5 w-5" />
+                <div>
+                  <p className="font-semibold">Mode aperçu - Article en brouillon</p>
+                  <p className="text-sm">Cet article n'est visible que par les administrateurs</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handlePublish}
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white text-yellow-700 hover:bg-gray-100"
+                >
+                  <Send className="mr-2 h-4 w-4" />
+                  Publier
+                </Button>
+                <Button
+                  onClick={handleEdit}
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white text-yellow-700 hover:bg-gray-100"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Éditer
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
       <div className="pt-24 pb-4 bg-getigne-50">
         <div className="container mx-auto px-4">
@@ -386,13 +467,15 @@ const NewsDetailPage = () => {
 
             <h1 className="text-3xl md:text-5xl font-bold mb-6">{article.title}</h1>
 
-            <div className="w-full h-[300px] md:h-[400px] mb-8 rounded-xl overflow-hidden">
-              <img
-                src={article.image}
-                alt={article.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            {article.image && (
+              <div className="w-full h-[350px] md:h-[450px] mb-8 rounded-xl overflow-hidden">
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
 
             <div className="prose prose-lg max-w-none mx-auto">
               <EditorJSRenderer data={article.content} />

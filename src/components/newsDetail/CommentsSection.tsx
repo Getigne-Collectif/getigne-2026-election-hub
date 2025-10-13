@@ -53,7 +53,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ newsId }) => {
   
   return (
     <div className="mt-12 border-t border-getigne-100 pt-8">
-      <h3 className="text-2xl font-bold mb-6">Commentaires</h3>
+      <h3 className="text-2xl font-bold mb-6">Vous souhaitez régir ?</h3>
       <Comments newsId={newsId} />
     </div>
   );
