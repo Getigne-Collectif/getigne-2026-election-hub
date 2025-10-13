@@ -202,15 +202,15 @@ const JoinPage = () => {
                 <div className="space-y-6">
                   <div className="rounded-xl overflow-hidden shadow-sm h-[300px]">
                     <img
-                      src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-                      alt="Groupe de discussion"
+                      src="/images/reunion.jpg"
+                      alt="Reunion de collectif"
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="rounded-xl overflow-hidden shadow-sm h-[300px]">
                     <img
-                      src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-                      alt="Réunion de collectif"
+                      src="/images/reunion2.jpg"
+                      alt="Réunion de collectif à l'exterieur"
                       className="w-full h-full object-cover"
                     />
                   </div>
