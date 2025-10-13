@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/context/auth";
 import { CookieConsentProvider } from "@/context/CookieConsentContext";
@@ -13,6 +13,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react"
 import { Analytics } from "@vercel/analytics/react"
 import Index from "./pages/Index";
 import LoadingSpinner from "@/components/ui/loading";
+import { AuthenticatedRoute, AdminRoute } from "@/components/auth/ProtectedRoutes";
 
 // Lazy load admin pages for better performance
 const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage"));
@@ -67,6 +68,14 @@ const queryClient = new QueryClient({
   },
 });
 
+function AdminProtectedOutlet() {
+  return (
+    <AdminRoute>
+      <Outlet />
+    </AdminRoute>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -100,34 +109,60 @@ function App() {
                     <Route path={AppRoutes.AUTH} element={<AuthPage />} />
                     <Route path={AppRoutes.AUTH_CALLBACK} element={<AuthCallbackPage />} />
                     <Route path={AppRoutes.AUTH_RESET_PASSWORD} element={<ResetPasswordPage />} />
-                    <Route path={AppRoutes.PROFILE} element={<ProfilePage />} />
+                    <Route path={AppRoutes.PROFILE} element={
+                      <AuthenticatedRoute>
+                        <ProfilePage />
+                      </AuthenticatedRoute>
+                    } />
                     <Route path={AppRoutes.LIFT} element={<LiftPage />} />
                     
-                    {/* Admin Routes */}
-                    <Route path={AppRoutes.ADMIN} element={<AdminDashboardPage />} />
-                    <Route path={AppRoutes.ADMIN_NEWS} element={<AdminNewsPage />} />
-                    <Route path={AppRoutes.ADMIN_NEWS_NEW} element={<AdminNewsEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_NEWS_EDIT} element={<AdminNewsEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_EVENTS} element={<AdminEventsPage />} />
-                    <Route path={AppRoutes.ADMIN_EVENTS_NEW} element={<AdminEventEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_EVENTS_EDIT} element={<AdminEventEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_USERS} element={<AdminUsersPage />} />
-                    <Route path={AppRoutes.ADMIN_PAGES} element={<AdminPagesPage />} />
-                    <Route path={AppRoutes.ADMIN_PAGES_NEW} element={<AdminPageEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_PAGES_EDIT} element={<AdminPageEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_COMMITTEES} element={<AdminCommitteesPage />} />
-                    <Route path={AppRoutes.ADMIN_COMMITTEES_NEW} element={<AdminCommitteeEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_COMMITTEES_EDIT} element={<AdminCommitteeEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_MENU} element={<AdminMenuPage />} />
-                    <Route path={AppRoutes.ADMIN_GALAXY} element={<AdminGalaxyPage />} />
-                    <Route path={AppRoutes.ADMIN_GALAXY_NEW} element={<AdminGalaxyEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_GALAXY_EDIT} element={<AdminGalaxyEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_PROGRAM} element={<AdminProgramPage />} />
-                    <Route path={AppRoutes.ADMIN_PROGRAM_EDIT} element={<AdminProgramEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_PROJECTS} element={<AdminProjectsPage />} />
-                    <Route path={AppRoutes.ADMIN_PROJECTS_NEW} element={<AdminProjectEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_PROJECTS_EDIT} element={<AdminProjectEditorPage />} />
-                    <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />
+                    {/* Admin Routes - All protected by AdminRoute via nested routes */}
+                    <Route element={<AdminProtectedOutlet />}>
+                      <Route path={AppRoutes.ADMIN} element={<AdminDashboardPage />} />
+                      
+                      {/* News */}
+                      <Route path={AppRoutes.ADMIN_NEWS} element={<AdminNewsPage />} />
+                      <Route path={AppRoutes.ADMIN_NEWS_NEW} element={<AdminNewsEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_NEWS_EDIT} element={<AdminNewsEditorPage />} />
+                      
+                      {/* Events */}
+                      <Route path={AppRoutes.ADMIN_EVENTS} element={<AdminEventsPage />} />
+                      <Route path={AppRoutes.ADMIN_EVENTS_NEW} element={<AdminEventEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_EVENTS_EDIT} element={<AdminEventEditorPage />} />
+                      
+                      {/* Users */}
+                      <Route path={AppRoutes.ADMIN_USERS} element={<AdminUsersPage />} />
+                      
+                      {/* Pages */}
+                      <Route path={AppRoutes.ADMIN_PAGES} element={<AdminPagesPage />} />
+                      <Route path={AppRoutes.ADMIN_PAGES_NEW} element={<AdminPageEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_PAGES_EDIT} element={<AdminPageEditorPage />} />
+                      
+                      {/* Committees */}
+                      <Route path={AppRoutes.ADMIN_COMMITTEES} element={<AdminCommitteesPage />} />
+                      <Route path={AppRoutes.ADMIN_COMMITTEES_NEW} element={<AdminCommitteeEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_COMMITTEES_EDIT} element={<AdminCommitteeEditorPage />} />
+                      
+                      {/* Menu */}
+                      <Route path={AppRoutes.ADMIN_MENU} element={<AdminMenuPage />} />
+                      
+                      {/* Galaxy */}
+                      <Route path={AppRoutes.ADMIN_GALAXY} element={<AdminGalaxyPage />} />
+                      <Route path={AppRoutes.ADMIN_GALAXY_NEW} element={<AdminGalaxyEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_GALAXY_EDIT} element={<AdminGalaxyEditorPage />} />
+                      
+                      {/* Program */}
+                      <Route path={AppRoutes.ADMIN_PROGRAM} element={<AdminProgramPage />} />
+                      <Route path={AppRoutes.ADMIN_PROGRAM_EDIT} element={<AdminProgramEditorPage />} />
+                      
+                      {/* Projects */}
+                      <Route path={AppRoutes.ADMIN_PROJECTS} element={<AdminProjectsPage />} />
+                      <Route path={AppRoutes.ADMIN_PROJECTS_NEW} element={<AdminProjectEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_PROJECTS_EDIT} element={<AdminProjectEditorPage />} />
+                      
+                      {/* Settings */}
+                      <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />
+                    </Route>
 
                     {/* Dynamic pages - this should be last */}
                     <Route path={AppRoutes.DYNAMIC_PAGE} element={<DynamicPage />} />

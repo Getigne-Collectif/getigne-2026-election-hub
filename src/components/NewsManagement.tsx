@@ -48,7 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/routes';
 

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, Heart, Calendar } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 import { Routes } from '@/routes';
 import { usePostHog } from '@/hooks/usePostHog';
 

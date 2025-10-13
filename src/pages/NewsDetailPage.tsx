@@ -20,7 +20,7 @@ import { Home } from 'lucide-react';
 import { Json } from '@/integrations/supabase/types';
 import { generateRoutes, Routes } from '@/routes';
 import EditorJSRenderer from '@/components/EditorJSRenderer';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 import { useToast } from '@/components/ui/use-toast';
 
 interface NewsArticle {

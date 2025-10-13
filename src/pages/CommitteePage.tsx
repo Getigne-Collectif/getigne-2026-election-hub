@@ -36,7 +36,7 @@ import { Home } from 'lucide-react';
 import {toast} from "sonner";
 import CitizenCommittees, { getColorTheme } from '@/components/CitizenCommittees';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 
 interface Member {
   id: string;

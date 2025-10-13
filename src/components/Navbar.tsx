@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import AuthButton from './AuthButton';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/auth';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Routes } from '@/routes';
 

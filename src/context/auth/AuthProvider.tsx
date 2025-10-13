@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '../../integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import AuthContext from './AuthContext';
@@ -8,6 +8,8 @@ import { fetchUserRoles, fetchUserProfile } from './utils';
 import { usePostHog } from '@/hooks/usePostHog';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { toast } = useToast();
+  const posthog = usePostHog();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -15,53 +17,113 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isMember, setIsMember] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [isInvitedUser, setIsInvitedUser] = useState(false);
-  const { toast } = useToast();
-  const { capture } = usePostHog();
 
-  const refreshUserRoles = async () => {
-    if (!user) {
-      return [];
-    }
-    
+  const loadUserData = async (currentUser: User) => {
     try {
-      const roles = await fetchUserRoles(user.id);
+      const [roles, profileData] = await Promise.all([
+        fetchUserRoles(currentUser.id),
+        fetchUserProfile(currentUser.id)
+      ]);
+      
       setUserRoles(roles);
       
-      const profileData = await fetchUserProfile(user.id);
       if (profileData) {
         setProfile(profileData);
         setIsMember(profileData.is_member === true);
       }
-      
+
+      if (posthog?.identify) {
+        posthog.identify(currentUser.id, {
+          email: currentUser.email,
+          roles: roles.join(','),
+          is_member: profileData?.is_member || false
+        });
+      }
+
       return roles;
     } catch (error) {
-      console.error('[AUTH] Error refreshing roles:', error);
       return [];
     }
   };
 
+  const refreshUserRoles = async () => {
+    if (!user) return [];
+    return loadUserData(user);
+  };
+
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
+    let initialized = false;
+
+    const initAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (cancelled) {
+          return;
+        }
+        
+        if (error) {
+          setLoading(false);
+          setAuthChecked(true);
+          initialized = true;
+          return;
+        }
+
+        if (session?.user) {
+          setUser(session.user);
+          
+          const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
+          setIsInvitedUser(isNewInvitedUser);
+          
+          await loadUserData(session.user);
+          
+          if (cancelled) {
+            return;
+          }
+        }
+        
+        setLoading(false);
+        setAuthChecked(true);
+        initialized = true;
+      } catch (error) {
+        if (!cancelled) {
+          setLoading(false);
+          setAuthChecked(true);
+          initialized = true;
+        }
+      }
+    };
+
+    initAuth();
     
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AUTH] Auth state changed:', event, session?.user?.id);
-      
+      if (cancelled) {
+        return;
+      }
+
+      if (!initialized && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
+        return;
+      }
+
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user);
-        await refreshUserRoles();
         
         const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
         setIsInvitedUser(isNewInvitedUser);
         
-        // Track user login in PostHog
+        await loadUserData(session.user);
+        
         const loginMethod = session.user.app_metadata?.provider || 'email';
-        capture('user_login', {
-          user_id: session.user.id,
-          email: session.user.email,
-          is_new_user: isNewInvitedUser,
-          login_method: loginMethod,
-          timestamp: new Date().toISOString()
-        });
+        if (posthog?.capture) {
+          posthog.capture('user_login', {
+            user_id: session.user.id,
+            email: session.user.email,
+            is_new_user: isNewInvitedUser,
+            login_method: loginMethod,
+            timestamp: new Date().toISOString()
+          });
+        }
         
         setLoading(false);
         setAuthChecked(true);
@@ -75,42 +137,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAuthChecked(true);
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         setUser(session.user);
-        await refreshUserRoles();
+        await loadUserData(session.user);
       }
     });
-    
-    const getInitialSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('[AUTH] Error getting session:', error);
-          setLoading(false);
-          setAuthChecked(true);
-          return;
-        }
-
-        if (session?.user) {
-          setUser(session.user);
-          
-          const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
-          setIsInvitedUser(isNewInvitedUser);
-          
-          await refreshUserRoles();
-        }
-        
-        setLoading(false);
-        setAuthChecked(true);
-      } catch (error) {
-        console.error('[AUTH] Error during session initialization:', error);
-        setLoading(false);
-        setAuthChecked(true);
-      }
-    };
-
-    getInitialSession();
 
     return () => {
+      cancelled = true;
       authListener.subscription.unsubscribe();
     };
   }, []);
@@ -149,17 +181,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
-      // Track user registration in PostHog
-      capture('user_registration', {
-        email: email,
-        first_name: firstName,
-        last_name: lastName,
-        registration_method: 'email',
-        timestamp: new Date().toISOString()
-      });
+      if (posthog?.capture) {
+        posthog.capture('user_registration', {
+          email: email,
+          first_name: firstName,
+          last_name: lastName,
+          registration_method: 'email',
+          timestamp: new Date().toISOString()
+        });
+      }
 
-      // Déconnecter l'utilisateur s'il a été connecté automatiquement
-      // car sa session ne sera pas persistante sans confirmation d'email
       await supabase.auth.signOut();
 
       toast({
@@ -179,6 +210,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      if (posthog?.capture) {
+        posthog.capture('user_logout', {
+          user_id: user?.id,
+          timestamp: new Date().toISOString()
+        });
+      }
+      if (posthog?.reset) {
+        posthog.reset();
+      }
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     } catch (error: any) {
@@ -192,11 +233,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithProvider = async (provider: 'discord' | 'facebook' | 'google') => {
     try {
-      // Track OAuth login attempt in PostHog
-      capture('oauth_login_attempt', {
-        provider: provider,
-        timestamp: new Date().toISOString()
-      });
+      if (posthog?.capture) {
+        posthog.capture('oauth_login_attempt', {
+          provider: provider,
+          timestamp: new Date().toISOString()
+        });
+      }
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
