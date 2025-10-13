@@ -11,7 +11,7 @@ import {ArrowLeft} from "lucide-react";
 
 const AdminPageEditorPage = () => {
   const { id } = useParams();
-  const { user, isAdmin, authChecked } = useAuth();
+  const { user, isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isEditMode = !!id;
@@ -29,6 +29,8 @@ const AdminPageEditorPage = () => {
       return;
     }
 
+    if (isRefreshingRoles) return;
+
     if (user && !isAdmin) {
       toast({
         title: 'Accès refusé',
@@ -38,7 +40,7 @@ const AdminPageEditorPage = () => {
       navigate('/');
       return;
     }
-  }, [user, isAdmin, authChecked, navigate]);
+  }, [user, isAdmin, authChecked, navigate, isRefreshingRoles]);
   const breadcrumb = <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>

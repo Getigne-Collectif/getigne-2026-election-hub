@@ -19,7 +19,7 @@ import {GearIcon} from "@radix-ui/react-icons";
 import { Routes } from '@/routes';
 
 const AdminDashboardPage = () => {
-  const { user, isAdmin, authChecked } = useAuth();
+  const { user, isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [metrics, setMetrics] = useState({
@@ -42,6 +42,8 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     if (!authChecked) return;
 
+    if (isRefreshingRoles) return;
+
     if (user && isAdmin) {
       setIsAuthorized(true);
       fetchMetrics();
@@ -59,7 +61,7 @@ const AdminDashboardPage = () => {
       }
     }
     setIsChecking(false);
-  }, [user, isAdmin, authChecked, navigate, toast]);
+  }, [user, isAdmin, authChecked, navigate, toast, isRefreshingRoles]);
 
   const fetchMetrics = async () => {
     try {

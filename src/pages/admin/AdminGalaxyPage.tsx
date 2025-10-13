@@ -27,7 +27,7 @@ interface GalaxyItem {
 }
 
 const AdminGalaxyPage = () => {
-  const { isAdmin, authChecked } = useAuth();
+  const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [items, setItems] = useState<GalaxyItem[]>([]);
@@ -35,6 +35,8 @@ const AdminGalaxyPage = () => {
 
   useEffect(() => {
     if (!authChecked) return;
+
+    if (isRefreshingRoles) return;
 
     if (!isAdmin) {
       navigate('/');
@@ -47,7 +49,7 @@ const AdminGalaxyPage = () => {
     }
 
     fetchItems();
-  }, [authChecked, isAdmin, navigate, toast]);
+  }, [authChecked, isAdmin, navigate, toast, isRefreshingRoles]);
 
   const fetchItems = async () => {
     setLoading(true);

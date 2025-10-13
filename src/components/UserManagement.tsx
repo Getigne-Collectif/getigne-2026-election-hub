@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool, RefreshCcw } from 'lucide-react';
+import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool, RefreshCcw, Camera } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -47,6 +47,7 @@ interface UserManagementProps {
   onRoleChange: (userId: string, role: 'moderator' | 'admin' | 'program_manager', action: 'add' | 'remove') => Promise<void>;
   onInviteUser: (userData: InviteUserFormValues) => Promise<void>;
   onToggleUserStatus: (userId: string, isActive: boolean) => Promise<void>;
+  onUpdateAvatar?: (userId: string, file: File) => Promise<void>;
 }
 
 const inviteUserSchema = z.object({
@@ -63,7 +64,8 @@ const UserManagement: React.FC<UserManagementProps> = ({
   loading, 
   onRoleChange,
   onInviteUser,
-  onToggleUserStatus
+  onToggleUserStatus,
+  onUpdateAvatar
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -71,6 +73,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
   const [resendingInvitation, setResendingInvitation] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState<string | null>(null);
 
   const form = useForm<InviteUserFormValues>({
     resolver: zodResolver(inviteUserSchema),
@@ -201,6 +204,40 @@ const UserManagement: React.FC<UserManagementProps> = ({
     return firstInitial + lastInitial || '?';
   };
 
+  const handleAvatarChange = async (userId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onUpdateAvatar) return;
+    
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un fichier image",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "Erreur",
+        description: "L'image ne doit pas dépasser 2 Mo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingAvatar(userId);
+    try {
+      await onUpdateAvatar(userId, file);
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+    } finally {
+      setUploadingAvatar(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
@@ -263,12 +300,34 @@ const UserManagement: React.FC<UserManagementProps> = ({
                   {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
-                        <Avatar className="h-9 w-9">
-                          {user.avatar_url ? (
-                            <AvatarImage src={user.avatar_url} alt={`${user.first_name} ${user.last_name}`} />
-                          ) : null}
-                          <AvatarFallback>{getInitials(user.first_name, user.last_name)}</AvatarFallback>
-                        </Avatar>
+                        <div className="relative group">
+                          <Avatar className="h-9 w-9">
+                            {user.avatar_url ? (
+                              <AvatarImage src={user.avatar_url} alt={`${user.first_name} ${user.last_name}`} />
+                            ) : null}
+                            <AvatarFallback>{getInitials(user.first_name, user.last_name)}</AvatarFallback>
+                          </Avatar>
+                          {onUpdateAvatar && (
+                            <label 
+                              htmlFor={`avatar-${user.id}`}
+                              className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-full"
+                            >
+                              {uploadingAvatar === user.id ? (
+                                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                              ) : (
+                                <Camera className="h-4 w-4 text-white" />
+                              )}
+                              <input
+                                id={`avatar-${user.id}`}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleAvatarChange(user.id, e)}
+                                disabled={uploadingAvatar === user.id}
+                              />
+                            </label>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         {user.first_name && user.last_name 

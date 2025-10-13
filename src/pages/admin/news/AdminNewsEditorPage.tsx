@@ -90,7 +90,7 @@ const generateSlug = (title: string): string => {
 
 const AdminNewsEditorPage = () => {
   const { id } = useParams();
-  const { user, isAdmin, loading, authChecked } = useAuth();
+  const { user, isAdmin, loading, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
   const [users, setUsers] = useState<{id: string, first_name: string, last_name: string, avatar_url?: string}[]>([]);
@@ -236,6 +236,10 @@ const AdminNewsEditorPage = () => {
       return;
     }
 
+    if (isRefreshingRoles) {
+      return;
+    }
+
     if (user && !isAdmin) {
       toast({
         title: 'Accès refusé',
@@ -246,7 +250,6 @@ const AdminNewsEditorPage = () => {
       return;
     }
 
-    // Ne charger les données qu'une seule fois
     if (isDataLoaded) return;
 
     fetchCategories();
@@ -273,7 +276,7 @@ const AdminNewsEditorPage = () => {
     }
     
     setIsDataLoaded(true);
-  }, [user, isAdmin, authChecked, navigate, id, isEditMode, isDataLoaded]);
+  }, [user, isAdmin, authChecked, navigate, id, isEditMode, isDataLoaded, isRefreshingRoles]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

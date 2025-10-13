@@ -25,7 +25,7 @@ const ICON_OPTIONS = [
 const CUSTOM_SVG_VALUE = '__custom_svg__';
 
 const AdminGalaxyEditorPage = () => {
-  const { isAdmin, authChecked } = useAuth();
+  const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { id } = useParams();
@@ -123,6 +123,8 @@ const AdminGalaxyEditorPage = () => {
   useEffect(() => {
     if (!authChecked) return;
 
+    if (isRefreshingRoles) return;
+
     if (!isAdmin) {
       navigate('/');
       toast({
@@ -136,7 +138,7 @@ const AdminGalaxyEditorPage = () => {
     if (isEditing && id) {
       fetchItem(id);
     }
-  }, [authChecked, isAdmin, navigate, toast, isEditing, id, fetchItem]);
+  }, [authChecked, isAdmin, navigate, toast, isEditing, id, fetchItem, isRefreshingRoles]);
 
   
 

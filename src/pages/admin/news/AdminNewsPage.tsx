@@ -67,7 +67,7 @@ interface NewsCategory {
 }
 
 const AdminNewsPage = () => {
-  const { isAdmin, loading: authLoading, authChecked } = useAuth();
+  const { isAdmin, loading: authLoading, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -84,6 +84,8 @@ const AdminNewsPage = () => {
   useEffect(() => {
     if (!authChecked || loading) return;
 
+    if (isRefreshingRoles) return;
+
     if (!isAdmin) {
       navigate('/');
       toast({
@@ -92,7 +94,7 @@ const AdminNewsPage = () => {
         variant: 'destructive',
       });
     }
-  }, [authChecked, loading, isAdmin, navigate, toast]);
+  }, [authChecked, loading, isAdmin, navigate, toast, isRefreshingRoles]);
 
   useEffect(() => {
     const fetchCategories = async () => {

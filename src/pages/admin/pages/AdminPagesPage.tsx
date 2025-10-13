@@ -22,7 +22,7 @@ interface Page {
 }
 
 const AdminPagesPage = () => {
-  const { isAdmin, authChecked } = useAuth();
+  const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [pages, setPages] = useState<Page[]>([]);
@@ -30,6 +30,8 @@ const AdminPagesPage = () => {
 
   useEffect(() => {
     if (!authChecked) return;
+
+    if (isRefreshingRoles) return;
 
     if (!isAdmin) {
       navigate('/');
@@ -42,7 +44,7 @@ const AdminPagesPage = () => {
     }
 
     fetchPages();
-  }, [authChecked, isAdmin, navigate, toast]);
+  }, [authChecked, isAdmin, navigate, toast, isRefreshingRoles]);
 
   const fetchPages = async () => {
     setLoading(true);

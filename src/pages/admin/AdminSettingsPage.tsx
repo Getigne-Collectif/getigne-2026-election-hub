@@ -12,7 +12,7 @@ import { Home } from 'lucide-react';
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 
 const AdminSettingsPage = () => {
-  const { user, isAdmin, authChecked } = useAuth();
+  const { user, isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const { toast } = useToast();
@@ -24,6 +24,8 @@ const AdminSettingsPage = () => {
 
   useEffect(() => {
     if (!authChecked) return;
+
+    if (isRefreshingRoles) return;
 
     if (user && isAdmin) {
       setIsAuthorized(true);
@@ -41,7 +43,7 @@ const AdminSettingsPage = () => {
       }
     }
     setIsChecking(false);
-  }, [user, isAdmin, authChecked, navigate, toast]);
+  }, [user, isAdmin, authChecked, navigate, toast, isRefreshingRoles]);
 
   if (isChecking) {
     return (

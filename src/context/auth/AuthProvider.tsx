@@ -17,13 +17,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isMember, setIsMember] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [isInvitedUser, setIsInvitedUser] = useState(false);
+  const [isRefreshingRoles, setIsRefreshingRoles] = useState(false);
 
-  const loadUserData = async (currentUser: User) => {
+  const loadUserData = async (currentUser: User, isRefreshing = false) => {
     try {
+      if (isRefreshing) {
+        setIsRefreshingRoles(true);
+      }
+      
       const [roles, profileData] = await Promise.all([
         fetchUserRoles(currentUser.id),
         fetchUserProfile(currentUser.id)
       ]);
+      
+      // Protection : ne jamais remplacer des rôles existants par un tableau vide
+      // Cela peut arriver lors d'un timeout ou d'une erreur de session temporaire
+      if (roles.length === 0 && userRoles.length > 0 && currentUser.id === user?.id) {
+        if (isRefreshing) {
+          setIsRefreshingRoles(false);
+        }
+        return userRoles;
+      }
       
       setUserRoles(roles);
       
@@ -40,9 +54,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
 
+      if (isRefreshing) {
+        setIsRefreshingRoles(false);
+      }
+
       return roles;
     } catch (error) {
-      return [];
+      if (isRefreshing) {
+        setIsRefreshingRoles(false);
+      }
+      return userRoles;
     }
   };
 
@@ -137,7 +158,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAuthChecked(true);
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         setUser(session.user);
-        await loadUserData(session.user);
+        await loadUserData(session.user, true);
       }
     });
 
@@ -354,6 +375,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     userRoles,
     authChecked,
     isInvitedUser,
+    isRefreshingRoles,
     setUser,
     signInWithProvider,
     refreshUserRoles,

@@ -23,7 +23,7 @@ interface MenuItem {
 }
 
 const AdminMenuPage = () => {
-  const { isAdmin, authChecked } = useAuth();
+  const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -31,6 +31,8 @@ const AdminMenuPage = () => {
 
   useEffect(() => {
     if (!authChecked) return;
+
+    if (isRefreshingRoles) return;
 
     if (!isAdmin) {
       navigate('/');
@@ -43,7 +45,7 @@ const AdminMenuPage = () => {
     }
 
     fetchMenuItems();
-  }, [authChecked, isAdmin, navigate, toast]);
+  }, [authChecked, isAdmin, navigate, toast, isRefreshingRoles]);
 
   const fetchMenuItems = async () => {
     setLoading(true);

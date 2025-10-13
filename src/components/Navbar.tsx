@@ -18,7 +18,7 @@ import { Routes } from '@/routes';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { isAdmin, user, refreshUserRoles, userRoles } = useAuth();
+  const { isAdmin, user, refreshUserRoles, userRoles, isRefreshingRoles } = useAuth();
   const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
   const { settings } = useAppSettings();
 
@@ -48,12 +48,11 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (user && !hasRefreshedRoles) {
-      console.log('Navbar admin status check:', { isAdmin, userId: user.id });
+    if (user && !hasRefreshedRoles && userRoles.length === 0) {
       refreshUserRoles();
       setHasRefreshedRoles(true);
     }
-  }, [user, refreshUserRoles, isAdmin, hasRefreshedRoles]);
+  }, [user, refreshUserRoles, isAdmin, hasRefreshedRoles, userRoles]);
 
   useEffect(() => {
     if (user === null) {
@@ -129,7 +128,8 @@ const Navbar = () => {
   );
 
   const AdminLinks = () => {
-    if (!isAdmin) return null;
+    if (!isAdmin && !isRefreshingRoles) return null;
+    if (!isAdmin && isRefreshingRoles && userRoles.length === 0) return null;
 
     return (
       <>

@@ -57,7 +57,7 @@ interface InviteUserData {
 }
 
 const AdminUsersPage = () => {
-  const { user, isAdmin, userRoles, loading, authChecked, refreshUserRoles } = useAuth();
+  const { user, isAdmin, userRoles, loading, authChecked, refreshUserRoles, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<UserWithRoles[]>([]);
@@ -244,6 +244,56 @@ const AdminUsersPage = () => {
     }
   };
 
+  const handleUpdateAvatar = async (userId: string, file: File) => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}-${Math.random()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { data: bucketData } = await supabase.storage.getBucket('avatars');
+      
+      if (!bucketData) {
+        await supabase.storage.createBucket('avatars', {
+          public: true,
+          fileSizeLimit: 1024 * 1024 * 2
+        });
+      }
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+        
+      if (uploadError) {
+        console.error('Erreur upload:', uploadError);
+        throw uploadError;
+      }
+      
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      await fetchUsers();
+
+      toast({
+        title: 'Succès',
+        description: "L'avatar a été mis à jour."
+      });
+    } catch (error: any) {
+      console.error('Erreur lors de la mise à jour de l\'avatar:', error);
+      toast({
+        title: 'Erreur',
+        description: error.message || "Une erreur est survenue lors de la mise à jour de l'avatar.",
+        variant: 'destructive'
+      });
+      throw error;
+    }
+  };
+
 
   useEffect(() => {
     if (!authChecked) return;
@@ -255,6 +305,10 @@ const AdminUsersPage = () => {
         variant: 'destructive'
       });
       navigate('/auth');
+      return;
+    }
+
+    if (isRefreshingRoles) {
       return;
     }
 
@@ -277,7 +331,7 @@ const AdminUsersPage = () => {
     if (user && isAdmin) {
       fetchUsers();
     }
-  }, [user, isAdmin, authChecked, navigate, refreshUserRoles]);
+  }, [user, isAdmin, authChecked, navigate, refreshUserRoles, isRefreshingRoles]);
 
   return (
       <HelmetProvider>
@@ -293,7 +347,7 @@ const AdminUsersPage = () => {
 
           <section className="py-16">
           <div className="container mx-auto px-4">
-            {!authChecked || loading ? (
+            {!authChecked || loading || isRefreshingRoles ? (
               <div className="text-center py-10">
                 <p>Vérification des droits d'accès...</p>
               </div>
@@ -313,6 +367,7 @@ const AdminUsersPage = () => {
                 onRoleChange={handleRoleChange}
                 onInviteUser={handleInviteUser}
                 onToggleUserStatus={handleToggleUserStatus}
+                onUpdateAvatar={handleUpdateAvatar}
               />
             )}
           </div>
