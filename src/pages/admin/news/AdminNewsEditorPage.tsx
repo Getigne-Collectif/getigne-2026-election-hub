@@ -627,7 +627,7 @@ const AdminNewsEditorPage = () => {
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
-                            value={field.value}
+                            defaultValue={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner une catégorie" />
@@ -694,7 +694,7 @@ const AdminNewsEditorPage = () => {
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
-                            value={field.value}
+                            defaultValue={field.value}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner un auteur" />
