@@ -380,6 +380,7 @@ const NewsDetailPage = () => {
   const authorName = article.author 
     ? `${article.author.first_name || ''} ${article.author.last_name || ''}`.trim() 
     : '';
+  const imageUrl = article.image ? `${window.location.origin}${article.image}` : '';
 
   return (
     <HelmetProvider>
@@ -388,7 +389,19 @@ const NewsDetailPage = () => {
         {article.excerpt && (
           <meta name="description" content={article.excerpt} />
         )}
-      </Helmet>
+          {/* Balises OpenGraph pour les réseaux sociaux */}
+          <meta property="og:type" content="article" />
+          <meta property="og:title" content={article.title} />
+          <meta property="og:description" content={article.excerpt} />
+          <meta property="og:url" content={`${window.location.origin}${generatePath(Routes.NEWS_DETAIL, {slug: article.slug})}`} />
+          {article.image && <meta property="og:image" content={imageUrl} />}
+          
+          {/* Balises Twitter Card */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={article.title} />
+          <meta name="twitter:description" content={article.excerpt} />
+          {article.image && <meta name="twitter:image" content={imageUrl} />}
+        </Helmet>
 
       <div className="min-h-screen flex flex-col">
         <Navbar />
