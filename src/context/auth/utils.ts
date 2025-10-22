@@ -6,7 +6,7 @@ import { User } from '@supabase/supabase-js';
 export const fetchUserRoles = async (userId: string): Promise<string[]> => {
   try {
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout after 3s')), 3000);
+      setTimeout(() => reject(new Error('Timeout after 10s')), 10000);
     });
 
     const queryPromise = supabase
@@ -20,11 +20,13 @@ export const fetchUserRoles = async (userId: string): Promise<string[]> => {
     ]) as any;
 
     if (rolesError) {
+      console.warn('Erreur lors de la récupération des rôles:', rolesError);
       return [];
     }
 
     return rolesData?.map(r => r.role) || [];
   } catch (error) {
+    console.warn('Timeout ou erreur lors de la récupération des rôles:', error);
     return [];
   }
 };

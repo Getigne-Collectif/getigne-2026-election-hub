@@ -80,24 +80,12 @@ const Program = () => {
   useEffect(() => {
     const fetchProgramItems = async () => {
       try {
-        console.log("[Program] Fetching program items for homepage");
         const { data, error } = await supabase
           .from('program_items')
           .select('*')
           .order('title');
         
         if (error) throw error;
-        
-        console.log(`[Program] Fetched ${data.length} program items`);
-        
-        // Log images to check if they exist
-        data.forEach(item => {
-          if (item.image) {
-            console.log(`[Program] Item "${item.title}" has image: ${item.image}`);
-          } else {
-            console.log(`[Program] Item "${item.title}" has no image`);
-          }
-        });
         
         // Limiter à 5 items pour la page d'accueil
         setProgramItems(data.slice(0, 5));

@@ -93,7 +93,6 @@ const News = ({ limit, showPagination = false }) => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        console.log('Fetching news articles...');
         
         const from = (currentPage - 1) * ITEMS_PER_PAGE;
         const to = from + (limit || ITEMS_PER_PAGE) - 1;
@@ -124,7 +123,6 @@ const News = ({ limit, showPagination = false }) => {
           throw error;
         }
         
-        console.log('Fetched news articles:', data);
         setNewsArticles(data);
         setError(null);
       } catch (err) {

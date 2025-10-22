@@ -27,11 +27,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
   const fetchComments = async () => {
     setLoading(true);
-    console.log('Fetching comments for resourceType:', resourceType, 'resourceId:', resourceId);
     
     try {
       if (resourceType === 'news') {
-        console.log('Fetching news comments for newsId:', newsId);
         // Modification importante: ne pas utiliser la relation directe, mais plutôt deux requêtes séparées
         const { data: commentsData, error: commentsError } = await supabase
           .from('comments')
@@ -44,7 +42,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           throw commentsError;
         }
 
-        console.log('Comments data fetched:', commentsData);
 
         // Maintenant, récupérons les profils utilisateur séparément
         const commentWithProfiles = await Promise.all(
@@ -89,11 +86,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           })
         );
 
-        console.log('Comments with profiles:', commentWithProfiles);
         setComments(commentWithProfiles);
       } else {
         // For program comments, we need to use a different approach
-        console.log('Fetching program comments for programItemId:', programItemId);
         const { data, error } = await supabase
           .from('program_comments')
           .select('*')
@@ -104,12 +99,9 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           throw error;
         }
 
-        console.log('Program comments data fetched:', data);
-
         // If this is for a program point, filter by program_point_id
         let filteredData = data;
         if (programPointId) {
-          console.log('Filtering by program_point_id:', programPointId);
           filteredData = data.filter(comment => comment.program_point_id === programPointId);
         } else {
           // If not for a specific point, only get comments without a point id
@@ -159,7 +151,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           })
         );
 
-        console.log('Program comments with profiles:', commentsWithProfiles);
         setComments(commentsWithProfiles);
       }
     } catch (err: any) {
@@ -186,7 +177,6 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const handleModerateComment = async (commentId: string, status: CommentStatus) => {
     try {
       const table = resourceType === 'news' ? 'comments' : 'program_comments';
-      console.log('Moderating comment:', commentId, 'with status:', status, 'in table:', table);
       
       const { error } = await supabase
         .from(table)

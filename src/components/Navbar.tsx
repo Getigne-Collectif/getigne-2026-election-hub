@@ -48,11 +48,13 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (user && !hasRefreshedRoles && userRoles.length === 0) {
-      refreshUserRoles();
+    // Ne pas re-vérifier les rôles automatiquement dans la navbar
+    // Cela peut causer des redirections intempestives lors du changement d'onglet
+    // Les rôles sont déjà gérés par AuthProvider lors du refresh de token
+    if (user && !hasRefreshedRoles) {
       setHasRefreshedRoles(true);
     }
-  }, [user, refreshUserRoles, isAdmin, hasRefreshedRoles, userRoles]);
+  }, [user, hasRefreshedRoles]);
 
   useEffect(() => {
     if (user === null) {

@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fetchUserProfile(currentUser.id)
       ]);
       
-      // Protection : ne jamais remplacer des rôles existants par un tableau vide
+      // Protection renforcée : ne jamais remplacer des rôles existants par un tableau vide
       // Cela peut arriver lors d'un timeout ou d'une erreur de session temporaire
       if (roles.length === 0 && userRoles.length > 0 && currentUser.id === user?.id) {
         if (isRefreshing) {
@@ -39,7 +39,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return userRoles;
       }
       
-      setUserRoles(roles);
+      // Ne mettre à jour les rôles que si on a vraiment des rôles valides
+      if (roles.length > 0) {
+        setUserRoles(roles);
+      } else if (userRoles.length === 0) {
+        setUserRoles(roles);
+      }
       
       if (profileData) {
         setProfile(profileData);
@@ -68,8 +73,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refreshUserRoles = async () => {
-    if (!user) return [];
-    return loadUserData(user);
+    // Désactivation complète du refresh des rôles
+    // Les rôles sont conservés et ne sont re-vérifiés que lors d'une vraie connexion/déconnexion
+    console.log('refreshUserRoles appelé mais désactivé pour éviter les redirections');
+    return userRoles;
   };
 
   useEffect(() => {
@@ -132,8 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         const isNewInvitedUser = session.user.email_confirmed_at && !session.user.last_sign_in_at;
         setIsInvitedUser(isNewInvitedUser);
-        
-        await loadUserData(session.user);
+      
         
         const loginMethod = session.user.app_metadata?.provider || 'email';
         if (posthog?.capture) {
@@ -158,11 +164,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAuthChecked(true);
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         setUser(session.user);
-        // Ne pas re-vérifier les rôles lors du refresh de token si on a déjà des rôles valides
-        // Cela évite les timeouts et redirections intempestives au retour sur l'onglet
-        if (userRoles.length === 0) {
-          await loadUserData(session.user, true);
-        }
       }
     });
 

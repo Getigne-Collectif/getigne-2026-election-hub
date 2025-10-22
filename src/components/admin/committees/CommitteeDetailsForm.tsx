@@ -78,7 +78,6 @@ export default function CommitteeDetailsForm({
 
   useEffect(() => {
     if (initialData && !dataInitialized) {
-      console.log("Setting form data from initialData:", initialData);
       setTitle(initialData.title || '');
       setDescription(initialData.description || '');
       setIcon(initialData.icon || 'users');
@@ -138,7 +137,6 @@ export default function CommitteeDetailsForm({
 
       const bucketName = 'public';
       
-      console.log(`Uploading to ${bucketName}/${filePath}`);
       const { error: uploadError, data } = await supabase.storage
         .from(bucketName)
         .upload(filePath, file, {
@@ -155,7 +153,6 @@ export default function CommitteeDetailsForm({
         .from(bucketName)
         .getPublicUrl(filePath);
 
-      console.log('Upload successful, public URL:', publicUrlData.publicUrl);
       return publicUrlData.publicUrl;
     } catch (error) {
       console.error(`Erreur lors de l'upload de l'image:`, error);
@@ -179,7 +176,6 @@ export default function CommitteeDetailsForm({
         const uploadedTeamUrl = await uploadPhoto(teamPhotoFile, 'teams');
         if (uploadedTeamUrl) {
           teamPhotoUrlFinal = uploadedTeamUrl;
-          console.log('Team photo updated to:', teamPhotoUrlFinal);
         }
       }
       
@@ -187,7 +183,6 @@ export default function CommitteeDetailsForm({
         const uploadedCoverUrl = await uploadPhoto(coverPhotoFile, 'covers');
         if (uploadedCoverUrl) {
           coverPhotoUrlFinal = uploadedCoverUrl;
-          console.log('Cover photo updated to:', coverPhotoUrlFinal);
         }
       }
       
@@ -200,12 +195,10 @@ export default function CommitteeDetailsForm({
         color
       };
       
-      console.log("Saving committee data:", committeeData);
       
       let finalCommitteeId = committeeId;
       
       if (isEditMode && committeeId) {
-        console.log("Updating committee with ID:", committeeId);
         
         const { error, data } = await supabase
           .from('citizen_committees')
@@ -218,10 +211,8 @@ export default function CommitteeDetailsForm({
           throw error;
         }
         
-        console.log("Update response:", data);
       } else {
         finalCommitteeId = uuidv4();
-        console.log("Creating new committee with ID:", finalCommitteeId);
         
         const { error, data } = await supabase
           .from('citizen_committees')
@@ -236,7 +227,6 @@ export default function CommitteeDetailsForm({
           throw error;
         }
         
-        console.log("Insert response:", data);
       }
       
       toast.success(isEditMode 

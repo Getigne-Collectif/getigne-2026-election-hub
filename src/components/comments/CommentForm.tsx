@@ -31,7 +31,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submitting comment for resourceType:', resourceType);
 
     if (!user) {
       toast({
@@ -60,7 +59,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
       const initialStatus: CommentStatus = isModerator ? 'approved' : 'pending';
 
       if (resourceType === 'news') {
-        console.log('Adding comment to news:', newsId);
         
         // Insert into comments table for news
         const { data: commentData, error: commentError } = await supabase
@@ -81,7 +79,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
           throw commentError;
         }
 
-        console.log('Inserted comment data:', commentData);
         
         // Fetch the user profile separately
         const { data: profileData, error: profileError } = await supabase
@@ -119,7 +116,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
           resource_type: 'news'
         });
       } else {
-        console.log('Adding comment to program:', programItemId, 'program point:', programPointId);
         
         // Insert into program_comments table for program items or points
         const commentData: any = {
@@ -145,7 +141,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
           throw commentError;
         }
         
-        console.log('Inserted program comment data:', insertedComment);
         
         // Get user profile data separately
         const { data: profileData, error: profileError } = await supabase

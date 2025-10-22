@@ -24,7 +24,6 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
   const { data: programItem, isLoading: isLoadingItem } = useQuery({
     queryKey: ['programItemDetail', programItemId],
     queryFn: async () => {
-      console.log(`[ProgramContent] Fetching program item details: ${programItemId}`);
       const { data, error } = await supabase
         .from('program_items')
         .select('*')
@@ -36,7 +35,6 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         throw error;
       }
       
-      console.log("[ProgramContent] Program item loaded:", data);
       return data;
     },
     enabled: !!programItemId,
@@ -46,7 +44,6 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
   const { isLoading: isLoadingPoints } = useQuery({
     queryKey: ['programPoints', programItemId],
     queryFn: async () => {
-      console.log(`[ProgramContent] Fetching program points for item: ${programItemId}`);
       const { data, error } = await supabase
         .from('program_points')
         .select('*')
@@ -58,7 +55,6 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         throw error;
       }
       
-      console.log(`[ProgramContent] Loaded ${data?.length || 0} program points`);
       setProgramPoints(data || []);
       return data;
     },
@@ -91,9 +87,7 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
 
   // Check if there's an image and log it
   if (programItem.image) {
-    console.log(`[ProgramContent] Section image found: ${programItem.image}`);
   } else {
-    console.log("[ProgramContent] No section image found, using placeholder");
   }
 
   return (
