@@ -27,9 +27,9 @@ interface AdminRouteProps {
 }
 
 export function AdminRoute({ children }: AdminRouteProps) {
-  const { user, isAdmin, loading, authChecked } = useAuth();
+  const { user, isAdmin, loading, authChecked, isRefreshingRoles } = useAuth();
 
-  if (loading || !authChecked) {
+  if (loading || !authChecked || isRefreshingRoles) {
     return <LoadingSpinner />;
   }
 

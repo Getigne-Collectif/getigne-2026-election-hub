@@ -158,7 +158,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAuthChecked(true);
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         setUser(session.user);
-        await loadUserData(session.user, true);
+        // Ne pas re-vérifier les rôles lors du refresh de token si on a déjà des rôles valides
+        // Cela évite les timeouts et redirections intempestives au retour sur l'onglet
+        if (userRoles.length === 0) {
+          await loadUserData(session.user, true);
+        }
       }
     });
 
