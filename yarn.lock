@@ -4949,7 +4949,7 @@ __metadata:
     recharts: "npm:^2.12.7"
     remark-gfm: "npm:^3.0.1"
     sonner: "npm:^1.5.0"
-    supabase: "npm:^2.19.7"
+    supabase: "npm:2.53.6"
     tailwind-merge: "npm:^2.5.2"
     tailwindcss: "npm:^3.4.11"
     tailwindcss-animate: "npm:^1.0.7"
@@ -6161,15 +6161,6 @@ __metadata:
   dependencies:
     minipass: "npm:^7.1.2"
   checksum: 10/f47365cc2cb7f078cbe7e046eb52655e2e7e97f8c0a9a674f4da60d94fb0624edfcec9b5db32e8ba5a99a5f036f595680ae6fe02a262beaa73026e505cc52f99
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "mkdirp@npm:3.0.1"
-  bin:
-    mkdirp: dist/cjs/src/bin.js
-  checksum: 10/16fd79c28645759505914561e249b9a1f5fe3362279ad95487a4501e4467abeb714fd35b95307326b8fd03f3c7719065ef11a6f97b7285d7888306d1bd2232ba
   languageName: node
   linkType: hard
 
@@ -7490,17 +7481,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supabase@npm:^2.19.7":
-  version: 2.19.7
-  resolution: "supabase@npm:2.19.7"
+"supabase@npm:2.53.6":
+  version: 2.53.6
+  resolution: "supabase@npm:2.53.6"
   dependencies:
     bin-links: "npm:^5.0.0"
     https-proxy-agent: "npm:^7.0.2"
     node-fetch: "npm:^3.3.2"
-    tar: "npm:7.4.3"
+    tar: "npm:7.5.1"
   bin:
     supabase: bin/supabase
-  checksum: 10/e462c2698f43932229592e07fde249aa4f04dc3d96cf8ea22b0846f55cd9162573224760b7f24690df01a9cad3e23a3575f810768e21e977befac1578acb2854
+  checksum: 10/0e9d2ce71de752c8d8f4ccdb0a68ef48546c00abea9b994b11b0255e51f9bd1df4b9e7cb4f8996e5cf40ee67472212813c95122b5b6c6155bd12bdf69d8082b6
   languageName: node
   linkType: hard
 
@@ -7576,21 +7567,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar@npm:7.4.3":
-  version: 7.4.3
-  resolution: "tar@npm:7.4.3"
-  dependencies:
-    "@isaacs/fs-minipass": "npm:^4.0.0"
-    chownr: "npm:^3.0.0"
-    minipass: "npm:^7.1.2"
-    minizlib: "npm:^3.0.1"
-    mkdirp: "npm:^3.0.1"
-    yallist: "npm:^5.0.0"
-  checksum: 10/12a2a4fc6dee23e07cc47f1aeb3a14a1afd3f16397e1350036a8f4cdfee8dcac7ef5978337a4e7b2ac2c27a9a6d46388fc2088ea7c80cb6878c814b1425f8ecf
-  languageName: node
-  linkType: hard
-
-"tar@npm:^7.4.3":
+"tar@npm:7.5.1, tar@npm:^7.4.3":
   version: 7.5.1
   resolution: "tar@npm:7.5.1"
   dependencies:

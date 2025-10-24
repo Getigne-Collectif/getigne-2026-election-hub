@@ -25,3 +25,15 @@ verify_jwt = false
 
 [functions.rss-feed]
 verify_jwt = false
+
+[functions.helloasso-webhook]
+verify_jwt = false
+
+[functions.discord-member-handler]
+verify_jwt = false
+
+[functions.check-helloasso-membership]
+verify_jwt = true
+
+[functions.delete-user]
+verify_jwt = true

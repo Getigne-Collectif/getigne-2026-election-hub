@@ -7,6 +7,31 @@ import { Profile, IAuthContext } from './types';
 import { fetchUserRoles, fetchUserProfile } from './utils';
 import { usePostHog } from '@/hooks/usePostHog';
 
+// Fonction pour vérifier et promouvoir les adhérents HelloAsso
+const checkAndPromoteHelloAssoMember = async (email: string, userId: string) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-helloasso-membership`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ email, userId }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.isMember && result.promoted) {
+        console.log('Utilisateur promu adhérent HelloAsso:', email);
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error('Erreur lors de la vérification HelloAsso:', error);
+  }
+  return false;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
   const posthog = usePostHog();
@@ -105,6 +130,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsInvitedUser(isNewInvitedUser);
           
           await loadUserData(session.user);
+          
+          // Vérifier si l'utilisateur est un adhérent HelloAsso et le promouvoir si nécessaire
+          if (session.user.email) {
+            await checkAndPromoteHelloAssoMember(session.user.email, session.user.id);
+          }
           
           if (cancelled) {
             return;
