@@ -202,6 +202,7 @@ export type Database = {
       }
       event_registrations: {
         Row: {
+          additional_guests: number
           created_at: string
           event_id: string
           id: string
@@ -209,6 +210,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          additional_guests?: number
           created_at?: string
           event_id: string
           id?: string
@@ -216,6 +218,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          additional_guests?: number
           created_at?: string
           event_id?: string
           id?: string

@@ -20,6 +20,7 @@ interface EventRegistration {
   event_id: string;
   created_at: string;
   status: string;
+  additional_guests: number;
   profiles: {
     id: string;
     first_name: string;
@@ -65,6 +66,7 @@ export const EventRegistrationsDrawer: React.FC<EventRegistrationsDrawerProps> =
           event_id,
           created_at,
           status,
+          additional_guests,
           profiles (
             id,
             first_name,
@@ -143,7 +145,7 @@ export const EventRegistrationsDrawer: React.FC<EventRegistrationsDrawerProps> =
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-gray-600">
-                  {registrations.length} participant{registrations.length > 1 ? 's' : ''}
+                  {registrations.length} inscription{registrations.length > 1 ? 's' : ''} ({registrations.reduce((total, reg) => total + 1 + (reg.additional_guests || 0), 0)} personnes au total)
                 </p>
                 <Button onClick={fetchRegistrations} variant="outline" size="sm">
                   Actualiser
@@ -175,6 +177,13 @@ export const EventRegistrationsDrawer: React.FC<EventRegistrationsDrawerProps> =
                         <div className="flex items-center">
                           <Mail className="h-3 w-3 mr-1" />
                           <span className="truncate">{registration.profiles.email}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Users className="h-3 w-3 mr-1" />
+                          <span>{1 + (registration.additional_guests || 0)} personne{(1 + (registration.additional_guests || 0)) > 1 ? 's' : ''}</span>
+                          {registration.additional_guests > 0 && (
+                            <span className="ml-1 text-gray-400">(dont {registration.additional_guests} invité{registration.additional_guests > 1 ? 's' : ''})</span>
+                          )}
                         </div>
                       </div>
                       

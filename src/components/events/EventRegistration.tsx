@@ -4,7 +4,7 @@ import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
-import { Loader2, Check, X, Users } from 'lucide-react';
+import { Loader2, Check, X, Users, Plus, Minus } from 'lucide-react';
 import { sendDiscordNotification, DiscordColors } from '@/utils/notifications';
 import { Routes } from '@/routes';
 import { usePostHog } from '@/hooks/usePostHog';
@@ -34,6 +34,8 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
   const [registering, setRegistering] = useState(false);
   const [unregistering, setUnregistering] = useState(false);
   const [participantCount, setParticipantCount] = useState(0);
+  const [additionalGuests, setAdditionalGuests] = useState(0);
+  const [registrationData, setRegistrationData] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -60,6 +62,10 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
       }
       
       setIsRegistered(!!data);
+      if (data) {
+        setRegistrationData(data);
+        setAdditionalGuests(data.additional_guests || 0);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error checking registration:', error);
@@ -69,15 +75,19 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
 
   const fetchParticipantCount = async () => {
     try {
-      const { count, error } = await supabase
+      const { data, error } = await supabase
         .from('event_registrations')
-        .select('*', { count: 'exact', head: true })
+        .select('additional_guests')
         .eq('event_id', eventId);
       
       if (error) {
         console.error('Error fetching participant count:', error);
       } else {
-        setParticipantCount(count || 0);
+        // Calculer le nombre total de participants (utilisateurs + invités additionnels)
+        const totalParticipants = data?.reduce((total, registration) => {
+          return total + 1 + (registration.additional_guests || 0);
+        }, 0) || 0;
+        setParticipantCount(totalParticipants);
       }
     } catch (error) {
       console.error('Error fetching participant count:', error);
@@ -103,11 +113,12 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
       return;
     }
 
-    // Vérifier si le maximum de participants est atteint
-    if (event?.max_participants && participantCount >= event.max_participants) {
+    // Vérifier si le maximum de participants est atteint (en incluant les invités additionnels)
+    const totalWithGuests = participantCount + additionalGuests;
+    if (event?.max_participants && totalWithGuests > event.max_participants) {
       toast({
         title: 'Événement complet',
-        description: `Le nombre maximum de participants (${event.max_participants}) est atteint`,
+        description: `Le nombre maximum de participants (${event.max_participants}) serait dépassé avec ${additionalGuests} invité${additionalGuests > 1 ? 's' : ''} additionnel${additionalGuests > 1 ? 's' : ''}`,
         variant: 'destructive'
       });
       return;
@@ -118,7 +129,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
       const { error } = await supabase
         .from('event_registrations')
         .insert([
-          { user_id: user.id, event_id: eventId }
+          { user_id: user.id, event_id: eventId, additional_guests: additionalGuests }
         ]);
 
       if (error) {
@@ -155,7 +166,8 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
 **Participant**: ${userName} (${profileData.email})
 **Événement**: ${eventData.title}
 **Date**: ${eventDate}
-**Nombre total de participants**: ${participantCount + 1}
+**Invités additionnels**: ${additionalGuests}
+**Nombre total de participants**: ${participantCount + 1 + additionalGuests}
             `,
             color: DiscordColors.PURPLE,
             username: "Système d'Événements"
@@ -164,7 +176,9 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
         
         toast({
           title: 'Inscription confirmée',
-          description: 'Vous êtes inscrit à cet événement',
+          description: additionalGuests > 0 
+            ? `Vous êtes inscrit à cet événement avec ${additionalGuests} invité${additionalGuests > 1 ? 's' : ''} additionnel${additionalGuests > 1 ? 's' : ''}`
+            : 'Vous êtes inscrit à cet événement',
           variant: 'default'
         });
         
@@ -176,7 +190,8 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           user_id: user.id,
           is_member: isMember,
           is_members_only: isMembersOnly,
-          participant_count: participantCount + 1
+          participant_count: participantCount + 1 + additionalGuests,
+          additional_guests: additionalGuests
         });
         
         setIsRegistered(true);
@@ -249,6 +264,58 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
       });
     } finally {
       setUnregistering(false);
+    }
+  };
+
+  const handleUpdateGuests = async (newGuestCount: number) => {
+    if (!user || !isRegistered) return;
+
+    try {
+      const { error } = await supabase
+        .from('event_registrations')
+        .update({ additional_guests: newGuestCount })
+        .eq('user_id', user.id)
+        .eq('event_id', eventId);
+
+      if (error) {
+        console.error('Error updating guests:', error);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de mettre à jour le nombre d\'invités',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      setAdditionalGuests(newGuestCount);
+      fetchParticipantCount();
+      onRegistrationChange();
+      
+      toast({
+        title: 'Nombre d\'invités mis à jour',
+        description: newGuestCount > 0 
+          ? `Vous venez maintenant avec ${newGuestCount} invité${newGuestCount > 1 ? 's' : ''}`
+          : 'Vous venez seul(e) à l\'événement',
+        variant: 'default'
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Une erreur est survenue',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const incrementGuests = () => {
+    if (additionalGuests < 9) {
+      handleUpdateGuests(additionalGuests + 1);
+    }
+  };
+
+  const decrementGuests = () => {
+    if (additionalGuests > 0) {
+      handleUpdateGuests(additionalGuests - 1);
     }
   };
 
@@ -330,6 +397,47 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
             <Check size={16} />
             <span>Vous êtes inscrit à cet événement</span>
           </div>
+          
+          {/* Sélecteur d'invités additionnels */}
+          <div className="mb-3 p-3 bg-getigne-50 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-getigne-700">
+                Invités additionnels
+              </span>
+              <span className="text-xs text-getigne-500">
+                {additionalGuests}/9
+              </span>
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={decrementGuests}
+                disabled={additionalGuests === 0}
+                className="h-8 w-8 p-0"
+              >
+                <Minus size={16} />
+              </Button>
+              <span className="text-lg font-semibold min-w-[2rem] text-center">
+                {additionalGuests}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={incrementGuests}
+                disabled={additionalGuests === 9}
+                className="h-8 w-8 p-0"
+              >
+                <Plus size={16} />
+              </Button>
+            </div>
+            {additionalGuests > 0 && (
+              <p className="text-xs text-getigne-600 mt-2 text-center">
+                Vous venez avec {additionalGuests} invité{additionalGuests > 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+          
           <Button 
             variant="outline" 
             className="w-full border-getigne-200 text-getigne-700"
@@ -348,13 +456,54 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
               <span>Événement complet ({participantCount}/{event.max_participants} participants)</span>
             </div>
           ) : null}
+          
+          {/* Sélecteur d'invités additionnels pour l'inscription */}
+          <div className="mb-3 p-3 bg-getigne-50 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-getigne-700">
+                Invités additionnels
+              </span>
+              <span className="text-xs text-getigne-500">
+                {additionalGuests}/9
+              </span>
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAdditionalGuests(Math.max(0, additionalGuests - 1))}
+                disabled={additionalGuests === 0}
+                className="h-8 w-8 p-0"
+              >
+                <Minus size={16} />
+              </Button>
+              <span className="text-lg font-semibold min-w-[2rem] text-center">
+                {additionalGuests}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAdditionalGuests(Math.min(9, additionalGuests + 1))}
+                disabled={additionalGuests === 9}
+                className="h-8 w-8 p-0"
+              >
+                <Plus size={16} />
+              </Button>
+            </div>
+            {additionalGuests > 0 && (
+              <p className="text-xs text-getigne-600 mt-2 text-center">
+                Vous viendrez avec {additionalGuests} invité{additionalGuests > 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+          
           <Button 
             className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
             onClick={handleRegister}
             disabled={registering || (event?.max_participants && participantCount >= event.max_participants)}
           >
             {registering ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-            S'inscrire
+            S'inscrire{additionalGuests > 0 ? ` avec ${additionalGuests} invité${additionalGuests > 1 ? 's' : ''}` : ''}
           </Button>
         </div>
       )}

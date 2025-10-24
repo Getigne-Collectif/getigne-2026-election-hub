@@ -113,7 +113,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
       const eventIds = events.map(event => event.id);
       const { data, error } = await supabase
         .from('event_registrations')
-        .select('event_id')
+        .select('event_id, additional_guests')
         .in('event_id', eventIds);
 
       if (error) {
@@ -121,10 +121,11 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
         return;
       }
 
-      // Compter les inscriptions par événement
+      // Compter le nombre total de personnes par événement (utilisateurs + invités)
       const counts: Record<string, number> = {};
       data?.forEach(registration => {
-        counts[registration.event_id] = (counts[registration.event_id] || 0) + 1;
+        const totalPeople = 1 + (registration.additional_guests || 0);
+        counts[registration.event_id] = (counts[registration.event_id] || 0) + totalPeople;
       });
 
       setRegistrationCounts(counts);
@@ -283,7 +284,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
                     className="flex items-center gap-1 hover:bg-gray-100"
                   >
                     <UserCheck size={16} />
-                    <span className="font-medium">{registrationCounts[event.id] || 0}</span>
+                    <span className="font-medium">{registrationCounts[event.id] || 0} personnes</span>
                   </Button>
                 </TableCell>
                 <TableCell>{getStatusBadge(event.status)}</TableCell>
