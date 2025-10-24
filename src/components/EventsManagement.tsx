@@ -21,12 +21,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, FileEdit, Trash2, Plus, Calendar, MapPin, Users, Package } from 'lucide-react';
+import { Search, FileEdit, Trash2, Plus, Calendar, MapPin, Users, Package, UserCheck } from 'lucide-react';
 import { Link, useNavigate, generatePath } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Routes } from '@/routes';
+import { supabase } from '@/integrations/supabase/client';
+import EventRegistrationsDrawer from '@/components/admin/EventRegistrationsDrawer';
 
 // Helper function to generate slug
 const generateSlug = (title: string): string => {
@@ -94,7 +96,42 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isRegistrationsDrawerOpen, setIsRegistrationsDrawerOpen] = useState(false);
+  const [selectedEventForRegistrations, setSelectedEventForRegistrations] = useState<Event | null>(null);
+  const [registrationCounts, setRegistrationCounts] = useState<Record<string, number>>({});
   const navigate = useNavigate();
+
+  // Récupérer les compteurs d'inscriptions pour tous les événements
+  useEffect(() => {
+    if (events.length > 0) {
+      fetchRegistrationCounts();
+    }
+  }, [events]);
+
+  const fetchRegistrationCounts = async () => {
+    try {
+      const eventIds = events.map(event => event.id);
+      const { data, error } = await supabase
+        .from('event_registrations')
+        .select('event_id')
+        .in('event_id', eventIds);
+
+      if (error) {
+        console.error('Error fetching registration counts:', error);
+        return;
+      }
+
+      // Compter les inscriptions par événement
+      const counts: Record<string, number> = {};
+      data?.forEach(registration => {
+        counts[registration.event_id] = (counts[registration.event_id] || 0) + 1;
+      });
+
+      setRegistrationCounts(counts);
+    } catch (error) {
+      console.error('Error fetching registration counts:', error);
+    }
+  };
 
   const handleToggleStatus = async (event: Event, newStatus: string) => {
     try {
@@ -137,6 +174,16 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
   const openDeleteDialog = (event: Event) => {
     setSelectedEvent(event);
     setIsDeleteDialogOpen(true);
+  };
+
+  const openRegistrationsDrawer = (event: Event) => {
+    setSelectedEventForRegistrations(event);
+    setIsRegistrationsDrawerOpen(true);
+  };
+
+  const closeRegistrationsDrawer = () => {
+    setIsRegistrationsDrawerOpen(false);
+    setSelectedEventForRegistrations(null);
   };
 
   const getStatusBadge = (status: string | undefined) => {
@@ -195,6 +242,7 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
               <TableHead>Date</TableHead>
               <TableHead>Lieu</TableHead>
               <TableHead>Commission</TableHead>
+              <TableHead>Inscrits</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -226,6 +274,17 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
                       {event.committee}
                     </div>
                   )}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openRegistrationsDrawer(event)}
+                    className="flex items-center gap-1 hover:bg-gray-100"
+                  >
+                    <UserCheck size={16} />
+                    <span className="font-medium">{registrationCounts[event.id] || 0}</span>
+                  </Button>
                 </TableCell>
                 <TableCell>{getStatusBadge(event.status)}</TableCell>
                 <TableCell>
@@ -292,6 +351,13 @@ const EventsManagement: React.FC<EventsManagementProps> = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <EventRegistrationsDrawer
+        isOpen={isRegistrationsDrawerOpen}
+        onClose={closeRegistrationsDrawer}
+        eventId={selectedEventForRegistrations?.id || ''}
+        eventTitle={selectedEventForRegistrations?.title || ''}
+      />
     </div>
   );
 };
