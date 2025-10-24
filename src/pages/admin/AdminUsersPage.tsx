@@ -294,6 +294,34 @@ const AdminUsersPage = () => {
     }
   };
 
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      // Appeler la fonction Edge Function pour supprimer complètement l'utilisateur
+      const { error } = await supabase.functions.invoke('delete-user', {
+        body: {
+          userId: userId
+        }
+      });
+
+      if (error) throw error;
+
+      await fetchUsers();
+
+      toast({
+        title: 'Succès',
+        description: "L'utilisateur a été supprimé définitivement."
+      });
+    } catch (error: any) {
+      console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+      toast({
+        title: 'Erreur',
+        description: error.message || "Une erreur est survenue lors de la suppression de l'utilisateur.",
+        variant: 'destructive'
+      });
+      throw error;
+    }
+  };
+
 
   useEffect(() => {
     if (!authChecked) return;
@@ -368,6 +396,7 @@ const AdminUsersPage = () => {
                 onInviteUser={handleInviteUser}
                 onToggleUserStatus={handleToggleUserStatus}
                 onUpdateAvatar={handleUpdateAvatar}
+                onDeleteUser={handleDeleteUser}
               />
             )}
           </div>

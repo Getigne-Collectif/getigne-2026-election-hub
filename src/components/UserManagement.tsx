@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool, RefreshCcw, Camera } from 'lucide-react';
+import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool, RefreshCcw, Camera, Trash2 } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -48,6 +48,7 @@ interface UserManagementProps {
   onInviteUser: (userData: InviteUserFormValues) => Promise<void>;
   onToggleUserStatus: (userId: string, isActive: boolean) => Promise<void>;
   onUpdateAvatar?: (userId: string, file: File) => Promise<void>;
+  onDeleteUser?: (userId: string) => Promise<void>;
 }
 
 const inviteUserSchema = z.object({
@@ -65,15 +66,19 @@ const UserManagement: React.FC<UserManagementProps> = ({
   onRoleChange,
   onInviteUser,
   onToggleUserStatus,
-  onUpdateAvatar
+  onUpdateAvatar,
+  onDeleteUser
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("users");
   const [resendingInvitation, setResendingInvitation] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState<string | null>(null);
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
 
   const form = useForm<InviteUserFormValues>({
     resolver: zodResolver(inviteUserSchema),
@@ -238,6 +243,34 @@ const UserManagement: React.FC<UserManagementProps> = ({
     }
   };
 
+  const openDeleteDialog = (user: any) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!onDeleteUser || !userToDelete) return;
+
+    setDeletingUser(userToDelete.id);
+    try {
+      await onDeleteUser(userToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
+      toast({
+        title: "Utilisateur supprimé",
+        description: `${userToDelete.first_name} ${userToDelete.last_name} a été supprimé définitivement.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la suppression",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingUser(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
@@ -381,6 +414,23 @@ const UserManagement: React.FC<UserManagementProps> = ({
                           >
                             {user.status === 'disabled' ? "Activer" : "Désactiver"}
                           </Button>
+                          {user.status === 'disabled' && onDeleteUser && (
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => openDeleteDialog(user)}
+                              disabled={deletingUser === user.id}
+                            >
+                              {deletingUser === user.id ? (
+                                <>Suppression...</>
+                              ) : (
+                                <>
+                                  <Trash2 className="h-4 w-4" />
+                                  Supprimer
+                                </>
+                              )}
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -567,6 +617,50 @@ const UserManagement: React.FC<UserManagementProps> = ({
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmer la suppression</DialogTitle>
+            <DialogDescription>
+              Cette action est irréversible. Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ?
+            </DialogDescription>
+          </DialogHeader>
+
+          {userToDelete && (
+            <div className="py-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-red-800 font-medium mb-2">
+                  <Trash2 className="h-4 w-4" />
+                  Utilisateur à supprimer
+                </div>
+                <div className="text-sm text-red-700">
+                  <p><strong>Nom :</strong> {userToDelete.first_name} {userToDelete.last_name}</p>
+                  <p><strong>Email :</strong> {userToDelete.email}</p>
+                  <p><strong>Statut :</strong> {userToDelete.status === 'disabled' ? 'Désactivé' : 'Actif'}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={deletingUser !== null}
+            >
+              Annuler
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteUser}
+              disabled={deletingUser !== null}
+            >
+              {deletingUser ? 'Suppression...' : 'Supprimer définitivement'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
