@@ -481,7 +481,7 @@ const NewsDetailPage = () => {
             <h1 className="text-3xl md:text-5xl font-bold mb-6">{article.title}</h1>
 
             {article.image && (
-              <div className="w-full h-[350px] md:h-[450px] mb-8 rounded-xl overflow-hidden">
+              <div className="w-full mb-8 rounded-xl overflow-hidden">
                 <img
                   src={article.image}
                   alt={article.title}

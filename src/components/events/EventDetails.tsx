@@ -76,7 +76,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
           <img 
             src={event.image} 
             alt={event.title} 
-            className="w-full rounded-lg object-cover h-64 md:h-80"
+            className="w-full rounded-lg object-cover h-auto"
           />
         </div>
         
