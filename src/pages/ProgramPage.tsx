@@ -25,6 +25,7 @@ import ProgramAlertForm from '@/components/program/ProgramAlertForm';
 import ProgramTimeline from '@/components/program/ProgramTimeline';
 import { Routes } from '@/routes';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
+import ProgramPointsEditor from '@/components/admin/program/points/ProgramPointsEditor';
 
 type ProgramItemWithPoints = Tables<'program_items'> & {
   program_points: Tables<'program_points'>[];
@@ -503,34 +504,45 @@ const ProgramPage = () => {
                             </div>
                           )}
 
-                          {item.program_points && item.program_points.length > 0 && (
-                            <div className="mt-8 space-y-4">
+                          {isProgramAdmin ? (
+                            <div className="mt-8">
                               <h3 className="text-lg font-semibold text-getigne-900 border-b border-getigne-200 pb-2">
-                                Points du programme
+                                Gestion des points de la section
                               </h3>
-                              {item.program_points.map((point: Tables<'program_points'>) => {
-                                const normalizedPoint: ProgramPoint = {
-                                  id: point.id,
-                                  title: point.title as unknown as string,
-                                  content: point.content as unknown as string,
-                                  position: point.position,
-                                  program_item_id: point.program_item_id,
-                                  status: (point.status as 'draft' | 'pending' | 'validated') || 'validated',
-                                  files: Array.isArray(point.files) ? (point.files as string[]) : [],
-                                  created_at: point.created_at,
-                                  updated_at: point.updated_at,
-                                };
-
-                                return (
-                                  <ProgramPointCard
-                                    key={point.id}
-                                    point={normalizedPoint}
-                                    programItemId={item.id}
-                                    icon={item.icon}
-                                  />
-                                );
-                              })}
+                              <div className="mt-4">
+                                <ProgramPointsEditor programItemId={item.id} />
+                              </div>
                             </div>
+                          ) : (
+                            item.program_points && item.program_points.length > 0 && (
+                              <div className="mt-8 space-y-4">
+                                <h3 className="text-lg font-semibold text-getigne-900 border-b border-getigne-200 pb-2">
+                                  Points du programme
+                                </h3>
+                                {item.program_points.map((point: Tables<'program_points'>) => {
+                                  const normalizedPoint: ProgramPoint = {
+                                    id: point.id,
+                                    title: point.title as unknown as string,
+                                    content: point.content as unknown as string,
+                                    position: point.position,
+                                    program_item_id: point.program_item_id,
+                                    status: (point.status as 'draft' | 'pending' | 'validated') || 'validated',
+                                    files: Array.isArray(point.files) ? (point.files as string[]) : [],
+                                    created_at: point.created_at,
+                                    updated_at: point.updated_at,
+                                  };
+
+                                  return (
+                                    <ProgramPointCard
+                                      key={point.id}
+                                      point={normalizedPoint}
+                                      programItemId={item.id}
+                                      icon={item.icon}
+                                    />
+                                  );
+                                })}
+                              </div>
+                            )
                           )}
 
                           <div className="mt-8 pt-6 border-t border-getigne-200">
