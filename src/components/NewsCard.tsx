@@ -94,7 +94,20 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
             )}
           </div>
           <h3 className="font-medium text-xl mb-2">{article.title}</h3>
-          <p className="text-getigne-700 mb-4">{article.excerpt}</p>
+          <p
+            className="text-getigne-700 mb-4 line-clamp-2"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 5,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxHeight: '180px', // ~3 lines for most font-sizes
+            }}
+            title={article.excerpt}
+          >
+            {article.excerpt}
+          </p>
           <div className="text-getigne-accent flex items-center text-sm font-medium group">
             Lire la suite
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
