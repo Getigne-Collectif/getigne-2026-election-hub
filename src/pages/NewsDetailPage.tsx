@@ -442,7 +442,7 @@ const NewsDetailPage = () => {
 
       <div className="pt-24 pb-4 bg-getigne-50">
         <div className="container mx-auto px-4">
-          <div className="mb-4">
+          <div className="mb-4 flex items-center gap-2">
             <Button
                 variant="outline"
                 size="sm"
@@ -451,6 +451,16 @@ const NewsDetailPage = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retour aux actualités
             </Button>
+            {isAdmin && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleEdit}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Modifier
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {X, Search, Calendar, User, FileDown, Rss} from 'lucide-react';
+import {X, Search, Calendar, User, FileDown, Rss, Plus} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { NewsCard } from '@/components/NewsCard';
 import {
@@ -20,12 +20,14 @@ import {
 } from '@/components/ui/pagination';
 import { toast } from '@/components/ui/use-toast';
 import { Routes } from '@/routes';
+import { useAuth } from '@/context/auth';
 
 const ITEMS_PER_PAGE = 9;
 
 const NewsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [newsArticles, setNewsArticles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -421,6 +423,12 @@ const NewsPage = () => {
             </form>
 
             <div className="flex gap-2">
+              {isAdmin && (
+                <Button onClick={() => navigate(Routes.ADMIN_NEWS_NEW)} size="sm">
+                  <Plus size={16} className="mr-1" />
+                  Nouvel article
+                </Button>
+              )}
               {(selectedCategory !== 'all' || selectedTags.length !== 0 || searchTerm) && (
                 <Button onClick={handleClearFilters} variant="outline" size="sm">
                   <X size={16} className="mr-1" />

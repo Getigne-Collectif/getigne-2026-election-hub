@@ -1,5 +1,6 @@
 import React from 'react';
 import { OutputData, OutputBlockData } from '@editorjs/editorjs';
+import ImageCarousel from '@/components/ImageCarousel';
 
 interface EditorJSRendererProps {
   data: OutputData | string;
@@ -202,6 +203,14 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
               </div>
             </div>
           </a>
+        );
+
+      case 'imageCarousel':
+        return (
+          <ImageCarousel
+            key={index}
+            images={block.data.images || []}
+          />
         );
 
       default:

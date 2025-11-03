@@ -15,6 +15,7 @@ import Checklist from '@editorjs/checklist';
 import Warning from '@editorjs/warning';
 import Paragraph from '@editorjs/paragraph';
 import { supabase } from '@/integrations/supabase/client';
+import ImageCarouselTool from '@/components/editorjs/ImageCarouselTool';
 
 interface EditorJSComponentProps {
   value: OutputData | string;
@@ -172,6 +173,12 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           config: {
             rows: 2,
             cols: 3
+          }
+        },
+        imageCarousel: {
+          class: ImageCarouselTool,
+          config: {
+            placeholder: 'Ajouter un carousel d\'images'
           }
         }
       },
