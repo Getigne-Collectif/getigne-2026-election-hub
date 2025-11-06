@@ -52,6 +52,7 @@ interface NewsFormValues {
   tags: string[];
   author_id?: string;
   publication_date?: string;
+  status?: 'draft' | 'published';
   comments_enabled?: boolean;
 }
 
@@ -72,6 +73,7 @@ const newsFormSchema = z.object({
   tags: z.array(z.string()).default([]),
   author_id: z.string().optional(),
   publication_date: z.date().optional(),
+  status: z.enum(['draft', 'published']).default('draft'),
   comments_enabled: z.boolean().default(true),
 });
 
@@ -115,7 +117,8 @@ const AdminNewsEditorPage = () => {
       image: undefined,
       tags: [],
       author_id: "",
-      publication_date: new Date(),
+      publication_date: undefined,
+      status: 'draft',
       comments_enabled: true,
     },
   });
@@ -208,7 +211,8 @@ const AdminNewsEditorPage = () => {
         image: data.image,
         tags: articleTags,
         author_id: data.author_id || "",
-        publication_date: data.publication_date ? new Date(data.publication_date) : new Date(),
+        publication_date: data.publication_date ? new Date(data.publication_date) : undefined,
+        status: (data.status === 'published' ? 'published' : 'draft') as 'draft' | 'published',
         comments_enabled: data.comments_enabled !== false,
       });
       setIsDataLoaded(true);
@@ -268,7 +272,8 @@ const AdminNewsEditorPage = () => {
         image: undefined,
         tags: [],
         author_id: user?.id || "",
-        publication_date: new Date(),
+        publication_date: undefined,
+        status: 'draft',
         comments_enabled: true,
       });
       setImagePreview(null);
@@ -344,12 +349,8 @@ const AdminNewsEditorPage = () => {
     }
   };
 
-  const handleSaveAsDraft = async (values: FormValues) => {
-    await handleSubmit(values, 'draft');
-  };
-
-  const handlePublish = async (values: FormValues) => {
-    await handleSubmit(values, 'published');
+  const handleSave = async (values: FormValues) => {
+    await handleSubmit(values);
   };
 
   const handlePreview = () => {
@@ -359,7 +360,7 @@ const AdminNewsEditorPage = () => {
     }
   };
 
-  const handleSubmit = async (values: FormValues, status: 'draft' | 'published') => {
+  const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
       let imageUrl = typeof values.image === 'string' ? values.image : "";
@@ -372,6 +373,9 @@ const AdminNewsEditorPage = () => {
         ? values.content 
         : JSON.stringify(values.content);
 
+      const status = values.status || 'draft';
+      const isPublishing = status === 'published';
+
       const formData: any = {
         title: values.title,
         excerpt: values.excerpt,
@@ -380,10 +384,14 @@ const AdminNewsEditorPage = () => {
         category: categories.find(cat => cat.id === values.category_id)?.name || '',
         image: imageUrl,
         author_id: values.author_id || user?.id,
+        // publication_date reste pour une date manuelle si l'utilisateur la définit
         publication_date: values.publication_date ? format(values.publication_date, 'yyyy-MM-dd') : undefined,
         comments_enabled: values.comments_enabled,
         slug: values.slug,
-        status
+        status,
+        // published_at est mis à jour automatiquement selon le statut
+        // Si on publie, on met la date/heure actuelle, sinon on met null
+        published_at: isPublishing ? new Date().toISOString() : null,
       };
 
       if (isEditMode && id) {
@@ -439,7 +447,7 @@ const AdminNewsEditorPage = () => {
 
         toast({
           title: "Article mis à jour",
-          description: status === 'published'
+          description: isPublishing
             ? "L'article a été publié avec succès"
             : "L'article a été enregistré comme brouillon",
         });
@@ -449,7 +457,7 @@ const AdminNewsEditorPage = () => {
           setArticleSlug(data[0].slug || data[0].id);
         }
 
-        if (status === 'published' && data && data.length > 0) {
+        if (isPublishing && data && data.length > 0) {
           const articleData = data[0];
           const articleSlug = articleData.slug || articleData.id;
           const redirectUrl = generatePath(Routes.NEWS_DETAIL, { slug: articleSlug });
@@ -505,7 +513,7 @@ const AdminNewsEditorPage = () => {
 
         toast({
           title: "Article créé",
-          description: status === 'published'
+          description: isPublishing
             ? "L'article a été publié avec succès"
             : "L'article a été enregistré comme brouillon",
         });
@@ -515,7 +523,7 @@ const AdminNewsEditorPage = () => {
           setArticleSlug(data[0].slug || data[0].id);
         }
 
-        if (status === 'published' && data && data.length > 0) {
+        if (isPublishing && data && data.length > 0) {
           const articleData = data[0];
           const articleSlug = articleData.slug || articleData.id;
           const redirectUrl = generatePath(Routes.NEWS_DETAIL, { slug: articleSlug });
@@ -629,43 +637,56 @@ const AdminNewsEditorPage = () => {
                   <div className="space-y-4">
                     <h3 className="font-bold text-lg">Paramètres de publication</h3>
                     
-                    {currentStatus === 'draft' && (
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Statut</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Sélectionner un statut" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="draft">Brouillon</SelectItem>
+                                <SelectItem value="published">Publié</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {form.watch('status') === 'draft' && (
                       <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
                         <p className="text-sm text-yellow-800">
-                          Cet article est en brouillon et n'est pas visible publiquement.
+                          Cet article sera enregistré comme brouillon et ne sera pas visible publiquement.
                         </p>
                       </div>
                     )}
                     
-                    {currentStatus === 'published' && (
+                    {form.watch('status') === 'published' && (
                       <div className="bg-green-50 border border-green-200 rounded-md p-3">
                         <p className="text-sm text-green-800">
-                          Cet article est publié et visible publiquement.
+                          Cet article sera publié et visible publiquement.
                         </p>
                       </div>
                     )}
                     
                     <div className="flex flex-col gap-2">
                       <Button
-                        onClick={form.handleSubmit(currentStatus === 'draft' ? handleSaveAsDraft : handlePublish)}
+                        onClick={form.handleSubmit(handleSave)}
                         disabled={isSubmitting}
                         className="w-full"
                       >
                         <Save className="mr-2 h-4 w-4" />
                         {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
                       </Button>
-                      
-                      {currentStatus === 'draft' && (
-                        <Button
-                          onClick={form.handleSubmit(handlePublish)}
-                          disabled={isSubmitting}
-                          variant="default"
-                          className="w-full bg-green-600 hover:bg-green-700"
-                        >
-                          <Send className="mr-2 h-4 w-4" />
-                          Publier l'article
-                        </Button>
-                      )}
                       
                       {isEditMode && articleSlug && (
                         <Button

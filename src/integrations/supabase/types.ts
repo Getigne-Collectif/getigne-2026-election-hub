@@ -547,6 +547,7 @@ export type Database = {
           id: string
           image: string
           publication_date: string | null
+          published_at: string | null
           slug: string | null
           status: string
           title: string
@@ -564,6 +565,7 @@ export type Database = {
           id?: string
           image: string
           publication_date?: string | null
+          published_at?: string | null
           slug?: string | null
           status?: string
           title: string
@@ -581,6 +583,7 @@ export type Database = {
           id?: string
           image?: string
           publication_date?: string | null
+          published_at?: string | null
           slug?: string | null
           status?: string
           title?: string
