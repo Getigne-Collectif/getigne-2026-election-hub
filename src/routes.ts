@@ -33,6 +33,7 @@ export enum Routes {
   ADMIN_NEWS = "/admin/news",
   ADMIN_NEWS_NEW = "/admin/news/new",
   ADMIN_NEWS_EDIT = "/admin/news/:id/edit",
+  ADMIN_NEWS_PREVIEW = "/admin/news/preview/:slug",
   ADMIN_EVENTS = "/admin/events",
   ADMIN_EVENTS_NEW = "/admin/events/new",
   ADMIN_EVENTS_EDIT = "/admin/events/:id/edit",

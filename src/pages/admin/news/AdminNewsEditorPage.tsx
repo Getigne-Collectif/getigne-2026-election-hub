@@ -355,7 +355,7 @@ const AdminNewsEditorPage = () => {
 
   const handlePreview = () => {
     if (isEditMode && articleSlug) {
-      const previewUrl = generatePath(Routes.NEWS_DETAIL, { slug: articleSlug });
+      const previewUrl = generatePath(Routes.ADMIN_NEWS_PREVIEW, { slug: articleSlug });
       navigate(previewUrl);
     }
   };

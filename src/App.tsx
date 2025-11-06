@@ -19,6 +19,7 @@ import { AuthenticatedRoute, AdminRoute } from "@/components/auth/ProtectedRoute
 const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage"));
 const AdminNewsPage = lazy(() => import("./pages/admin/news/AdminNewsPage"));
 const AdminNewsEditorPage = lazy(() => import("./pages/admin/news/AdminNewsEditorPage"));
+const AdminNewsPreviewPage = lazy(() => import("./pages/admin/news/AdminNewsPreviewPage"));
 const AdminEventsPage = lazy(() => import("./pages/admin/events/AdminEventsPage"));
 const AdminEventEditorPage = lazy(() => import("./pages/admin/events/AdminEventEditorPage"));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
@@ -124,6 +125,7 @@ function App() {
                       <Route path={AppRoutes.ADMIN_NEWS} element={<AdminNewsPage />} />
                       <Route path={AppRoutes.ADMIN_NEWS_NEW} element={<AdminNewsEditorPage />} />
                       <Route path={AppRoutes.ADMIN_NEWS_EDIT} element={<AdminNewsEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_NEWS_PREVIEW} element={<AdminNewsPreviewPage />} />
                       
                       {/* Events */}
                       <Route path={AppRoutes.ADMIN_EVENTS} element={<AdminEventsPage />} />
