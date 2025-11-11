@@ -589,7 +589,7 @@ const ProgramPage = () => {
                           )}
 
                           {hasDescriptionContent && (
-                            <div className="mt-6 bg-getigne-50/60 border border-getigne-100 rounded-lg p-6">
+                            <div className="mt-6">
                               <EditorJSRenderer
                                 data={item.description ?? ''}
                                 className="prose max-w-none rich-content text-getigne-800"
