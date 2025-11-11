@@ -189,6 +189,36 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     }
   };
 
+  const applyFormatting = useCallback(
+    (syntaxStart: string, syntaxEnd: string = syntaxStart) => {
+      if (!textareaRef.current) return;
+
+      const textarea = textareaRef.current;
+      const selectionStart = textarea.selectionStart;
+      const selectionEnd = textarea.selectionEnd;
+      const selectedText = value.substring(selectionStart, selectionEnd);
+
+      const newValue =
+        value.substring(0, selectionStart) +
+        syntaxStart +
+        selectedText +
+        syntaxEnd +
+        value.substring(selectionEnd);
+
+      onChange(newValue);
+
+      const cursorStart = selectionStart + syntaxStart.length;
+      const cursorEnd = cursorStart + selectedText.length;
+
+      setTimeout(() => {
+        textarea.focus();
+        textarea.selectionStart = cursorStart;
+        textarea.selectionEnd = cursorEnd;
+      }, 0);
+    },
+    [value, onChange]
+  );
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -203,6 +233,25 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       setTimeout(() => {
         textarea.selectionStart = textarea.selectionEnd = start + 2;
       }, 0);
+      return;
+    }
+
+    if (e.key && (e.ctrlKey || e.metaKey)) {
+      const key = e.key.toLowerCase();
+
+      if (key === 'b') {
+        e.preventDefault();
+        applyFormatting('**');
+      } else if (key === 'i') {
+        e.preventDefault();
+        applyFormatting('*');
+      } else if (key === 'k') {
+        e.preventDefault();
+        applyFormatting('[', '](url)');
+      } else if (key === 'e') {
+        e.preventDefault();
+        applyFormatting('`');
+      }
     }
   };
 
