@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import PointForm, { ProgramPointFormValues } from './PointForm';
+import PointForm, { ProgramPointFormValues, ProgramPointFormSubmitPayload } from './PointForm';
 import { uploadFiles } from './FileUploadService';
 
 interface AddPointDialogProps {
@@ -27,7 +27,10 @@ export default function AddPointDialog({
 }: AddPointDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (values: ProgramPointFormValues, files: File[]) => {
+  const handleSubmit = async (
+    values: ProgramPointFormValues,
+    payload: ProgramPointFormSubmitPayload
+  ) => {
     setIsSubmitting(true);
     
     try {
@@ -44,7 +47,7 @@ export default function AddPointDialog({
         : 0;
       
       // Upload files if any
-      const fileUrls = await uploadFiles(files);
+      const uploadedFiles = await uploadFiles(payload.newFiles);
 
       // Create the program point
       const { error } = await supabase
@@ -53,7 +56,8 @@ export default function AddPointDialog({
           program_item_id: programItemId,
           title: values.title,
           content: values.content,
-          files: fileUrls,
+          files: uploadedFiles.map((file) => file.url),
+          files_metadata: uploadedFiles,
           position: nextPosition,
           status: 'draft',
           created_at: new Date().toISOString(),

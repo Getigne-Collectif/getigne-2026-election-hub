@@ -20,9 +20,9 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Move, Settings } from 'lucide-react';
-import PointForm, { ProgramPointFormValues } from './PointForm';
-import { uploadFiles } from './FileUploadService';
-import { ProgramPoint, ProgramItem } from '@/types/program.types';
+import PointForm, { ProgramPointFormValues, ProgramPointFormSubmitPayload } from './PointForm';
+import { uploadFiles, removeFilesFromStorage } from './FileUploadService';
+import { ProgramPoint, ProgramItem, ProgramPointFileMeta } from '@/types/program.types';
 
 interface EditPointDialogProps {
   open: boolean;
@@ -75,11 +75,6 @@ export default function EditPointDialog({
 
   if (!point) return null;
 
-  const defaultValues = {
-    title: point.title,
-    content: point.content
-  };
-
   const currentSection = programSections.find(s => s.id === point.program_item_id);
   const selectedSection = programSections.find(s => s.id === selectedSectionId);
 
@@ -88,18 +83,57 @@ export default function EditPointDialog({
     setIsSectionChanged(newSectionId !== point.program_item_id);
   };
 
-  const handleSubmit = async (values: ProgramPointFormValues, files: File[]) => {
+  const enrichWithPath = (file: ProgramPointFileMeta): ProgramPointFileMeta => {
+    if (file.path) return file;
+    try {
+      const url = new URL(file.url);
+      const segments = url.pathname.split('/');
+      const bucketIndex = segments.findIndex((segment) => segment === 'program_files');
+      const relativePath =
+        bucketIndex >= 0 ? segments.slice(bucketIndex + 1).join('/') : undefined;
+      return { ...file, path: relativePath || undefined };
+    } catch {
+      return file;
+    }
+  };
+
+  const defaultValues = {
+    title: point.title,
+    content: point.content
+  };
+
+  const initialFiles: ProgramPointFileMeta[] = (
+    point.files_metadata && point.files_metadata.length > 0
+      ? point.files_metadata
+      : (point.files || []).map((url) => ({
+          url,
+          label: url.split('/').pop() || 'Fichier',
+          path: null,
+        }))
+  ).map(enrichWithPath);
+
+  const handleSubmit = async (
+    values: ProgramPointFormValues,
+    payload: ProgramPointFormSubmitPayload
+  ) => {
     setIsSubmitting(true);
     
     try {
       // Upload new files if any
-      const newFileUrls = await uploadFiles(files);
+      const uploadedFiles = await uploadFiles(payload.newFiles);
 
-      // Get existing files
-      const existingFiles = point.files || [];
-      
+      // Prepare existing files with updated labels
+      const existingFiles = payload.existingFiles.map(enrichWithPath);
+
+      // Handle removed files
+      if (payload.removedFiles.length > 0) {
+        await removeFilesFromStorage(
+          payload.removedFiles.map((file) => enrichWithPath(file).path || null)
+        );
+      }
+
       // Combine existing and new files
-      const allFiles = [...existingFiles, ...newFileUrls];
+      const combinedFiles = [...existingFiles, ...uploadedFiles];
 
       // Si la section a changé, on doit gérer la position dans la nouvelle section
       let newPosition = point.position;
@@ -121,7 +155,8 @@ export default function EditPointDialog({
         .update({
           title: values.title,
           content: values.content,
-          files: allFiles,
+          files: combinedFiles.map((file) => file.url),
+          files_metadata: combinedFiles,
           program_item_id: selectedSectionId,
           position: newPosition,
           updated_at: new Date().toISOString(),
@@ -161,6 +196,7 @@ export default function EditPointDialog({
           isSubmitting={isSubmitting}
           onCancel={() => onOpenChange(false)}
           submitLabel="Mettre à jour"
+          initialFiles={initialFiles}
         />
 
         {/* Section des options avancées */}
@@ -207,21 +243,6 @@ export default function EditPointDialog({
                 </Alert>
               )}
 
-              {/* Bouton de déplacement séparé */}
-              {isSectionChanged && (
-                <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => handleSubmit(defaultValues, [])}
-                    disabled={isSubmitting}
-                  >
-                    <Move className="h-4 w-4 mr-2" />
-                    Déplacer vers {selectedSection?.title}
-                  </Button>
-                </div>
-              )}
             </div>
           )}
         </div>

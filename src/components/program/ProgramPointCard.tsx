@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, FileDown } from 'lucide-react';
+import { MessageSquare, FileDown, Paperclip } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import ProgramLikeButton from './ProgramLikeButton';
 import Comments from '../comments';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ProgramPoint } from '@/types/program.types';
+import { ProgramPoint, ProgramPointFileMeta } from '@/types/program.types';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -73,6 +73,15 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
     }
   }, [point.id, programItemId]);
 
+  const filesToRender: ProgramPointFileMeta[] =
+    (point.files_metadata && point.files_metadata.length > 0
+      ? point.files_metadata
+      : (point.files || []).map((url) => ({
+          url,
+          label: url.split('/').pop() || 'Fichier',
+          path: null,
+        }))) as ProgramPointFileMeta[];
+
   return (
     <Card key={point.id} className="border-getigne-200">
       <CardContent className="p-4">
@@ -82,16 +91,6 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
               onClick={() => setShowContent(!showContent)}>{point.title}</h3>
           </div>
           <div className="flex items-center gap-3">
-            {/* Show counts */}
-            <div className="flex items-center gap-2 text-sm text-getigne-500">
-              <div className="flex items-center">
-                <MessageSquare className="h-4 w-4 mr-1" />
-                <span>{commentCount}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-getigne-accent">{likeCount}</span>
-              </div>
-            </div>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -114,20 +113,27 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
               </ReactMarkdown>
             </div>
 
-            {point.files && point.files.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-sm font-medium mb-2">Fichiers attachés</h4>
-                <div className="space-y-2">
-                  {point.files.map((fileUrl, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center justify-between bg-gray-50 p-2 rounded"
+            {filesToRender.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Paperclip className="h-4 w-4 text-getigne-accent" />
+                  <h4 className="text-sm font-semibold text-getigne-900 uppercase tracking-wide">
+                    Fichiers attachés
+                  </h4>
+                </div>
+                <div className="space-y-3">
+                  {filesToRender.map((fileMeta, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-getigne-accent/30 bg-getigne-accent/10 px-4 py-3"
                     >
-                      <span className="text-sm truncate">{fileUrl.split('/').pop()}</span>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => downloadFile(fileUrl)}
+                      <span className="text-sm font-medium text-getigne-900 truncate">
+                        {fileMeta.label}
+                      </span>
+                      <Button
+                        size="sm"
+                        className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
+                        onClick={() => downloadFile(fileMeta.url)}
                       >
                         <FileDown className="h-4 w-4 mr-2" />
                         Télécharger

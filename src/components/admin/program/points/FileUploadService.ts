@@ -1,14 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ProgramPointFileMeta } from '@/types/program.types';
+
+export interface PendingFileUpload {
+  file: File;
+  label: string;
+}
 
 /**
  * Uploads files to Supabase storage and returns an array of public URLs
  */
-export async function uploadFiles(files: File[]): Promise<string[]> {
+export async function uploadFiles(files: PendingFileUpload[]): Promise<ProgramPointFileMeta[]> {
   if (files.length === 0) return [];
   
-  const uploadPromises = files.map(async (file) => {
+  const uploadPromises = files.map(async ({ file, label }) => {
     const fileExt = file.name.split('.').pop();
     const fileName = `${uuidv4()}.${fileExt}`;
     const filePath = `program_points/${fileName}`;
@@ -26,10 +32,14 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
       .from('program_files')
       .getPublicUrl(filePath);
 
-    return publicUrl;
+    return {
+      url: publicUrl,
+      label: label || file.name,
+      path: filePath,
+    } as ProgramPointFileMeta;
   });
 
-  return (await Promise.all(uploadPromises)).filter(url => url !== null) as string[];
+  return (await Promise.all(uploadPromises)).filter(Boolean) as ProgramPointFileMeta[];
 }
 
 /**
@@ -76,5 +86,18 @@ export async function uploadProgramImage(file: File): Promise<string | null> {
   } catch (error) {
     toast.error(`Erreur lors de l'upload: ${error instanceof Error ? error.message : String(error)}`);
     return null;
+  }
+}
+
+export async function removeFilesFromStorage(paths: (string | null | undefined)[]) {
+  const validPaths = paths.filter((path): path is string => Boolean(path));
+  if (validPaths.length === 0) {
+    return;
+  }
+
+  const { error } = await supabase.storage.from('program_files').remove(validPaths);
+  if (error) {
+    console.error('[FileUploadService] remove error:', error);
+    toast.error("Impossible de supprimer certains fichiers.");
   }
 }

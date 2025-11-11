@@ -24,6 +24,7 @@ import { Routes } from '@/routes';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import ProgramPointsEditor from '@/components/admin/program/points/ProgramPointsEditor';
 import EditorJSRenderer from '@/components/EditorJSRenderer';
+import { Switch } from '@/components/ui/switch';
 
 type ProgramItemWithPoints = Tables<'program_items'> & {
   program_points: Tables<'program_points'>[];
@@ -76,9 +77,34 @@ const steps = [
   }
 ]
 
+const EDIT_MODE_COOKIE = 'program_edit_mode';
+
+const readEditModeFromCookie = () => {
+  if (typeof window === 'undefined') {
+    return true;
+  }
+
+  const match = document.cookie.match(new RegExp(`(?:^|; )${EDIT_MODE_COOKIE}=([^;]*)`));
+  if (!match) {
+    return true;
+  }
+
+  return decodeURIComponent(match[1]) === '1';
+};
+
+const persistEditModeToCookie = (value: boolean) => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  const maxAge = 60 * 60 * 24 * 30; // 30 jours
+  document.cookie = `${EDIT_MODE_COOKIE}=${value ? '1' : '0'}; path=/; max-age=${maxAge}`;
+};
+
 const ProgramPage = () => {
   const { user, isAdmin, userRoles } = useAuth();
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState<boolean>(() => readEditModeFromCookie());
   const { settings } = useAppSettings();
 
   const canAccessProgram = 
@@ -97,7 +123,11 @@ const ProgramPage = () => {
     }
   };
 
-  const { data: programGeneral, isLoading: isLoadingGeneral } = useQuery({
+  const {
+    data: programGeneral,
+    isLoading: isLoadingGeneral,
+    refetch: refetchGeneral,
+  } = useQuery({
     queryKey: ['program-general'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -113,7 +143,11 @@ const ProgramPage = () => {
     },
   });
 
-  const { data: programItems, isLoading: isLoadingItems } = useQuery<ProgramItemWithPoints[]>({
+  const {
+    data: programItems,
+    isLoading: isLoadingItems,
+    refetch: refetchProgramItems,
+  } = useQuery<ProgramItemWithPoints[]>({
     queryKey: ['program-items'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -126,6 +160,7 @@ const ProgramPage = () => {
             content,
             position,
             files,
+            files_metadata,
             program_item_id,
             status
           )
@@ -135,13 +170,32 @@ const ProgramPage = () => {
 
       if (error) throw error;
 
-      return (data || []).map((item) => ({
-        ...item,
-        program_points:
-          ((item as unknown as { program_points?: Tables<'program_points'>[] | null }).program_points
-            ?.filter(point => point.status === 'validated')
-            ?.sort((a, b) => a.position - b.position)) || [],
-      }));
+      return (data || []).map((item) => {
+        const rawPoints =
+          (item as unknown as { program_points?: Tables<'program_points'>[] | null }).program_points || [];
+
+        const normalizedPoints = rawPoints
+          .map((point) => ({
+            ...point,
+            files: Array.isArray(point.files) ? (point.files as string[]) : [],
+            files_metadata: Array.isArray(point.files_metadata)
+              ? (point.files_metadata as { url?: string | null; label?: string | null; path?: string | null }[])
+                  .filter((meta) => typeof meta?.url === 'string')
+                  .map((meta) => ({
+                    url: meta.url as string,
+                    label: meta.label ?? (meta.url ? meta.url.split('/').pop() ?? 'Fichier' : 'Fichier'),
+                    path: meta.path ?? null,
+                  }))
+              : [],
+            status: point.status ?? 'validated',
+          }))
+          .sort((a, b) => a.position - b.position);
+
+        return {
+          ...item,
+          program_points: normalizedPoints,
+        };
+      });
     },
   });
 
@@ -161,6 +215,7 @@ const ProgramPage = () => {
   });
 
   const isProgramAdmin = isAdmin || userRoles.includes('program_manager');
+  const showAdminControls = isProgramAdmin && isEditMode;
 
   // Observe sections to highlight the active one in the sidebar
   useEffect(() => {
@@ -184,6 +239,19 @@ const ProgramPage = () => {
 
     return () => observer.disconnect();
   }, [programItems]);
+
+  useEffect(() => {
+    if (isProgramAdmin) {
+      setIsEditMode(readEditModeFromCookie());
+    }
+  }, [isProgramAdmin]);
+
+  const handleEditModeToggle = (checked: boolean) => {
+    setIsEditMode(checked);
+    persistEditModeToCookie(checked);
+    refetchProgramItems();
+    refetchGeneral();
+  };
 
   if (!canAccessProgram) {
     return (
@@ -318,6 +386,24 @@ const ProgramPage = () => {
         <div className="pt-20 pb-16">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
+              {isProgramAdmin && (
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-end mb-8">
+                  <div className="flex items-center gap-3 bg-white border border-getigne-200 rounded-full px-4 py-2 shadow-sm">
+                    <span className="text-sm font-medium text-getigne-700">Mode édition</span>
+                    <Switch
+                      id="program-edit-mode-toggle"
+                      checked={isEditMode}
+                      onCheckedChange={handleEditModeToggle}
+                      aria-label="Activer le mode édition du programme"
+                    />
+                  </div>
+                  {showAdminControls && (
+                    <Button asChild>
+                      <a href="/admin/program">Administrer le programme</a>
+                    </Button>
+                  )}
+                </div>
+              )}
               <div className="text-center mb-12">
                 <div className="inline-flex items-center space-x-2 bg-getigne-accent/10 text-getigne-accent px-4 py-2 rounded-full text-sm font-medium mb-4">
                   <Target className="w-4 h-4" />
@@ -329,72 +415,62 @@ const ProgramPage = () => {
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                   Notre programme pour Gétigné, élaboré avec vous et pour vous
                 </p>
-                {isProgramAdmin && (
-                  <div className="mt-6">
-                    <Button asChild>
-                      <a href="/admin/program">
-                        Administrer le programme
-                      </a>
-                    </Button>
-                  </div>
-                )}
               </div>
 
               {programGeneral && (
-                <div className="mb-12">
-                  <Card className="border-getigne-accent shadow-lg">
-                    <CardHeader className="bg-gradient-to-r from-getigne-accent to-cyan-500 text-white">
-                      <CardTitle className="text-2xl">Présentation générale</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-8">
-                      <EditorJSRenderer data={programGeneral.content || ''} />
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-
-              {/* Bandeau fort et différenciant pour introduire le programme */}
-              <div className="relative mb-12 overflow-hidden rounded-xl bg-gradient-to-r from-getigne-accent to-cyan-500 text-white">
-                <div className="px-6 py-10 md:px-10 md:py-14">
-                  <div className="max-w-4xl">
-                    <p className="uppercase tracking-wider text-white/90 text-sm mb-2">Un projet collectif et vivant</p>
-                    <h2 className="text-3xl md:text-4xl font-extrabold leading-tight mb-4">
-                      Un programme ambitieux, réfléchi et participatif
-                    </h2>
-                    <p className="text-white/90 text-lg md:text-xl">
-                      Co-construit avec les habitantes et habitants, enrichi en continu, orienté vers l'action concrète.
-                    </p>
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Participatif</span>
-                      <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Transversal</span>
-                      <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Écologique & sociale</span>
-                      <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Évolutif</span>
-                    </div>
-                    {programGeneral?.file && (
-                      <div className="mt-8">
-                        <Button
-                          size="lg"
-                          className="bg-white text-getigne-900 hover:bg-white/90"
-                          onClick={async () => {
-                            try {
-                              const pg = programGeneral as { file?: string | null; file_path?: string | null };
-                              if (pg.file_path) {
-                                await downloadFromSupabasePath('program_files', pg.file_path, 'programme.pdf');
-                              } else {
-                                await downloadFileFromUrl(pg.file!, 'programme.pdf');
-                              }
-                            } catch {
-                              // Pas d’ouverture d’onglet ici pour éviter d’ouvrir le PDF: on reste silencieux
-                            }
-                          }}
-                        >
-                          <FileDown className="w-4 h-4 mr-2" /> Télécharger le PDF
-                        </Button>
+                <div className="mb-12 overflow-hidden rounded-2xl border border-getigne-accent/20 shadow-xl">
+                  <div className="relative bg-gradient-to-r from-getigne-accent to-cyan-500 text-white">
+                    <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-white/10 blur-3xl md:block" aria-hidden />
+                    <div className="relative px-6 py-10 md:px-12 md:py-14">
+                      <div className="max-w-4xl">
+                        <p className="uppercase tracking-widest text-white/80 text-xs md:text-sm mb-3">Un projet collectif et vivant</p>
+                        <h2 className="text-3xl md:text-4xl font-extrabold leading-tight mb-4">
+                          Un programme ambitieux, réfléchi et participatif
+                        </h2>
+                        <p className="text-white/90 text-lg md:text-xl max-w-3xl">
+                          Co-construit avec les habitantes et habitants, enrichi en continu, orienté vers l'action concrète.
+                        </p>
+                        <div className="mt-6 flex flex-wrap gap-2">
+                          <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Participatif</span>
+                          <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Transversal</span>
+                          <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Écologique & sociale</span>
+                          <span className="bg-white/15 backdrop-blur px-3 py-1.5 rounded-full text-sm">Évolutif</span>
+                        </div>
+                        {programGeneral?.file && (
+                          <div className="mt-8">
+                            <Button
+                              size="lg"
+                              className="bg-white text-getigne-900 hover:bg-white/90"
+                              onClick={async () => {
+                                try {
+                                  const pg = programGeneral as { file?: string | null; file_path?: string | null };
+                                  if (pg.file_path) {
+                                    await downloadFromSupabasePath('program_files', pg.file_path, 'programme.pdf');
+                                  } else {
+                                    await downloadFileFromUrl(pg.file!, 'programme.pdf');
+                                  }
+                                } catch {
+                                  // Pas d’ouverture d’onglet ici pour éviter d’ouvrir le PDF: on reste silencieux
+                                }
+                              }}
+                            >
+                              <FileDown className="w-4 h-4 mr-2" /> Télécharger le PDF
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  </div>
+                  <div className="bg-white px-6 py-8 md:px-12 md:py-10">
+                    <div className="max-w-4xl">
+
+                      <div className="rich-content prose max-w-none text-getigne-800">
+                        <EditorJSRenderer data={programGeneral.content || ''} />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Navigation Mobile (horizontale) */}
               {programItems && programItems.length > 0 && (
@@ -459,7 +535,15 @@ const ProgramPage = () => {
                 </aside>
 
                 <main className="lg:col-span-9 space-y-10">
-                  {programItems?.map((item) => (
+                  {programItems?.map((item) => {
+                    const allPoints = Array.isArray(item.program_points) ? item.program_points : [];
+                    const visitorPoints = allPoints.filter((point) => {
+                      const status = (point.status as 'draft' | 'pending' | 'validated' | null) ?? null;
+                      return status === null || status === 'validated' || status === 'pending';
+                    });
+                    const pointsToDisplay = showAdminControls ? allPoints : visitorPoints;
+
+                    return (
                     <section
                       key={item.id}
                       id={`section-${item.id}`}
@@ -497,8 +581,7 @@ const ProgramPage = () => {
                               <div dangerouslySetInnerHTML={{ __html: item.content }} />
                             </div>
                           )}
-
-                          {isProgramAdmin ? (
+                          {showAdminControls ? (
                             <div className="mt-8">
                               <h3 className="text-lg font-semibold text-getigne-900 border-b border-getigne-200 pb-2">
                                 Gestion des points de la section
@@ -508,12 +591,12 @@ const ProgramPage = () => {
                               </div>
                             </div>
                           ) : (
-                            item.program_points && item.program_points.length > 0 && (
+                            pointsToDisplay && pointsToDisplay.length > 0 && (
                               <div className="mt-8 space-y-4">
                                 <h3 className="text-lg font-semibold text-getigne-900 border-b border-getigne-200 pb-2">
                                   Points du programme
                                 </h3>
-                                {item.program_points.map((point: Tables<'program_points'>) => {
+                                {pointsToDisplay.map((point: Tables<'program_points'>) => {
                                   const normalizedPoint: ProgramPoint = {
                                     id: point.id,
                                     title: point.title as unknown as string,
@@ -522,6 +605,17 @@ const ProgramPage = () => {
                                     program_item_id: point.program_item_id,
                                     status: (point.status as 'draft' | 'pending' | 'validated') || 'validated',
                                     files: Array.isArray(point.files) ? (point.files as string[]) : [],
+                                    files_metadata: Array.isArray(point.files_metadata)
+                                      ? (point.files_metadata as { url?: string | null; label?: string | null; path?: string | null }[])
+                                          .filter((meta) => typeof meta?.url === 'string')
+                                          .map((meta) => ({
+                                            url: meta.url as string,
+                                            label:
+                                              meta.label ??
+                                              (meta.url ? meta.url.split('/').pop() ?? 'Fichier' : 'Fichier'),
+                                            path: meta.path ?? null,
+                                          }))
+                                      : [],
                                     created_at: point.created_at,
                                     updated_at: point.updated_at,
                                   };
@@ -552,7 +646,8 @@ const ProgramPage = () => {
                         </div>
                       </div>
                     </section>
-                  ))}
+                    );
+                  })}
 
                 </main>
               </div>

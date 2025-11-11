@@ -36,6 +36,13 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       const transformedData = data?.map(point => ({
         ...point,
         files: Array.isArray(point.files) ? point.files : [],
+        files_metadata: Array.isArray(point.files_metadata)
+          ? point.files_metadata.map((file: any) => ({
+              url: file?.url ?? '',
+              label: file?.label ?? (file?.url ? String(file.url).split('/').pop() : 'Fichier'),
+              path: file?.path ?? null,
+            }))
+          : [],
         status: point.status || 'draft'
       })) as ProgramPoint[];
       

@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useState } from "react";
-import { ProgramPoint } from "@/types/program.types";
-import { uploadFiles } from "./FileUploadService";
+import { useEffect, useState, useId } from "react";
+import { ProgramPointFileMeta } from "@/types/program.types";
+import { PendingFileUpload } from "./FileUploadService";
 import { Loader2, Paperclip, Upload, X } from "lucide-react";
 
 const formSchema = z.object({
@@ -27,8 +27,14 @@ const formSchema = z.object({
 
 export type ProgramPointFormValues = z.infer<typeof formSchema>;
 
+export interface ProgramPointFormSubmitPayload {
+  newFiles: PendingFileUpload[];
+  existingFiles: ProgramPointFileMeta[];
+  removedFiles: ProgramPointFileMeta[];
+}
+
 interface PointFormProps {
-  onSubmit: (values: ProgramPointFormValues, files: File[]) => void;
+  onSubmit: (values: ProgramPointFormValues, payload: ProgramPointFormSubmitPayload) => void;
   isSubmitting: boolean;
   onCancel: () => void;
   defaultValues?: {
@@ -36,6 +42,7 @@ interface PointFormProps {
     content: string;
   };
   submitLabel?: string;
+  initialFiles?: ProgramPointFileMeta[];
 }
 
 export default function PointForm({ 
@@ -43,9 +50,15 @@ export default function PointForm({
   isSubmitting, 
   onCancel,
   defaultValues = { title: '', content: '' },
-  submitLabel = "Ajouter" 
+  submitLabel = "Ajouter",
+  initialFiles = [],
 }: PointFormProps) {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const fileInputId = useId();
+  const [selectedFiles, setSelectedFiles] = useState<PendingFileUpload[]>([]);
+  const [existingFiles, setExistingFiles] = useState<ProgramPointFileMeta[]>(
+    initialFiles.map((file) => ({ ...file }))
+  );
+  const [removedFiles, setRemovedFiles] = useState<ProgramPointFileMeta[]>([]);
   
   const form = useForm<ProgramPointFormValues>({
     resolver: zodResolver(formSchema),
@@ -56,19 +69,59 @@ export default function PointForm({
     },
   });
 
+  useEffect(() => {
+    setExistingFiles(initialFiles.map((file) => ({ ...file })));
+    setRemovedFiles([]);
+  }, [initialFiles]);
+
   const handleSubmit = (values: ProgramPointFormValues) => {
-    onSubmit(values, selectedFiles);
+    onSubmit(values, {
+      newFiles: selectedFiles,
+      existingFiles,
+      removedFiles,
+    });
   };
 
   const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      setSelectedFiles(prev => [...prev, ...Array.from(files)]);
+      const nextFiles: PendingFileUpload[] = Array.from(files).map((file) => ({
+        file,
+        label: file.name.replace(/\.[^/.]+$/, '') || file.name,
+      }));
+      setSelectedFiles(prev => [...prev, ...nextFiles]);
     }
   };
 
   const removeSelectedFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateSelectedFileLabel = (index: number, label: string) => {
+    setSelectedFiles(prev =>
+      prev.map((item, i) => (i === index ? { ...item, label } : item))
+    );
+  };
+
+  const updateExistingFileLabel = (index: number, label: string) => {
+    setExistingFiles(prev =>
+      prev.map((item, i) => (i === index ? { ...item, label } : item))
+    );
+  };
+
+  const removeExistingFile = (index: number) => {
+    setExistingFiles(prev => {
+      const file = prev[index];
+      if (file) {
+        setRemovedFiles(current => {
+          if (current.find(existing => existing.url === file.url)) {
+            return current;
+          }
+          return [...current, file];
+        });
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   return (
@@ -109,6 +162,61 @@ export default function PointForm({
           )}
         />
 
+        {/* Existing files */}
+        {existingFiles.length > 0 && (
+          <div className="space-y-2">
+            <FormLabel>Fichiers existants</FormLabel>
+            <div className="space-y-2">
+              {existingFiles.map((file, index) => (
+                <div
+                  key={file.url}
+                  className="flex flex-col gap-2 rounded-md border border-border bg-muted/20 p-3"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Paperclip className="h-4 w-4" />
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="truncate max-w-[220px] text-getigne-accent hover:underline"
+                      >
+                        {file.url.split('/').pop()}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground"
+                        asChild
+                      >
+                        <a href={file.url} target="_blank" rel="noopener noreferrer">
+                          Télécharger
+                        </a>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeExistingFile(index)}
+                      >
+                        <X className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </div>
+                  <Input
+                    value={file.label}
+                    onChange={(event) => updateExistingFileLabel(index, event.target.value)}
+                    placeholder="Libellé du fichier"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* File upload section */}
         <div className="space-y-4">
           <div className="flex flex-col gap-1.5">
@@ -128,11 +236,18 @@ export default function PointForm({
                     key={index}
                     className="flex items-center justify-between bg-muted/30 border border-border rounded-md p-2"
                   >
-                    <div className="flex items-center gap-2">
-                      <Paperclip className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm truncate max-w-[300px]">
-                        {file.name}
-                      </span>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Paperclip className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm truncate max-w-[240px]">
+                          {file.file.name}
+                        </span>
+                      </div>
+                      <Input
+                        value={file.label}
+                        onChange={(event) => updateSelectedFileLabel(index, event.target.value)}
+                        placeholder="Libellé affiché pour ce fichier"
+                      />
                     </div>
                     <Button
                       type="button"
@@ -153,13 +268,13 @@ export default function PointForm({
               type="button"
               variant="outline"
               className="gap-2"
-              onClick={() => document.getElementById("file-upload")?.click()}
+              onClick={() => document.getElementById(fileInputId)?.click()}
             >
               <Upload className="h-4 w-4" />
               Ajouter des fichiers
             </Button>
             <input
-              id="file-upload"
+              id={fileInputId}
               type="file"
               className="hidden"
               multiple
