@@ -26,7 +26,7 @@ import {
 import { ArrowLeft, Loader2, Upload, X } from 'lucide-react';
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Link } from 'react-router-dom';
-import MarkdownEditor from '@/components/MarkdownEditor';
+import EditorJSComponent from '@/components/EditorJSComponent';
 import { IconSelect } from '@/components/ui/icon-select';
 import ProgramPointsEditor from '@/components/admin/program/points/ProgramPointsEditor';
 import { uploadProgramImage } from '@/components/admin/program/points/FileUploadService';
@@ -228,12 +228,11 @@ export default function AdminProgramEditorPage() {
                       <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <MarkdownEditor
-                            value={field.value}
-                            onChange={field.onChange}
-                            className="min-h-[200px]"
-                            contentType="news"
-                            disableImageUpload={true}
+                          <EditorJSComponent
+                            value={field.value || ''}
+                            onChange={(data) => field.onChange(JSON.stringify(data))}
+                            className="min-h-[300px]"
+                            placeholder="Décrivez cette section du programme..."
                           />
                         </FormControl>
                         <FormDescription>
@@ -407,12 +406,11 @@ export default function AdminProgramEditorPage() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <MarkdownEditor
-                          value={field.value}
-                          onChange={field.onChange}
-                          className="min-h-[200px]"
-                          contentType="news"
-                          disableImageUpload={true}
+                        <EditorJSComponent
+                          value={field.value || ''}
+                          onChange={(data) => field.onChange(JSON.stringify(data))}
+                          className="min-h-[300px]"
+                          placeholder="Décrivez cette section du programme..."
                         />
                       </FormControl>
                       <FormDescription>

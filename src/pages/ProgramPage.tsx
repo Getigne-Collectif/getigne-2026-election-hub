@@ -542,6 +542,19 @@ const ProgramPage = () => {
                       return status === null || status === 'validated' || status === 'pending';
                     });
                     const pointsToDisplay = showAdminControls ? allPoints : visitorPoints;
+                    const hasDescriptionContent = (() => {
+                      if (!item.description) return false;
+                      if (typeof item.description === 'string') {
+                        try {
+                          const parsed = JSON.parse(item.description);
+                          return Array.isArray(parsed?.blocks) && parsed.blocks.length > 0;
+                        } catch {
+                          return item.description.trim().length > 0;
+                        }
+                      }
+                      return Array.isArray((item.description as unknown as { blocks?: unknown[] })?.blocks) &&
+                        ((item.description as unknown as { blocks?: unknown[] }).blocks?.length ?? 0) > 0;
+                    })();
 
                     return (
                     <section
@@ -558,7 +571,6 @@ const ProgramPage = () => {
                             </div>
                             <div className="flex-1">
                               <h2 className="text-2xl font-bold text-getigne-900">{item.title}</h2>
-                              <p className="text-getigne-700 mt-2">{item.description}</p>
                             </div>
                             <div className="hidden md:block">
                               <ProgramLikeButton programId={item.id} />
@@ -572,6 +584,15 @@ const ProgramPage = () => {
                                 alt={item.title}
                                 className="w-full h-56 md:h-72 object-cover rounded-md border border-getigne-100"
                                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.svg'; }}
+                              />
+                            </div>
+                          )}
+
+                          {hasDescriptionContent && (
+                            <div className="mt-6 bg-getigne-50/60 border border-getigne-100 rounded-lg p-6">
+                              <EditorJSRenderer
+                                data={item.description ?? ''}
+                                className="prose max-w-none rich-content text-getigne-800"
                               />
                             </div>
                           )}
