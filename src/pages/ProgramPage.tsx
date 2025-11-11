@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar } from 'lucide-react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
@@ -13,9 +13,6 @@ import ProgramCommentsSection from '@/components/program/ProgramCommentsSection'
 import ProgramLikeButton from '@/components/program/ProgramLikeButton';
 import ProgramPointCard from '@/components/program/ProgramPointCard';
 import { useAppSettings } from '@/hooks/useAppSettings';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import Program from '@/components/Program';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
 import CtaBanner from '@/components/ui/cta-banner';
@@ -26,6 +23,7 @@ import ProgramTimeline from '@/components/program/ProgramTimeline';
 import { Routes } from '@/routes';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import ProgramPointsEditor from '@/components/admin/program/points/ProgramPointsEditor';
+import EditorJSRenderer from '@/components/EditorJSRenderer';
 
 type ProgramItemWithPoints = Tables<'program_items'> & {
   program_points: Tables<'program_points'>[];
@@ -349,11 +347,7 @@ const ProgramPage = () => {
                       <CardTitle className="text-2xl">Présentation générale</CardTitle>
                     </CardHeader>
                     <CardContent className="p-8">
-                      <div className="rich-content">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {programGeneral.content || ''}
-                        </ReactMarkdown>
-                      </div>
+                      <EditorJSRenderer data={programGeneral.content || ''} />
                     </CardContent>
                   </Card>
                 </div>

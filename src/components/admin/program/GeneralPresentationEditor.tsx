@@ -1,20 +1,58 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import type { ChangeEvent } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Save, Upload, X, FileDown } from 'lucide-react';
-import { supabase, ProgramGeneral, asTable } from '@/integrations/supabase/client';
-import MarkdownEditor from '@/components/MarkdownEditor';
+import { supabase, ProgramGeneral } from '@/integrations/supabase/client';
+import EditorJSComponent from '@/components/EditorJSComponent';
+import type { OutputData } from '@editorjs/editorjs';
 
 export default function GeneralPresentationEditor() {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState<OutputData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [filePath, setFilePath] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const getEmptyContent = useCallback((): OutputData => ({
+    time: Date.now(),
+    blocks: [],
+    version: '2.28.0'
+  }), []);
+
+  const parseContent = useCallback((value: unknown): OutputData => {
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed && typeof parsed === 'object' && Array.isArray((parsed as OutputData).blocks)) {
+          return parsed as OutputData;
+        }
+      } catch {
+        if (value.trim().length > 0) {
+          return {
+            time: Date.now(),
+            blocks: [
+              {
+                type: 'paragraph',
+                data: { text: value }
+              }
+            ],
+            version: '2.28.0'
+          };
+        }
+      }
+    } else if (value && typeof value === 'object' && Array.isArray((value as OutputData).blocks)) {
+      return value as OutputData;
+    }
+
+    return getEmptyContent();
+  }, [getEmptyContent]);
+
+  const emptyContent = useMemo(() => getEmptyContent(), [getEmptyContent]);
 
   useEffect(() => {
     const fetchPresentationContent = async () => {
@@ -31,9 +69,11 @@ export default function GeneralPresentationEditor() {
         }
 
         if (data) {
-          setContent(data.content || '');
+          setContent(parseContent((data as ProgramGeneral).content));
           setFileUrl((data as any).file || null);
           setFilePath((data as any).file_path || null);
+        } else {
+          setContent(emptyContent);
         }
       } catch (error) {
         console.error('Error fetching presentation:', error);
@@ -48,11 +88,13 @@ export default function GeneralPresentationEditor() {
     };
 
     fetchPresentationContent();
-  }, [toast]);
+  }, [toast, parseContent, emptyContent]);
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
+
+      const serializedContent = JSON.stringify(content ?? emptyContent);
       
       // Check if record exists first
       const { data: existingData, error: checkError } = await supabase
@@ -69,7 +111,7 @@ export default function GeneralPresentationEditor() {
         const { error } = await supabase
           .from('program_general')
           .update({ 
-            content,
+            content: serializedContent,
             file: fileUrl,
             file_path: filePath,
             updated_at: new Date().toISOString()
@@ -82,7 +124,7 @@ export default function GeneralPresentationEditor() {
         const { error } = await supabase
           .from('program_general')
           .insert({ 
-            content,
+            content: serializedContent,
             file: fileUrl,
             file_path: filePath,
             created_at: new Date().toISOString(),
@@ -110,7 +152,7 @@ export default function GeneralPresentationEditor() {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
@@ -139,6 +181,7 @@ export default function GeneralPresentationEditor() {
 
   const removeFile = () => {
     setFileUrl(null);
+    setFilePath(null);
   };
 
   if (isLoading) {
@@ -166,21 +209,13 @@ export default function GeneralPresentationEditor() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <div className="markdown-editor-container">
-            <MarkdownEditor
-              value={content}
-              onChange={setContent}
-              contentType="news"
+          <div className="editorjs-wrapper">
+            <EditorJSComponent
+              value={content ?? emptyContent}
+              onChange={(data) => setContent(data)}
+              placeholder="Commencez à écrire la présentation générale..."
               className="min-h-[400px]"
             />
-          </div>
-          
-          <div className="text-sm text-muted-foreground mt-2">
-            <p>
-              Conseil : Utilisez cette section pour présenter votre vision politique globale, les valeurs 
-              qui guident votre programme, et expliquer comment ce programme a été construit de manière
-              participative avec les citoyens.
-            </p>
           </div>
         </div>
 
