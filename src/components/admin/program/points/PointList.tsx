@@ -4,6 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Pencil, Trash2 } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface PointListProps {
   points: ProgramPoint[];
@@ -53,10 +55,10 @@ export default function PointList({ points, onEdit, onDelete, onStatusChange, is
                             className="ml-2"
                           />
                         </div>
-                        <div 
-                          className="prose prose-sm max-w-none text-muted-foreground line-clamp-2" 
-                        >
-                          {point.content.substring(0, 120)}...
+                        <div className="prose prose-sm max-w-none text-muted-foreground line-clamp-2">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {point.content || ''}
+                          </ReactMarkdown>
                         </div>
                       </div>
                       <div className="flex gap-2 items-start ml-2">

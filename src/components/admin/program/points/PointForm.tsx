@@ -13,11 +13,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState, useId } from "react";
 import { ProgramPointFileMeta } from "@/types/program.types";
 import { PendingFileUpload } from "./FileUploadService";
 import { Loader2, Paperclip, Upload, X } from "lucide-react";
+import MarkdownEditor from "@/components/MarkdownEditor";
 
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
@@ -148,10 +148,11 @@ export default function PointForm({
             <FormItem>
               <FormLabel>Contenu</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Décrivez ce point du programme..."
-                  className="h-32"
-                  {...field}
+                <MarkdownEditor
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  editorMinHeight="280px"
+                  previewMaxHeight="45vh"
                 />
               </FormControl>
               <FormDescription>

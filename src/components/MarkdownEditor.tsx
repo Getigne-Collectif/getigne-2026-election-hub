@@ -13,6 +13,8 @@ interface MarkdownEditorProps {
   className?: string;
   contentType?: 'news' | 'event';
   disableImageUpload?: boolean;
+  editorMinHeight?: string;
+  previewMaxHeight?: string;
 }
 
 const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ 
@@ -20,7 +22,9 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   onChange,
   className = '',
   contentType = 'news',
-  disableImageUpload = false
+  disableImageUpload = false,
+  editorMinHeight = '400px',
+  previewMaxHeight,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -246,11 +250,19 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             onPaste={disableImageUpload ? undefined : handlePaste}
             onKeyDown={handleKeyDown}
             placeholder="Rédigez votre contenu en Markdown... (Vous pouvez aussi coller des images directement)"
-            className="min-h-[400px] resize-y rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-4 font-mono"
+            className="resize-y rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-4 font-mono"
+            style={{ minHeight: editorMinHeight }}
           />
         </TabsContent>
         
-        <TabsContent value="preview" className="p-4 prose max-w-none min-h-[400px] rich-content">
+        <TabsContent
+          value="preview"
+          className="p-4 prose max-w-none rich-content overflow-y-auto"
+          style={{
+            minHeight: editorMinHeight,
+            maxHeight: previewMaxHeight,
+          }}
+        >
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {value}
           </ReactMarkdown>
