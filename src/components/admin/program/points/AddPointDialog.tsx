@@ -11,19 +11,24 @@ import {
 } from '@/components/ui/dialog';
 import PointForm, { ProgramPointFormValues, ProgramPointFormSubmitPayload } from './PointForm';
 import { uploadFiles } from './FileUploadService';
+import type { ProgramCompetentEntity } from '@/types/program.types';
 
 interface AddPointDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   programItemId: string;
   onSuccess: () => void;
+  competentEntities: ProgramCompetentEntity[];
+  isLoadingCompetentEntities?: boolean;
 }
 
 export default function AddPointDialog({ 
   open, 
   onOpenChange, 
   programItemId, 
-  onSuccess 
+  onSuccess,
+  competentEntities,
+  isLoadingCompetentEntities = false,
 }: AddPointDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,6 +61,7 @@ export default function AddPointDialog({
           program_item_id: programItemId,
           title: values.title,
           content: values.content,
+          competent_entity_id: values.competent_entity_id ?? null,
           files: uploadedFiles.map((file) => file.url),
           files_metadata: uploadedFiles,
           position: nextPosition,
@@ -92,6 +98,8 @@ export default function AddPointDialog({
           isSubmitting={isSubmitting}
           onCancel={() => onOpenChange(false)}
           submitLabel="Ajouter"
+          competentEntities={competentEntities}
+          isLoadingCompetentEntities={isLoadingCompetentEntities}
         />
       </DialogContent>
     </Dialog>

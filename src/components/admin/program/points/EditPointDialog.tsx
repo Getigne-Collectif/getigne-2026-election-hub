@@ -22,20 +22,24 @@ import { Button } from '@/components/ui/button';
 import { Move, Settings } from 'lucide-react';
 import PointForm, { ProgramPointFormValues, ProgramPointFormSubmitPayload } from './PointForm';
 import { uploadFiles, removeFilesFromStorage } from './FileUploadService';
-import { ProgramPoint, ProgramItem, ProgramPointFileMeta } from '@/types/program.types';
+import { ProgramPoint, ProgramItem, ProgramPointFileMeta, ProgramCompetentEntity } from '@/types/program.types';
 
 interface EditPointDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   point: ProgramPoint | null;
   onSuccess: () => void;
+  competentEntities: ProgramCompetentEntity[];
+  isLoadingCompetentEntities?: boolean;
 }
 
 export default function EditPointDialog({ 
   open, 
   onOpenChange, 
   point, 
-  onSuccess 
+  onSuccess,
+  competentEntities,
+  isLoadingCompetentEntities = false,
 }: EditPointDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [programSections, setProgramSections] = useState<ProgramItem[]>([]);
@@ -99,7 +103,8 @@ export default function EditPointDialog({
 
   const defaultValues = {
     title: point.title,
-    content: point.content
+    content: point.content,
+    competent_entity_id: point.competent_entity_id ?? null,
   };
 
   const initialFiles: ProgramPointFileMeta[] = (
@@ -155,6 +160,7 @@ export default function EditPointDialog({
         .update({
           title: values.title,
           content: values.content,
+          competent_entity_id: values.competent_entity_id ?? null,
           files: combinedFiles.map((file) => file.url),
           files_metadata: combinedFiles,
           program_item_id: selectedSectionId,
@@ -197,6 +203,8 @@ export default function EditPointDialog({
           onCancel={() => onOpenChange(false)}
           submitLabel="Mettre à jour"
           initialFiles={initialFiles}
+          competentEntities={competentEntities}
+          isLoadingCompetentEntities={isLoadingCompetentEntities}
         />
 
         {/* Section des options avancées */}

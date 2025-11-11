@@ -18,11 +18,20 @@ import { ProgramPointFileMeta } from "@/types/program.types";
 import { PendingFileUpload } from "./FileUploadService";
 import { Loader2, Paperclip, Upload, X } from "lucide-react";
 import MarkdownEditor from "@/components/MarkdownEditor";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { ProgramCompetentEntity } from "@/types/program.types";
 
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   content: z.string().min(1, "Le contenu est requis"),
   files: z.array(z.string()).optional(),
+  competent_entity_id: z.string().uuid().optional().nullable(),
 });
 
 export type ProgramPointFormValues = z.infer<typeof formSchema>;
@@ -40,9 +49,12 @@ interface PointFormProps {
   defaultValues?: {
     title: string;
     content: string;
+    competent_entity_id?: string | null;
   };
   submitLabel?: string;
   initialFiles?: ProgramPointFileMeta[];
+  competentEntities: ProgramCompetentEntity[];
+  isLoadingCompetentEntities?: boolean;
 }
 
 export default function PointForm({ 
@@ -52,6 +64,8 @@ export default function PointForm({
   defaultValues = { title: '', content: '' },
   submitLabel = "Ajouter",
   initialFiles = [],
+  competentEntities,
+  isLoadingCompetentEntities = false,
 }: PointFormProps) {
   const fileInputId = useId();
   const [selectedFiles, setSelectedFiles] = useState<PendingFileUpload[]>([]);
@@ -66,6 +80,7 @@ export default function PointForm({
       title: defaultValues.title,
       content: defaultValues.content,
       files: [],
+      competent_entity_id: defaultValues.competent_entity_id ?? null,
     },
   });
 
@@ -157,6 +172,39 @@ export default function PointForm({
               </FormControl>
               <FormDescription>
                 Détaillez cette proposition et ses objectifs
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="competent_entity_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instance compétente</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={(value) => field.onChange(value === 'none' ? null : value)}
+                  value={field.value ?? 'none'}
+                  disabled={isLoadingCompetentEntities}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionnez une instance" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Aucune (gérée directement)</SelectItem>
+                    {competentEntities.map((entity) => (
+                      <SelectItem key={entity.id} value={entity.id}>
+                        {entity.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormDescription>
+                Indiquez l’échelle principalement responsable de la mise en œuvre de cette mesure.
               </FormDescription>
               <FormMessage />
             </FormItem>

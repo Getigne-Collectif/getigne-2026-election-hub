@@ -10,6 +10,12 @@ import remarkGfm from 'remark-gfm';
 import { ProgramPoint, ProgramPointFileMeta } from '@/types/program.types';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ProgramPointCardProps {
   point: ProgramPoint;
@@ -85,10 +91,43 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
   return (
     <Card key={point.id} className="border-getigne-200">
       <CardContent className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-getigne-800 cursor-pointer" 
-              onClick={() => setShowContent(!showContent)}>{point.title}</h3>
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            {point.competent_entity && (
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-getigne-200 bg-white">
+                      {point.competent_entity.logo_url ? (
+                        <img
+                          src={point.competent_entity.logo_url}
+                          alt={`Logo ${point.competent_entity.name}`}
+                          className="h-full w-full object-contain"
+                          onError={(event) => {
+                            (event.currentTarget as HTMLImageElement).src = '/placeholder.svg';
+                          }}
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center bg-getigne-50 text-sm font-semibold uppercase text-getigne-600">
+                          {((point.competent_entity?.name ?? '').slice(0, 2) || '??').toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <span>{point.competent_entity.name}</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <div className="flex flex-col gap-1">
+              <h3
+                className="cursor-pointer text-lg font-semibold text-getigne-800"
+                onClick={() => setShowContent(!showContent)}
+              >
+                {point.title}
+              </h3>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Button 

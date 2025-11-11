@@ -47,10 +47,17 @@ export default function PointList({ points, onEdit, onDelete, onStatusChange, is
                         <GripVertical className="h-6 w-6" />
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-medium text-getigne-800">{point.title}</h4>
-                          <StatusBadge 
-                            status={point.status} 
+                        <div className="mb-2 flex items-start justify-between gap-2">
+                          <div className="flex flex-col gap-1">
+                            <h4 className="font-medium text-getigne-800">{point.title}</h4>
+                            {point.competent_entity && (
+                              <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                                {point.competent_entity.name}
+                              </span>
+                            )}
+                          </div>
+                          <StatusBadge
+                            status={point.status}
                             onStatusChange={(newStatus) => onStatusChange(point.id, newStatus)}
                             className="ml-2"
                           />

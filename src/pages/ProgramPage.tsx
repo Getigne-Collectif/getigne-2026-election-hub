@@ -17,7 +17,7 @@ import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
 import CtaBanner from '@/components/ui/cta-banner';
 import type { Tables } from '@/integrations/supabase/types';
-import type { ProgramPoint } from '@/types/program.types';
+import type { ProgramPoint, ProgramCompetentEntity } from '@/types/program.types';
 import ProgramAlertForm from '@/components/program/ProgramAlertForm';
 import ProgramTimeline from '@/components/program/ProgramTimeline';
 import { Routes } from '@/routes';
@@ -26,8 +26,12 @@ import ProgramPointsEditor from '@/components/admin/program/points/ProgramPoints
 import EditorJSRenderer from '@/components/EditorJSRenderer';
 import { Switch } from '@/components/ui/switch';
 
+type ProgramPointRow = Tables<'program_points'> & {
+  competent_entity?: ProgramCompetentEntity | null;
+};
+
 type ProgramItemWithPoints = Tables<'program_items'> & {
-  program_points: Tables<'program_points'>[];
+  program_points: ProgramPointRow[];
 };
 
 const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
@@ -162,7 +166,14 @@ const ProgramPage = () => {
             files,
             files_metadata,
             program_item_id,
-            status
+            status,
+            competent_entity_id,
+            competent_entity:program_competent_entities (
+              id,
+              name,
+              logo_url,
+              logo_path
+            )
           )
         `)
         .order('position', { ascending: true })
@@ -175,20 +186,26 @@ const ProgramPage = () => {
           (item as unknown as { program_points?: Tables<'program_points'>[] | null }).program_points || [];
 
         const normalizedPoints = rawPoints
-          .map((point) => ({
-            ...point,
-            files: Array.isArray(point.files) ? (point.files as string[]) : [],
-            files_metadata: Array.isArray(point.files_metadata)
-              ? (point.files_metadata as { url?: string | null; label?: string | null; path?: string | null }[])
-                  .filter((meta) => typeof meta?.url === 'string')
-                  .map((meta) => ({
-                    url: meta.url as string,
-                    label: meta.label ?? (meta.url ? meta.url.split('/').pop() ?? 'Fichier' : 'Fichier'),
-                    path: meta.path ?? null,
-                  }))
-              : [],
-            status: point.status ?? 'validated',
-          }))
+          .map((point) => {
+            const competentEntity =
+              (point as unknown as { competent_entity?: ProgramCompetentEntity | null }).competent_entity ?? null;
+
+            return {
+              ...point,
+              files: Array.isArray(point.files) ? (point.files as string[]) : [],
+              files_metadata: Array.isArray(point.files_metadata)
+                ? (point.files_metadata as { url?: string | null; label?: string | null; path?: string | null }[])
+                    .filter((meta) => typeof meta?.url === 'string')
+                    .map((meta) => ({
+                      url: meta.url as string,
+                      label: meta.label ?? (meta.url ? meta.url.split('/').pop() ?? 'Fichier' : 'Fichier'),
+                      path: meta.path ?? null,
+                    }))
+                : [],
+              status: point.status ?? 'validated',
+              competent_entity: competentEntity,
+            };
+          })
           .sort((a, b) => a.position - b.position);
 
         return {
@@ -216,6 +233,16 @@ const ProgramPage = () => {
 
   const isProgramAdmin = isAdmin || userRoles.includes('program_manager');
   const showAdminControls = isProgramAdmin && isEditMode;
+  const validatedPointsCount =
+    programItems?.reduce((count, item) => {
+      const points = Array.isArray(item.program_points) ? item.program_points : [];
+      const validatedPoints = points.filter((point) => {
+        const status = (point.status as 'draft' | 'pending' | 'validated' | null) ?? 'validated';
+        return status === 'validated';
+      });
+      return count + validatedPoints.length;
+    }, 0) ?? 0;
+  const shouldDisplayCounter = validatedPointsCount >= 10;
 
   // Observe sections to highlight the active one in the sidebar
   useEffect(() => {
@@ -492,6 +519,14 @@ const ProgramPage = () => {
                   </div>
                 </div>
               )}
+              <div className="mb-12 text-center"> 
+                <h2 className="text-3xl font-bold text-getigne-900 mb-2">
+                  {shouldDisplayCounter ? `Nos ${validatedPointsCount} mesures pour Gétigné` : 'Nos mesures pour Gétigné'}
+                </h2>
+                <p className="text-getigne-700">
+                  Découvrez les mesures concrètes que nous proposons pour Gétigné, classés par thématique et réagissez en commentant..
+                </p>
+              </div>
 
               {/* Grille avec barre latérale gauche (desktop) et contenu principal */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -533,7 +568,6 @@ const ProgramPage = () => {
                     )}
                   </div>
                 </aside>
-
                 <main className="lg:col-span-9 space-y-10">
                   {programItems?.map((item) => {
                     const allPoints = Array.isArray(item.program_points) ? item.program_points : [];
@@ -565,12 +599,12 @@ const ProgramPage = () => {
                     >
                       <div className="bg-white rounded-lg border border-getigne-200 overflow-hidden shadow">
                         <div className="p-6 md:p-8">
-                          <div className="flex items-start gap-4">
+                          <div className="flex items-start gap-4 items-center">
                             <div className="p-3 bg-getigne-50 rounded-lg">
                               <DynamicIcon name={item.icon} className="w-6 h-6 text-getigne-700" />
                             </div>
                             <div className="flex-1">
-                              <h2 className="text-2xl font-bold text-getigne-900">{item.title}</h2>
+                              <h2 className="text-2xl font-bold text-getigne-900 ">{item.title}</h2>
                             </div>
                             <div className="hidden md:block">
                               <ProgramLikeButton programId={item.id} />
@@ -608,7 +642,12 @@ const ProgramPage = () => {
                                 Gestion des points de la section
                               </h3>
                               <div className="mt-4">
-                                <ProgramPointsEditor programItemId={item.id} />
+                                <ProgramPointsEditor
+                                  programItemId={item.id}
+                                  onPointsUpdated={() => {
+                                    refetchProgramItems();
+                                  }}
+                                />
                               </div>
                             </div>
                           ) : (
@@ -625,6 +664,10 @@ const ProgramPage = () => {
                                     position: point.position,
                                     program_item_id: point.program_item_id,
                                     status: (point.status as 'draft' | 'pending' | 'validated') || 'validated',
+                                  competent_entity_id:
+                                    (point as unknown as { competent_entity_id?: string | null }).competent_entity_id ?? null,
+                                  competent_entity:
+                                    (point as unknown as { competent_entity?: ProgramCompetentEntity | null }).competent_entity ?? null,
                                     files: Array.isArray(point.files) ? (point.files as string[]) : [],
                                     files_metadata: Array.isArray(point.files_metadata)
                                       ? (point.files_metadata as { url?: string | null; label?: string | null; path?: string | null }[])

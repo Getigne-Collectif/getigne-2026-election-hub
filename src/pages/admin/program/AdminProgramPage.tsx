@@ -36,6 +36,7 @@ import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '@/component
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DragDropContext, DropResult, Droppable, Draggable } from '@hello-pangea/dnd';
 import GeneralPresentationEditor from '@/components/admin/program/GeneralPresentationEditor';
+import CompetentEntitiesManager from '@/components/admin/program/competent-entities/CompetentEntitiesManager';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { Routes } from '@/routes';
 
@@ -145,6 +146,7 @@ export default function AdminProgramPage() {
           <TabsList>
             <TabsTrigger value="presentation">Présentation générale</TabsTrigger>
             <TabsTrigger value="sections">Sections thématiques</TabsTrigger>
+            <TabsTrigger value="entities">Instances compétentes</TabsTrigger>
           </TabsList>
           
           {activeTab === "sections" && (
@@ -288,6 +290,10 @@ export default function AdminProgramPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="entities" className="space-y-6">
+          <CompetentEntitiesManager />
         </TabsContent>
       </Tabs>
 

@@ -813,6 +813,33 @@ export type Database = {
           },
         ]
       }
+      program_competent_entities: {
+        Row: {
+          created_at: string
+          id: string
+          logo_path: string | null
+          logo_url: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_path?: string | null
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_path?: string | null
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       program_general: {
         Row: {
           content: string
@@ -924,35 +951,41 @@ export type Database = {
       }
       program_points: {
         Row: {
+          competent_entity_id: string | null
           content: string
           created_at: string
           files: Json | null
+          files_metadata: Json | null
           id: string
           position: number
           program_item_id: string
-          status: string
+          status: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          competent_entity_id?: string | null
           content: string
           created_at?: string
           files?: Json | null
+          files_metadata?: Json | null
           id?: string
           position: number
           program_item_id: string
-          status?: string
+          status?: string | null
           title?: string
           updated_at?: string
         }
         Update: {
+          competent_entity_id?: string | null
           content?: string
           created_at?: string
           files?: Json | null
+          files_metadata?: Json | null
           id?: string
           position?: number
           program_item_id?: string
-          status?: string
+          status?: string | null
           title?: string
           updated_at?: string
         }
@@ -962,6 +995,13 @@ export type Database = {
             columns: ["program_item_id"]
             isOneToOne: false
             referencedRelation: "program_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_points_competent_entity_id_fkey"
+            columns: ["competent_entity_id"]
+            isOneToOne: false
+            referencedRelation: "program_competent_entities"
             referencedColumns: ["id"]
           },
         ]
@@ -1105,14 +1145,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      count_program_likes: {
-        Args: { program_id: string }
-        Returns: number
-      }
-      count_project_likes: {
-        Args: { project_id: string }
-        Returns: number
-      }
+      count_program_likes: { Args: { program_id: string }; Returns: number }
+      count_project_likes: { Args: { project_id: string }; Returns: number }
       get_user_roles: {
         Args: { uid: string }
         Returns: Database["public"]["Enums"]["app_role"][]

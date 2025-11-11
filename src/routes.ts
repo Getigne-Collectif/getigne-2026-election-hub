@@ -69,6 +69,7 @@ export const generateRoutes = {
   eventDetail: (slug: string) => `/agenda/${slug}`,
   committeeDetail: (id: string) => `/comites/${id}`,
   adminNewsEdit: (id: string) => `/admin/news/${id}/edit`,
+  adminNewsPreview: (slug: string) => `/admin/news/preview/${slug}`,
   adminEventsEdit: (id: string) => `/admin/events/${id}/edit`,
   adminPagesEdit: (id: string) => `/admin/pages/${id}/edit`,
   adminCommitteesEdit: (id: string) => `/admin/committees/${id}/edit`,

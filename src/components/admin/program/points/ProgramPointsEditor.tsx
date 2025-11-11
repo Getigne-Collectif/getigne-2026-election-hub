@@ -1,22 +1,45 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Loader2, Plus } from 'lucide-react';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
-import { ProgramPoint, ProgramPointStatus } from '@/types/program.types';
+import { ProgramPoint, ProgramPointStatus, ProgramCompetentEntity } from '@/types/program.types';
 import { StatusBadge } from '@/components/ui/status-badge';
 import PointList from './PointList';
 import AddPointDialog from './AddPointDialog';
 import EditPointDialog from './EditPointDialog';
 
-export default function ProgramPointsEditor({ programItemId }: { programItemId: string }) {
+export default function ProgramPointsEditor({
+  programItemId,
+  onPointsUpdated,
+}: {
+  programItemId: string;
+  onPointsUpdated?: () => void;
+}) {
   const [points, setPoints] = useState<ProgramPoint[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPointId, setCurrentPointId] = useState<string | null>(null);
   const [isReordering, setIsReordering] = useState(false);
+
+  const { data: competentEntities = [], isLoading: isLoadingCompetentEntities } = useQuery({
+    queryKey: ['program_competent_entities'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_competent_entities')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) {
+        toast.error("Erreur lors du chargement des instances compétentes");
+        throw error;
+      }
+
+      return (data || []) as ProgramCompetentEntity[];
+    },
+  });
 
   const { isLoading, refetch } = useQuery({
     queryKey: ['programPoints', programItemId],
@@ -71,6 +94,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       
       toast.success("Point supprimé avec succès");
       refetch();
+      onPointsUpdated?.();
     } catch (error: any) {
       toast.error(`Erreur: ${error.message}`);
       console.error("Delete error:", error);
@@ -99,6 +123,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       );
       
       toast.success(`Statut mis à jour vers "${newStatus === 'draft' ? 'Brouillon' : newStatus === 'pending' ? 'À valider' : 'Validé'}"`);
+      onPointsUpdated?.();
     } catch (error: any) {
       toast.error(`Erreur lors de la mise à jour du statut: ${error.message}`);
       console.error("Status change error:", error);
@@ -135,6 +160,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       }
       
       toast.success("Ordre mis à jour");
+      onPointsUpdated?.();
     } catch (error: any) {
       toast.error(`Erreur lors de la mise à jour de l'ordre: ${error.message}`);
       console.error("Reorder error:", error);
@@ -143,14 +169,6 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       setIsReordering(false);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-4">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   const getCurrentPoint = () => {
     return points.find(point => point.id === currentPointId) || null;
@@ -161,6 +179,25 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
     acc[point.status] = (acc[point.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
+  const pointsWithEntities = useMemo(() => {
+    if (points.length === 0) return [];
+    const entityById = new Map(competentEntities.map((entity) => [entity.id, entity]));
+    return points.map((point) => ({
+      ...point,
+      competent_entity: point.competent_entity_id
+        ? entityById.get(point.competent_entity_id) ?? null
+        : null,
+    }));
+  }, [points, competentEntities]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-4">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -209,7 +246,7 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
           <PointList 
-            points={points} 
+            points={pointsWithEntities} 
             onEdit={handleEditClick} 
             onDelete={handleDeletePoint} 
             onStatusChange={handleStatusChange}
@@ -222,7 +259,12 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
         open={isAddDialogOpen} 
         onOpenChange={setIsAddDialogOpen}
         programItemId={programItemId}
-        onSuccess={refetch}
+        onSuccess={() => {
+          refetch();
+          onPointsUpdated?.();
+        }}
+        competentEntities={competentEntities}
+        isLoadingCompetentEntities={isLoadingCompetentEntities}
       />
 
       {currentPointId && (
@@ -230,7 +272,12 @@ export default function ProgramPointsEditor({ programItemId }: { programItemId: 
           open={isEditDialogOpen} 
           onOpenChange={setIsEditDialogOpen}
           point={getCurrentPoint()}
-          onSuccess={refetch}
+          onSuccess={() => {
+            refetch();
+            onPointsUpdated?.();
+          }}
+          competentEntities={competentEntities}
+          isLoadingCompetentEntities={isLoadingCompetentEntities}
         />
       )}
     </div>
