@@ -53,6 +53,7 @@ export default function AdminProgramEditorPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [editorInstanceKey, setEditorInstanceKey] = useState(0);
 
   const form = useForm<ProgramItemFormValues>({
     resolver: zodResolver(programItemSchema),
@@ -87,12 +88,21 @@ export default function AdminProgramEditorPage() {
 
   useEffect(() => {
     if (programItem) {
+      const rawDescription = programItem.description;
+      const normalizedDescription =
+        typeof rawDescription === 'string'
+          ? rawDescription
+          : rawDescription
+          ? JSON.stringify(rawDescription)
+          : '';
+
       form.reset({
         title: programItem.title,
-        description: programItem.description,
+        description: normalizedDescription,
         icon: programItem.icon || '',
         image: programItem.image || '',
       });
+      setEditorInstanceKey((prev) => prev + 1);
       
       if (programItem.image) {
         setImagePreview(programItem.image);
@@ -229,6 +239,7 @@ export default function AdminProgramEditorPage() {
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           <EditorJSComponent
+                            key={`${isEditing && id ? `editor-${id}` : 'editor-new'}-${editorInstanceKey}`}
                             value={field.value || ''}
                             onChange={(data) => field.onChange(JSON.stringify(data))}
                             className="min-h-[300px]"
@@ -407,6 +418,7 @@ export default function AdminProgramEditorPage() {
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <EditorJSComponent
+                          key={`${isEditing && id ? `editor-${id}` : 'editor-new'}-${editorInstanceKey}`}
                           value={field.value || ''}
                           onChange={(data) => field.onChange(JSON.stringify(data))}
                           className="min-h-[300px]"

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar } from 'lucide-react';
+import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar, Sparkles } from 'lucide-react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
@@ -17,7 +17,7 @@ import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
 import CtaBanner from '@/components/ui/cta-banner';
 import type { Tables } from '@/integrations/supabase/types';
-import type { ProgramPoint, ProgramCompetentEntity } from '@/types/program.types';
+import type { ProgramPoint, ProgramCompetentEntity, ProgramFlagshipProject } from '@/types/program.types';
 import ProgramAlertForm from '@/components/program/ProgramAlertForm';
 import ProgramTimeline from '@/components/program/ProgramTimeline';
 import { Routes } from '@/routes';
@@ -25,6 +25,9 @@ import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import ProgramPointsEditor from '@/components/admin/program/points/ProgramPointsEditor';
 import EditorJSRenderer from '@/components/EditorJSRenderer';
 import { Switch } from '@/components/ui/switch';
+import FlagshipProjectsShowcase from '@/components/program/FlagshipProjectsShowcase';
+import FlagshipProjectEditModal from '@/components/program/FlagshipProjectEditModal';
+import { fetchFlagshipProjects } from '@/services/programFlagshipProjects';
 
 type ProgramPointRow = Tables<'program_points'> & {
   competent_entity?: ProgramCompetentEntity | null;
@@ -109,6 +112,8 @@ const ProgramPage = () => {
   const { user, isAdmin, userRoles } = useAuth();
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(() => readEditModeFromCookie());
+  const [editingFlagshipProject, setEditingFlagshipProject] = useState<ProgramFlagshipProject | null>(null);
+  const [flagshipEditModalOpen, setFlagshipEditModalOpen] = useState(false);
   const { settings } = useAppSettings();
 
   const canAccessProgram = 
@@ -216,6 +221,28 @@ const ProgramPage = () => {
     },
   });
 
+  const {
+    data: flagshipProjects,
+    isLoading: isLoadingFlagship,
+    refetch: refetchFlagshipProjects,
+  } = useQuery<ProgramFlagshipProject[]>({
+    queryKey: ['program-flagship-projects'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_flagship_projects')
+        .select('*')
+        .order('position', { ascending: true })
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      return (data ?? []).map((project) => ({
+        ...project,
+        description: project.description ?? null,
+      })) as ProgramFlagshipProject[];
+    },
+  });
+
   const { data: userLikes } = useQuery({
     queryKey: ['user-program-likes', user?.id],
     queryFn: async () => {
@@ -243,6 +270,7 @@ const ProgramPage = () => {
       return count + validatedPoints.length;
     }, 0) ?? 0;
   const shouldDisplayCounter = validatedPointsCount >= 10;
+  const hasFlagshipProjects = (flagshipProjects?.length ?? 0) > 0;
 
   // Observe sections to highlight the active one in the sidebar
   useEffect(() => {
@@ -278,6 +306,7 @@ const ProgramPage = () => {
     persistEditModeToCookie(checked);
     refetchProgramItems();
     refetchGeneral();
+    refetchFlagshipProjects();
   };
 
   if (!canAccessProgram) {
@@ -382,7 +411,7 @@ const ProgramPage = () => {
     );
   }
 
-  if (isLoadingGeneral || isLoadingItems) {
+  if (isLoadingGeneral || isLoadingItems || isLoadingFlagship) {
     return (
       <HelmetProvider>
         <div className="min-h-screen bg-gradient-to-br from-getigne-50 to-getigne-100">
@@ -498,7 +527,36 @@ const ProgramPage = () => {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
 
+        {/* Section projets phares - Pleine largeur sans container */}
+        {hasFlagshipProjects && flagshipProjects && (
+          <>
+            <FlagshipProjectsShowcase 
+              projects={flagshipProjects}
+              isProgramAdmin={isProgramAdmin}
+              onEditProject={(project) => {
+                setEditingFlagshipProject(project);
+                setFlagshipEditModalOpen(true);
+              }}
+            />
+            <FlagshipProjectEditModal
+              project={editingFlagshipProject}
+              open={flagshipEditModalOpen}
+              onOpenChange={setFlagshipEditModalOpen}
+              onSuccess={() => {
+                refetchFlagshipProjects();
+              }}
+            />
+          </>
+        )}
+
+        {/* Reprise du container pour la suite */}
+        <div className="pt-20 pb-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
               {/* Navigation Mobile (horizontale) */}
               {programItems && programItems.length > 0 && (
                 <div className="md:hidden sticky top-16 z-10 -mx-4 px-4 bg-gradient-to-br from-getigne-50 to-getigne-100 py-3 mb-6 border-b border-getigne-100">
@@ -733,7 +791,7 @@ const ProgramPage = () => {
               </div>
             </div>
           </div>
-        </div>        
+        </div>
         <Footer />
       </div>
     </HelmetProvider>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useEffect, useRef, memo, useState } from 'react';
 import EditorJS, { OutputData } from '@editorjs/editorjs';
 import Header from '@editorjs/header';
 import List from '@editorjs/list';
@@ -32,9 +32,9 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
 }) => {
   const editorRef = useRef<EditorJS | null>(null);
   const holderRef = useRef<HTMLDivElement>(null);
-  const isInitialized = useRef(false);
   const isUpdating = useRef(false);
   const lastValueRef = useRef<string>('');
+  const [isReady, setIsReady] = useState(false);
 
   const parseValue = (val: OutputData | string): OutputData => {
     if (typeof val === 'string') {
@@ -55,6 +55,8 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
     if (!holderRef.current) return;
 
     const initialData = parseValue(value);
+
+    setIsReady(false);
 
     const editor = new EditorJS({
       holder: holderRef.current,
@@ -190,9 +192,9 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
         }
       },
       onReady: () => {
-        isInitialized.current = true;
+        setIsReady(true);
       }
-    });
+    } as any);
 
     editorRef.current = editor;
 
@@ -204,34 +206,39 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           console.error('Error destroying editor:', error);
         }
         editorRef.current = null;
-        isInitialized.current = false;
+        setIsReady(false);
       }
     };
   }, []);
 
   useEffect(() => {
-    if (!editorRef.current || !isInitialized.current) return;
+    if (!editorRef.current || !isReady) return;
 
     const valueString = typeof value === 'string' ? value : JSON.stringify(value);
-    
+
     if (valueString && valueString !== lastValueRef.current && valueString !== '{}') {
       const newData = parseValue(value);
-      
+
       if (newData.blocks && newData.blocks.length > 0) {
-        isUpdating.current = true;
-        editorRef.current.clear()
-          .then(() => editorRef.current!.render(newData))
-          .then(() => {
+        const applyValue = async () => {
+          if (!editorRef.current) return;
+
+          isUpdating.current = true;
+          try {
+            await editorRef.current.clear();
+            await editorRef.current.render(newData);
             lastValueRef.current = valueString;
-            isUpdating.current = false;
-          })
-          .catch((error) => {
+          } catch (error) {
             console.error('Error rendering editor data:', error);
+          } finally {
             isUpdating.current = false;
-          });
+          }
+        };
+
+        applyValue();
       }
     }
-  }, [value]);
+  }, [value, isReady]);
 
   return (
     <div className={`editorjs-container ${className}`}>

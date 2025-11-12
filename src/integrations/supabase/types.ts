@@ -840,6 +840,39 @@ export type Database = {
         }
         Relationships: []
       }
+      program_flagship_projects: {
+        Row: {
+          created_at: string
+          description: Json | null
+          id: string
+          image_path: string | null
+          image_url: string | null
+          position: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: Json | null
+          id?: string
+          image_path?: string | null
+          image_url?: string | null
+          position?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: Json | null
+          id?: string
+          image_path?: string | null
+          image_url?: string | null
+          position?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       program_general: {
         Row: {
           content: string

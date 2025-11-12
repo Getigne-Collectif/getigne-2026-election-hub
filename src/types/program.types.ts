@@ -1,4 +1,6 @@
 
+import type { OutputData } from '@editorjs/editorjs';
+
 export type ProgramPointStatus = 'draft' | 'pending' | 'validated';
 
 export interface ProgramPointFileMeta {
@@ -39,6 +41,37 @@ export interface ProgramCompetentEntity {
   name: string;
   logo_url?: string | null;
   logo_path?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FlagshipProjectEffect {
+  id: string;
+  name: string;
+  icon?: string | null;
+  color: string;
+}
+
+export interface FlagshipProjectTimelineEvent {
+  id: string;
+  name: string;
+  icon?: string | null;
+  date_text: string;
+}
+
+export interface ProgramFlagshipProject {
+  id: string;
+  title: string;
+  description: OutputData | string | null;
+  image_url?: string | null;
+  image_path?: string | null;
+  position: number;
+  effects?: FlagshipProjectEffect[] | null;
+  timeline?: FlagshipProjectTimelineEvent[] | null;
+  timeline_horizon?: string | null;
+  file_url?: string | null;
+  file_path?: string | null;
+  file_label?: string | null;
   created_at?: string;
   updated_at?: string;
 }

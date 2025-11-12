@@ -37,6 +37,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DragDropContext, DropResult, Droppable, Draggable } from '@hello-pangea/dnd';
 import GeneralPresentationEditor from '@/components/admin/program/GeneralPresentationEditor';
 import CompetentEntitiesManager from '@/components/admin/program/competent-entities/CompetentEntitiesManager';
+import FlagshipProjectsManager from '@/components/admin/program/flagship/FlagshipProjectsManager';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { Routes } from '@/routes';
 
@@ -146,6 +147,7 @@ export default function AdminProgramPage() {
           <TabsList>
             <TabsTrigger value="presentation">Présentation générale</TabsTrigger>
             <TabsTrigger value="sections">Sections thématiques</TabsTrigger>
+            <TabsTrigger value="flagship">Projets phares</TabsTrigger>
             <TabsTrigger value="entities">Instances compétentes</TabsTrigger>
           </TabsList>
           
@@ -189,7 +191,6 @@ export default function AdminProgramPage() {
                               <TableHead className="w-12"></TableHead>
                               <TableHead className="w-12"></TableHead>
                               <TableHead>Titre</TableHead>
-                              <TableHead>Description</TableHead>
                               <TableHead>Image</TableHead>
                               <TableHead className="w-[150px]">Actions</TableHead>
                             </TableRow>
@@ -235,10 +236,6 @@ export default function AdminProgramPage() {
                                           #{item.position + 1}
                                         </span>
                                       </div>
-                                    </TableCell>
-                                    <TableCell className="truncate max-w-[250px]">
-                                      {item.description.substring(0, 100)}
-                                      {item.description.length > 100 ? '...' : ''}
                                     </TableCell>
                                     <TableCell>
                                       {item.image ? (
@@ -290,6 +287,10 @@ export default function AdminProgramPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="flagship" className="space-y-6">
+          <FlagshipProjectsManager />
         </TabsContent>
 
         <TabsContent value="entities" className="space-y-6">

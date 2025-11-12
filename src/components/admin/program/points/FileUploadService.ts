@@ -89,6 +89,78 @@ export async function uploadProgramImage(file: File): Promise<string | null> {
   }
 }
 
+export async function uploadFlagshipProjectImage(file: File): Promise<{ url: string; path: string } | null> {
+  if (!file) return null;
+
+  try {
+    const fileType = file.type.toLowerCase();
+    if (!fileType.startsWith('image/')) {
+      toast.error("Seules les images peuvent être téléchargées");
+      return null;
+    }
+
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const uniqueId = uuidv4();
+    const fileName = `program_flagship_${uniqueId}.${fileExt}`;
+    const filePath = `program_flagship_projects/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('program_files')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (uploadError) {
+      toast.error(`Erreur lors de l'upload: ${uploadError.message}`);
+      return null;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('program_files').getPublicUrl(filePath);
+
+    toast.success("Image téléchargée avec succès");
+    return { url: publicUrl, path: filePath };
+  } catch (error) {
+    toast.error(`Erreur lors de l'upload: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
+
+export async function uploadFlagshipProjectFile(file: File): Promise<{ url: string; path: string } | null> {
+  if (!file) return null;
+
+  try {
+    const fileExt = file.name.split('.').pop() || 'pdf';
+    const uniqueId = uuidv4();
+    const fileName = `program_flagship_file_${uniqueId}.${fileExt}`;
+    const filePath = `program_flagship_projects/files/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('program_files')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (uploadError) {
+      toast.error(`Erreur lors de l'upload: ${uploadError.message}`);
+      return null;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('program_files').getPublicUrl(filePath);
+
+    toast.success('Fichier téléchargé avec succès');
+    return { url: publicUrl, path: filePath };
+  } catch (error) {
+    toast.error(`Erreur lors de l'upload: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
+
 export async function removeFilesFromStorage(paths: (string | null | undefined)[]) {
   const validPaths = paths.filter((path): path is string => Boolean(path));
   if (validPaths.length === 0) {
