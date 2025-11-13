@@ -200,9 +200,123 @@ export type Database = {
           },
         ]
       }
+      electoral_list: {
+        Row: {
+          created_at: string
+          description: string | null
+          election_date: string
+          governance_content: Json | null
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          election_date: string
+          governance_content?: Json | null
+          id?: string
+          is_active?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          election_date?: string
+          governance_content?: Json | null
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      electoral_list_members: {
+        Row: {
+          created_at: string
+          electoral_list_id: string
+          id: string
+          position: number
+          team_member_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          electoral_list_id: string
+          id?: string
+          position: number
+          team_member_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          electoral_list_id?: string
+          id?: string
+          position?: number
+          team_member_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "electoral_list_members_electoral_list_id_fkey"
+            columns: ["electoral_list_id"]
+            isOneToOne: false
+            referencedRelation: "electoral_list"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "electoral_list_members_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      electoral_member_roles: {
+        Row: {
+          created_at: string
+          electoral_list_member_id: string
+          id: string
+          is_primary: boolean
+          thematic_role_id: string
+        }
+        Insert: {
+          created_at?: string
+          electoral_list_member_id: string
+          id?: string
+          is_primary?: boolean
+          thematic_role_id: string
+        }
+        Update: {
+          created_at?: string
+          electoral_list_member_id?: string
+          id?: string
+          is_primary?: boolean
+          thematic_role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "electoral_member_roles_electoral_list_member_id_fkey"
+            columns: ["electoral_list_member_id"]
+            isOneToOne: false
+            referencedRelation: "electoral_list_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "electoral_member_roles_thematic_role_id_fkey"
+            columns: ["thematic_role_id"]
+            isOneToOne: false
+            referencedRelation: "thematic_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
-          additional_guests: number
+          additional_guests: number | null
           created_at: string
           event_id: string
           id: string
@@ -210,7 +324,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          additional_guests?: number
+          additional_guests?: number | null
           created_at?: string
           event_id: string
           id?: string
@@ -218,7 +332,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          additional_guests?: number
+          additional_guests?: number | null
           created_at?: string
           event_id?: string
           id?: string
@@ -245,6 +359,7 @@ export type Database = {
       events: {
         Row: {
           allow_registration: boolean | null
+          checklist_progress: Json | null
           committee: string | null
           committee_id: string | null
           content: string | null
@@ -259,6 +374,7 @@ export type Database = {
           latitude: number | null
           location: string
           longitude: number | null
+          max_participants: number | null
           member_present: boolean | null
           organizer_contact: string | null
           organizer_name: string | null
@@ -269,6 +385,7 @@ export type Database = {
         }
         Insert: {
           allow_registration?: boolean | null
+          checklist_progress?: Json | null
           committee?: string | null
           committee_id?: string | null
           content?: string | null
@@ -283,6 +400,7 @@ export type Database = {
           latitude?: number | null
           location: string
           longitude?: number | null
+          max_participants?: number | null
           member_present?: boolean | null
           organizer_contact?: string | null
           organizer_name?: string | null
@@ -293,6 +411,7 @@ export type Database = {
         }
         Update: {
           allow_registration?: boolean | null
+          checklist_progress?: Json | null
           committee?: string | null
           committee_id?: string | null
           content?: string | null
@@ -307,6 +426,7 @@ export type Database = {
           latitude?: number | null
           location?: string
           longitude?: number | null
+          max_participants?: number | null
           member_present?: boolean | null
           organizer_contact?: string | null
           organizer_name?: string | null
@@ -367,6 +487,48 @@ export type Database = {
           position?: number
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      helloasso_memberships: {
+        Row: {
+          created_at: string | null
+          discord_role_assigned: boolean | null
+          discord_role_assigned_at: string | null
+          discord_user_id: string | null
+          email: string
+          first_name: string | null
+          helloasso_order_id: string | null
+          id: string
+          last_name: string | null
+          membership_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          discord_role_assigned?: boolean | null
+          discord_role_assigned_at?: string | null
+          discord_user_id?: string | null
+          email: string
+          first_name?: string | null
+          helloasso_order_id?: string | null
+          id?: string
+          last_name?: string | null
+          membership_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          discord_role_assigned?: boolean | null
+          discord_role_assigned_at?: string | null
+          discord_user_id?: string | null
+          email?: string
+          first_name?: string | null
+          helloasso_order_id?: string | null
+          id?: string
+          last_name?: string | null
+          membership_type?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -711,6 +873,252 @@ export type Database = {
           },
         ]
       }
+      observatory_documents: {
+        Row: {
+          analysis_data: Json | null
+          created_at: string
+          description: string | null
+          error_message: string | null
+          extracted_text: string | null
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          meeting_date: string | null
+          meeting_type: string | null
+          mime_type: string | null
+          rolebase_meeting_id: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          analysis_data?: Json | null
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          extracted_text?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          meeting_date?: string | null
+          meeting_type?: string | null
+          mime_type?: string | null
+          rolebase_meeting_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          analysis_data?: Json | null
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          extracted_text?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          meeting_date?: string | null
+          meeting_type?: string | null
+          mime_type?: string | null
+          rolebase_meeting_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      observatory_groups: {
+        Row: {
+          color_hex: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color_hex: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color_hex?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      observatory_participants: {
+        Row: {
+          avatar_path: string | null
+          created_at: string
+          group_id: string | null
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          name: string
+          party_affiliation: string | null
+          position_title: string | null
+          role: string
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_path?: string | null
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          name: string
+          party_affiliation?: string | null
+          position_title?: string | null
+          role: string
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_path?: string | null
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          name?: string
+          party_affiliation?: string | null
+          position_title?: string | null
+          role?: string
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observatory_participants_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "observatory_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      observatory_positions: {
+        Row: {
+          confidence_score: number | null
+          content: string
+          context: string | null
+          document_id: string
+          extracted_at: string
+          id: string
+          metadata: Json | null
+          page_number: number | null
+          participant_id: string | null
+          position: string | null
+          subject_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          content: string
+          context?: string | null
+          document_id: string
+          extracted_at?: string
+          id?: string
+          metadata?: Json | null
+          page_number?: number | null
+          participant_id?: string | null
+          position?: string | null
+          subject_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          content?: string
+          context?: string | null
+          document_id?: string
+          extracted_at?: string
+          id?: string
+          metadata?: Json | null
+          page_number?: number | null
+          participant_id?: string | null
+          position?: string | null
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observatory_positions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "observatory_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observatory_positions_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "observatory_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observatory_positions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "observatory_subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      observatory_subjects: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          first_mention_date: string | null
+          id: string
+          keywords: string[] | null
+          last_mention_date: string | null
+          metadata: Json | null
+          status: string | null
+          title: string
+          total_discussions: number | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          first_mention_date?: string | null
+          id?: string
+          keywords?: string[] | null
+          last_mention_date?: string | null
+          metadata?: Json | null
+          status?: string | null
+          title: string
+          total_discussions?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          first_mention_date?: string | null
+          id?: string
+          keywords?: string[] | null
+          last_mention_date?: string | null
+          metadata?: Json | null
+          status?: string | null
+          title?: string
+          total_discussions?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           content: string
@@ -960,6 +1368,7 @@ export type Database = {
           id: string
           image: string | null
           position: number | null
+          slug: string
           title: string
           updated_at: string
         }
@@ -971,6 +1380,7 @@ export type Database = {
           id?: string
           image?: string | null
           position?: number | null
+          slug: string
           title: string
           updated_at?: string
         }
@@ -982,6 +1392,7 @@ export type Database = {
           id?: string
           image?: string | null
           position?: number | null
+          slug?: string
           title?: string
           updated_at?: string
         }
@@ -1169,36 +1580,84 @@ export type Database = {
       }
       team_members: {
         Row: {
-          bio: string
+          bio: string | null
+          birth_date: string | null
           created_at: string
+          email: string | null
+          gender: string | null
           id: string
-          image: string
+          image: string | null
           is_board_member: boolean | null
           is_elected: boolean | null
           name: string
-          role: string
+          phone: string | null
+          profession: string | null
+          role: string | null
           updated_at: string
         }
         Insert: {
-          bio: string
+          bio?: string | null
+          birth_date?: string | null
           created_at?: string
+          email?: string | null
+          gender?: string | null
           id?: string
-          image: string
+          image?: string | null
           is_board_member?: boolean | null
           is_elected?: boolean | null
           name: string
-          role: string
+          phone?: string | null
+          profession?: string | null
+          role?: string | null
           updated_at?: string
         }
         Update: {
-          bio?: string
+          bio?: string | null
+          birth_date?: string | null
           created_at?: string
+          email?: string | null
+          gender?: string | null
           id?: string
-          image?: string
+          image?: string | null
           is_board_member?: boolean | null
           is_elected?: boolean | null
           name?: string
-          role?: string
+          phone?: string | null
+          profession?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      thematic_roles: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
           updated_at?: string
         }
         Relationships: []
@@ -1388,3 +1847,4 @@ export const Constants = {
     },
   },
 } as const
+
