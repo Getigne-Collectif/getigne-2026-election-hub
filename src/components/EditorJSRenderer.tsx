@@ -73,66 +73,83 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
     const doc = parser.parseFromString(html, 'text/html');
     const acronymSpans = doc.querySelectorAll('span.acronym[data-lexicon-id]');
 
+    // Si pas d'acronymes, retourner le HTML tel quel
     if (acronymSpans.length === 0) {
       return <span dangerouslySetInnerHTML={{ __html: html }} />;
     }
 
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    const textContent = doc.body.innerHTML;
-
-    acronymSpans.forEach((span, index) => {
-      const spanElement = span as HTMLElement;
-      const lexiconId = spanElement.getAttribute('data-lexicon-id');
-      const spanHTML = spanElement.outerHTML;
-      const spanIndex = textContent.indexOf(spanHTML, lastIndex);
-
-      if (spanIndex > lastIndex) {
-        // Ajouter le contenu avant le span
-        parts.push(
-          <span 
-            key={`text-${index}`}
-            dangerouslySetInnerHTML={{ __html: textContent.substring(lastIndex, spanIndex) }}
-          />
-        );
+    // Fonction récursive pour parcourir les nœuds et construire les éléments React
+    let nodeIndex = 0;
+    
+    const processNode = (node: Node): React.ReactNode => {
+      // Si c'est un nœud texte
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
       }
-
-      if (lexiconId && lexiconEntries[lexiconId]) {
-        parts.push(
-          <AcronymTooltip key={`acronym-${index}`} entry={lexiconEntries[lexiconId]}>
-            {spanElement.textContent || ''}
-          </AcronymTooltip>
-        );
-      } else {
-        // Si l'entrée du lexique n'est pas trouvée, afficher le texte simple avec le style
-        parts.push(
-          <span 
-            key={`acronym-${index}`}
-            style={{
-              textDecoration: 'underline dotted',
-              textDecorationColor: '#10b981',
-              cursor: 'help',
-            }}
-          >
-            {spanElement.textContent || ''}
-          </span>
-        );
+      
+      // Si c'est un élément
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
+        
+        // Si c'est un span avec la classe acronym
+        if (element.tagName === 'SPAN' && element.classList.contains('acronym')) {
+          const lexiconId = element.getAttribute('data-lexicon-id');
+          const text = element.textContent || '';
+          const entry = lexiconId && lexiconEntries[lexiconId] ? lexiconEntries[lexiconId] : null;
+          
+          if (entry) {
+            return (
+              <AcronymTooltip key={`acronym-${nodeIndex++}`} entry={entry}>
+                {text}
+              </AcronymTooltip>
+            );
+          } else {
+            return (
+              <span 
+                key={`acronym-${nodeIndex++}`}
+                style={{
+                  textDecoration: 'underline dotted',
+                  textDecorationColor: '#10b981',
+                  cursor: 'help',
+                }}
+              >
+                {text}
+              </span>
+            );
+          }
+        }
+        
+        // Pour les autres éléments HTML (b, i, em, strong, etc.)
+        const children: React.ReactNode[] = [];
+        element.childNodes.forEach((child) => {
+          children.push(processNode(child));
+        });
+        
+        // Recréer l'élément avec ses enfants
+        const tagName = element.tagName.toLowerCase();
+        const props: any = { key: `elem-${nodeIndex++}` };
+        
+        // Copier les attributs importants
+        if (element.className) {
+          props.className = element.className;
+        }
+        if (element.style.cssText) {
+          props.style = element.style.cssText;
+        }
+        
+        return React.createElement(tagName, props, ...children);
       }
-
-      lastIndex = spanIndex + spanHTML.length;
+      
+      return null;
+    };
+    
+    // Traiter tous les enfants du body
+    const result: React.ReactNode[] = [];
+    doc.body.childNodes.forEach((child) => {
+      result.push(processNode(child));
     });
-
-    // Ajouter le contenu restant après le dernier span
-    if (lastIndex < textContent.length) {
-      parts.push(
-        <span 
-          key="text-end"
-          dangerouslySetInnerHTML={{ __html: textContent.substring(lastIndex) }}
-        />
-      );
-    }
-
-    return <>{parts}</>;
+    
+    return <>{result}</>;
   }, [lexiconEntries]);
 
   const renderBlock = (block: OutputBlockData, index: number) => {
@@ -209,7 +226,7 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
               {parseAcronyms(block.data.text)}
             </p>
             {block.data.caption && (
-              <cite className="text-sm text-gray-600 not-italic">— {block.data.caption}</cite>
+              <cite className="text-sm text-gray-600 not-italic">— {parseAcronyms(block.data.caption)}</cite>
             )}
           </blockquote>
         );
@@ -218,9 +235,9 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
         return (
           <div key={index} className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4 rounded">
             {block.data.title && (
-              <h4 className="font-bold text-yellow-800 mb-2">{block.data.title}</h4>
+              <h4 className="font-bold text-yellow-800 mb-2">{parseAcronyms(block.data.title)}</h4>
             )}
-            <p className="text-yellow-700" dangerouslySetInnerHTML={{ __html: block.data.message }} />
+            <p className="text-yellow-700">{parseAcronyms(block.data.message)}</p>
           </div>
         );
 
@@ -248,7 +265,7 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
             />
             {block.data.caption && (
               <figcaption className="text-center text-sm text-gray-600 mt-2">
-                {block.data.caption}
+                {parseAcronyms(block.data.caption)}
               </figcaption>
             )}
           </figure>
@@ -267,7 +284,7 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
               />
             </div>
             {block.data.caption && (
-              <p className="text-center text-sm text-gray-600 mt-2">{block.data.caption}</p>
+              <p className="text-center text-sm text-gray-600 mt-2">{parseAcronyms(block.data.caption)}</p>
             )}
           </div>
         );
@@ -283,8 +300,9 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
                       <td 
                         key={cellIndex} 
                         className="border border-gray-300 px-4 py-2"
-                        dangerouslySetInnerHTML={{ __html: cell }}
-                      />
+                      >
+                        {parseAcronyms(cell)}
+                      </td>
                     ))}
                   </tr>
                 ))}
@@ -312,10 +330,10 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
               )}
               <div>
                 <h4 className="font-bold text-getigne-accent hover:underline">
-                  {block.data.meta?.title || block.data.link}
+                  {parseAcronyms(block.data.meta?.title || block.data.link)}
                 </h4>
                 {block.data.meta?.description && (
-                  <p className="text-sm text-gray-600 mt-1">{block.data.meta.description}</p>
+                  <p className="text-sm text-gray-600 mt-1">{parseAcronyms(block.data.meta.description)}</p>
                 )}
               </div>
             </div>

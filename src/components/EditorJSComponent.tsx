@@ -63,6 +63,7 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       holder: holderRef.current,
       placeholder,
       data: initialData,
+      inlineToolbar: ['bold', 'italic', 'link', 'marker', 'acronym'],
       tools: {
         header: {
           class: Header,
@@ -337,6 +338,16 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
 
         .embed-tool {
           margin: 1.5rem 0;
+        }
+
+        /* Style pour les acronymes */
+        span.acronym {
+          text-decoration: underline dotted;
+          text-decoration-color: #10b981;
+          cursor: help;
+          background-color: rgba(16, 185, 129, 0.1);
+          padding: 0 2px;
+          border-radius: 2px;
         }
       `}</style>
     </div>
