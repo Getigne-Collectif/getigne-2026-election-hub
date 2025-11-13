@@ -53,6 +53,13 @@ const DialogContent = React.forwardRef<
           e.preventDefault();
         }
       }}
+      onFocusOutside={(e) => {
+        // Permettre au focus de sortir du dialog vers la dropdown d'acronyme
+        const target = e.target as HTMLElement;
+        if (target.closest('[data-acronym-dropdown]')) {
+          e.preventDefault();
+        }
+      }}
       {...props}
     >
       {children}

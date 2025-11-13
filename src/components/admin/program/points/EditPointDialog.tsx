@@ -70,7 +70,7 @@ export default function EditPointDialog({
 
   // Initialiser la section sélectionnée
   useEffect(() => {
-    if (point) {
+    if (point && point.program_item_id) {
       setSelectedSectionId(point.program_item_id);
       setIsSectionChanged(false);
       setShowMoveOptions(false);
@@ -157,20 +157,26 @@ export default function EditPointDialog({
       }
 
       // Update the program point
+      const updatePayload: any = {
+        title: values.title,
+        content: typeof values.content === 'string' 
+          ? JSON.parse(values.content) 
+          : values.content,
+        competent_entity_id: values.competent_entity_id ?? null,
+        files: combinedFiles.map((file) => file.url),
+        files_metadata: combinedFiles,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Ne mettre à jour program_item_id et position que si la section a changé
+      if (isSectionChanged && selectedSectionId) {
+        updatePayload.program_item_id = selectedSectionId;
+        updatePayload.position = newPosition;
+      }
+
       const { error } = await supabase
         .from('program_points')
-        .update({
-          title: values.title,
-          content: typeof values.content === 'string' 
-            ? JSON.parse(values.content) 
-            : values.content,
-          competent_entity_id: values.competent_entity_id ?? null,
-          files: combinedFiles.map((file) => file.url),
-          files_metadata: combinedFiles,
-          program_item_id: selectedSectionId,
-          position: newPosition,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updatePayload)
         .eq('id', point.id);
         
       if (error) throw error;

@@ -138,12 +138,18 @@ export default class AcronymTool {
     // Sauvegarder la sélection
     this.savedRange = range.cloneRange();
 
+    // Détecter si on est dans un dialog pour ajuster le positionnement
+    const dialogContent = document.querySelector('[role="dialog"]');
+    const isInDialog = !!dialogContent;
+    const positionType = isInDialog ? 'absolute' : 'fixed';
+
     // Créer le dropdown
     this.dropdown = document.createElement('div');
     this.dropdown.classList.add('acronym-dropdown');
     this.dropdown.setAttribute('data-acronym-dropdown', 'true');
+    
     this.dropdown.style.cssText = `
-      position: fixed;
+      position: ${positionType};
       background: white;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
@@ -153,6 +159,15 @@ export default class AcronymTool {
       z-index: 999999;
       pointer-events: auto;
     `;
+    
+    // Empêcher les événements de se propager du dropdown
+    this.dropdown.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+    
+    this.dropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
 
     // Input de recherche
     this.searchInput = document.createElement('input');
@@ -184,6 +199,19 @@ export default class AcronymTool {
     this.searchInput.addEventListener('input', () => {
       this.filterEntries();
     });
+    
+    // Empêcher les événements de se propager pour éviter que le dialog ne reprenne le focus
+    this.searchInput.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+    
+    this.searchInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Forcer le focus au cas où il aurait été perdu
+      if (this.searchInput && document.activeElement !== this.searchInput) {
+        this.searchInput.focus();
+      }
+    });
 
     this.dropdown.appendChild(this.searchInput);
 
@@ -204,10 +232,11 @@ export default class AcronymTool {
 
     this.dropdown.appendChild(entriesList);
 
-    // Ajouter au body AVANT de calculer la position
-    document.body.appendChild(this.dropdown);
+    // Ajouter au body ou au dialog si on est dans un dialog
+    const container = dialogContent || document.body;
+    container.appendChild(this.dropdown);
 
-    // Positionner le dropdown (fixed positioning)
+    // Positionner le dropdown
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const rect = selection.getRangeAt(0).getBoundingClientRect();
@@ -216,19 +245,42 @@ export default class AcronymTool {
       let top = rect.bottom + 8;
       let left = rect.left;
 
-      // Vérifier si le dropdown dépasse en bas
-      if (top + dropdownRect.height > window.innerHeight) {
-        top = rect.top - dropdownRect.height - 8; // Afficher au-dessus
-      }
+      if (isInDialog) {
+        // Si on est dans un dialog, calculer la position relative au dialog
+        const dialogRect = dialogContent!.getBoundingClientRect();
+        top = rect.bottom - dialogRect.top + 8;
+        left = rect.left - dialogRect.left;
+        
+        // Vérifier si le dropdown dépasse en bas du dialog
+        if (top + dropdownRect.height > dialogRect.height) {
+          top = rect.top - dialogRect.top - dropdownRect.height - 8; // Afficher au-dessus
+        }
+        
+        // Vérifier si le dropdown dépasse à droite du dialog
+        if (left + dropdownRect.width > dialogRect.width) {
+          left = dialogRect.width - dropdownRect.width - 16;
+        }
+        
+        // S'assurer qu'il ne dépasse pas à gauche
+        if (left < 8) {
+          left = 8;
+        }
+      } else {
+        // Position fixe normale si on est dans le body
+        // Vérifier si le dropdown dépasse en bas
+        if (top + dropdownRect.height > window.innerHeight) {
+          top = rect.top - dropdownRect.height - 8; // Afficher au-dessus
+        }
 
-      // Vérifier si le dropdown dépasse à droite
-      if (left + dropdownRect.width > window.innerWidth) {
-        left = window.innerWidth - dropdownRect.width - 16;
-      }
-      
-      // S'assurer qu'il ne dépasse pas à gauche
-      if (left < 8) {
-        left = 8;
+        // Vérifier si le dropdown dépasse à droite
+        if (left + dropdownRect.width > window.innerWidth) {
+          left = window.innerWidth - dropdownRect.width - 16;
+        }
+        
+        // S'assurer qu'il ne dépasse pas à gauche
+        if (left < 8) {
+          left = 8;
+        }
       }
 
       this.dropdown.style.top = `${top}px`;
@@ -250,7 +302,20 @@ export default class AcronymTool {
     }, 100);
 
     // Focus sur l'input de recherche
-    this.searchInput.focus();
+    // Utiliser plusieurs tentatives pour forcer le focus même dans un dialog
+    const tryFocus = () => {
+      if (this.searchInput) {
+        this.searchInput.focus();
+      }
+    };
+    
+    // Focus immédiat
+    tryFocus();
+    
+    // Réessayer après un court délai pour contrer le focus trap des dialogs
+    setTimeout(tryFocus, 10);
+    setTimeout(tryFocus, 50);
+    setTimeout(tryFocus, 100);
   }
 
   /**
@@ -265,6 +330,9 @@ export default class AcronymTool {
       border-radius: 4px;
       margin-bottom: 4px;
       user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     `;
 
     entryDiv.addEventListener('mouseenter', () => {
@@ -275,20 +343,50 @@ export default class AcronymTool {
       entryDiv.style.backgroundColor = 'transparent';
     });
 
+    // Logo si disponible
+    if (entry.logo_url) {
+      const logoImg = document.createElement('img');
+      logoImg.src = entry.logo_url;
+      logoImg.alt = entry.name;
+      logoImg.style.cssText = `
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        flex-shrink: 0;
+        border-radius: 4px;
+      `;
+      entryDiv.appendChild(logoImg);
+    }
+
+    // Conteneur pour le texte
+    const textContainer = document.createElement('div');
+    textContainer.style.cssText = `
+      flex: 1;
+      min-width: 0;
+    `;
+
     const nameDiv = document.createElement('div');
     nameDiv.style.fontWeight = '600';
     nameDiv.style.fontSize = '14px';
+    nameDiv.style.overflow = 'hidden';
+    nameDiv.style.textOverflow = 'ellipsis';
+    nameDiv.style.whiteSpace = 'nowrap';
     nameDiv.textContent = entry.name;
 
-    entryDiv.appendChild(nameDiv);
+    textContainer.appendChild(nameDiv);
 
     if (entry.acronym) {
       const acronymDiv = document.createElement('div');
       acronymDiv.style.fontSize = '12px';
       acronymDiv.style.color = '#6b7280';
+      acronymDiv.style.overflow = 'hidden';
+      acronymDiv.style.textOverflow = 'ellipsis';
+      acronymDiv.style.whiteSpace = 'nowrap';
       acronymDiv.textContent = entry.acronym;
-      entryDiv.appendChild(acronymDiv);
+      textContainer.appendChild(acronymDiv);
     }
+
+    entryDiv.appendChild(textContainer);
 
     entryDiv.addEventListener('click', () => {
       // Appliquer l'acronyme et fermer la dropdown
