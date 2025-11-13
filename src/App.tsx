@@ -37,6 +37,11 @@ const AdminProjectEditorPage = lazy(() => import("./pages/admin/projects/AdminPr
 const AdminLexiconPage = lazy(() => import("./pages/admin/AdminLexiconPage"));
 const AdminLexiconEditorPage = lazy(() => import("./pages/admin/AdminLexiconEditorPage"));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
+const AdminTeamMembersPage = lazy(() => import("./pages/admin/team/AdminTeamMembersPage"));
+const AdminTeamMemberNewPage = lazy(() => import("./pages/admin/team/AdminTeamMemberNewPage"));
+const AdminTeamMemberEditPage = lazy(() => import("./pages/admin/team/AdminTeamMemberEditPage"));
+const AdminThematicRolesPage = lazy(() => import("./pages/admin/roles/AdminThematicRolesPage"));
+const AdminElectoralListPage = lazy(() => import("./pages/admin/electoral/AdminElectoralListPage"));
 
 // Other pages
 const NewsPage = lazy(() => import("./pages/NewsPage"));
@@ -168,6 +173,17 @@ function App() {
                       <Route path={AppRoutes.ADMIN_LEXICON} element={<AdminLexiconPage />} />
                       <Route path={AppRoutes.ADMIN_LEXICON_NEW} element={<AdminLexiconEditorPage />} />
                       <Route path={AppRoutes.ADMIN_LEXICON_EDIT} element={<AdminLexiconEditorPage />} />
+                      
+                      {/* Team Members */}
+                      <Route path={AppRoutes.ADMIN_TEAM_MEMBERS} element={<AdminTeamMembersPage />} />
+                      <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_NEW} element={<AdminTeamMemberNewPage />} />
+                      <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_EDIT} element={<AdminTeamMemberEditPage />} />
+                      
+                      {/* Thematic Roles */}
+                      <Route path={AppRoutes.ADMIN_THEMATIC_ROLES} element={<AdminThematicRolesPage />} />
+                      
+                      {/* Electoral List */}
+                      <Route path={AppRoutes.ADMIN_ELECTORAL_LIST} element={<AdminElectoralListPage />} />
                       
                       {/* Settings */}
                       <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />

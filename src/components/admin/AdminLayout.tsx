@@ -13,7 +13,9 @@ import {
   BookOpen,
   FolderOpen,
   Settings,
-  ArrowLeft
+  ArrowLeft,
+  UserCircle,
+  ListChecks
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -67,6 +69,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
       title: 'Comités citoyens',
       href: '/admin/committees',
       icon: Users,
+    },
+    {
+      title: 'Membres de l\'équipe',
+      href: '/admin/team-members',
+      icon: UserCircle,
+    },
+    {
+      title: 'Liste électorale',
+      href: '/admin/electoral-list',
+      icon: ListChecks,
     },
     {
       title: 'Programme',

@@ -12,7 +12,11 @@ import {
   MessageSquare,
   Component,
   File,
-  Star, MenuIcon
+  Star,
+  MenuIcon,
+  UserCircle,
+  Tags,
+  ListChecks
 } from 'lucide-react';
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 import {GearIcon} from "@radix-ui/react-icons";
@@ -268,6 +272,48 @@ const AdminDashboardPage = () => {
                   <CardContent>
                     <div className="text-3xl font-bold">{metrics.programPoints}</div>
                     <CardDescription>points de programme</CardDescription>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to={Routes.ADMIN_TEAM_MEMBERS}>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl flex items-center">
+                      <UserCircle className="h-5 w-5 mr-2 text-getigne-accent" />
+                      Membres de l'équipe
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription>Gérer les membres du collectif</CardDescription>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to={Routes.ADMIN_THEMATIC_ROLES}>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl flex items-center">
+                      <Tags className="h-5 w-5 mr-2 text-getigne-accent" />
+                      Rôles thématiques
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription>Gérer les rôles thématiques</CardDescription>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to={Routes.ADMIN_ELECTORAL_LIST}>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xl flex items-center">
+                      <ListChecks className="h-5 w-5 mr-2 text-getigne-accent" />
+                      Liste électorale
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription>Composer la liste pour Mars 2026</CardDescription>
                   </CardContent>
                 </Card>
               </Link>

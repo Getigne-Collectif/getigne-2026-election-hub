@@ -58,6 +58,11 @@ export enum Routes {
   ADMIN_LEXICON_NEW = "/admin/lexicon/new",
   ADMIN_LEXICON_EDIT = "/admin/lexicon/:id/edit",
   ADMIN_SETTINGS = "/admin/settings",
+  ADMIN_TEAM_MEMBERS = "/admin/team-members",
+  ADMIN_TEAM_MEMBERS_NEW = "/admin/team-members/new",
+  ADMIN_TEAM_MEMBERS_EDIT = "/admin/team-members/:id/edit",
+  ADMIN_THEMATIC_ROLES = "/admin/thematic-roles",
+  ADMIN_ELECTORAL_LIST = "/admin/electoral-list",
 
   // Routes spéciales
   DYNAMIC_PAGE = "/:slug",
@@ -80,5 +85,6 @@ export const generateRoutes = {
   adminProgramEdit: (id: string) => `/admin/program/${id}/edit`,
   adminProjectsEdit: (id: string) => `/admin/projects/${id}/edit`,
   adminLexiconEdit: (id: string) => `/admin/lexicon/${id}/edit`,
+  adminTeamMembersEdit: (id: string) => `/admin/team-members/${id}/edit`,
   dynamicPage: (slug: string) => `/${slug}`,
 };
