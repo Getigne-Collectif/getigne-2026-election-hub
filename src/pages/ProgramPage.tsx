@@ -1,14 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar, Sparkles, Pencil } from 'lucide-react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ProgramCommentsSection from '@/components/program/ProgramCommentsSection';
 import ProgramLikeButton from '@/components/program/ProgramLikeButton';
 import ProgramPointCard from '@/components/program/ProgramPointCard';
@@ -115,6 +114,11 @@ const ProgramPage = () => {
   const [editingFlagshipProject, setEditingFlagshipProject] = useState<ProgramFlagshipProject | null>(null);
   const [flagshipEditModalOpen, setFlagshipEditModalOpen] = useState(false);
   const { settings } = useAppSettings();
+  
+  // Refs pour le sticky header de la section mesures
+  const measuresSectionRef = React.useRef<HTMLDivElement>(null);
+  const measuresHeaderRef = React.useRef<HTMLDivElement>(null);
+  const [showMeasuresSticky, setShowMeasuresSticky] = useState(false);
 
   const canAccessProgram = 
     settings.showProgram || 
@@ -301,6 +305,26 @@ const ProgramPage = () => {
     }
   }, [isProgramAdmin]);
 
+  // Gestion du sticky header de la section mesures
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!measuresSectionRef.current || !measuresHeaderRef.current) return;
+      
+      const sectionRect = measuresSectionRef.current.getBoundingClientRect();
+      const headerRect = measuresHeaderRef.current.getBoundingClientRect();
+      
+      const isInSection = sectionRect.top < 80 && sectionRect.bottom > 80;
+      const headerHidden = headerRect.bottom < 80;
+      
+      setShowMeasuresSticky(isInSection && headerHidden);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [programItems]);
+
   const handleEditModeToggle = (checked: boolean) => {
     setIsEditMode(checked);
     persistEditModeToCookie(checked);
@@ -460,18 +484,6 @@ const ProgramPage = () => {
                   )}
                 </div>
               )}
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center space-x-2 bg-getigne-accent/10 text-getigne-accent px-4 py-2 rounded-full text-sm font-medium mb-4">
-                  <Target className="w-4 h-4" />
-                  <span>Programme participatif</span>
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-getigne-900 mb-4">
-                  Objectif 2026
-                </h1>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Notre programme pour Gétigné, élaboré avec vous et pour vous
-                </p>
-              </div>
 
               {programGeneral && (
                 <div className="mb-12 overflow-hidden rounded-2xl border border-getigne-accent/20 shadow-xl">
@@ -553,22 +565,59 @@ const ProgramPage = () => {
           </>
         )}
 
-        {/* Reprise du container pour la suite */}
-        <div className="pt-20 pb-16">
+        {/* Section Nos mesures - Pleine largeur sans container */}
+        <div ref={measuresSectionRef} className="w-full">
+          {/* Sticky header léger */}
+          <div 
+            className={`hidden md:block sticky top-16 z-30 transition-all duration-300 ${
+              showMeasuresSticky ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+            }`}
+          >
+            <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 border-b border-white/20 shadow-md">
+              <div className="container mx-auto px-4 py-3">
+                <div className="max-w-6xl mx-auto flex items-center gap-2 text-white">
+                  <Target className="w-4 h-4" />
+                  <span className="font-bold text-sm md:text-base">
+                    {shouldDisplayCounter ? `Nos ${validatedPointsCount} mesures pour Gétigné` : 'Nos mesures pour Gétigné'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div ref={measuresHeaderRef} className="bg-gradient-to-r from-getigne-accent to-cyan-500 py-12 md:py-16 lg:py-20">
+            <div className="container mx-auto px-4">
+              <div className="max-w-6xl mx-auto text-center">
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full text-white text-xs md:text-sm font-medium mb-4 md:mb-6">
+                  <Target className="w-3 h-3 md:w-4 md:h-4" />
+                  <span>Notre programme détaillé</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 md:mb-4 px-4">
+                  {shouldDisplayCounter ? `Nos ${validatedPointsCount} mesures pour Gétigné` : 'Nos mesures pour Gétigné'}
+                </h2>
+                <p className="text-base md:text-lg lg:text-xl text-white/90 max-w-3xl mx-auto px-4">
+                  Découvrez les mesures concrètes que nous proposons pour Gétigné, classées par thématique. Réagissez en commentant et participez à l'élaboration de notre projet !
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Contenu des mesures */}
+          <div className="py-16 md:py-20 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               {/* Navigation Mobile (horizontale) */}
               {programItems && programItems.length > 0 && (
-                <div className="md:hidden sticky top-16 z-10 -mx-4 px-4 bg-gradient-to-br from-getigne-50 to-getigne-100 py-3 mb-6 border-b border-getigne-100">
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                <div className="md:hidden sticky top-16 z-20 -mx-4 px-4 bg-white/80 backdrop-blur-lg py-4 mb-8 border-b border-gray-200 shadow-sm">
+                  <div className="flex gap-3 overflow-x-auto no-scrollbar">
                     {programItems.map((item) => (
                       <button
                         key={item.id}
                         onClick={() => scrollToSection(item.id)}
-                        className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                        className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
                           activeSectionId === item.id
-                            ? 'bg-getigne-accent text-white border-transparent'
-                            : 'bg-white text-getigne-700 border-getigne-200'
+                            ? 'bg-gradient-to-r from-getigne-accent to-cyan-500 text-white border-transparent shadow-lg'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-getigne-accent/30'
                         }`}
                       >
                         {item.title}
@@ -577,56 +626,53 @@ const ProgramPage = () => {
                   </div>
                 </div>
               )}
-              <div className="mb-12 text-center"> 
-                <h2 className="text-3xl font-bold text-getigne-900 mb-2">
-                  {shouldDisplayCounter ? `Nos ${validatedPointsCount} mesures pour Gétigné` : 'Nos mesures pour Gétigné'}
-                </h2>
-                <p className="text-getigne-700">
-                  Découvrez les mesures concrètes que nous proposons pour Gétigné, classés par thématique et réagissez en commentant..
-                </p>
-              </div>
 
               {/* Grille avec barre latérale gauche (desktop) et contenu principal */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <aside className="hidden lg:block lg:col-span-3">
-                  <div className="sticky top-24 space-y-4">
-                    <nav className="space-y-2">
+                  <div 
+                    className="sticky space-y-4 transition-all duration-300"
+                    style={{ top: showMeasuresSticky ? '130px' : '96px' }}
+                  >
+                    <nav className="space-y-3">
                       {programItems?.map((item) => (
                         <button
                           key={item.id}
                           onClick={() => scrollToSection(item.id)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md border transition-all ${
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
                             activeSectionId === item.id
-                              ? 'bg-getigne-accent text-white border-transparent shadow'
-                              : 'bg-white text-getigne-800 border-getigne-200 hover:bg-getigne-50'
+                              ? 'bg-gradient-to-r from-getigne-accent to-cyan-500 text-white border-transparent shadow-lg'
+                              : 'bg-white text-getigne-800 border-gray-200 hover:border-getigne-accent/30 hover:shadow-md'
                           }`}
                         >
-                          <span className={`inline-flex items-center justify-center w-8 h-8 rounded-md ${
-                            activeSectionId === item.id ? 'bg-white/20' : 'bg-getigne-100'
+                          <span className={`inline-flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0 ${
+                            activeSectionId === item.id ? 'bg-white/20 backdrop-blur-sm' : 'bg-gray-50'
                           }`}>
                             <DynamicIcon name={item.icon} className={`w-5 h-5 ${activeSectionId === item.id ? 'text-white' : 'text-getigne-700'}`} />
                           </span>
-                          <span className="text-left line-clamp-2">{item.title}</span>
+                          <span className="text-left text-sm font-medium line-clamp-2">{item.title}</span>
                         </button>
                       ))}
                     </nav>
 
                     {/* CTA dans la sidebar */}
                     {programGeneral?.file && (
-                      <CtaBanner
-                        title="Téléchargez le programme en PDF"
-                        content="Conservez-le, partagez-le, diffusez-le autour de vous."
-                        iconName="FileDown"
-                        buttonLabel="Télécharger le PDF"
-                        buttonHref={programGeneral.file}
-                        compact
-                        download
-                        downloadName="programme.pdf"
-                      />
+                      <div className="pt-2">
+                        <CtaBanner
+                          title="Téléchargez le programme en PDF"
+                          content="Conservez-le, partagez-le, diffusez-le autour de vous."
+                          iconName="FileDown"
+                          buttonLabel="Télécharger le PDF"
+                          buttonHref={programGeneral.file}
+                          compact
+                          download
+                          downloadName="programme.pdf"
+                        />
+                      </div>
                     )}
                   </div>
                 </aside>
-                <main className="lg:col-span-9 space-y-10">
+                <main className="lg:col-span-9 space-y-12 md:space-y-16">
                   {programItems?.map((item) => {
                     const allPoints = Array.isArray(item.program_points) ? item.program_points : [];
                     const visitorPoints = allPoints.filter((point) => {
@@ -655,48 +701,57 @@ const ProgramPage = () => {
                       data-section-id={item.id}
                       className="scroll-mt-24"
                     >
-                      <div className="bg-white rounded-lg border border-getigne-200 overflow-hidden shadow">
-                        <div className="p-6 md:p-8">
-                          <div className="flex items-start gap-4 items-center">
-                            <div className="p-3 bg-getigne-50 rounded-lg">
-                              <DynamicIcon name={item.icon} className="w-6 h-6 text-getigne-700" />
+                      <div className="bg-white rounded-xl md:rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
+                        {/* Image en haut de la card si elle existe */}
+                        {item.image && (
+                          <div className="relative overflow-hidden">
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="w-full h-56 md:h-80 lg:h-96 object-cover"
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.svg'; }}
+                            />
+                            {/* Gradient overlay en bas de l'image */}
+                            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
+                          </div>
+                        )}
+                        
+                        <div className="p-6 md:p-8 lg:p-10">
+                          {/* En-tête avec titre et icône */}
+                          <div className="flex items-center gap-4 mb-6">
+                            <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-getigne-accent to-cyan-500 text-white shadow-lg flex-shrink-0">
+                              <DynamicIcon name={item.icon} className="w-6 h-6 md:w-7 md:h-7" />
                             </div>
                             <div className="flex-1">
-                              <h2 className="text-2xl font-bold text-getigne-900 ">{item.title}</h2>
+                              <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-getigne-900 leading-tight">
+                                {item.title}
+                              </h2>
                             </div>
-                            <div className="hidden md:block">
+                            <div className="hidden md:block flex-shrink-0">
                               <ProgramLikeButton programId={item.id} />
                             </div>
                           </div>
 
-                          {item.image && (
-                            <div className="mt-6">
-                              <img
-                                src={item.image}
-                                alt={item.title}
-                                className="w-full h-56 md:h-72 object-cover rounded-md border border-getigne-100"
-                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.svg'; }}
-                              />
-                            </div>
-                          )}
-
                           {hasDescriptionContent && (
-                            <div className="mt-6">
+                            <div className="mb-8">
                               <EditorJSRenderer
                                 data={item.description ?? ''}
-                                className="prose max-w-none rich-content text-getigne-800"
+                                className="prose prose-base md:prose-lg max-w-none rich-content text-gray-700"
                               />
                             </div>
                           )}
 
                           {item.content && (
-                            <div className="prose max-w-none rich-content mt-6">
+                            <div className="prose prose-base md:prose-lg max-w-none rich-content mb-8">
                               <div dangerouslySetInnerHTML={{ __html: item.content }} />
                             </div>
                           )}
                           {showAdminControls ? (
-                            <div className="mt-8">
-                              <h3 className="text-lg font-semibold text-getigne-900 border-b border-getigne-200 pb-2">
+                            <div className="mt-10 pt-8 border-t border-gray-200">
+                              <h3 className="text-xl font-bold text-getigne-900 mb-4 flex items-center gap-2">
+                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-getigne-accent/10 text-getigne-accent">
+                                  <Pencil className="w-4 h-4" />
+                                </span>
                                 Gestion des points de la section
                               </h3>
                               <div className="mt-4">
@@ -710,10 +765,15 @@ const ProgramPage = () => {
                             </div>
                           ) : (
                             pointsToDisplay && pointsToDisplay.length > 0 && (
-                              <div className="mt-8 space-y-4">
-                                <h3 className="text-lg font-semibold text-getigne-900 border-b border-getigne-200 pb-2">
-                                  Points du programme
-                                </h3>
+                              <div className="mt-10 space-y-4">
+                                <div className="flex items-center gap-3 mb-6">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-getigne-accent to-cyan-500 text-white">
+                                    <Target className="w-5 h-5" />
+                                  </div>
+                                  <h3 className="text-xl md:text-2xl font-bold text-getigne-900">
+                                    Points du programme
+                                  </h3>
+                                </div>
                                 {pointsToDisplay.map((point: Tables<'program_points'>) => {
                                   const normalizedPoint: ProgramPoint = {
                                     id: point.id,
@@ -755,10 +815,19 @@ const ProgramPage = () => {
                             )
                           )}
 
-                          <div className="mt-8 pt-6 border-t border-getigne-200">
-                            <div className="flex items-center space-x-4 text-sm text-getigne-600">
-                              <MessageSquare className="w-4 h-4" />
-                              <span>Participez à l'élaboration de ce thème</span>
+                          <div className="mt-10 pt-8 border-t border-gray-200">
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-getigne-accent to-cyan-500 text-white">
+                                <MessageSquare className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h3 className="text-xl md:text-2xl font-bold text-getigne-900">
+                                  Vos réactions
+                                </h3>
+                                <p className="text-sm text-gray-600 mt-0.5">
+                                  Participez à l'élaboration de ce thème
+                                </p>
+                              </div>
                             </div>
                             <ProgramCommentsSection
                               programItemId={item.id}
@@ -775,21 +844,29 @@ const ProgramPage = () => {
               </div>
 
               {/* Frise chronologique du processus (version publique) */}
-              <div className="my-12">
-                <Card className="border-getigne-100 shadow-lg">
-                  <CardHeader className="bg-gradient-to-r from-white to-gray-100">
-                    <CardTitle className="text-2xl text-getigne-900">Les étapes de l'élaboration de ce programme</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-8">
-                  <ProgramTimeline 
-                    mini={false}
-                    showToggle={false}
-                    steps={steps}
-                  />
-                  </CardContent>
-                </Card>
+              <div className="mt-16 md:mt-20">
+                <div className="bg-white rounded-xl md:rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
+                  <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 p-6 md:p-8">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm">
+                        <Clock className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-2xl md:text-3xl font-extrabold text-white">
+                        Les étapes de l'élaboration de ce programme
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="p-6 md:p-8 lg:p-10">
+                    <ProgramTimeline 
+                      mini={false}
+                      showToggle={false}
+                      steps={steps}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
         <Footer />

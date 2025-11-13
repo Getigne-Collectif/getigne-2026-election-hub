@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, FileDown, Paperclip } from 'lucide-react';
+import { MessageSquare, FileDown, Paperclip, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import ProgramLikeButton from './ProgramLikeButton';
 import Comments from '../comments';
@@ -91,7 +91,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
   return (
     <Card key={point.id} className="border-getigne-200">
       <CardContent className="p-4">
-        <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 cursor-pointer" onClick={() => setShowContent(!showContent)}>
           <div className="flex items-center gap-3">
             {point.competent_entity && (
               <TooltipProvider delayDuration={150}>
@@ -123,7 +123,6 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             <div className="flex flex-col gap-1">
               <h3
                 className="cursor-pointer text-lg font-semibold text-getigne-800"
-                onClick={() => setShowContent(!showContent)}
               >
                 {point.title}
               </h3>
@@ -133,15 +132,14 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => setShowContent(!showContent)}
             >
-              {showContent ? 'Masquer' : 'Développer'}
+              {!showContent ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
           </div>
         </div>
         
         <div
-          className={`grid transition-all duration-300 ease-in-out ${
+          className={`grid mt-4 transition-all duration-300 ease-in-out ${
             showContent ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
           }`}
         >

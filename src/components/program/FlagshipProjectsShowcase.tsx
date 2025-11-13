@@ -1,3 +1,4 @@
+import React, { useRef, useEffect, useState } from 'react';
 import type { ProgramFlagshipProject, FlagshipProjectEffect, FlagshipProjectTimelineEvent } from '@/types/program.types';
 import EditorJSRenderer from '@/components/EditorJSRenderer';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
@@ -224,12 +225,56 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
 }
 
 export default function FlagshipProjectsShowcase({ projects, isProgramAdmin, onEditProject }: FlagshipProjectsShowcaseProps) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current || !headerRef.current) return;
+      
+      const sectionRect = sectionRef.current.getBoundingClientRect();
+      const headerRect = headerRef.current.getBoundingClientRect();
+      
+      // On est dans la section si le top de la section est au-dessus de la navbar
+      // ET que le bas de la section est en dessous de la navbar
+      const isInSection = sectionRect.top < 80 && sectionRect.bottom > 80;
+      
+      // Le header principal a disparu (est au-dessus de la navbar)
+      const headerHidden = headerRect.bottom < 80;
+      
+      // Afficher le sticky seulement si on est dans la section ET que le header principal est caché
+      setShowSticky(isInSection && headerHidden);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   if (!projects || projects.length === 0) return null;
 
   return (
-    <div className="w-full">
+    <div ref={sectionRef} className="w-full">
+      {/* Sticky header léger */}
+      <div 
+        className={`hidden md:block sticky top-16 z-30 transition-all duration-300 ${
+          showSticky ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+        }`}
+      >
+        <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 border-b border-white/20 shadow-md">
+          <div className="container mx-auto px-4 py-3">
+            <div className="max-w-6xl mx-auto flex items-center gap-2 text-white">
+              <Sparkles className="w-4 h-4" />
+              <span className="font-bold text-sm md:text-base">Trois projets phares pour l'avenir</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Header section */}
-      <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 py-12 md:py-16 lg:py-20">
+      <div ref={headerRef} className="bg-gradient-to-r from-getigne-accent to-cyan-500 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full text-white text-xs md:text-sm font-medium mb-4 md:mb-6">
