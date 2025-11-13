@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, ChevronDown, ChevronUp, FileText, LogIn, UserPlus } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import EditorJSRenderer from '@/components/EditorJSRenderer';
 import ProgramLikeButton from './ProgramLikeButton';
 import ProgramCommentsSection from './ProgramCommentsSection';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +14,7 @@ interface ProgramPointPreviewProps {
   point: {
     id: string;
     title: string;
-    content: string;
+    content: any;
     files?: string[];
   };
   programItemId: string;
@@ -125,9 +124,9 @@ const ProgramPointPreview: React.FC<ProgramPointPreviewProps> = ({
         {showContent ? (
           <>
             <div className="prose max-w-none mb-4">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {point.content}
-              </ReactMarkdown>
+              <EditorJSRenderer 
+                data={point.content}
+              />
             </div>
 
             {point.files && point.files.length > 0 && (
@@ -192,9 +191,10 @@ const ProgramPointPreview: React.FC<ProgramPointPreviewProps> = ({
           </>
         ) : (
           <div className="prose prose-sm max-w-none line-clamp-1">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {point.content}
-            </ReactMarkdown>
+            <EditorJSRenderer 
+              data={point.content}
+              className="line-clamp-1"
+            />
           </div>
         )}
 

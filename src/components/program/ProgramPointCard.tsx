@@ -5,8 +5,7 @@ import { MessageSquare, FileDown, Paperclip, ChevronDown, ChevronLeft, ChevronRi
 import { Separator } from '@/components/ui/separator';
 import ProgramLikeButton from './ProgramLikeButton';
 import Comments from '../comments';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import EditorJSRenderer from '@/components/EditorJSRenderer';
 import { ProgramPoint, ProgramPointFileMeta } from '@/types/program.types';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { supabase } from '@/integrations/supabase/client';
@@ -145,9 +144,9 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
         >
           <div className="overflow-hidden">
             <div className="prose max-w-none rich-content mb-4">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {point.content || "Contenu en cours d'élaboration"}
-              </ReactMarkdown>
+              <EditorJSRenderer 
+                data={point.content}
+              />
             </div>
 
             {filesToRender.length > 0 && (

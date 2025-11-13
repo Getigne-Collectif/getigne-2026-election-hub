@@ -60,7 +60,9 @@ export default function AddPointDialog({
         .insert([{
           program_item_id: programItemId,
           title: values.title,
-          content: values.content,
+          content: typeof values.content === 'string' 
+            ? JSON.parse(values.content) 
+            : values.content,
           competent_entity_id: values.competent_entity_id ?? null,
           files: uploadedFiles.map((file) => file.url),
           files_metadata: uploadedFiles,
@@ -85,22 +87,24 @@ export default function AddPointDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Ajouter un point du programme</DialogTitle>
           <DialogDescription>
             Créez un nouveau point pour cette section du programme.
           </DialogDescription>
         </DialogHeader>
         
-        <PointForm
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-          onCancel={() => onOpenChange(false)}
-          submitLabel="Ajouter"
-          competentEntities={competentEntities}
-          isLoadingCompetentEntities={isLoadingCompetentEntities}
-        />
+        <div className="overflow-y-auto flex-1">
+          <PointForm
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            onCancel={() => onOpenChange(false)}
+            submitLabel="Ajouter"
+            competentEntities={competentEntities}
+            isLoadingCompetentEntities={isLoadingCompetentEntities}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

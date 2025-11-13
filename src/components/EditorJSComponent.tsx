@@ -128,7 +128,11 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
               async uploadByFile(file: File) {
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${Date.now()}.${fileExt}`;
-                const filePath = `${fileName}`;
+                // Utiliser un sous-dossier basé sur le contexte (par défaut 'general', 'program_points' pour les points du programme)
+                const subFolder = (window.location.pathname.includes('/admin/program') || window.location.pathname.includes('/programme')) 
+                  ? 'program_points' 
+                  : 'news_content';
+                const filePath = `${subFolder}/${fileName}`;
 
                 try {
                   const { error: uploadError } = await supabase.storage
@@ -249,6 +253,8 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           border-radius: 0.5rem;
           padding: 1rem;
           min-height: 400px;
+          max-height: 60vh;
+          overflow-y: auto;
           background: white;
         }
 
