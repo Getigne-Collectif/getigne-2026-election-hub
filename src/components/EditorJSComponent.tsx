@@ -16,6 +16,7 @@ import Warning from '@editorjs/warning';
 import Paragraph from '@editorjs/paragraph';
 import { supabase } from '@/integrations/supabase/client';
 import ImageCarouselTool from '@/components/editorjs/ImageCarouselTool';
+import AcronymTool from '@/components/editorjs/AcronymTool';
 
 interface EditorJSComponentProps {
   value: OutputData | string;
@@ -104,6 +105,9 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
         },
         marker: {
           class: Marker
+        },
+        acronym: {
+          class: AcronymTool
         },
         code: {
           class: Code,

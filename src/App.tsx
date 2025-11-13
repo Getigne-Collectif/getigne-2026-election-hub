@@ -34,6 +34,8 @@ const AdminProgramPage = lazy(() => import("./pages/admin/program/AdminProgramPa
 const AdminProgramEditorPage = lazy(() => import("./pages/admin/program/AdminProgramEditorPage"));
 const AdminProjectsPage = lazy(() => import("./pages/admin/projects/AdminProjectsPage"));
 const AdminProjectEditorPage = lazy(() => import("./pages/admin/projects/AdminProjectEditorPage"));
+const AdminLexiconPage = lazy(() => import("./pages/admin/AdminLexiconPage"));
+const AdminLexiconEditorPage = lazy(() => import("./pages/admin/AdminLexiconEditorPage"));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
 
 // Other pages
@@ -161,6 +163,11 @@ function App() {
                       <Route path={AppRoutes.ADMIN_PROJECTS} element={<AdminProjectsPage />} />
                       <Route path={AppRoutes.ADMIN_PROJECTS_NEW} element={<AdminProjectEditorPage />} />
                       <Route path={AppRoutes.ADMIN_PROJECTS_EDIT} element={<AdminProjectEditorPage />} />
+                      
+                      {/* Lexicon */}
+                      <Route path={AppRoutes.ADMIN_LEXICON} element={<AdminLexiconPage />} />
+                      <Route path={AppRoutes.ADMIN_LEXICON_NEW} element={<AdminLexiconEditorPage />} />
+                      <Route path={AppRoutes.ADMIN_LEXICON_EDIT} element={<AdminLexiconEditorPage />} />
                       
                       {/* Settings */}
                       <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />

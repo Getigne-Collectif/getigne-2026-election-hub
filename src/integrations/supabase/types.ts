@@ -397,6 +397,39 @@ export type Database = {
         }
         Relationships: []
       }
+      lexicon_entries: {
+        Row: {
+          acronym: string | null
+          content: Json | null
+          created_at: string
+          external_link: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          acronym?: string | null
+          content?: Json | null
+          created_at?: string
+          external_link?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          acronym?: string | null
+          content?: Json | null
+          created_at?: string
+          external_link?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lift_messages: {
         Row: {
           created_at: string
@@ -844,30 +877,48 @@ export type Database = {
         Row: {
           created_at: string
           description: Json | null
+          effects: Json | null
+          file_label: string | null
+          file_path: string | null
+          file_url: string | null
           id: string
           image_path: string | null
           image_url: string | null
           position: number
+          timeline: Json | null
+          timeline_horizon: string | null
           title: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           description?: Json | null
+          effects?: Json | null
+          file_label?: string | null
+          file_path?: string | null
+          file_url?: string | null
           id?: string
           image_path?: string | null
           image_url?: string | null
           position?: number
+          timeline?: Json | null
+          timeline_horizon?: string | null
           title: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           description?: Json | null
+          effects?: Json | null
+          file_label?: string | null
+          file_path?: string | null
+          file_url?: string | null
           id?: string
           image_path?: string | null
           image_url?: string | null
           position?: number
+          timeline?: Json | null
+          timeline_horizon?: string | null
           title?: string
           updated_at?: string
         }
@@ -877,25 +928,25 @@ export type Database = {
         Row: {
           content: string
           created_at: string
-          id: string
           file: string | null
           file_path: string | null
+          id: string
           updated_at: string
         }
         Insert: {
           content?: string
           created_at?: string
-          id?: string
           file?: string | null
           file_path?: string | null
+          id?: string
           updated_at?: string
         }
         Update: {
           content?: string
           created_at?: string
-          id?: string
           file?: string | null
           file_path?: string | null
+          id?: string
           updated_at?: string
         }
         Relationships: []
@@ -908,7 +959,7 @@ export type Database = {
           icon: string
           id: string
           image: string | null
-          position: number
+          position: number | null
           title: string
           updated_at: string
         }
@@ -919,7 +970,7 @@ export type Database = {
           icon: string
           id?: string
           image?: string | null
-          position?: number
+          position?: number | null
           title: string
           updated_at?: string
         }
@@ -930,7 +981,7 @@ export type Database = {
           icon?: string
           id?: string
           image?: string | null
-          position?: number
+          position?: number | null
           title?: string
           updated_at?: string
         }
@@ -985,10 +1036,10 @@ export type Database = {
       program_points: {
         Row: {
           competent_entity_id: string | null
-          content: string
+          content: Json | null
           created_at: string
           files: Json | null
-          files_metadata: Json | null
+          files_metadata: Json
           id: string
           position: number
           program_item_id: string
@@ -998,10 +1049,10 @@ export type Database = {
         }
         Insert: {
           competent_entity_id?: string | null
-          content: string
+          content?: Json | null
           created_at?: string
           files?: Json | null
-          files_metadata?: Json | null
+          files_metadata?: Json
           id?: string
           position: number
           program_item_id: string
@@ -1011,10 +1062,10 @@ export type Database = {
         }
         Update: {
           competent_entity_id?: string | null
-          content?: string
+          content?: Json | null
           created_at?: string
           files?: Json | null
-          files_metadata?: Json | null
+          files_metadata?: Json
           id?: string
           position?: number
           program_item_id?: string
@@ -1024,17 +1075,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "program_points_program_item_id_fkey"
-            columns: ["program_item_id"]
-            isOneToOne: false
-            referencedRelation: "program_items"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "program_points_competent_entity_id_fkey"
             columns: ["competent_entity_id"]
             isOneToOne: false
             referencedRelation: "program_competent_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_points_program_item_id_fkey"
+            columns: ["program_item_id"]
+            isOneToOne: false
+            referencedRelation: "program_items"
             referencedColumns: ["id"]
           },
         ]
@@ -1185,7 +1236,7 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role"][]
       }
       is_committee_member: {
-        Args: { user_id: string; committee_id: string }
+        Args: { committee_id: string; user_id: string }
         Returns: boolean
       }
       user_has_liked_project: {

@@ -1,13 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { OutputData, OutputBlockData } from '@editorjs/editorjs';
 import ImageCarousel from '@/components/ImageCarousel';
+import AcronymTooltip from '@/components/AcronymTooltip';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EditorJSRendererProps {
   data: OutputData | string;
   className?: string;
 }
 
+interface LexiconEntry {
+  id: string;
+  name: string;
+  acronym: string | null;
+  content: any;
+  external_link: string | null;
+  logo_url: string | null;
+}
+
 const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '' }) => {
+  const [lexiconEntries, setLexiconEntries] = useState<Record<string, LexiconEntry>>({});
+  
   let parsedData: OutputData;
 
   if (typeof data === 'string') {
@@ -24,6 +37,104 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
     return null;
   }
 
+  // Charger les entrées du lexique
+  useEffect(() => {
+    const loadLexiconEntries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('lexicon_entries')
+          .select('*');
+
+        if (error) {
+          console.error('Erreur lors du chargement du lexique:', error);
+          return;
+        }
+
+        if (data) {
+          const entriesMap = data.reduce((acc, entry) => {
+            acc[entry.id] = entry;
+            return acc;
+          }, {} as Record<string, LexiconEntry>);
+          setLexiconEntries(entriesMap);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement du lexique:', error);
+      }
+    };
+
+    loadLexiconEntries();
+  }, []);
+
+  // Fonction pour parser le HTML et remplacer les acronymes par des tooltips
+  const parseAcronyms = React.useCallback((html: string): React.ReactNode => {
+    if (!html) return null;
+    
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const acronymSpans = doc.querySelectorAll('span.acronym[data-lexicon-id]');
+
+    if (acronymSpans.length === 0) {
+      return <span dangerouslySetInnerHTML={{ __html: html }} />;
+    }
+
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    const textContent = doc.body.innerHTML;
+
+    acronymSpans.forEach((span, index) => {
+      const spanElement = span as HTMLElement;
+      const lexiconId = spanElement.getAttribute('data-lexicon-id');
+      const spanHTML = spanElement.outerHTML;
+      const spanIndex = textContent.indexOf(spanHTML, lastIndex);
+
+      if (spanIndex > lastIndex) {
+        // Ajouter le contenu avant le span
+        parts.push(
+          <span 
+            key={`text-${index}`}
+            dangerouslySetInnerHTML={{ __html: textContent.substring(lastIndex, spanIndex) }}
+          />
+        );
+      }
+
+      if (lexiconId && lexiconEntries[lexiconId]) {
+        parts.push(
+          <AcronymTooltip key={`acronym-${index}`} entry={lexiconEntries[lexiconId]}>
+            {spanElement.textContent || ''}
+          </AcronymTooltip>
+        );
+      } else {
+        // Si l'entrée du lexique n'est pas trouvée, afficher le texte simple avec le style
+        parts.push(
+          <span 
+            key={`acronym-${index}`}
+            style={{
+              textDecoration: 'underline dotted',
+              textDecorationColor: '#10b981',
+              cursor: 'help',
+            }}
+          >
+            {spanElement.textContent || ''}
+          </span>
+        );
+      }
+
+      lastIndex = spanIndex + spanHTML.length;
+    });
+
+    // Ajouter le contenu restant après le dernier span
+    if (lastIndex < textContent.length) {
+      parts.push(
+        <span 
+          key="text-end"
+          dangerouslySetInnerHTML={{ __html: textContent.substring(lastIndex) }}
+        />
+      );
+    }
+
+    return <>{parts}</>;
+  }, [lexiconEntries]);
+
   const renderBlock = (block: OutputBlockData, index: number) => {
     switch (block.type) {
       case 'header':
@@ -38,7 +149,7 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
         };
         return (
           <HeaderTag key={index} className={headerClasses[block.data.level as number] || headerClasses[2]}>
-            {block.data.text}
+            {parseAcronyms(block.data.text)}
           </HeaderTag>
         );
 
@@ -47,8 +158,9 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
           <p 
             key={index} 
             className="mb-4 leading-relaxed text-gray-700"
-            dangerouslySetInnerHTML={{ __html: block.data.text }}
-          />
+          >
+            {parseAcronyms(block.data.text)}
+          </p>
         );
 
       case 'list':
@@ -61,7 +173,9 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
             {block.data.items.map((item: string | { content: string; meta: any; items: any[] }, i: number) => {
               const content = typeof item === 'string' ? item : item.content;
               return (
-                <li key={i} className="text-gray-700" dangerouslySetInnerHTML={{ __html: content }} />
+                <li key={i} className="text-gray-700">
+                  {parseAcronyms(content)}
+                </li>
               );
             })}
           </ListTag>
@@ -80,8 +194,9 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
                 />
                 <span 
                   className={`text-gray-700 ${item.checked ? 'line-through text-gray-500' : ''}`}
-                  dangerouslySetInnerHTML={{ __html: item.text }}
-                />
+                >
+                  {parseAcronyms(item.text)}
+                </span>
               </div>
             ))}
           </div>
@@ -90,7 +205,9 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
       case 'quote':
         return (
           <blockquote key={index} className="border-l-4 border-getigne-accent pl-4 py-2 mb-4 italic bg-gray-50">
-            <p className="text-gray-700 mb-2" dangerouslySetInnerHTML={{ __html: block.data.text }} />
+            <p className="text-gray-700 mb-2">
+              {parseAcronyms(block.data.text)}
+            </p>
             {block.data.caption && (
               <cite className="text-sm text-gray-600 not-italic">— {block.data.caption}</cite>
             )}

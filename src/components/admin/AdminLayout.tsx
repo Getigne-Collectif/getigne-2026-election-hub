@@ -79,6 +79,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
       icon: FolderOpen,
     },
     {
+      title: 'Lexique',
+      href: '/admin/lexicon',
+      icon: BookOpen,
+    },
+    {
       title: 'Administration',
       href: '/admin/settings',
       icon: Settings,
