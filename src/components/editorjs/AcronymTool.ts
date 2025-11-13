@@ -44,6 +44,8 @@ export default class AcronymTool {
   private lexiconEntries: LexiconEntry[] = [];
   private dropdown: HTMLDivElement | null = null;
   private searchInput: HTMLInputElement | null = null;
+  private closeDropdownHandler: ((e: MouseEvent) => void) | null = null;
+  private savedRange: Range | null = null;
 
   static get isInline(): boolean {
     return true;
@@ -134,22 +136,22 @@ export default class AcronymTool {
    */
   private showDropdown(range: Range, selectedText: string): void {
     // Sauvegarder la sélection
-    const savedRange = range.cloneRange();
+    this.savedRange = range.cloneRange();
 
     // Créer le dropdown
     this.dropdown = document.createElement('div');
     this.dropdown.classList.add('acronym-dropdown');
+    this.dropdown.setAttribute('data-acronym-dropdown', 'true');
     this.dropdown.style.cssText = `
       position: fixed;
       background: white;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      padding: 8px;
-      max-height: 300px;
-      width: 300px;
-      overflow-y: auto;
-      z-index: 99999;
+      padding: 12px;
+      width: 320px;
+      z-index: 999999;
+      pointer-events: auto;
     `;
 
     // Input de recherche
@@ -159,12 +161,25 @@ export default class AcronymTool {
     this.searchInput.classList.add('acronym-search');
     this.searchInput.style.cssText = `
       width: 100%;
-      padding: 8px;
-      border: 1px solid #e5e7eb;
-      border-radius: 4px;
-      margin-bottom: 8px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      margin-bottom: 12px;
       font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
     `;
+    
+    // Focus style
+    this.searchInput.addEventListener('focus', () => {
+      this.searchInput!.style.borderColor = '#10b981';
+      this.searchInput!.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+    });
+    
+    this.searchInput.addEventListener('blur', () => {
+      this.searchInput!.style.borderColor = '#d1d5db';
+      this.searchInput!.style.boxShadow = 'none';
+    });
 
     this.searchInput.addEventListener('input', () => {
       this.filterEntries();
@@ -175,9 +190,15 @@ export default class AcronymTool {
     // Liste des entrées
     const entriesList = document.createElement('div');
     entriesList.classList.add('acronym-entries-list');
+    entriesList.style.cssText = `
+      max-height: 280px;
+      overflow-y: auto;
+      margin: -4px;
+      padding: 4px;
+    `;
 
     this.lexiconEntries.forEach((entry) => {
-      const entryDiv = this.createEntryElement(entry, savedRange);
+      const entryDiv = this.createEntryElement(entry, this.savedRange!);
       entriesList.appendChild(entryDiv);
     });
 
@@ -190,43 +211,42 @@ export default class AcronymTool {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const rect = selection.getRangeAt(0).getBoundingClientRect();
-      let top = rect.bottom + 5;
+      const dropdownRect = this.dropdown.getBoundingClientRect();
+      
+      let top = rect.bottom + 8;
       let left = rect.left;
 
       // Vérifier si le dropdown dépasse en bas
-      if (top + 300 > window.innerHeight) {
-        top = rect.top - 305; // Afficher au-dessus
+      if (top + dropdownRect.height > window.innerHeight) {
+        top = rect.top - dropdownRect.height - 8; // Afficher au-dessus
       }
 
       // Vérifier si le dropdown dépasse à droite
-      if (left + 300 > window.innerWidth) {
-        left = window.innerWidth - 310;
+      if (left + dropdownRect.width > window.innerWidth) {
+        left = window.innerWidth - dropdownRect.width - 16;
+      }
+      
+      // S'assurer qu'il ne dépasse pas à gauche
+      if (left < 8) {
+        left = 8;
       }
 
       this.dropdown.style.top = `${top}px`;
       this.dropdown.style.left = `${left}px`;
     }
 
-    // Empêcher la propagation des clics dans le dropdown
-    this.dropdown.addEventListener('mousedown', (e) => {
-      e.stopPropagation();
-    });
-
-    this.dropdown.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-
     // Fermer le dropdown si on clique à l'extérieur
-    const closeDropdown = (e: MouseEvent) => {
+    this.closeDropdownHandler = (e: MouseEvent) => {
       if (this.dropdown && !this.dropdown.contains(e.target as Node)) {
         this.closeDropdown();
-        document.removeEventListener('mousedown', closeDropdown, true);
       }
     };
 
-    // Utiliser capture phase pour attraper les clics avant qu'ils n'atteignent d'autres éléments
+    // Attendre un peu avant d'ajouter le listener pour ne pas fermer immédiatement
     setTimeout(() => {
-      document.addEventListener('mousedown', closeDropdown, true);
+      if (this.closeDropdownHandler) {
+        document.addEventListener('mousedown', this.closeDropdownHandler);
+      }
     }, 100);
 
     // Focus sur l'input de recherche
@@ -255,12 +275,6 @@ export default class AcronymTool {
       entryDiv.style.backgroundColor = 'transparent';
     });
 
-    // Empêcher la propagation pour que le clic fonctionne dans les modales
-    entryDiv.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-
     const nameDiv = document.createElement('div');
     nameDiv.style.fontWeight = '600';
     nameDiv.style.fontSize = '14px';
@@ -276,9 +290,8 @@ export default class AcronymTool {
       entryDiv.appendChild(acronymDiv);
     }
 
-    entryDiv.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+    entryDiv.addEventListener('click', () => {
+      // Appliquer l'acronyme et fermer la dropdown
       this.wrapSelection(range, entry);
       this.closeDropdown();
     });
@@ -290,7 +303,7 @@ export default class AcronymTool {
    * Filtre les entrées selon la recherche
    */
   private filterEntries(): void {
-    if (!this.dropdown || !this.searchInput) return;
+    if (!this.dropdown || !this.searchInput || !this.savedRange) return;
 
     const searchTerm = this.searchInput.value.toLowerCase();
     const entriesList = this.dropdown.querySelector('.acronym-entries-list');
@@ -316,11 +329,8 @@ export default class AcronymTool {
     }
 
     filteredEntries.forEach((entry) => {
-      const savedRange = this.api.selection.save();
-      if (savedRange) {
-        const entryDiv = this.createEntryElement(entry, savedRange as Range);
-        entriesList.appendChild(entryDiv);
-      }
+      const entryDiv = this.createEntryElement(entry, this.savedRange!);
+      entriesList.appendChild(entryDiv);
     });
   }
 
@@ -328,11 +338,21 @@ export default class AcronymTool {
    * Ferme le dropdown
    */
   private closeDropdown(): void {
+    // Nettoyer l'event listener
+    if (this.closeDropdownHandler) {
+      document.removeEventListener('mousedown', this.closeDropdownHandler);
+      this.closeDropdownHandler = null;
+    }
+    
+    // Supprimer le dropdown du DOM
     if (this.dropdown) {
       this.dropdown.remove();
       this.dropdown = null;
       this.searchInput = null;
     }
+    
+    // Nettoyer la range sauvegardée
+    this.savedRange = null;
   }
 
   /**

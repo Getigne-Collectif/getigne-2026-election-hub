@@ -126,13 +126,35 @@ const ProgramPage = () => {
     userRoles.includes('program_manager');
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Ne scroller en haut que s'il n'y a pas d'ancre dans l'URL
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(`section-${id}`);
+  const scrollToSection = async (slug: string) => {
+    const el = document.getElementById(`section-${slug}`);
     if (el) {
+      // Attendre un peu que les images de la section cible soient chargées
+      const sectionImages = Array.from(el.querySelectorAll('img'));
+      const imagePromises = sectionImages
+        .filter(img => !img.complete)
+        .map(img => 
+          new Promise<void>(resolve => {
+            img.addEventListener('load', () => resolve());
+            img.addEventListener('error', () => resolve());
+            setTimeout(() => resolve(), 1000);
+          })
+        );
+      
+      if (imagePromises.length > 0) {
+        await Promise.all(imagePromises);
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Mettre à jour l'URL avec l'ancre
+      window.history.pushState(null, '', `#${slug}`);
     }
   };
 
@@ -297,6 +319,77 @@ const ProgramPage = () => {
     sections.forEach((s) => observer.observe(s));
 
     return () => observer.disconnect();
+  }, [programItems]);
+
+  // Scroll vers la section indiquée par l'ancre dans l'URL au chargement
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && programItems) {
+      // Attendre que tout le contenu soit chargé (y compris le mode édition)
+      const waitForContentToLoad = async () => {
+        // Attendre un peu que le DOM soit rendu
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Utiliser un MutationObserver pour détecter quand le DOM arrête de changer
+        let mutationTimeout: NodeJS.Timeout;
+        const stabilityDelay = 500; // Temps d'attente sans changement pour considérer la page stable
+        
+        const waitForDomStability = new Promise<void>((resolve) => {
+          const observer = new MutationObserver(() => {
+            clearTimeout(mutationTimeout);
+            mutationTimeout = setTimeout(() => {
+              observer.disconnect();
+              resolve();
+            }, stabilityDelay);
+          });
+          
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+          });
+          
+          // Démarrer le timer initial
+          mutationTimeout = setTimeout(() => {
+            observer.disconnect();
+            resolve();
+          }, stabilityDelay);
+          
+          // Timeout de sécurité maximum de 5 secondes
+          setTimeout(() => {
+            observer.disconnect();
+            resolve();
+          }, 5000);
+        });
+        
+        await waitForDomStability;
+        
+        // Récupérer toutes les images de la page
+        const images = Array.from(document.images);
+        const imagePromises = images
+          .filter(img => !img.complete)
+          .map(img => 
+            new Promise<void>(resolve => {
+              img.addEventListener('load', () => resolve());
+              img.addEventListener('error', () => resolve());
+              setTimeout(() => resolve(), 2000);
+            })
+          );
+        
+        await Promise.all(imagePromises);
+        
+        // Attendre encore un peu pour être sûr que tout est stabilisé
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Maintenant on peut scroller
+        const el = document.getElementById(`section-${hash}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+      
+      waitForContentToLoad();
+    }
   }, [programItems]);
 
   useEffect(() => {
@@ -613,9 +706,9 @@ const ProgramPage = () => {
                     {programItems.map((item) => (
                       <button
                         key={item.id}
-                        onClick={() => scrollToSection(item.id)}
+                        onClick={() => scrollToSection(item.slug)}
                         className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
-                          activeSectionId === item.id
+                          activeSectionId === item.slug
                             ? 'bg-gradient-to-r from-getigne-accent to-cyan-500 text-white border-transparent shadow-lg'
                             : 'bg-white text-gray-700 border-gray-200 hover:border-getigne-accent/30'
                         }`}
@@ -638,17 +731,17 @@ const ProgramPage = () => {
                       {programItems?.map((item) => (
                         <button
                           key={item.id}
-                          onClick={() => scrollToSection(item.id)}
+                          onClick={() => scrollToSection(item.slug)}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
-                            activeSectionId === item.id
+                            activeSectionId === item.slug
                               ? 'bg-gradient-to-r from-getigne-accent to-cyan-500 text-white border-transparent shadow-lg'
                               : 'bg-white text-getigne-800 border-gray-200 hover:border-getigne-accent/30 hover:shadow-md'
                           }`}
                         >
                           <span className={`inline-flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0 ${
-                            activeSectionId === item.id ? 'bg-white/20 backdrop-blur-sm' : 'bg-gray-50'
+                            activeSectionId === item.slug ? 'bg-white/20 backdrop-blur-sm' : 'bg-gray-50'
                           }`}>
-                            <DynamicIcon name={item.icon} className={`w-5 h-5 ${activeSectionId === item.id ? 'text-white' : 'text-getigne-700'}`} />
+                            <DynamicIcon name={item.icon} className={`w-5 h-5 ${activeSectionId === item.slug ? 'text-white' : 'text-getigne-700'}`} />
                           </span>
                           <span className="text-left text-sm font-medium line-clamp-2">{item.title}</span>
                         </button>
@@ -697,8 +790,8 @@ const ProgramPage = () => {
                     return (
                     <section
                       key={item.id}
-                      id={`section-${item.id}`}
-                      data-section-id={item.id}
+                      id={`section-${item.slug}`}
+                      data-section-id={item.slug}
                       className="scroll-mt-24"
                     >
                       <div className="bg-white rounded-xl md:rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
