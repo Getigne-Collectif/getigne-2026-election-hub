@@ -28,13 +28,6 @@ import type { ProgramFlagshipProject, FlagshipProjectEffect, FlagshipProjectTime
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const effectSchema = z.object({
   id: z.string(),
@@ -479,19 +472,13 @@ export default function FlagshipProjectForm({
                     <FormItem>
                       <FormLabel>Horizon global</FormLabel>
                       <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Sélectionnez un horizon" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Début de mandat">Début de mandat</SelectItem>
-                            <SelectItem value="Milieu de mandat">Milieu de mandat</SelectItem>
-                            <SelectItem value="Fin de mandat">Fin de mandat</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Input 
+                          placeholder="Ex: Début de mandat, Milieu de mandat, 2026-2027..." 
+                          {...field} 
+                        />
                       </FormControl>
                       <FormDescription>
-                        Donnez une vision d'ensemble de l'horizon temporel de ce projet.
+                        Donnez une vision d'ensemble de l'horizon temporel de ce projet (saisie libre).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
