@@ -27,6 +27,8 @@ import { Switch } from '@/components/ui/switch';
 import FlagshipProjectsShowcase from '@/components/program/FlagshipProjectsShowcase';
 import FlagshipProjectEditModal from '@/components/program/FlagshipProjectEditModal';
 import { fetchFlagshipProjects } from '@/services/programFlagshipProjects';
+import { generateProgramPDF } from '@/utils/generateProgramPDF';
+import { toast } from 'sonner';
 
 type ProgramPointRow = Tables<'program_points'> & {
   competent_entity?: ProgramCompetentEntity | null;
@@ -113,6 +115,7 @@ const ProgramPage = () => {
   const [isEditMode, setIsEditMode] = useState<boolean>(() => readEditModeFromCookie());
   const [editingFlagshipProject, setEditingFlagshipProject] = useState<ProgramFlagshipProject | null>(null);
   const [flagshipEditModalOpen, setFlagshipEditModalOpen] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { settings } = useAppSettings();
   
   // Refs pour le sticky header de la section mesures
@@ -426,6 +429,36 @@ const ProgramPage = () => {
     refetchFlagshipProjects();
   };
 
+  const handleGeneratePDF = async () => {
+    if (!programGeneral || !programItems || !flagshipProjects) {
+      toast.error('Les données du programme ne sont pas encore chargées');
+      return;
+    }
+
+    setIsGeneratingPDF(true);
+    const toastId = toast.loading('Génération du PDF en cours...');
+
+    try {
+      await generateProgramPDF(
+        programGeneral,
+        flagshipProjects,
+        programItems,
+        (message) => {
+          toast.loading(message, { id: toastId });
+        }
+      );
+      toast.success('PDF généré avec succès !', { id: toastId });
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+      toast.error(
+        `Erreur lors de la génération du PDF: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+        { id: toastId }
+      );
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   if (!canAccessProgram) {
     return (
       <HelmetProvider>
@@ -570,6 +603,14 @@ const ProgramPage = () => {
                       aria-label="Activer le mode édition du programme"
                     />
                   </div>
+                  <Button
+                    onClick={handleGeneratePDF}
+                    disabled={isGeneratingPDF || !programGeneral || !programItems || !flagshipProjects}
+                    className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
+                  >
+                    <FileDown className="w-4 h-4 mr-2" />
+                    {isGeneratingPDF ? 'Génération...' : 'Télécharger le PDF complet'}
+                  </Button>
                   {showAdminControls && (
                     <Button asChild>
                       <a href="/admin/program">Administrer le programme</a>
