@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useParams, Link, useNavigate, generatePath } from 'react-router-dom';
-import { Calendar, Tag, ArrowLeft, User, Edit, Send, Eye } from 'lucide-react';
+import { Calendar, Tag, ArrowLeft, Edit, Send, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import NotFound from './NotFound';
 import CommentsSection from '@/components/newsDetail/CommentsSection';
 import {
@@ -48,6 +49,7 @@ interface NewsArticle {
   author?: {
     first_name?: string;
     last_name?: string;
+    avatar_url?: string | null;
   } | null;
   slug?: string;
   comments_enabled?: boolean;
@@ -157,7 +159,7 @@ const NewsDetailPage = () => {
         if (data.author_id) {
           const { data: authorData, error: authorError } = await supabase
             .from('profiles')
-            .select('first_name, last_name')
+            .select('first_name, last_name, avatar_url')
             .eq('id', data.author_id)
             .single();
           
@@ -240,7 +242,7 @@ const NewsDetailPage = () => {
                 if (item.author_id) {
                   const { data: relatedAuthorData } = await supabase
                     .from('profiles')
-                    .select('first_name, last_name')
+                    .select('first_name, last_name, avatar_url')
                     .eq('id', item.author_id)
                     .single();
                   
@@ -291,7 +293,7 @@ const NewsDetailPage = () => {
                 if (item.author_id) {
                   const { data: recentAuthorData } = await supabase
                     .from('profiles')
-                    .select('first_name, last_name')
+                    .select('first_name, last_name, avatar_url')
                     .eq('id', item.author_id)
                     .single();
                   
@@ -380,6 +382,15 @@ const NewsDetailPage = () => {
   const authorName = article.author 
     ? `${article.author.first_name || ''} ${article.author.last_name || ''}`.trim() 
     : '';
+  
+  // Initiales de l'auteur pour le fallback de l'avatar
+  const getAuthorInitials = () => {
+    if (!article.author) return '';
+    const firstInitial = article.author.first_name?.charAt(0).toUpperCase() || '';
+    const lastInitial = article.author.last_name?.charAt(0).toUpperCase() || '';
+    return `${firstInitial}${lastInitial}`.trim() || 'A';
+  };
+  
   const imageUrl = article.image ? `${window.location.origin}${article.image}` : '';
 
   return (
@@ -481,8 +492,13 @@ const NewsDetailPage = () => {
                 })}</time>
               </div>
               {authorName && (
-                <div className="flex items-center text-getigne-500 text-sm">
-                  <User size={16} className="mr-1" />
+                <div className="flex items-center gap-2 text-getigne-500 text-sm">
+                  <Avatar className="h-6 w-6">
+                    {article.author?.avatar_url && (
+                      <AvatarImage src={article.author.avatar_url} alt={authorName} />
+                    )}
+                    <AvatarFallback className="text-xs">{getAuthorInitials()}</AvatarFallback>
+                  </Avatar>
                   <span>{authorName}</span>
                 </div>
               )}

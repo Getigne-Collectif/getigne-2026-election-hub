@@ -41,6 +41,7 @@ import { cn } from '@/lib/utils.ts';
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
 import { Routes } from '@/routes';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface NewsFormValues {
   title: string;
@@ -792,29 +793,63 @@ const AdminNewsEditorPage = () => {
                   <FormField
                     control={form.control}
                     name="author_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Auteur</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionner un auteur" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {users.map(user => (
-                                <SelectItem key={user.id} value={user.id}>
-                                  {user.first_name} {user.last_name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const selectedUser = users.find(u => u.id === field.value);
+                      const getAuthorInitials = (user: typeof users[0]) => {
+                        const firstInitial = user.first_name?.charAt(0).toUpperCase() || '';
+                        const lastInitial = user.last_name?.charAt(0).toUpperCase() || '';
+                        return `${firstInitial}${lastInitial}`.trim() || 'A';
+                      };
+                      
+                      return (
+                        <FormItem>
+                          <FormLabel>Auteur</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Sélectionner un auteur">
+                                  {selectedUser ? (
+                                    <div className="flex items-center gap-2">
+                                      <Avatar className="h-5 w-5">
+                                        {selectedUser.avatar_url && (
+                                          <AvatarImage src={selectedUser.avatar_url} alt={`${selectedUser.first_name} ${selectedUser.last_name}`} />
+                                        )}
+                                        <AvatarFallback className="text-xs">{getAuthorInitials(selectedUser)}</AvatarFallback>
+                                      </Avatar>
+                                      <span>{selectedUser.first_name} {selectedUser.last_name}</span>
+                                    </div>
+                                  ) : (
+                                    <span>Sélectionner un auteur</span>
+                                  )}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {users.map(user => {
+                                  const initials = getAuthorInitials(user);
+                                  return (
+                                    <SelectItem key={user.id} value={user.id}>
+                                      <div className="flex items-center gap-2">
+                                        <Avatar className="h-6 w-6">
+                                          {user.avatar_url && (
+                                            <AvatarImage src={user.avatar_url} alt={`${user.first_name} ${user.last_name}`} />
+                                          )}
+                                          <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                                        </Avatar>
+                                        <span>{user.first_name} {user.last_name}</span>
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
 
                   <div>

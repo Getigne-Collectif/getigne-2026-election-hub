@@ -120,7 +120,7 @@ const NewsPage = () => {
           news_to_tags(
             news_tags(name)
           ),
-          author:profiles(first_name, last_name)
+          author:profiles(first_name, last_name, avatar_url)
         `, { count: 'exact' })
         .eq('status', 'published');
 

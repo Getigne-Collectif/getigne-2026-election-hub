@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, ChevronRight, User } from 'lucide-react';
+import { Calendar, ChevronRight } from 'lucide-react';
 import { generateRoutes } from '@/routes';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface NewsCardProps {
   article: {
@@ -21,6 +22,7 @@ interface NewsCardProps {
     author?: {
       first_name?: string;
       last_name?: string;
+      avatar_url?: string | null;
     } | null;
   };
   index?: number;
@@ -61,6 +63,14 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
   const authorName = article.author 
     ? `${article.author.first_name || ''} ${article.author.last_name || ''}`.trim() 
     : '';
+  
+  // Initiales de l'auteur pour le fallback de l'avatar
+  const getAuthorInitials = () => {
+    if (!article.author) return '';
+    const firstInitial = article.author.first_name?.charAt(0).toUpperCase() || '';
+    const lastInitial = article.author.last_name?.charAt(0).toUpperCase() || '';
+    return `${firstInitial}${lastInitial}`.trim() || 'A';
+  };
 
   return (
     <Link to={articleUrl} className="block h-full">
@@ -87,8 +97,13 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
               <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
             </div>
             {authorName && (
-              <div className="flex items-center">
-                <User size={14} className="mr-1" />
+              <div className="flex items-center gap-2">
+                <Avatar className="h-5 w-5">
+                  {article.author?.avatar_url && (
+                    <AvatarImage src={article.author.avatar_url} alt={authorName} />
+                  )}
+                  <AvatarFallback className="text-xs">{getAuthorInitials()}</AvatarFallback>
+                </Avatar>
                 <span>{authorName}</span>
               </div>
             )}
