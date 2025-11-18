@@ -341,7 +341,7 @@ export default function CommitteeMembersManagement({ committeeId, defaultMembers
                   <SelectContent>
                     {userProfiles.map((profile) => (
                       <SelectItem key={profile.id} value={profile.id}>
-                        {profile.first_name} {profile.last_name} {profile.email ? `(${profile.email})` : ''}
+                        {profile.first_name} {profile.last_name}
                       </SelectItem>
                     ))}
                   </SelectContent>

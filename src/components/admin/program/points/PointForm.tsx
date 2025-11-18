@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState, useId } from "react";
+import { useEffect, useState, useId, useMemo } from "react";
 import { ProgramPointFileMeta } from "@/types/program.types";
 import { PendingFileUpload } from "./FileUploadService";
 import { Loader2, Paperclip, Upload, X } from "lucide-react";
@@ -28,17 +28,122 @@ import {
 } from "@/components/ui/select";
 import type { ProgramCompetentEntity } from "@/types/program.types";
 
+// Default empty EditorJS data structure
+const DEFAULT_EDITOR_DATA: OutputData = { time: Date.now(), blocks: [], version: '2.28.0' };
+
+// Helper function to check if a block has actual content
+const hasBlockContent = (block: any): boolean => {
+  if (!block || !block.type) {
+    return false;
+  }
+  
+  switch (block.type) {
+    case 'paragraph':
+      return block.data?.text && block.data.text.trim().length > 0;
+    case 'header':
+      return block.data?.text && block.data.text.trim().length > 0;
+    case 'list':
+      return block.data?.items && Array.isArray(block.data.items) && 
+             block.data.items.some((item: any) => 
+               typeof item === 'string' ? item.trim().length > 0 : 
+               item?.text?.trim().length > 0 || item?.content?.trim().length > 0
+             );
+    case 'checklist':
+      return block.data?.items && Array.isArray(block.data.items) && 
+             block.data.items.some((item: any) => item?.text?.trim().length > 0);
+    case 'quote':
+      return (block.data?.text && block.data.text.trim().length > 0) ||
+             (block.data?.caption && block.data.caption.trim().length > 0);
+    case 'code':
+      return block.data?.code && block.data.code.trim().length > 0;
+    case 'warning':
+      return (block.data?.title && block.data.title.trim().length > 0) ||
+             (block.data?.message && block.data.message.trim().length > 0);
+    case 'table':
+      return block.data?.content && Array.isArray(block.data.content) &&
+             block.data.content.some((row: any[]) => 
+               Array.isArray(row) && row.some((cell: any) => 
+                 typeof cell === 'string' ? cell.trim().length > 0 : cell?.trim().length > 0
+               )
+             );
+    case 'image':
+    case 'imageCarousel':
+      return block.data?.file?.url || block.data?.url || 
+             (Array.isArray(block.data?.items) && block.data.items.length > 0);
+    case 'embed':
+      return block.data?.embed || block.data?.url;
+    case 'linkTool':
+      return block.data?.link || block.data?.url;
+    case 'delimiter':
+      return true; // Delimiter is always considered as content
+    default:
+      // For unknown block types, check if data exists and is not empty
+      return block.data && Object.keys(block.data).length > 0;
+  }
+};
+
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
-  content: z.any().refine(
+  content: z.any().optional().refine(
     (val) => {
-      if (typeof val === 'string') return val.length > 0;
-      if (typeof val === 'object' && val !== null) {
-        return val.blocks && Array.isArray(val.blocks) && val.blocks.length > 0;
+      // Allow empty content (undefined, null, empty object, or empty blocks)
+      if (!val || val === null || val === undefined) {
+        console.log('[PointForm] Content is empty/null/undefined - allowing');
+        return true;
       }
-      return false;
-    },
-    { message: "Le contenu est requis" }
+      
+      console.log('[PointForm] Validating content - type:', typeof val);
+      console.log('[PointForm] Validating content - value:', val);
+      
+      if (typeof val === 'string') {
+        // Empty string is allowed
+        if (val.trim().length === 0) {
+          console.log('[PointForm] Content is empty string - allowing');
+          return true;
+        }
+        try {
+          const parsed = JSON.parse(val);
+          if (parsed.blocks && Array.isArray(parsed.blocks)) {
+            // Empty blocks array is allowed
+            if (parsed.blocks.length === 0) {
+              console.log('[PointForm] Content has empty blocks array - allowing');
+              return true;
+            }
+            console.log('[PointForm] Parsed string - blocks length:', parsed.blocks.length);
+            const hasValidContent = parsed.blocks.some(hasBlockContent);
+            console.log('[PointForm] Has valid content:', hasValidContent);
+            // If there are blocks but none have content, that's also allowed (empty content)
+            return true; // Always allow, content is optional
+          }
+          // Non-empty string is allowed
+          return true;
+        } catch {
+          // Non-empty string is allowed
+          return true;
+        }
+      }
+      if (typeof val === 'object' && val !== null) {
+        if (val.blocks && Array.isArray(val.blocks)) {
+          // Empty blocks array is allowed
+          if (val.blocks.length === 0) {
+            console.log('[PointForm] Content has empty blocks array - allowing');
+            return true;
+          }
+          console.log('[PointForm] Object - blocks length:', val.blocks.length);
+          console.log('[PointForm] Object - blocks:', val.blocks);
+          // Even if blocks don't have content, that's allowed (content is optional)
+          console.log('[PointForm] Content is optional - allowing');
+          return true;
+        }
+        // Object without blocks is allowed (empty content)
+        console.log('[PointForm] Object has no blocks array - allowing (optional)');
+        return true;
+      }
+      // Any other case is allowed (content is optional)
+      console.log('[PointForm] Content is optional - allowing');
+      return true;
+    }
+    // No error message needed since content is optional
   ),
   files: z.array(z.string()).optional(),
   competent_entity_id: z.string().uuid().optional().nullable(),
@@ -174,23 +279,47 @@ export default function PointForm({
             <FormField
               control={form.control}
               name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contenu</FormLabel>
-                  <FormControl>
-                    <EditorJSComponent
-                      value={field.value ?? { time: Date.now(), blocks: [], version: '2.28.0' }}
-                      onChange={field.onChange}
-                      placeholder="Détaillez cette proposition et ses objectifs..."
-                      className="max-h-[60vh] overflow-y-auto"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Détaillez cette proposition et ses objectifs
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                // Normalize the value to ensure it's always an OutputData object
+                // Use useMemo to prevent infinite re-renders
+                const normalizedValue = useMemo(() => {
+                  if (!field.value) {
+                    return DEFAULT_EDITOR_DATA;
+                  }
+                  if (typeof field.value === 'string') {
+                    try {
+                      return JSON.parse(field.value);
+                    } catch {
+                      return DEFAULT_EDITOR_DATA;
+                    }
+                  }
+                  // If it's already an object, return it directly
+                  return field.value;
+                }, [field.value]);
+
+                return (
+                  <FormItem>
+                    <FormLabel>Contenu</FormLabel>
+                    <FormControl>
+                      <EditorJSComponent
+                        value={normalizedValue}
+                        onChange={(data) => {
+                          console.log('[PointForm] EditorJS onChange - data:', data);
+                          console.log('[PointForm] EditorJS onChange - blocks:', data?.blocks);
+                          console.log('[PointForm] EditorJS onChange - blocks length:', data?.blocks?.length);
+                          field.onChange(data);
+                        }}
+                        placeholder="Détaillez cette proposition et ses objectifs..."
+                        className="max-h-[60vh] overflow-y-auto"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Détaillez cette proposition et ses objectifs
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
           </div>
 

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -16,12 +16,20 @@ import {
   DialogDescription,
   DialogFooter
 } from '@/components/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool, RefreshCcw, Camera, Trash2 } from 'lucide-react';
+import { Search, UserCheck, Shield, UserX, UserPlus, Inbox, PenTool, RefreshCcw, Camera, Trash2, Edit, Save, Loader2 } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -36,7 +44,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from '@/components/ui/use-toast';
-import UserMembershipStatus from '@/components/admin/UserMembershipStatus';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -49,6 +56,7 @@ interface UserManagementProps {
   onToggleUserStatus: (userId: string, isActive: boolean) => Promise<void>;
   onUpdateAvatar?: (userId: string, file: File) => Promise<void>;
   onDeleteUser?: (userId: string) => Promise<void>;
+  onUpdateUser?: (userId: string, userData: UpdateUserFormValues) => Promise<void>;
 }
 
 const inviteUserSchema = z.object({
@@ -59,6 +67,20 @@ const inviteUserSchema = z.object({
 
 type InviteUserFormValues = z.infer<typeof inviteUserSchema>;
 
+const updateUserSchema = z.object({
+  first_name: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
+  last_name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  status: z.enum(['active', 'disabled']),
+  is_member: z.boolean(),
+  roles: z.object({
+    admin: z.boolean(),
+    moderator: z.boolean(),
+    program_manager: z.boolean(),
+  }),
+});
+
+type UpdateUserFormValues = z.infer<typeof updateUserSchema>;
+
 const UserManagement: React.FC<UserManagementProps> = ({ 
   users, 
   invitedUsers,
@@ -67,11 +89,13 @@ const UserManagement: React.FC<UserManagementProps> = ({
   onInviteUser,
   onToggleUserStatus,
   onUpdateAvatar,
-  onDeleteUser
+  onDeleteUser,
+  onUpdateUser
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
@@ -79,6 +103,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
   const [resendingInvitation, setResendingInvitation] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [savingUser, setSavingUser] = useState(false);
 
   const form = useForm<InviteUserFormValues>({
     resolver: zodResolver(inviteUserSchema),
@@ -86,6 +111,21 @@ const UserManagement: React.FC<UserManagementProps> = ({
       first_name: "",
       last_name: "",
       email: "",
+    },
+  });
+
+  const editForm = useForm<UpdateUserFormValues>({
+    resolver: zodResolver(updateUserSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      status: 'active',
+      is_member: false,
+      roles: {
+        admin: false,
+        moderator: false,
+        program_manager: false,
+      },
     },
   });
 
@@ -174,13 +214,72 @@ const UserManagement: React.FC<UserManagementProps> = ({
     );
   });
 
+  const hasRole = (user: any, role: string) => {
+    return user.roles?.includes(role) || false;
+  };
+
   const openRoleDialog = (user: any) => {
     setSelectedUser(user);
     setIsDialogOpen(true);
   };
 
-  const hasRole = (user: any, role: string) => {
-    return user.roles?.includes(role) || false;
+  const openEditSheet = (user: any) => {
+    setSelectedUser(user);
+    editForm.reset({
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
+      status: user.status === 'disabled' ? 'disabled' : 'active',
+      is_member: user.is_member === true,
+      roles: {
+        admin: hasRole(user, 'admin'),
+        moderator: hasRole(user, 'moderator'),
+        program_manager: hasRole(user, 'program_manager'),
+      },
+    });
+    setIsEditSheetOpen(true);
+  };
+
+  const handleUpdateUser = async (values: UpdateUserFormValues) => {
+    if (!selectedUser || !onUpdateUser) return;
+    
+    setSavingUser(true);
+    try {
+      // Mettre à jour les rôles si nécessaire
+      const currentRoles = {
+        admin: hasRole(selectedUser, 'admin'),
+        moderator: hasRole(selectedUser, 'moderator'),
+        program_manager: hasRole(selectedUser, 'program_manager'),
+      };
+
+      // Comparer et mettre à jour les rôles
+      for (const [role, shouldHave] of Object.entries(values.roles)) {
+        const roleKey = role as 'admin' | 'moderator' | 'program_manager';
+        const currentlyHas = currentRoles[roleKey];
+        
+        if (shouldHave && !currentlyHas) {
+          await onRoleChange(selectedUser.id, roleKey, 'add');
+        } else if (!shouldHave && currentlyHas) {
+          await onRoleChange(selectedUser.id, roleKey, 'remove');
+        }
+      }
+
+      // Mettre à jour les autres informations
+      await onUpdateUser(selectedUser.id, values);
+      
+      setIsEditSheetOpen(false);
+      toast({
+        title: "Utilisateur mis à jour",
+        description: "Les informations de l'utilisateur ont été mises à jour avec succès.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la mise à jour",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingUser(false);
+    }
   };
 
   const handleRoleToggle = async (role: 'moderator' | 'admin' | 'program_manager') => {
@@ -242,6 +341,28 @@ const UserManagement: React.FC<UserManagementProps> = ({
       setUploadingAvatar(null);
     }
   };
+
+  // Mettre à jour selectedUser quand users change (pour refléter les changements d'avatar, etc.)
+  useEffect(() => {
+    if (selectedUser && isEditSheetOpen) {
+      const updatedUser = users.find(u => u.id === selectedUser.id);
+      if (updatedUser && updatedUser.avatar_url !== selectedUser.avatar_url) {
+        setSelectedUser(updatedUser);
+        // Mettre à jour aussi le formulaire avec les nouvelles données
+        editForm.reset({
+          first_name: updatedUser.first_name || '',
+          last_name: updatedUser.last_name || '',
+          status: updatedUser.status === 'disabled' ? 'disabled' : 'active',
+          is_member: updatedUser.is_member === true,
+          roles: {
+            admin: hasRole(updatedUser, 'admin'),
+            moderator: hasRole(updatedUser, 'moderator'),
+            program_manager: hasRole(updatedUser, 'program_manager'),
+          },
+        });
+      }
+    }
+  }, [users, isEditSheetOpen, selectedUser?.id]);
 
   const openDeleteDialog = (user: any) => {
     setUserToDelete(user);
@@ -321,11 +442,9 @@ const UserManagement: React.FC<UserManagementProps> = ({
                   <TableRow>
                     <TableHead>Avatar</TableHead>
                     <TableHead>Utilisateur</TableHead>
-                    <TableHead>Email</TableHead>
                     <TableHead>Date d'inscription</TableHead>
                     <TableHead>Statut</TableHead>
                     <TableHead>Rôles</TableHead>
-                    <TableHead>Adhésion</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -367,7 +486,6 @@ const UserManagement: React.FC<UserManagementProps> = ({
                           ? `${user.first_name} ${user.last_name}` 
                           : 'Utilisateur'}
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>
                       <TableCell>
                         {new Date(user.created_at).toLocaleDateString('fr-FR')}
                       </TableCell>
@@ -392,20 +510,15 @@ const UserManagement: React.FC<UserManagementProps> = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <UserMembershipStatus 
-                          userId={user.id}
-                          isMember={user.is_member === true}
-                          onUpdate={() => {/* Cette fonction n'est pas utilisée ici */}}
-                        />
-                      </TableCell>
-                      <TableCell>
                         <div className="flex gap-2">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => openRoleDialog(user)}
+                            onClick={() => openEditSheet(user)}
+                            className="gap-1"
                           >
-                            Gérer les rôles
+                            <Edit className="h-4 w-4" />
+                            Modifier
                           </Button>
                           <Button 
                             variant={user.status === 'disabled' ? "default" : "destructive"}
@@ -663,6 +776,223 @@ const UserManagement: React.FC<UserManagementProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Modifier l'utilisateur</SheetTitle>
+            <SheetDescription>
+              Modifiez toutes les informations de l'utilisateur. Les modifications seront sauvegardées lorsque vous cliquerez sur "Enregistrer".
+            </SheetDescription>
+          </SheetHeader>
+
+          {selectedUser && (
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit(handleUpdateUser)} className="space-y-6 mt-6">
+                {/* Avatar */}
+                <div className="space-y-2">
+                  <Label>Avatar</Label>
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-20 w-20">
+                      {selectedUser.avatar_url ? (
+                        <AvatarImage src={selectedUser.avatar_url} alt={`${selectedUser.first_name} ${selectedUser.last_name}`} />
+                      ) : null}
+                      <AvatarFallback>{getInitials(selectedUser.first_name, selectedUser.last_name)}</AvatarFallback>
+                    </Avatar>
+                    {onUpdateAvatar && (
+                      <div>
+                        <input
+                          id="avatar-edit"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleAvatarChange(selectedUser.id, e)}
+                          disabled={uploadingAvatar === selectedUser.id}
+                        />
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => document.getElementById('avatar-edit')?.click()}
+                          disabled={uploadingAvatar === selectedUser.id}
+                        >
+                          <Camera className="h-4 w-4 mr-2" />
+                          {uploadingAvatar === selectedUser.id ? 'Téléchargement...' : 'Changer l\'avatar'}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Prénom */}
+                <FormField
+                  control={editForm.control}
+                  name="first_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prénom</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Jean" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Nom */}
+                <FormField
+                  control={editForm.control}
+                  name="last_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Dupont" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Statut */}
+                <FormField
+                  control={editForm.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Statut</FormLabel>
+                        <FormDescription>
+                          Activer ou désactiver le compte utilisateur
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value === 'active'}
+                          onCheckedChange={(checked) => field.onChange(checked ? 'active' : 'disabled')}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Adhésion */}
+                <FormField
+                  control={editForm.control}
+                  name="is_member"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Adhésion</FormLabel>
+                        <FormDescription>
+                          Définir si l'utilisateur est un adhérent
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Rôles */}
+                <div className="space-y-4 rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Rôles</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Attribuer des rôles spécifiques à l'utilisateur
+                    </p>
+                  </div>
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="roles.admin"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Shield className="h-5 w-5 text-red-500" />
+                          <FormLabel>Administrateur</FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="roles.moderator"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <UserCheck className="h-5 w-5 text-blue-500" />
+                          <FormLabel>Modérateur</FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editForm.control}
+                    name="roles.program_manager"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <PenTool className="h-5 w-5 text-green-500" />
+                          <FormLabel>Équipe Programme</FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <SheetFooter className="gap-2 sm:gap-0">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditSheetOpen(false)}
+                    disabled={savingUser}
+                  >
+                    Annuler
+                  </Button>
+                  <Button type="submit" disabled={savingUser}>
+                    {savingUser ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Enregistrement...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Enregistrer
+                      </>
+                    )}
+                  </Button>
+                </SheetFooter>
+              </form>
+            </Form>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

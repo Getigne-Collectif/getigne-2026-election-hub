@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Users, Mail, Calendar } from 'lucide-react';
+import { Loader2, Users, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -25,7 +25,6 @@ interface EventRegistration {
     id: string;
     first_name: string;
     last_name: string;
-    email: string;
     avatar_url?: string;
   };
 }
@@ -71,7 +70,6 @@ export const EventRegistrationsDrawer: React.FC<EventRegistrationsDrawerProps> =
             id,
             first_name,
             last_name,
-            email,
             avatar_url
           )
         `)
@@ -174,10 +172,6 @@ export const EventRegistrationsDrawer: React.FC<EventRegistrationsDrawerProps> =
                       </div>
                       
                       <div className="flex items-center mt-1 space-x-4 text-xs text-gray-500">
-                        <div className="flex items-center">
-                          <Mail className="h-3 w-3 mr-1" />
-                          <span className="truncate">{registration.profiles.email}</span>
-                        </div>
                         <div className="flex items-center">
                           <Users className="h-3 w-3 mr-1" />
                           <span>{1 + (registration.additional_guests || 0)} personne{(1 + (registration.additional_guests || 0)) > 1 ? 's' : ''}</span>

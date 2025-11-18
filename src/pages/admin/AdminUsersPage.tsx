@@ -82,10 +82,9 @@ const AdminUsersPage = () => {
         profiles.map(async (profile: Profile) => {
           const { data: roles } = await supabase.rpc('get_user_roles', { uid: profile.id });
 
-          let email = profile.email;
-          
-          // Si on n'a pas d'email dans le profil, chercher dans les invitations
-          if (!email && invitedUsersData) {
+          // Récupérer l'email depuis les invitations si disponible (pour les utilisateurs invités qui n'ont pas encore créé de compte)
+          let email = '';
+          if (invitedUsersData) {
             const matchingInvite = invitedUsersData.find((invited: InvitedUser) => invited.id === profile.id);
             if (matchingInvite) {
               email = matchingInvite.email;
@@ -102,7 +101,7 @@ const AdminUsersPage = () => {
 
           return {
             id: profile.id,
-            email: email || '',
+            email: email,
             created_at: String(profile.created_at),
             first_name: profile.first_name || '',
             last_name: profile.last_name || '',
@@ -322,6 +321,50 @@ const AdminUsersPage = () => {
     }
   };
 
+  interface UpdateUserFormValues {
+    first_name: string;
+    last_name: string;
+    status: 'active' | 'disabled';
+    is_member: boolean;
+    roles: {
+      admin: boolean;
+      moderator: boolean;
+      program_manager: boolean;
+    };
+  }
+
+  const handleUpdateUser = async (userId: string, userData: UpdateUserFormValues) => {
+    try {
+      // Mettre à jour le profil (sans l'email qui est dans auth.users et ne peut pas être modifié)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          status: userData.status,
+          is_member: userData.is_member
+        })
+        .eq('id', userId);
+
+      if (profileError) throw profileError;
+
+      await fetchUsers();
+
+      toast({
+        title: 'Succès',
+        description: "Les informations de l'utilisateur ont été mises à jour."
+      });
+    } catch (error: any) {
+      console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
+      toast({
+        title: 'Erreur',
+        description: error.message || "Une erreur est survenue lors de la mise à jour de l'utilisateur.",
+        variant: 'destructive'
+      });
+      throw error;
+    }
+  };
+
 
   useEffect(() => {
     if (!authChecked) return;
@@ -397,6 +440,7 @@ const AdminUsersPage = () => {
                 onToggleUserStatus={handleToggleUserStatus}
                 onUpdateAvatar={handleUpdateAvatar}
                 onDeleteUser={handleDeleteUser}
+                onUpdateUser={handleUpdateUser}
               />
             )}
           </div>

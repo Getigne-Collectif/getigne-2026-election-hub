@@ -55,14 +55,30 @@ export default function AddPointDialog({
       const uploadedFiles = await uploadFiles(payload.newFiles);
 
       // Create the program point
+      // Handle content: if it's a string, parse it; if it's an object, use it; if it's empty, use default
+      let contentData = null;
+      if (values.content) {
+        if (typeof values.content === 'string') {
+          try {
+            contentData = JSON.parse(values.content);
+          } catch {
+            // If parsing fails, use default empty structure
+            contentData = { time: Date.now(), blocks: [], version: '2.28.0' };
+          }
+        } else {
+          contentData = values.content;
+        }
+      } else {
+        // No content provided, use default empty structure
+        contentData = { time: Date.now(), blocks: [], version: '2.28.0' };
+      }
+
       const { error } = await supabase
         .from('program_points')
         .insert([{
           program_item_id: programItemId,
           title: values.title,
-          content: typeof values.content === 'string' 
-            ? JSON.parse(values.content) 
-            : values.content,
+          content: contentData,
           competent_entity_id: values.competent_entity_id ?? null,
           files: uploadedFiles.map((file) => file.url),
           files_metadata: uploadedFiles,
