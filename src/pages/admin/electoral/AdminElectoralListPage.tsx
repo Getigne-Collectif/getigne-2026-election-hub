@@ -225,6 +225,34 @@ const AdminElectoralListPage = () => {
     return member.gender === expectedGender;
   };
 
+  // Trouver la prochaine position disponible pour un membre selon la règle de parité
+  const findNextAvailablePosition = (memberId: string, startFrom: number = 1): number | null => {
+    const member = allMembers.find(m => m.id === memberId);
+    if (!member) return null;
+
+    // Si pas de règle de parité, trouver la première position libre
+    const rule = getParityRule();
+    if (!rule || !member.gender || member.gender === 'autre') {
+      for (let i = startFrom; i <= 29; i++) {
+        const pos = positions.find(p => p.position === i);
+        if (!pos?.member) return i;
+      }
+      return null;
+    }
+
+    // Avec règle de parité, trouver la première position libre qui respecte la règle
+    for (let i = startFrom; i <= 29; i++) {
+      const pos = positions.find(p => p.position === i);
+      if (!pos?.member) {
+        const expectedGender = getExpectedGenderForPosition(i);
+        if (!expectedGender || member.gender === expectedGender) {
+          return i;
+        }
+      }
+    }
+    return null;
+  };
+
   // Fonction pour calculer l'âge
   const calculateAge = (birthDate: string | null): number | null => {
     if (!birthDate) return null;
@@ -533,6 +561,149 @@ const AdminElectoralListPage = () => {
     }
   };
 
+  // Fonction pour assigner un membre depuis le select (gère le déplacement automatique)
+  const assignMemberFromSelect = async (memberId: string, targetPosition: number) => {
+    try {
+      if (!electoralList) {
+        toast({
+          title: 'Erreur',
+          description: 'Aucune liste électorale active.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Vérifier l'âge minimum
+      if (!validateMinimumAge(memberId)) {
+        return;
+      }
+
+      // Vérifier la règle de parité
+      if (!validateParityRule(memberId, targetPosition)) {
+        const expectedGender = getExpectedGenderForPosition(targetPosition);
+        const genderLabel = expectedGender === 'femme' ? 'une femme' : 'un homme';
+        toast({
+          title: 'Règle de parité non respectée',
+          description: `La position ${targetPosition} doit être occupée par ${genderLabel} selon la règle établie.`,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const existingMember = positions.find((p) => p.position === targetPosition)?.member;
+      const memberToAssign = unassignedMembers.find(m => m.id === memberId);
+      if (!memberToAssign) return;
+
+      // Mise à jour optimiste de l'UI - retirer le membre de la liste des non assignés
+      setUnassignedMembers(prev => prev.filter(m => m.id !== memberId));
+
+      // Si la position est occupée, déplacer la personne actuelle
+      if (existingMember) {
+        const nextPosition = findNextAvailablePosition(
+          existingMember.team_member_id,
+          targetPosition + 1
+        );
+
+        if (nextPosition) {
+          // Mise à jour optimiste : déplacer la personne actuelle à la prochaine position
+          setPositions(prev => prev.map(p => {
+            if (p.position === targetPosition) {
+              return { ...p, member: null };
+            }
+            if (p.position === nextPosition) {
+              return { ...p, member: existingMember };
+            }
+            return p;
+          }));
+
+          // Déplacer la personne actuelle à la prochaine position disponible
+          const { error: updateError } = await supabase
+            .from('electoral_list_members')
+            .update({ position: nextPosition })
+            .eq('id', existingMember.id);
+          
+          if (updateError) throw updateError;
+          
+          toast({
+            title: 'Déplacement effectué',
+            description: `${existingMember.team_member.name} a été déplacé à la position ${nextPosition}.`,
+          });
+        } else {
+          // Pas de place disponible, renvoyer dans la liste des membres disponibles
+          // Mise à jour optimiste : retirer de la position et ajouter aux non assignés
+          setPositions(prev => prev.map(p => 
+            p.position === targetPosition ? { ...p, member: null } : p
+          ));
+          setUnassignedMembers(prev => [...prev, existingMember.team_member].sort((a, b) => a.name.localeCompare(b.name)));
+
+          const { error: deleteError } = await supabase
+            .from('electoral_list_members')
+            .delete()
+            .eq('id', existingMember.id);
+          
+          if (deleteError) throw deleteError;
+          
+          toast({
+            title: 'Membre déplacé',
+            description: `${existingMember.team_member.name} a été renvoyé dans la liste des membres disponibles.`,
+          });
+        }
+      }
+
+      // Insérer le nouveau membre en BDD
+      const { data, error } = await supabase
+        .from('electoral_list_members')
+        .insert({
+          electoral_list_id: electoralList.id,
+          team_member_id: memberId,
+          position: targetPosition,
+        })
+        .select(`
+          *,
+          team_member:team_members(*),
+          roles:electoral_member_roles(
+            id,
+            is_primary,
+            thematic_role:thematic_roles(*)
+          )
+        `)
+        .single();
+
+      if (error) throw error;
+
+      // Mise à jour optimiste des positions avec le nouveau membre
+      const newMember: ElectoralListMemberWithDetails = {
+        ...data,
+        team_member: data.team_member,
+        roles: data.roles.map((r: any) => ({
+          id: r.id,
+          is_primary: r.is_primary,
+          thematic_role: r.thematic_role,
+        })),
+      };
+
+      setPositions(prev => prev.map(p => 
+        p.position === targetPosition 
+          ? { ...p, member: newMember }
+          : p
+      ));
+
+      toast({
+        title: 'Membre assigné',
+        description: `${memberToAssign.name} a été assigné à la position ${targetPosition}.`,
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'assignation:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'assigner le membre.',
+        variant: 'destructive',
+      });
+      // Recharger en cas d'erreur
+      await loadData();
+    }
+  };
+
   const handleOpenEditModal = (member: ElectoralListMemberWithDetails) => {
     setSelectedMember(member);
     setEditModalOpen(true);
@@ -552,7 +723,7 @@ const AdminElectoralListPage = () => {
         <title>Gestion de la liste électorale | Admin</title>
       </Helmet>
 
-      <AdminLayout>
+      <AdminLayout noContainer>
         <div className="py-8">
           <div className="mb-6">
             <h1 className="text-2xl font-bold">Liste électorale</h1>
@@ -567,24 +738,30 @@ const AdminElectoralListPage = () => {
             </div>
           ) : (
             <DndContext 
-              onDragStart={handleDragStart} 
-              onDragOver={handleDragOver}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="flex gap-6">
-                <div className="flex-1">
-                  <ElectoralListGrid
-                    positions={positions}
-                    onOpenRolesModal={handleOpenEditModal}
-                    onRemoveMember={removeMemberFromPosition}
-                    overId={overId}
-                    draggedFrom={draggedFrom}
-                    getExpectedGender={getExpectedGenderForPosition}
-                  />
-                </div>
+                onDragStart={handleDragStart} 
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="flex gap-6">
+                  <div className="flex-1 min-w-0">
+                    <ElectoralListGrid
+                      positions={positions}
+                      onOpenRolesModal={handleOpenEditModal}
+                      onRemoveMember={removeMemberFromPosition}
+                      overId={overId}
+                      draggedFrom={draggedFrom}
+                      getExpectedGender={getExpectedGenderForPosition}
+                    />
+                  </div>
 
-                <div className="w-80">
-                  <UnassignedMembersList members={unassignedMembers} />
+                <div className="w-80 flex-shrink-0">
+                  <UnassignedMembersList 
+                    members={unassignedMembers}
+                    positions={positions}
+                    getExpectedGender={getExpectedGenderForPosition}
+                    validateParityRule={validateParityRule}
+                    onAssignMember={assignMemberFromSelect}
+                  />
                 </div>
               </div>
 

@@ -34,7 +34,7 @@ const ElectoralListGrid = ({
             <CardTitle>Titulaires (1-27)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 gap-4 auto-rows-fr">
+            <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-9 gap-4 auto-rows-fr">
               {titularPositions.map((position) => (
                 <ElectoralPositionCard
                   key={position.position}
@@ -60,7 +60,7 @@ const ElectoralListGrid = ({
             <CardTitle>Remplaçants (28-29)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4 auto-rows-fr">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-8 gap-4 auto-rows-fr">
               {substitutePositions.map((position) => (
                 <ElectoralPositionCard
                   key={position.position}

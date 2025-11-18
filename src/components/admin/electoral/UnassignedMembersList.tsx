@@ -3,13 +3,38 @@ import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import type { TeamMember } from '@/types/electoral.types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import type { TeamMember, ElectoralPosition } from '@/types/electoral.types';
 
 interface UnassignedMembersListProps {
   members: TeamMember[];
+  positions: ElectoralPosition[];
+  getExpectedGender: (position: number) => string | null;
+  validateParityRule: (memberId: string, position: number) => boolean;
+  onAssignMember: (memberId: string, position: number) => Promise<void>;
 }
 
-const UnassignedMemberItem = ({ member }: { member: TeamMember }) => {
+interface UnassignedMemberItemProps {
+  member: TeamMember;
+  positions: ElectoralPosition[];
+  getExpectedGender: (position: number) => string | null;
+  validateParityRule: (memberId: string, position: number) => boolean;
+  onAssignMember: (memberId: string, position: number) => Promise<void>;
+}
+
+const UnassignedMemberItem = ({
+  member,
+  positions,
+  getExpectedGender,
+  validateParityRule,
+  onAssignMember,
+}: UnassignedMemberItemProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `unassigned-${member.id}`,
@@ -25,44 +50,95 @@ const UnassignedMemberItem = ({ member }: { member: TeamMember }) => {
       }
     : undefined;
 
+  const handleSelectChange = async (value: string) => {
+    if (value === '') return;
+    const position = parseInt(value, 10);
+    await onAssignMember(member.id, position);
+  };
+
+  const isPositionDisabled = (position: number): boolean => {
+    return !validateParityRule(member.id, position);
+  };
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      className={`flex items-center gap-3 p-3 rounded-lg border bg-white hover:shadow-md transition-shadow cursor-move ${
+      className={`flex flex-col gap-2 p-3 rounded-lg border bg-white hover:shadow-md transition-shadow ${
         isDragging ? 'opacity-50' : ''
       }`}
     >
-      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-        {member.image ? (
-          <img
-            src={member.image}
-            alt={member.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-            <span className="text-lg text-getigne-400">
-              {member.name.charAt(0)}
-            </span>
-          </div>
-        )}
+      <div className="flex items-center gap-3 cursor-move">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+          {member.image ? (
+            <img
+              src={member.image}
+              alt={member.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-getigne-100">
+              <span className="text-lg text-getigne-400">
+                {member.name.charAt(0)}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-sm line-clamp-1">{member.name}</div>
+          {member.profession && (
+            <div className="text-xs text-gray-500 line-clamp-1">
+              {member.profession}
+            </div>
+          )}
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="font-medium text-sm line-clamp-1">{member.name}</div>
-        {member.profession && (
-          <div className="text-xs text-gray-500 line-clamp-1">
-            {member.profession}
-          </div>
-        )}
+      <div onClick={(e) => e.stopPropagation()}>
+        <Select onValueChange={handleSelectChange} defaultValue="">
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Assigner à une position" />
+          </SelectTrigger>
+          <SelectContent>
+            {positions.map((pos) => {
+              const isDisabled = isPositionDisabled(pos.position);
+              const currentMember = pos.member?.team_member;
+              const expectedGender = getExpectedGender(pos.position);
+              
+              let label = `Position ${pos.position}`;
+              if (currentMember) {
+                label += ` - ${currentMember.name}`;
+              }
+              if (expectedGender && !currentMember) {
+                label += ` (${expectedGender === 'femme' ? '♀' : '♂'})`;
+              }
+
+              return (
+                <SelectItem
+                  key={pos.position}
+                  value={pos.position.toString()}
+                  disabled={isDisabled}
+                  className={isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                >
+                  {label}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
 };
 
-const UnassignedMembersList = ({ members }: UnassignedMembersListProps) => {
+const UnassignedMembersList = ({
+  members,
+  positions,
+  getExpectedGender,
+  validateParityRule,
+  onAssignMember,
+}: UnassignedMembersListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { setNodeRef, isOver } = useDroppable({
@@ -109,7 +185,14 @@ const UnassignedMembersList = ({ members }: UnassignedMembersListProps) => {
           </div>
         ) : (
           filteredMembers.map((member) => (
-            <UnassignedMemberItem key={member.id} member={member} />
+            <UnassignedMemberItem
+              key={member.id}
+              member={member}
+              positions={positions}
+              getExpectedGender={getExpectedGender}
+              validateParityRule={validateParityRule}
+              onAssignMember={onAssignMember}
+            />
           ))
         )}
       </CardContent>

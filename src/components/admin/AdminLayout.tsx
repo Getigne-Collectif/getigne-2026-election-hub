@@ -33,6 +33,7 @@ interface AdminLayoutProps {
   description?: string;
   breadcrumb?: React.ReactNode;
   backLink?: React.ReactNode;
+  noContainer?: boolean;
 }
 
 interface MenuItem {
@@ -48,7 +49,7 @@ interface MenuSection {
   items: MenuItem[];
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description, breadcrumb, backLink }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description, breadcrumb, backLink, noContainer = false }) => {
   const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -357,17 +358,31 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-auto">
-          <div className="container mx-auto px-6">
-            {(backLink || title || description || breadcrumb) && (
-              <header className="py-6">
-                {backLink && <div className="mb-4">{backLink}</div>}
-                {breadcrumb && <nav aria-label="Breadcrumb" className="mb-2">{breadcrumb}</nav>}
-                {title && <h1 className="text-2xl font-bold">{title}</h1>}
-                {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
-              </header>
-            )}
-            {children}
-          </div>
+          {noContainer ? (
+            <div className="px-6">
+              {(backLink || title || description || breadcrumb) && (
+                <header className="py-6">
+                  {backLink && <div className="mb-4">{backLink}</div>}
+                  {breadcrumb && <nav aria-label="Breadcrumb" className="mb-2">{breadcrumb}</nav>}
+                  {title && <h1 className="text-2xl font-bold">{title}</h1>}
+                  {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+                </header>
+              )}
+              {children}
+            </div>
+          ) : (
+            <div className="container mx-auto px-6">
+              {(backLink || title || description || breadcrumb) && (
+                <header className="py-6">
+                  {backLink && <div className="mb-4">{backLink}</div>}
+                  {breadcrumb && <nav aria-label="Breadcrumb" className="mb-2">{breadcrumb}</nav>}
+                  {title && <h1 className="text-2xl font-bold">{title}</h1>}
+                  {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+                </header>
+              )}
+              {children}
+            </div>
+          )}
         </main>
       </div>
     </div>
