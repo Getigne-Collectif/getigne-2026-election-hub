@@ -256,3 +256,4 @@ COMMENT ON TABLE electoral_member_roles IS 'Rôles thématiques assignés aux me
 
 
 
+
