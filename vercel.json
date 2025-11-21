@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/enquetevillages",
+      "destination": "https://forms.gle/QE3BYjraQrDs6GKS7",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
