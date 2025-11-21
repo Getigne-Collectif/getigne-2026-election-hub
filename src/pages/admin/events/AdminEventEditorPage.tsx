@@ -10,7 +10,9 @@ import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { useAuth } from '@/context/auth';
-import MarkdownEditor from "@/components/MarkdownEditor.tsx";
+import EditorJSComponent from "@/components/EditorJSComponent.tsx";
+import { OutputData } from '@editorjs/editorjs';
+import { markdownToEditorJS, isMarkdown } from '@/utils/markdownToEditorJS';
 import { v4 as uuidv4 } from 'uuid';
 import {Helmet, HelmetProvider} from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
@@ -42,7 +44,7 @@ const AdminEventEditorPage = () => {
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState<string | OutputData>('');
   const [image, setImage] = useState('');
   const [committeeId, setCommitteeId] = useState('');
   const [status, setStatus] = useState('published');
@@ -146,7 +148,15 @@ const AdminEventEditorPage = () => {
       setDate(formatDateForInput(event.date || ''));
       setLocation(event.location || '');
       setDescription(event.description || '');
-      setContent(event.content || '');
+      
+      // Convertir le contenu markdown en EditorJS si nécessaire
+      const eventContent = event.content || '';
+      if (eventContent && typeof eventContent === 'string' && isMarkdown(eventContent)) {
+        setContent(markdownToEditorJS(eventContent));
+      } else {
+        setContent(eventContent);
+      }
+      
       setImage(event.image || '');
       setCommitteeId(event.committee_id || '');
       setStatus(event.status || 'published');
@@ -356,12 +366,17 @@ const AdminEventEditorPage = () => {
         return;
       }
 
+      // Convertir le contenu EditorJS en JSON string pour la base de données
+      const contentForDB = typeof content === 'string' 
+        ? content 
+        : JSON.stringify(content);
+
       const eventData = {
         title,
         date,
         location,
         description,
-        content,
+        content: contentForDB,
         image: imageUrl,
         committee_id: committeeId || null,
         committee: committeeId ? committees.find(c => c.id === committeeId)?.title : null,
@@ -612,11 +627,11 @@ const AdminEventEditorPage = () => {
 
                       <div>
                         <Label>Contenu détaillé</Label>
-                        <div className="mt-2 border rounded-md">
-                          <MarkdownEditor
+                        <div className="mt-2">
+                          <EditorJSComponent
                             value={content}
-                            onChange={setContent}
-                            contentType="event"
+                            onChange={(data: OutputData) => setContent(data)}
+                            placeholder="Rédigez le contenu détaillé de l'événement..."
                           />
                         </div>
                       </div>

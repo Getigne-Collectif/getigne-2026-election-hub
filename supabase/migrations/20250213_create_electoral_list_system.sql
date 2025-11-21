@@ -253,3 +253,6 @@ COMMENT ON TABLE electoral_list_members IS 'Association entre membres d''équipe
 COMMENT ON TABLE electoral_member_roles IS 'Rôles thématiques assignés aux membres de la liste électorale';
 
 
+
+
+

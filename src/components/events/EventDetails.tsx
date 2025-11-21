@@ -3,8 +3,8 @@ import React from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar, Clock, MapPin, Users, Coffee, Package, UserCheck } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import EditorJSRenderer from '@/components/EditorJSRenderer';
+import { markdownToEditorJS, isMarkdown } from '@/utils/markdownToEditorJS';
 import '@/styles/richTextContent.css';
 
 interface EventDetailsProps {
@@ -24,6 +24,31 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   formattedTime,
   onLogin
 }) => {
+  // Convertir le contenu markdown en EditorJS si nécessaire
+  const getContentForDisplay = () => {
+    const eventContent = event.content || '';
+    if (!eventContent) return '';
+    
+    // Si c'est déjà du EditorJS JSON, le retourner tel quel
+    if (typeof eventContent === 'string') {
+      try {
+        const parsed = JSON.parse(eventContent);
+        if (parsed.blocks && Array.isArray(parsed.blocks)) {
+          return eventContent; // C'est du EditorJS JSON
+        }
+      } catch {
+        // Ce n'est pas du JSON valide
+      }
+    }
+    
+    // Si c'est du markdown, le convertir
+    if (typeof eventContent === 'string' && isMarkdown(eventContent)) {
+      return JSON.stringify(markdownToEditorJS(eventContent));
+    }
+    
+    return eventContent;
+  };
+
   return (
     <div className="lg:col-span-2">
       <div className="mb-8">
@@ -96,9 +121,10 @@ const EventDetails: React.FC<EventDetailsProps> = ({
               </button>
             </div>
           ) : (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {event.content || ''}
-            </ReactMarkdown>
+            <EditorJSRenderer
+              data={getContentForDisplay()}
+              className="prose max-w-none"
+            />
           )}
         </div>
       </div>

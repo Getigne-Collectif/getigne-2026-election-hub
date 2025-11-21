@@ -31,3 +31,6 @@ const GovernanceSection = ({ content }: GovernanceSectionProps) => {
 export default GovernanceSection;
 
 
+
+
+

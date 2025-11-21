@@ -7,3 +7,6 @@ ADD COLUMN IF NOT EXISTS birth_date DATE;
 COMMENT ON COLUMN team_members.birth_date IS 'Date de naissance du membre. Utilisé pour valider l''âge minimum (18 ans) pour être sur la liste électorale';
 
 
+
+
+

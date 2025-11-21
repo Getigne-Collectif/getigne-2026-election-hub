@@ -74,3 +74,6 @@ const ElectoralListDisplay = ({ positions }: ElectoralListDisplayProps) => {
 export default ElectoralListDisplay;
 
 
+
+
+
