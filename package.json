@@ -70,6 +70,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
     "editorjs-react-renderer": "^3.5.1",
+    "editorjs-strikethrough": "^1.0.0",
     "embla-carousel-react": "^8.3.0",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.2.4",

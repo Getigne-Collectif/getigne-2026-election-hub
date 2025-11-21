@@ -40,7 +40,7 @@ export default class AcronymTool {
   private tag = 'SPAN';
   private class = 'acronym';
   private config: AcronymToolConfig;
-  private iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+  private iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
   private lexiconEntries: LexiconEntry[] = [];
   private dropdown: HTMLDivElement | null = null;
   private searchInput: HTMLInputElement | null = null;
@@ -98,8 +98,10 @@ export default class AcronymTool {
   render(): HTMLButtonElement {
     this.button = document.createElement('button');
     this.button.type = 'button';
-    this.button.classList.add('ce-inline-tool');
-    this.button.innerHTML = this.iconSvg;
+    this.button.classList.add('ce-inline-tool', 'acronym-tool');
+    // Ajouter le style directement dans le SVG
+    const styledSvg = this.iconSvg.replace('<svg', '<svg style="width: 13px; height: 13px;"');
+    this.button.innerHTML = styledSvg;
     this.button.title = 'Marquer dans le lexique';
 
     return this.button;

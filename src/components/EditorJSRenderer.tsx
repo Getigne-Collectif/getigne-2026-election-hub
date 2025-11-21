@@ -119,6 +119,19 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
           }
         }
         
+        // Si c'est une balise de texte barré (s ou del)
+        if (element.tagName === 'S' || element.tagName === 'DEL') {
+          const children: React.ReactNode[] = [];
+          element.childNodes.forEach((child) => {
+            children.push(processNode(child));
+          });
+          return (
+            <s key={`strikethrough-${nodeIndex++}`} className="line-through">
+              {children}
+            </s>
+          );
+        }
+        
         // Pour les autres éléments HTML (b, i, em, strong, etc.)
         const children: React.ReactNode[] = [];
         element.childNodes.forEach((child) => {

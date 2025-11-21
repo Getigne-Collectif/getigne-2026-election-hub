@@ -17,6 +17,7 @@ import Paragraph from '@editorjs/paragraph';
 import { supabase } from '@/integrations/supabase/client';
 import ImageCarouselTool from '@/components/editorjs/ImageCarouselTool';
 import AcronymTool from '@/components/editorjs/AcronymTool';
+import Strikethrough from 'editorjs-strikethrough';
 
 interface EditorJSComponentProps {
   value: OutputData | string;
@@ -35,35 +36,111 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
   const holderRef = useRef<HTMLDivElement>(null);
   const isUpdating = useRef(false);
   const lastValueRef = useRef<string>('');
+  const initialValueRef = useRef<string>('');
+  const isUserChangeRef = useRef(false);
+  const [initialValueKey, setInitialValueKey] = useState<string>('');
   const [isReady, setIsReady] = useState(false);
 
   const parseValue = (val: OutputData | string): OutputData => {
+    // Si c'est une chaîne vide ou null/undefined, retourner un contenu vide
+    if (!val || val === '') {
+      return { time: Date.now(), blocks: [], version: '2.28.0' };
+    }
+    
     if (typeof val === 'string') {
       try {
-        return JSON.parse(val);
-      } catch {
+        const parsed = JSON.parse(val);
+        // Vérifier que c'est bien un format EditorJS valide
+        if (parsed && typeof parsed === 'object' && Array.isArray(parsed.blocks)) {
+          return parsed;
+        }
+        // Si ce n'est pas du JSON EditorJS valide, créer un paragraphe
         return {
           time: Date.now(),
-          blocks: val ? [{ type: 'paragraph', data: { text: val } }] : [],
+          blocks: [{ type: 'paragraph', data: { text: val } }],
+          version: '2.28.0'
+        };
+      } catch {
+        // Ce n'est pas du JSON valide, créer un paragraphe avec le texte
+        return {
+          time: Date.now(),
+          blocks: [{ type: 'paragraph', data: { text: val } }],
           version: '2.28.0'
         };
       }
     }
-    return val || { time: Date.now(), blocks: [], version: '2.28.0' };
+    
+    // Si c'est déjà un objet OutputData, s'assurer qu'il a la bonne structure
+    if (val && typeof val === 'object' && Array.isArray((val as OutputData).blocks)) {
+      return val as OutputData;
+    }
+    
+    // Fallback : contenu vide
+    return { time: Date.now(), blocks: [], version: '2.28.0' };
   };
+
+  // Calculer la clé actuelle
+  const currentValueKey = typeof value === 'string' 
+    ? (value ? JSON.stringify(JSON.parse(value)) : 'empty')
+    : (value ? JSON.stringify(value) : 'empty');
+
+  // Mettre à jour la valeur initiale seulement lors d'un changement externe
+  // On utilise un flag pour distinguer les modifications utilisateur des changements externes
+  useEffect(() => {
+    // Si c'est la première fois, stocker la valeur initiale
+    if (!initialValueKey) {
+      initialValueRef.current = currentValueKey;
+      setInitialValueKey(currentValueKey);
+      lastValueRef.current = currentValueKey;
+      return;
+    }
+    
+    // Si c'est une modification utilisateur, ne pas recréer l'éditeur
+    if (isUserChangeRef.current) {
+      isUserChangeRef.current = false;
+      return;
+    }
+    
+    // Si le contenu a changé de manière externe
+    // (la valeur actuelle ne correspond pas à la dernière valeur sauvegardée)
+    // Cela signifie que le contenu vient d'être chargé depuis l'extérieur
+    if (currentValueKey !== lastValueRef.current && currentValueKey !== initialValueRef.current) {
+      initialValueRef.current = currentValueKey;
+      setInitialValueKey(currentValueKey);
+      lastValueRef.current = currentValueKey;
+    }
+  }, [currentValueKey, initialValueKey]);
 
   useEffect(() => {
     if (!holderRef.current) return;
 
-    const initialData = parseValue(value);
+    // Nettoyer d'abord toute instance existante
+    if (editorRef.current) {
+      try {
+        if (typeof (editorRef.current as any).destroy === 'function') {
+          (editorRef.current as any).destroy();
+        }
+      } catch (error) {
+        console.error('Error destroying existing editor:', error);
+      }
+      editorRef.current = null;
+      setIsReady(false);
+    }
 
+    // Vider le conteneur
+    if (holderRef.current) {
+      holderRef.current.innerHTML = '';
+    }
+
+    const initialData = parseValue(value);
     setIsReady(false);
+    lastValueRef.current = typeof value === 'string' ? value : (value ? JSON.stringify(value) : '');
 
     const editor = new EditorJS({
       holder: holderRef.current,
       placeholder,
       data: initialData,
-      inlineToolbar: ['bold', 'italic', 'link', 'marker', 'acronym'],
+      inlineToolbar: ['bold', 'italic', 'link', 'marker', 'acronym', 'strikethrough'],
       tools: {
         header: {
           class: Header,
@@ -109,6 +186,9 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
         },
         acronym: {
           class: AcronymTool
+        },
+        strikethrough: {
+          class: Strikethrough
         },
         code: {
           class: Code,
@@ -196,7 +276,10 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       onChange: async () => {
         if (editorRef.current && !isUpdating.current) {
           const data = await editorRef.current.save();
-          lastValueRef.current = JSON.stringify(data);
+          const dataString = JSON.stringify(data);
+          // Marquer que c'est une modification utilisateur
+          isUserChangeRef.current = true;
+          lastValueRef.current = dataString;
           onChange(data);
         }
       },
@@ -208,46 +291,23 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
     editorRef.current = editor;
 
     return () => {
-      if (editorRef.current && editorRef.current.destroy) {
+      if (editorRef.current) {
         try {
-          editorRef.current.destroy();
+          if (typeof (editorRef.current as any).destroy === 'function') {
+            (editorRef.current as any).destroy();
+          }
         } catch (error) {
           console.error('Error destroying editor:', error);
         }
         editorRef.current = null;
         setIsReady(false);
       }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!editorRef.current || !isReady) return;
-
-    const valueString = typeof value === 'string' ? value : JSON.stringify(value);
-
-    if (valueString && valueString !== lastValueRef.current && valueString !== '{}') {
-      const newData = parseValue(value);
-
-      if (newData.blocks && newData.blocks.length > 0) {
-        const applyValue = async () => {
-          if (!editorRef.current) return;
-
-          isUpdating.current = true;
-          try {
-            await editorRef.current.clear();
-            await editorRef.current.render(newData);
-            lastValueRef.current = valueString;
-          } catch (error) {
-            console.error('Error rendering editor data:', error);
-          } finally {
-            isUpdating.current = false;
-          }
-        };
-
-        applyValue();
+      if (holderRef.current) {
+        holderRef.current.innerHTML = '';
       }
-    }
-  }, [value, isReady]);
+    };
+  }, [initialValueKey]); // Dépendre de la clé initiale pour recréer seulement lors d'un changement externe
+
 
   return (
     <div className={`editorjs-container ${className}`}>
@@ -348,6 +408,39 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           background-color: rgba(16, 185, 129, 0.1);
           padding: 0 2px;
           border-radius: 2px;
+        }
+
+        /* Ajuster la taille des icônes inline personnalisées */
+        .ce-inline-tool.strikethrough-tool svg,
+        .ce-inline-tool.acronym-tool svg,
+        .ce-inline-tool[title="Barrer le texte"] svg,
+        .ce-inline-tool[title="Marquer dans le lexique"] svg {
+          width: 13px !important;
+          height: 13px !important;
+          max-width: 13px !important;
+          max-height: 13px !important;
+          min-width: 13px !important;
+          min-height: 13px !important;
+        }
+
+        /* Réduire l'épaisseur de l'icône strikethrough - cibler tous les SVG avec stroke-width > 1.5 */
+        .ce-inline-tool svg[stroke-width="2"] path,
+        .ce-inline-tool svg[stroke-width="2"] line,
+        .ce-inline-tool svg path[stroke-width="2"],
+        .ce-inline-tool svg line[stroke-width="2"],
+        .ce-inline-tool svg[style*="stroke-width: 2"] path,
+        .ce-inline-tool svg[style*="stroke-width: 2"] line {
+          stroke-width: 1.5 !important;
+        }
+
+        /* S'assurer que le bouton lui-même n'impose pas de taille */
+        .ce-inline-tool.strikethrough-tool,
+        .ce-inline-tool.acronym-tool,
+        .ce-inline-tool[title="Barrer le texte"],
+        .ce-inline-tool[title="Marquer dans le lexique"] {
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       `}</style>
     </div>

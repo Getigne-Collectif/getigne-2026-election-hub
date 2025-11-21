@@ -149,13 +149,33 @@ const AdminEventEditorPage = () => {
       setLocation(event.location || '');
       setDescription(event.description || '');
       
-      // Convertir le contenu markdown en EditorJS si nécessaire
-      const eventContent = event.content || '';
-      if (eventContent && typeof eventContent === 'string' && isMarkdown(eventContent)) {
-        setContent(markdownToEditorJS(eventContent));
-      } else {
-        setContent(eventContent);
+      // Traiter le contenu : parser le JSON EditorJS (exactement comme dans AdminNewsEditorPage)
+      let contentValue: string | OutputData = event.content;
+      
+      if (typeof event.content === 'string') {
+        try {
+          const parsed = JSON.parse(event.content);
+          if (parsed && typeof parsed === 'object' && Array.isArray(parsed.blocks)) {
+            contentValue = parsed;
+          } else {
+            // Ce n'est pas du JSON EditorJS valide, peut-être du markdown
+            if (isMarkdown(event.content)) {
+              contentValue = markdownToEditorJS(event.content);
+            }
+          }
+        } catch (e) {
+          // Ce n'est pas du JSON valide, peut-être du markdown
+          if (isMarkdown(event.content)) {
+            contentValue = markdownToEditorJS(event.content);
+          }
+        }
+      } else if (event.content && typeof event.content === 'object' && Array.isArray((event.content as OutputData).blocks)) {
+        // C'est déjà un objet OutputData
+        contentValue = event.content as OutputData;
       }
+      
+      // Toujours définir le contenu, même s'il est vide
+      setContent(contentValue || '');
       
       setImage(event.image || '');
       setCommitteeId(event.committee_id || '');
@@ -629,6 +649,7 @@ const AdminEventEditorPage = () => {
                         <Label>Contenu détaillé</Label>
                         <div className="mt-2">
                           <EditorJSComponent
+                            key={id || 'new'}
                             value={content}
                             onChange={(data: OutputData) => setContent(data)}
                             placeholder="Rédigez le contenu détaillé de l'événement..."
