@@ -213,7 +213,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
               <img 
                 src="/images/getigne-collectif-logo.png" 
                 alt="Gétigné Collectif" 
-                className="h-8 w-auto"
+                className="h-8 w-8 object-contain"
               />
             </div>
           )}

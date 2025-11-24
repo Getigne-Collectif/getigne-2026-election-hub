@@ -20,12 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Loader2, Upload, X, MapPin } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type {
   ElectoralListMemberWithDetails,
   ThematicRole,
 } from '@/types/electoral.types';
+import { geocodeAddress } from '@/utils/geocoding';
 
 interface EditMemberModalProps {
   open: boolean;
@@ -45,6 +46,9 @@ const EditMemberModal = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [geocoding, setGeocoding] = useState(false);
+  const [geocodingResult, setGeocodingResult] = useState<{ formattedAddress: string; latitude: number; longitude: number } | null>(null);
+  const [geocodingError, setGeocodingError] = useState<string | null>(null);
   
   // Team member form data
   const [formData, setFormData] = useState({
@@ -56,6 +60,11 @@ const EditMemberModal = ({
     phone: '',
     gender: '',
     birth_date: '',
+    address: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
+    education_level: '',
+    max_engagement_level: '',
   });
 
   // Roles data
@@ -73,7 +82,16 @@ const EditMemberModal = ({
         phone: member.team_member.phone || '',
         gender: member.team_member.gender || '',
         birth_date: member.team_member.birth_date || '',
+        address: member.team_member.address || '',
+        latitude: member.team_member.latitude || null,
+        longitude: member.team_member.longitude || null,
+        education_level: member.team_member.education_level || '',
+        max_engagement_level: member.team_member.max_engagement_level || '',
       });
+
+      // Réinitialiser les états de géocodification
+      setGeocodingResult(null);
+      setGeocodingError(null);
 
       const roleIds = new Set(member.roles.map((r) => r.thematic_role.id));
       setSelectedRoles(roleIds);
@@ -82,6 +100,59 @@ const EditMemberModal = ({
       setPrimaryRoleId(primaryRole?.thematic_role.id || null);
     }
   }, [member, open]);
+
+  // Géocodification automatique de l'adresse avec debounce
+  useEffect(() => {
+    if (!formData.address || formData.address.trim().length === 0) {
+      setFormData(prev => ({ ...prev, latitude: null, longitude: null }));
+      setGeocodingResult(null);
+      setGeocodingError(null);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setGeocoding(true);
+      setGeocodingError(null);
+      setGeocodingResult(null);
+      
+      try {
+        const result = await geocodeAddress(formData.address);
+        if (result) {
+          setFormData(prev => ({
+            ...prev,
+            latitude: result.latitude,
+            longitude: result.longitude,
+          }));
+          setGeocodingResult({
+            formattedAddress: result.formattedAddress,
+            latitude: result.latitude,
+            longitude: result.longitude,
+          });
+          setGeocodingError(null);
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            latitude: null,
+            longitude: null,
+          }));
+          setGeocodingResult(null);
+          setGeocodingError('Aucun résultat trouvé pour cette adresse');
+        }
+      } catch (error: any) {
+        setFormData(prev => ({
+          ...prev,
+          latitude: null,
+          longitude: null,
+        }));
+        setGeocodingResult(null);
+        setGeocodingError(error.message || 'Erreur lors de la géocodification');
+      } finally {
+        setGeocoding(false);
+      }
+    }, 1000); // Debounce de 1 seconde
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.address]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -189,6 +260,11 @@ const EditMemberModal = ({
         phone: formData.phone?.trim() || null,
         gender: formData.gender || null,
         birth_date: formData.birth_date || null,
+        address: formData.address?.trim() || null,
+        latitude: formData.latitude || null,
+        longitude: formData.longitude || null,
+        education_level: formData.education_level || null,
+        max_engagement_level: formData.max_engagement_level || null,
       };
 
       // Ne mettre à jour l'image que si elle a été modifiée
@@ -354,6 +430,114 @@ const EditMemberModal = ({
                     }
                     placeholder="06 12 34 56 78"
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="address">
+                    Adresse postale
+                    {geocoding && (
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        <Loader2 className="inline h-3 w-3 animate-spin mr-1" />
+                        Géocodification en cours...
+                      </span>
+                    )}
+                    {geocodingResult && !geocoding && (
+                      <span className="ml-2 text-sm text-green-600">
+                        <MapPin className="inline h-3 w-3 mr-1" />
+                        Géocodifiée
+                      </span>
+                    )}
+                    {geocodingError && !geocoding && (
+                      <span className="ml-2 text-sm text-red-600">
+                        Erreur
+                      </span>
+                    )}
+                  </Label>
+                  <Textarea
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
+                    placeholder="Rue, Code postal, Ville"
+                    rows={2}
+                  />
+                  {geocodingResult && !geocoding && (
+                    <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="text-sm font-medium text-green-800 mb-1">
+                        ✓ Adresse géocodifiée avec succès
+                      </div>
+                      <div className="text-xs text-green-700 mb-2">
+                        {geocodingResult.formattedAddress}
+                      </div>
+                      <div className="text-xs text-green-600 space-x-4">
+                        <span>Lat: {geocodingResult.latitude.toFixed(6)}</span>
+                        <span>Lng: {geocodingResult.longitude.toFixed(6)}</span>
+                      </div>
+                    </div>
+                  )}
+                  {geocodingError && !geocoding && (
+                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="text-sm font-medium text-red-800">
+                        ⚠ {geocodingError}
+                      </div>
+                      <div className="text-xs text-red-600 mt-1">
+                        Vérifiez que l'adresse est correcte et complète
+                      </div>
+                    </div>
+                  )}
+                  {!geocodingResult && !geocodingError && !geocoding && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      La latitude et longitude seront calculées automatiquement après la saisie
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="education_level">Niveau d'étude</Label>
+                  <Select
+                    value={formData.education_level || ''}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, education_level: value || '' })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un niveau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="brevet">Brevet / Fin de collège</SelectItem>
+                      <SelectItem value="cap_bep">CAP / BEP</SelectItem>
+                      <SelectItem value="bac_general">Bac général</SelectItem>
+                      <SelectItem value="bac_technologique">Bac technologique</SelectItem>
+                      <SelectItem value="bac_professionnel">Bac professionnel</SelectItem>
+                      <SelectItem value="bac_plus_1_2">Bac +1 / Bac +2 (BTS, DUT, DEUG)</SelectItem>
+                      <SelectItem value="bac_plus_3">Bac +3 (Licence, Licence pro)</SelectItem>
+                      <SelectItem value="bac_plus_4_5">Bac +4 / Bac +5 (Master, Grandes Écoles)</SelectItem>
+                      <SelectItem value="bac_plus_6_plus">Bac +6 et plus (Doctorat, HDR…)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="max_engagement_level">Niveau d'engagement max envisagé sur la liste</Label>
+                  <Select
+                    value={formData.max_engagement_level || ''}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, max_engagement_level: value || '' })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un niveau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="positions_1_8">8 premières places</SelectItem>
+                      <SelectItem value="positions_9_21">Places 9 à 21</SelectItem>
+                      <SelectItem value="positions_22_29">Places 22 à 29</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Si la position sur la liste est supérieure, la carte sera surlignée en rouge. Si inférieure ou égale, en bleu.
+                  </p>
                 </div>
 
                 <div>

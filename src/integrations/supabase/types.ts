@@ -1580,15 +1580,20 @@ export type Database = {
       }
       team_members: {
         Row: {
+          address: string | null
           bio: string | null
           birth_date: string | null
           created_at: string
+          education_level: 'brevet' | 'cap_bep' | 'bac_general' | 'bac_technologique' | 'bac_professionnel' | 'bac_plus_1_2' | 'bac_plus_3' | 'bac_plus_4_5' | 'bac_plus_6_plus' | null
           email: string | null
           gender: string | null
           id: string
           image: string | null
           is_board_member: boolean | null
           is_elected: boolean | null
+          latitude: number | null
+          longitude: number | null
+          max_engagement_level: 'positions_1_8' | 'positions_9_21' | 'positions_22_29' | null
           name: string
           phone: string | null
           profession: string | null
@@ -1596,15 +1601,20 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address?: string | null
           bio?: string | null
           birth_date?: string | null
           created_at?: string
+          education_level?: 'brevet' | 'cap_bep' | 'bac_general' | 'bac_technologique' | 'bac_professionnel' | 'bac_plus_1_2' | 'bac_plus_3' | 'bac_plus_4_5' | 'bac_plus_6_plus' | null
           email?: string | null
           gender?: string | null
           id?: string
           image?: string | null
           is_board_member?: boolean | null
           is_elected?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_engagement_level?: 'positions_1_8' | 'positions_9_21' | 'positions_22_29' | null
           name: string
           phone?: string | null
           profession?: string | null
@@ -1612,15 +1622,20 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address?: string | null
           bio?: string | null
           birth_date?: string | null
           created_at?: string
+          education_level?: 'brevet' | 'cap_bep' | 'bac_general' | 'bac_technologique' | 'bac_professionnel' | 'bac_plus_1_2' | 'bac_plus_3' | 'bac_plus_4_5' | 'bac_plus_6_plus' | null
           email?: string | null
           gender?: string | null
           id?: string
           image?: string | null
           is_board_member?: boolean | null
           is_elected?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          max_engagement_level?: 'positions_1_8' | 'positions_9_21' | 'positions_22_29' | null
           name?: string
           phone?: string | null
           profession?: string | null

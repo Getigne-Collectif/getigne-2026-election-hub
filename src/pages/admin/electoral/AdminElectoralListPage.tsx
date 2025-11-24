@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -7,9 +7,11 @@ import { useAuth } from '@/context/AuthContext';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Loader2 } from 'lucide-react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ElectoralListGrid from '@/components/admin/electoral/ElectoralListGrid';
 import UnassignedMembersList from '@/components/admin/electoral/UnassignedMembersList';
 import EditMemberModal from '@/components/admin/electoral/EditMemberModal';
+import ElectoralListAnalysis from '@/components/admin/electoral/ElectoralListAnalysis';
 import type {
   ElectoralList,
   ElectoralListMemberWithDetails,
@@ -21,6 +23,7 @@ import type {
 const AdminElectoralListPage = () => {
   const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [electoralList, setElectoralList] = useState<ElectoralList | null>(null);
@@ -35,6 +38,12 @@ const AdminElectoralListPage = () => {
   const [selectedMember, setSelectedMember] = useState<ElectoralListMemberWithDetails | null>(
     null
   );
+
+  // Gestion de l'onglet actif depuis l'URL
+  const activeTab = searchParams.get('tab') || 'construction';
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
+  };
 
   useEffect(() => {
     if (!authChecked) return;
@@ -713,6 +722,59 @@ const AdminElectoralListPage = () => {
     loadData();
   };
 
+  const handleUpdateMemberCoordinates = async (memberId: string, latitude: number, longitude: number) => {
+    try {
+      const { error } = await supabase
+        .from('team_members')
+        .update({ latitude, longitude })
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      // Mettre à jour localement les positions sans recharger toute la page
+      setPositions(prevPositions => 
+        prevPositions.map(pos => {
+          if (pos.member?.team_member_id === memberId) {
+            return {
+              ...pos,
+              member: {
+                ...pos.member,
+                team_member: {
+                  ...pos.member.team_member,
+                  latitude,
+                  longitude,
+                },
+              },
+            };
+          }
+          return pos;
+        })
+      );
+
+      // Mettre à jour aussi allMembers pour que les membres non assignés soient à jour
+      setAllMembers(prevMembers =>
+        prevMembers.map(member =>
+          member.id === memberId
+            ? { ...member, latitude, longitude }
+            : member
+        )
+      );
+
+      toast({
+        title: 'Coordonnées mises à jour',
+        description: 'Les coordonnées ont été sauvegardées avec succès.',
+      });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des coordonnées:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder les coordonnées.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
   if (!isAdmin) {
     return null;
   }
@@ -737,42 +799,60 @@ const AdminElectoralListPage = () => {
               <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
             </div>
           ) : (
-            <DndContext 
-                onDragStart={handleDragStart} 
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-              >
-                <div className="flex gap-6">
-                  <div className="flex-1 min-w-0">
-                    <ElectoralListGrid
-                      positions={positions}
-                      onOpenRolesModal={handleOpenEditModal}
-                      onRemoveMember={removeMemberFromPosition}
-                      overId={overId}
-                      draggedFrom={draggedFrom}
-                      getExpectedGender={getExpectedGenderForPosition}
-                    />
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="construction">Construction de la liste</TabsTrigger>
+                <TabsTrigger value="analysis">Analyse de la liste</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="construction">
+                <DndContext 
+                  onDragStart={handleDragStart} 
+                  onDragOver={handleDragOver}
+                  onDragEnd={handleDragEnd}
+                >
+                  <div className="flex gap-6">
+                    <div className="flex-1 min-w-0">
+                      <ElectoralListGrid
+                        positions={positions}
+                        onOpenRolesModal={handleOpenEditModal}
+                        onRemoveMember={removeMemberFromPosition}
+                        overId={overId}
+                        draggedFrom={draggedFrom}
+                        getExpectedGender={getExpectedGenderForPosition}
+                      />
+                    </div>
+
+                    <div className="w-80 flex-shrink-0">
+                      <UnassignedMembersList 
+                        members={unassignedMembers}
+                        positions={positions}
+                        getExpectedGender={getExpectedGenderForPosition}
+                        validateParityRule={validateParityRule}
+                        onAssignMember={assignMemberFromSelect}
+                      />
+                    </div>
                   </div>
 
-                <div className="w-80 flex-shrink-0">
-                  <UnassignedMembersList 
-                    members={unassignedMembers}
-                    positions={positions}
-                    getExpectedGender={getExpectedGenderForPosition}
-                    validateParityRule={validateParityRule}
-                    onAssignMember={assignMemberFromSelect}
-                  />
-                </div>
-              </div>
+                  <DragOverlay>
+                    {activeId && (
+                      <div className="bg-white border-2 border-getigne-accent rounded-lg p-4 shadow-lg">
+                        <div className="text-sm font-medium">Déplacement...</div>
+                      </div>
+                    )}
+                  </DragOverlay>
+                </DndContext>
+              </TabsContent>
 
-              <DragOverlay>
-                {activeId && (
-                  <div className="bg-white border-2 border-getigne-accent rounded-lg p-4 shadow-lg">
-                    <div className="text-sm font-medium">Déplacement...</div>
-                  </div>
-                )}
-              </DragOverlay>
-            </DndContext>
+              <TabsContent value="analysis">
+                <ElectoralListAnalysis 
+                  positions={positions} 
+                  onOpenEditModal={handleOpenEditModal}
+                  onUpdateMemberCoordinates={handleUpdateMemberCoordinates}
+                  getExpectedGenderForPosition={getExpectedGenderForPosition}
+                />
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </AdminLayout>

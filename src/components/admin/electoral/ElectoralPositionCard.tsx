@@ -127,6 +127,52 @@ const ElectoralPositionCard = ({
 
   const age = calculateAge(displayMember.team_member.birth_date);
 
+  // Déterminer la surbrillance selon le niveau d'engagement max
+  const getEngagementHighlight = () => {
+    // Si pas de niveau d'engagement max défini, bordure pointillée grise
+    if (!displayMember.team_member.max_engagement_level) {
+      return 'gray';
+    }
+
+    const maxLevel = displayMember.team_member.max_engagement_level;
+    const currentPosition = position.position;
+
+    // Déterminer la plage de positions acceptées selon le niveau d'engagement
+    let minPosition: number;
+    let maxPosition: number;
+    switch (maxLevel) {
+      case 'positions_1_8':
+        minPosition = 1;
+        maxPosition = 8;
+        break;
+      case 'positions_9_21':
+        minPosition = 9;
+        maxPosition = 21;
+        break;
+      case 'positions_22_29':
+        minPosition = 22;
+        maxPosition = 29;
+        break;
+      default:
+        return 'gray';
+    }
+
+    // Si la position est dans la plage acceptée → pas de surbrillance (OK)
+    if (currentPosition >= minPosition && currentPosition <= maxPosition) {
+      return null;
+    }
+    
+    // Si la position est plus haute (numéro plus bas) que la plage acceptée → rouge (trop haut)
+    if (currentPosition < minPosition) {
+      return 'red';
+    }
+    
+    // Si la position est plus basse (numéro plus élevé) que la plage acceptée → bleu (pourrait monter)
+    return 'blue';
+  };
+
+  const engagementHighlight = getEngagementHighlight();
+
   return (
     <div ref={setDroppableRef} className="h-full min-h-[480px]">
       <div
@@ -138,7 +184,15 @@ const ElectoralPositionCard = ({
       >
         <Card className={`h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow cursor-move ${
           isOver ? 'border-2 border-green-500 bg-green-50' : ''
-        } ${isPreviewMode ? 'opacity-60 border-2 border-dashed border-blue-400' : ''}`}>
+        } ${isPreviewMode ? 'opacity-60 border-2 border-dashed border-blue-400' : ''} ${
+          engagementHighlight === 'red' ? 'ring-4 ring-red-500 ring-opacity-75 bg-red-50/30' : ''
+        } ${
+          engagementHighlight === 'blue' ? 'ring-4 ring-blue-500 ring-opacity-75 bg-blue-50/30' : ''
+        } ${
+          engagementHighlight === 'gray' ? 'border-2 border-dashed border-gray-300' : ''
+        } ${
+          engagementHighlight === null ? '' : ''
+        }`}>
           <div className="relative">
             <div className="absolute top-2 left-2 z-10">
               <Badge className={`text-lg font-bold px-3 py-1 ${
@@ -209,6 +263,19 @@ const ElectoralPositionCard = ({
             </div>
           </div>
           <CardContent className="p-5 flex-1">
+            {engagementHighlight && engagementHighlight !== 'gray' && !isPreviewMode && (
+              <div className="mb-2">
+                <Badge 
+                  className={`text-xs font-semibold ${
+                    engagementHighlight === 'red' 
+                      ? 'bg-red-500 text-white' 
+                      : 'bg-blue-500 text-white'
+                  }`}
+                >
+                  {engagementHighlight === 'red' ? '⚠ Trop haut' : '↑ Pourrait monter'}
+                </Badge>
+              </div>
+            )}
             {displayMember.roles.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {displayMember.roles.map((role) => (
