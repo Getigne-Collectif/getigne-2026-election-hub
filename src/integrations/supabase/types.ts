@@ -1599,6 +1599,7 @@ export type Database = {
           profession: string | null
           role: string | null
           updated_at: string
+          vignoble_arrival_year: number | null
         }
         Insert: {
           address?: string | null
@@ -1620,6 +1621,7 @@ export type Database = {
           profession?: string | null
           role?: string | null
           updated_at?: string
+          vignoble_arrival_year?: number | null
         }
         Update: {
           address?: string | null
@@ -1629,6 +1631,7 @@ export type Database = {
           education_level?: 'brevet' | 'cap_bep' | 'bac_general' | 'bac_technologique' | 'bac_professionnel' | 'bac_plus_1_2' | 'bac_plus_3' | 'bac_plus_4_5' | 'bac_plus_6_plus' | null
           email?: string | null
           gender?: string | null
+          vignoble_arrival_year?: number | null
           id?: string
           image?: string | null
           is_board_member?: boolean | null

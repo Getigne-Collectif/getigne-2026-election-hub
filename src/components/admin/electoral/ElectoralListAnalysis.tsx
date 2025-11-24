@@ -422,6 +422,61 @@ const ElectoralListAnalysis = ({ positions, onOpenEditModal, onUpdateMemberCoord
       value,
     }));
 
+    // Statistiques d'ancrage territorial (nombre d'années dans le vignoble)
+    const currentYear = new Date().getFullYear();
+    const territorialAnchorageData: Array<{
+      name: string;
+      femmes: number;
+      hommes: number;
+      total: number;
+    }> = [
+      { name: '0-5 ans', femmes: 0, hommes: 0, total: 0 },
+      { name: '6-10 ans', femmes: 0, hommes: 0, total: 0 },
+      { name: '11-15 ans', femmes: 0, hommes: 0, total: 0 },
+      { name: '16-20 ans', femmes: 0, hommes: 0, total: 0 },
+      { name: '21+ ans', femmes: 0, hommes: 0, total: 0 },
+    ];
+
+    assignedMembers.forEach(m => {
+      const arrivalYear = m.team_member.vignoble_arrival_year;
+      if (!arrivalYear) return;
+
+      const yearsInVignoble = currentYear - arrivalYear;
+      const gender = m.team_member.gender;
+      let rangeIndex = -1;
+
+      if (yearsInVignoble >= 0 && yearsInVignoble <= 5) {
+        rangeIndex = 0;
+      } else if (yearsInVignoble >= 6 && yearsInVignoble <= 10) {
+        rangeIndex = 1;
+      } else if (yearsInVignoble >= 11 && yearsInVignoble <= 15) {
+        rangeIndex = 2;
+      } else if (yearsInVignoble >= 16 && yearsInVignoble <= 20) {
+        rangeIndex = 3;
+      } else if (yearsInVignoble >= 21) {
+        rangeIndex = 4;
+      }
+
+      if (rangeIndex >= 0) {
+        territorialAnchorageData[rangeIndex].total++;
+        if (gender === 'femme') {
+          territorialAnchorageData[rangeIndex].femmes++;
+        } else if (gender === 'homme') {
+          territorialAnchorageData[rangeIndex].hommes++;
+        }
+      }
+    });
+
+    // Filtrer les tranches vides et préparer les données pour le graphique
+    const territorialAnchorageChartData = territorialAnchorageData
+      .filter(range => range.total > 0)
+      .map(range => ({
+        name: range.name,
+        femmes: -range.femmes, // Négatif pour afficher à gauche (pyramide)
+        hommes: range.hommes,  // Positif pour afficher à droite
+        total: range.total,
+      }));
+
     // Identifier les fiches incomplètes
     const incompleteProfiles = assignedMembers
       .map(m => {
@@ -450,6 +505,7 @@ const ElectoralListAnalysis = ({ positions, onOpenEditModal, onUpdateMemberCoord
       averageAge,
       educationData,
       ageRangeData,
+      territorialAnchorageChartData,
       total,
       incompleteProfiles,
     };
@@ -720,7 +776,7 @@ const ElectoralListAnalysis = ({ positions, onOpenEditModal, onUpdateMemberCoord
         </Card>
       </div>
 
-      {/* Carte Google Maps - 1 colonne normalement, 2 sur très grand écran */}
+      {/* Carte Google Maps et Ancrage territorial - 1 colonne normalement, 2 sur très grand écran */}
       <div className="grid gap-6 2xl:grid-cols-2">
         <Card className="2xl:col-span-1">
           <CardHeader>
@@ -749,6 +805,78 @@ const ElectoralListAnalysis = ({ positions, onOpenEditModal, onUpdateMemberCoord
               </p>
             )}
           </div>
+          </CardContent>
+        </Card>
+
+        {/* Ancrage territorial */}
+        <Card className="2xl:col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Ancrage territorial
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm text-muted-foreground mb-4">
+              Nombre d'années passées dans le vignoble nantais
+            </div>
+            {stats.territorialAnchorageChartData.length > 0 ? (
+              <div className="w-full overflow-hidden">
+                <ChartContainer config={ageRangeChartConfig} className="h-[350px] w-full">
+                  <BarChart
+                    data={stats.territorialAnchorageChartData}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      type="number" 
+                      domain={['auto', 'auto']}
+                      tickFormatter={(value) => Math.abs(value).toString()}
+                    />
+                    <YAxis dataKey="name" type="category" width={70} />
+                    <ChartTooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-white border rounded-lg p-3 shadow-lg">
+                              <p className="font-medium">{data.name}</p>
+                              <p className="text-sm text-red-600">
+                                Femmes: {Math.abs(data.femmes)}
+                              </p>
+                              <p className="text-sm text-blue-600">
+                                Hommes: {data.hommes}
+                              </p>
+                              <p className="text-sm font-semibold mt-1">
+                                Total: {data.total}
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar 
+                      dataKey="femmes" 
+                      fill="#dc2626" 
+                      name="Femmes"
+                      radius={[0, 4, 4, 0]}
+                    />
+                    <Bar 
+                      dataKey="hommes" 
+                      fill="#2563eb" 
+                      name="Hommes"
+                      radius={[4, 0, 0, 4]}
+                    />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            ) : (
+              <div className="h-[350px] flex items-center justify-center text-muted-foreground text-sm">
+                Aucune donnée disponible (années d'arrivée non renseignées)
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

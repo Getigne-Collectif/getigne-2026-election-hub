@@ -48,6 +48,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
     longitude: null,
     education_level: null,
     max_engagement_level: null,
+    vignoble_arrival_year: null,
   });
 
   useEffect(() => {
@@ -237,6 +238,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
           longitude: formData.longitude || null,
           education_level: formData.education_level || null,
           max_engagement_level: formData.max_engagement_level || null,
+          vignoble_arrival_year: formData.vignoble_arrival_year || null,
         };
 
         const { error } = await supabase
@@ -269,6 +271,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
           longitude: formData.longitude || null,
           education_level: formData.education_level || null,
           max_engagement_level: formData.max_engagement_level || null,
+          vignoble_arrival_year: formData.vignoble_arrival_year || null,
         };
 
         const { error } = await supabase
@@ -466,7 +469,10 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
                 <Select
                   value={formData.education_level || ''}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, education_level: value || null })
+                    setFormData({ 
+                      ...formData, 
+                      education_level: (value || null) as 'brevet' | 'cap_bep' | 'bac_general' | 'bac_technologique' | 'bac_professionnel' | 'bac_plus_1_2' | 'bac_plus_3' | 'bac_plus_4_5' | 'bac_plus_6_plus' | null
+                    })
                   }
                 >
                   <SelectTrigger>
@@ -491,7 +497,10 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
                 <Select
                   value={formData.max_engagement_level || ''}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, max_engagement_level: value || null })
+                    setFormData({ 
+                      ...formData, 
+                      max_engagement_level: (value || null) as 'positions_1_8' | 'positions_9_21' | 'positions_22_29' | null
+                    })
                   }
                 >
                   <SelectTrigger>
@@ -507,43 +516,31 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
                   Si la position sur la liste est supérieure, la carte sera surlignée en rouge. Si inférieure ou égale, en bleu.
                 </p>
               </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Rôle dans l'association</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="role">Rôle</Label>
+                <Label htmlFor="vignoble_arrival_year">Année d'arrivée dans le vignoble</Label>
                 <Input
-                  id="role"
-                  value={formData.role}
+                  id="vignoble_arrival_year"
+                  type="number"
+                  min="1900"
+                  max={new Date().getFullYear()}
+                  value={formData.vignoble_arrival_year || ''}
                   onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
+                    setFormData({ 
+                      ...formData, 
+                      vignoble_arrival_year: e.target.value ? parseInt(e.target.value) : null 
+                    })
                   }
-                  placeholder="ex: Membre du collectif, Trésorier·e..."
+                  placeholder="Ex: 2015"
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Le rôle dans le collectif (différent des rôles thématiques sur la liste)
+                  Année d'arrivée dans le vignoble nantais (optionnel)
                 </p>
-              </div>
-
-              <div>
-                <Label htmlFor="bio">Biographie</Label>
-                <Textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) =>
-                    setFormData({ ...formData, bio: e.target.value })
-                  }
-                  placeholder="Présentez-vous en quelques mots..."
-                  rows={5}
-                />
               </div>
             </CardContent>
           </Card>
+
+          
         </div>
 
         <div className="space-y-6">
@@ -597,6 +594,40 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
                   <span className="text-sm">Téléchargement en cours...</span>
                 </div>
               )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Rôle dans l'association</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="role">Rôle</Label>
+                <Input
+                  id="role"
+                  value={formData.role}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
+                  placeholder="ex: Membre du collectif, Trésorier·e..."
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Le rôle dans le collectif (différent des rôles thématiques sur la liste)
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="bio">Biographie</Label>
+                <Textarea
+                  id="bio"
+                  value={formData.bio}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bio: e.target.value })
+                  }
+                  placeholder="Présentez-vous en quelques mots..."
+                  rows={5}
+                />
+              </div>
             </CardContent>
           </Card>
         </div>

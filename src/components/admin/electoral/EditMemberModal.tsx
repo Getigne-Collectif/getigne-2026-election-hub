@@ -65,6 +65,7 @@ const EditMemberModal = ({
     longitude: null as number | null,
     education_level: '',
     max_engagement_level: '',
+    vignoble_arrival_year: '',
   });
 
   // Roles data
@@ -87,6 +88,7 @@ const EditMemberModal = ({
         longitude: member.team_member.longitude || null,
         education_level: member.team_member.education_level || '',
         max_engagement_level: member.team_member.max_engagement_level || '',
+        vignoble_arrival_year: member.team_member.vignoble_arrival_year?.toString() || '',
       });
 
       // Réinitialiser les états de géocodification
@@ -265,6 +267,7 @@ const EditMemberModal = ({
         longitude: formData.longitude || null,
         education_level: formData.education_level || null,
         max_engagement_level: formData.max_engagement_level || null,
+        vignoble_arrival_year: formData.vignoble_arrival_year ? parseInt(formData.vignoble_arrival_year) : null,
       };
 
       // Ne mettre à jour l'image que si elle a été modifiée
@@ -537,6 +540,27 @@ const EditMemberModal = ({
                   </Select>
                   <p className="text-sm text-muted-foreground mt-1">
                     Si la position sur la liste est supérieure, la carte sera surlignée en rouge. Si inférieure ou égale, en bleu.
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="vignoble_arrival_year">Année d'arrivée dans le vignoble</Label>
+                  <Input
+                    id="vignoble_arrival_year"
+                    type="number"
+                    min="1900"
+                    max={new Date().getFullYear()}
+                    value={formData.vignoble_arrival_year || ''}
+                    onChange={(e) =>
+                      setFormData({ 
+                        ...formData, 
+                        vignoble_arrival_year: e.target.value 
+                      })
+                    }
+                    placeholder="Ex: 2015"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Année d'arrivée dans le vignoble nantais (optionnel)
                   </p>
                 </div>
 
