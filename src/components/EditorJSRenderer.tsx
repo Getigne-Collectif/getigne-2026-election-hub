@@ -177,17 +177,50 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
           5: 'text-lg font-bold mb-2 mt-4',
           6: 'text-base font-bold mb-2 mt-3'
         };
+        const headerStyle: React.CSSProperties = {};
+        if (block.data.textAlign && ['left', 'center', 'right', 'justify'].includes(block.data.textAlign)) {
+          headerStyle.textAlign = block.data.textAlign as 'left' | 'center' | 'right' | 'justify';
+        }
+        if (block.data.textSize && ['small', 'normal', 'large', 'x-large', 'xx-large'].includes(block.data.textSize)) {
+          const sizeMap: Record<string, string> = {
+            'small': '0.875rem',
+            'normal': '1rem',
+            'large': '1.25rem',
+            'x-large': '1.5rem',
+            'xx-large': '2rem'
+          };
+          headerStyle.fontSize = sizeMap[block.data.textSize];
+        }
         return (
-          <HeaderTag key={index} className={headerClasses[block.data.level as number] || headerClasses[2]}>
+          <HeaderTag 
+            key={index} 
+            className={headerClasses[block.data.level as number] || headerClasses[2]}
+            style={headerStyle}
+          >
             {parseAcronyms(block.data.text)}
           </HeaderTag>
         );
 
       case 'paragraph':
+        const paragraphStyle: React.CSSProperties = {};
+        if (block.data.textAlign && ['left', 'center', 'right', 'justify'].includes(block.data.textAlign)) {
+          paragraphStyle.textAlign = block.data.textAlign as 'left' | 'center' | 'right' | 'justify';
+        }
+        if (block.data.textSize && ['small', 'normal', 'large', 'x-large', 'xx-large'].includes(block.data.textSize)) {
+          const sizeMap: Record<string, string> = {
+            'small': '0.875rem',
+            'normal': '1rem',
+            'large': '1.25rem',
+            'x-large': '1.5rem',
+            'xx-large': '2rem'
+          };
+          paragraphStyle.fontSize = sizeMap[block.data.textSize];
+        }
         return (
           <p 
             key={index} 
             className="mb-4 leading-relaxed text-gray-700"
+            style={paragraphStyle}
           >
             {parseAcronyms(block.data.text)}
           </p>

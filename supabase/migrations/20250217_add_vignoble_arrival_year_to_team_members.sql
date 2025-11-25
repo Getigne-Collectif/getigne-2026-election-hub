@@ -7,3 +7,4 @@ ADD COLUMN IF NOT EXISTS vignoble_arrival_year INTEGER CHECK (vignoble_arrival_y
 COMMENT ON COLUMN team_members.vignoble_arrival_year IS 'Année d''arrivée dans le vignoble nantais. Utilisé pour analyser l''ancrage territorial des membres de la liste électorale';
 
 
+

@@ -18,6 +18,8 @@ import { supabase } from '@/integrations/supabase/client';
 import ImageCarouselTool from '@/components/editorjs/ImageCarouselTool';
 import AcronymTool from '@/components/editorjs/AcronymTool';
 import Strikethrough from 'editorjs-strikethrough';
+import TextAlignTool from '@/components/editorjs/TextAlignTool';
+import TextSizeTool from '@/components/editorjs/TextSizeTool';
 
 interface EditorJSComponentProps {
   value: OutputData | string;
@@ -140,10 +142,11 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       holder: holderRef.current,
       placeholder,
       data: initialData,
-      inlineToolbar: ['bold', 'italic', 'link', 'marker', 'acronym', 'strikethrough'],
+      inlineToolbar: ['bold', 'italic', 'textAlign', 'textSize', 'link', 'marker', 'acronym', 'strikethrough'],
       tools: {
         header: {
           class: Header,
+          inlineToolbar: true,
           config: {
             placeholder: 'Entrez un titre',
             levels: [1, 2, 3, 4, 5, 6],
@@ -189,6 +192,12 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
         },
         strikethrough: {
           class: Strikethrough
+        },
+        textAlign: {
+          class: TextAlignTool
+        },
+        textSize: {
+          class: TextSizeTool
         },
         code: {
           class: Code,
@@ -276,6 +285,81 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       onChange: async () => {
         if (editorRef.current && !isUpdating.current) {
           const data = await editorRef.current.save();
+          
+          // Extraire l'alignement depuis le DOM et l'ajouter aux données
+          if (data.blocks && holderRef.current && editorRef.current) {
+            data.blocks.forEach((block: any, index: number) => {
+              try {
+                const blockElement = (editorRef.current as any)?.blocks?.getBlockByIndex(index);
+                if (blockElement && blockElement.holder) {
+                  const blockContent = blockElement.holder.querySelector('.ce-block__content');
+                  if (blockContent) {
+                    const computedStyle = window.getComputedStyle(blockContent);
+                    let textAlign = computedStyle.textAlign;
+                    
+                    // Normaliser les valeurs (start -> left, end -> right)
+                    if (textAlign === 'start') textAlign = 'left';
+                    if (textAlign === 'end') textAlign = 'right';
+                    
+                    if (textAlign && ['left', 'center', 'right', 'justify'].includes(textAlign)) {
+                      // Ajouter l'alignement aux données du bloc seulement si ce n'est pas 'left' (valeur par défaut)
+                      if (!block.data) {
+                        block.data = {};
+                      }
+                      if (textAlign === 'left') {
+                        // Ne pas sauvegarder 'left' car c'est la valeur par défaut
+                        delete block.data.textAlign;
+                      } else {
+                        block.data.textAlign = textAlign;
+                      }
+                    } else if (block.data && block.data.textAlign === 'left') {
+                      // Supprimer textAlign si c'est 'left' (valeur par défaut)
+                      delete block.data.textAlign;
+                    }
+                    
+                    // Extraire la taille du texte depuis le DOM
+                    const fontSize = computedStyle.fontSize;
+                    if (fontSize) {
+                      // Parser la taille pour déterminer si c'est une taille personnalisée
+                      const sizeMap: Record<string, string> = {
+                        '0.875rem': 'small',
+                        '14px': 'small',
+                        '1rem': 'normal',
+                        '16px': 'normal',
+                        '1.25rem': 'large',
+                        '20px': 'large',
+                        '1.5rem': 'x-large',
+                        '24px': 'x-large',
+                        '2rem': 'xx-large',
+                        '32px': 'xx-large'
+                      };
+                      
+                      const normalizedSize = fontSize.trim().toLowerCase();
+                      const textSize = sizeMap[normalizedSize];
+                      
+                      if (textSize) {
+                        if (!block.data) {
+                          block.data = {};
+                        }
+                        if (textSize === 'normal') {
+                          // Ne pas sauvegarder 'normal' car c'est la valeur par défaut
+                          delete block.data.textSize;
+                        } else {
+                          block.data.textSize = textSize;
+                        }
+                      } else if (block.data && block.data.textSize === 'normal') {
+                        // Supprimer textSize si c'est 'normal' (valeur par défaut)
+                        delete block.data.textSize;
+                      }
+                    }
+                  }
+                }
+              } catch (e) {
+                // Ignorer les erreurs
+              }
+            });
+          }
+          
           const dataString = JSON.stringify(data);
           // Marquer que c'est une modification utilisateur
           isUserChangeRef.current = true;
@@ -285,6 +369,39 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       },
       onReady: () => {
         setIsReady(true);
+        // Appliquer l'alignement et la taille sauvegardés aux blocs
+        setTimeout(() => {
+          if (editorRef.current && initialData.blocks) {
+            initialData.blocks.forEach((block: any, index: number) => {
+              try {
+                const blockElement = (editorRef.current as any).blocks.getBlockByIndex(index);
+                if (blockElement && blockElement.holder) {
+                  const blockContent = blockElement.holder.querySelector('.ce-block__content');
+                  if (blockContent) {
+                    // Appliquer l'alignement
+                    if (block.data && block.data.textAlign && ['left', 'center', 'right', 'justify'].includes(block.data.textAlign)) {
+                      (blockContent as HTMLElement).style.textAlign = block.data.textAlign;
+                    }
+                    
+                    // Appliquer la taille
+                    if (block.data && block.data.textSize && ['small', 'normal', 'large', 'x-large', 'xx-large'].includes(block.data.textSize)) {
+                      const sizeMap: Record<string, string> = {
+                        'small': '0.875rem',
+                        'normal': '1rem',
+                        'large': '1.25rem',
+                        'x-large': '1.5rem',
+                        'xx-large': '2rem'
+                      };
+                      (blockContent as HTMLElement).style.fontSize = sizeMap[block.data.textSize];
+                    }
+                  }
+                }
+              } catch (e) {
+                // Ignorer les erreurs
+              }
+            });
+          }
+        }, 200);
       }
     } as any);
 
@@ -413,6 +530,7 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
         /* Ajuster la taille des icônes inline personnalisées */
         .ce-inline-tool.strikethrough-tool svg,
         .ce-inline-tool.acronym-tool svg,
+        .ce-inline-tool.text-align-tool svg,
         .ce-inline-tool[title="Barrer le texte"] svg,
         .ce-inline-tool[title="Marquer dans le lexique"] svg {
           width: 13px !important;
@@ -421,6 +539,16 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           max-height: 13px !important;
           min-width: 13px !important;
           min-height: 13px !important;
+        }
+        
+        /* Icône de taille plus grande pour T1-T5 */
+        .ce-inline-tool.text-size-tool svg {
+          width: 20px !important;
+          height: 20px !important;
+          max-width: 20px !important;
+          max-height: 20px !important;
+          min-width: 20px !important;
+          min-height: 20px !important;
         }
 
         /* Réduire l'épaisseur de l'icône strikethrough - cibler tous les SVG avec stroke-width > 1.5 */
@@ -436,6 +564,8 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
         /* S'assurer que le bouton lui-même n'impose pas de taille */
         .ce-inline-tool.strikethrough-tool,
         .ce-inline-tool.acronym-tool,
+        .ce-inline-tool.text-align-tool,
+        .ce-inline-tool.text-size-tool,
         .ce-inline-tool[title="Barrer le texte"],
         .ce-inline-tool[title="Marquer dans le lexique"] {
           display: flex;
