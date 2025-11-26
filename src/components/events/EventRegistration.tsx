@@ -94,6 +94,15 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
     }
   };
 
+  // Calculer les places restantes
+  const getAvailableSpots = () => {
+    if (!event?.max_participants) return null;
+    const available = event.max_participants - participantCount;
+    return Math.max(0, available);
+  };
+
+  const availableSpots = getAvailableSpots();
+
   const handleRegister = async () => {
     if (!user) {
       toast({
@@ -113,12 +122,12 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
       return;
     }
 
-    // Vérifier si le maximum de participants est atteint (en incluant les invités additionnels)
-    const totalWithGuests = participantCount + additionalGuests;
-    if (event?.max_participants && totalWithGuests > event.max_participants) {
+    // Vérifier si le maximum de participants est atteint (en incluant l'utilisateur et les invités)
+    const totalWithUserAndGuests = participantCount + 1 + additionalGuests;
+    if (event?.max_participants && totalWithUserAndGuests > event.max_participants) {
       toast({
         title: 'Événement complet',
-        description: `Le nombre maximum de participants (${event.max_participants}) serait dépassé avec ${additionalGuests} invité${additionalGuests > 1 ? 's' : ''} additionnel${additionalGuests > 1 ? 's' : ''}`,
+        description: `Le nombre maximum de participants (${event.max_participants}) serait dépassé. Places restantes: ${availableSpots || 0}`,
         variant: 'destructive'
       });
       return;
@@ -270,6 +279,24 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
   const handleUpdateGuests = async (newGuestCount: number) => {
     if (!user || !isRegistered) return;
 
+    // Vérifier la limite si elle existe
+    if (event?.max_participants) {
+      // Calculer le total avec le nouveau nombre d'invités
+      // participantCount inclut déjà l'utilisateur actuel et ses invités
+      const currentUserAndGuestsCount = 1 + additionalGuests;
+      const newTotal = participantCount - currentUserAndGuestsCount + 1 + newGuestCount;
+      
+      if (newTotal > event.max_participants) {
+        const available = event.max_participants - (participantCount - currentUserAndGuestsCount) - 1;
+        toast({
+          title: 'Limite atteinte',
+          description: `Impossible d'ajouter plus d'invités. Places restantes: ${Math.max(0, available)}`,
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+
     try {
       const { error } = await supabase
         .from('event_registrations')
@@ -309,6 +336,20 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
 
   const incrementGuests = () => {
     if (additionalGuests < 9) {
+      // Vérifier la limite
+      if (event?.max_participants) {
+        const currentUserAndGuestsCount = 1 + additionalGuests;
+        const newTotal = participantCount - currentUserAndGuestsCount + 1 + (additionalGuests + 1);
+        if (newTotal > event.max_participants) {
+          const available = event.max_participants - (participantCount - currentUserAndGuestsCount) - 1;
+          toast({
+            title: 'Limite atteinte',
+            description: `Places restantes: ${Math.max(0, available)}`,
+            variant: 'destructive'
+          });
+          return;
+        }
+      }
       handleUpdateGuests(additionalGuests + 1);
     }
   };
@@ -318,6 +359,23 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
       handleUpdateGuests(additionalGuests - 1);
     }
   };
+
+  // Calculer le nombre maximum d'invités possibles
+  const getMaxGuestsAllowed = () => {
+    if (!event?.max_participants) return 9; // Par défaut 9 invités max
+    if (!isRegistered) {
+      // Pour une nouvelle inscription, on compte l'utilisateur + ses invités
+      const available = availableSpots || 0;
+      return Math.min(9, Math.max(0, available - 1)); // -1 pour l'utilisateur lui-même
+    } else {
+      // Pour une inscription existante, on doit recalculer
+      const currentUserAndGuestsCount = 1 + additionalGuests;
+      const available = event.max_participants - (participantCount - currentUserAndGuestsCount) - 1;
+      return Math.min(9, Math.max(0, available));
+    }
+  };
+
+  const maxGuestsAllowed = getMaxGuestsAllowed();
 
   if (loading) {
     return <div className="flex justify-center py-4"><Loader2 className="animate-spin h-5 w-5" /></div>;
@@ -360,7 +418,13 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           <h3 className="font-medium">Inscription à l'événement</h3>
           <div className="text-getigne-500 text-sm flex items-center">
             <Users size={16} className="mr-1" />
-            <span>{participantCount} participant{participantCount > 1 ? 's' : ''}</span>
+            <span>
+              {participantCount} participant{participantCount > 1 ? 's' : ''}
+              {event?.max_participants && ` / ${event.max_participants}`}
+              {availableSpots !== null && availableSpots > 0 && (
+                <span className="text-green-600 ml-1">({availableSpots} place{availableSpots > 1 ? 's' : ''} restante{availableSpots > 1 ? 's' : ''})</span>
+              )}
+            </span>
           </div>
         </div>
         
@@ -425,7 +489,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={incrementGuests}
-                disabled={additionalGuests === 9}
+                disabled={additionalGuests >= maxGuestsAllowed}
                 className="h-8 w-8 p-0"
               >
                 <Plus size={16} />
@@ -434,6 +498,11 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
             {additionalGuests > 0 && (
               <p className="text-xs text-getigne-600 mt-2 text-center">
                 Vous venez avec {additionalGuests} invité{additionalGuests > 1 ? 's' : ''}
+              </p>
+            )}
+            {event?.max_participants && maxGuestsAllowed === 0 && (
+              <p className="text-xs text-red-600 mt-2 text-center">
+                Plus de places disponibles pour des invités
               </p>
             )}
           </div>
@@ -464,7 +533,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
                 Invités additionnels
               </span>
               <span className="text-xs text-getigne-500">
-                {additionalGuests}/9
+                {additionalGuests}/{maxGuestsAllowed}
               </span>
             </div>
             <div className="flex items-center justify-center gap-3">
@@ -483,8 +552,22 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setAdditionalGuests(Math.min(9, additionalGuests + 1))}
-                disabled={additionalGuests === 9}
+                onClick={() => {
+                  const newCount = additionalGuests + 1;
+                  if (event?.max_participants) {
+                    const totalWithUserAndGuests = participantCount + 1 + newCount;
+                    if (totalWithUserAndGuests > event.max_participants) {
+                      toast({
+                        title: 'Limite atteinte',
+                        description: `Places restantes: ${availableSpots || 0}`,
+                        variant: 'destructive'
+                      });
+                      return;
+                    }
+                  }
+                  setAdditionalGuests(Math.min(maxGuestsAllowed, newCount));
+                }}
+                disabled={additionalGuests >= maxGuestsAllowed || (event?.max_participants && participantCount >= event.max_participants)}
                 className="h-8 w-8 p-0"
               >
                 <Plus size={16} />
@@ -495,12 +578,22 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
                 Vous viendrez avec {additionalGuests} invité{additionalGuests > 1 ? 's' : ''}
               </p>
             )}
+            {event?.max_participants && maxGuestsAllowed === 0 && availableSpots === 0 && (
+              <p className="text-xs text-red-600 mt-2 text-center">
+                Événement complet
+              </p>
+            )}
+            {event?.max_participants && maxGuestsAllowed > 0 && availableSpots !== null && (
+              <p className="text-xs text-getigne-500 mt-2 text-center">
+                {availableSpots - additionalGuests - 1} place{availableSpots - additionalGuests - 1 > 1 ? 's' : ''} restante{availableSpots - additionalGuests - 1 > 1 ? 's' : ''} après votre inscription
+              </p>
+            )}
           </div>
           
           <Button 
             className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
             onClick={handleRegister}
-            disabled={registering || (event?.max_participants && participantCount >= event.max_participants)}
+            disabled={registering || (event?.max_participants && availableSpots !== null && availableSpots === 0)}
           >
             {registering ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
             S'inscrire{additionalGuests > 0 ? ` avec ${additionalGuests} invité${additionalGuests > 1 ? 's' : ''}` : ''}

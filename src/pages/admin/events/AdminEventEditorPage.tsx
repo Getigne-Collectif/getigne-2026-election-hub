@@ -50,6 +50,7 @@ const AdminEventEditorPage = () => {
   const [status, setStatus] = useState('published');
   const [allowRegistration, setAllowRegistration] = useState(true);
   const [isMembersOnly, setIsMembersOnly] = useState(false);
+  const [maxParticipants, setMaxParticipants] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slug, setSlug] = useState('');
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -182,6 +183,7 @@ const AdminEventEditorPage = () => {
       setStatus(event.status || 'published');
       setAllowRegistration(event.allow_registration !== false);
       setIsMembersOnly(event.is_members_only === true);
+      setMaxParticipants(event.max_participants ?? null);
       setSlug(event.slug || '');
       
       // Type d'événement
@@ -402,6 +404,7 @@ const AdminEventEditorPage = () => {
         committee: committeeId ? committees.find(c => c.id === committeeId)?.title : null,
         allow_registration: allowRegistration,
         is_members_only: isMembersOnly,
+        max_participants: maxParticipants || null,
         status,
         slug: eventSlug,
         event_type: eventType,
@@ -835,7 +838,6 @@ const AdminEventEditorPage = () => {
                       <h3 className="font-medium mb-4">Paramètres d'inscription</h3>
                       
                       <div className="space-y-4">
-                        {eventType === 'regular' ? (
                           <>
                             <div className="flex items-center justify-between">
                               <div>
@@ -860,19 +862,26 @@ const AdminEventEditorPage = () => {
                                 onCheckedChange={setIsMembersOnly} 
                               />
                             </div>
-                          </>
-                        ) : (
-                          <div className="text-sm text-getigne-600 bg-getigne-accent/10 p-3 rounded-lg">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Coffee className="w-4 h-4 text-getigne-accent" />
-                              <span className="font-medium">Café de quartier</span>
+                            
+                            <div>
+                              <Label htmlFor="max-participants" className="font-medium">Nombre maximum de participants</Label>
+                              <Input
+                                id="max-participants"
+                                type="number"
+                                min="1"
+                                value={maxParticipants ?? ''}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  setMaxParticipants(value === '' ? null : parseInt(value, 10));
+                                }}
+                                placeholder="Illimité"
+                                className="mt-2"
+                              />
+                              <p className="text-sm text-getigne-500 mt-1">
+                                Laissez vide pour ne pas limiter le nombre de participants
+                              </p>
                             </div>
-                            <p>
-                              Les cafés de quartier sont des événements ouverts à tous les habitants du secteur. 
-                              L'inscription n'est généralement pas requise pour ce type de rencontre conviviale.
-                            </p>
-                          </div>
-                        )}
+                          </>
                       </div>
                     </div>
                     
