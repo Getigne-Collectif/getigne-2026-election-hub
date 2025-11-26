@@ -58,13 +58,17 @@ export default function GeneralPresentationEditor() {
     const fetchPresentationContent = async () => {
       try {
         setIsLoading(true);
-        // Use the type assertion helper for the table name
+        
+        // Récupérer tous les enregistrements et prendre le plus récent
+        // Cela permet de gérer les cas où plusieurs enregistrements existent
         const { data, error } = await supabase
           .from('program_general')
           .select('*')
+          .order('updated_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
 
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
           throw error;
         }
 
@@ -96,19 +100,43 @@ export default function GeneralPresentationEditor() {
 
       const serializedContent = JSON.stringify(content ?? emptyContent);
       
-      // Check if record exists first
-      const { data: existingData, error: checkError } = await supabase
+      // Récupérer tous les enregistrements existants pour gérer les doublons
+      const { data: allRecords, error: fetchError } = await supabase
+        .from('program_general')
+        .select('id, updated_at')
+        .order('updated_at', { ascending: false });
+        
+      if (fetchError) throw fetchError;
+      
+      // Si plusieurs enregistrements existent, supprimer les doublons (garder le plus récent)
+      if (allRecords && allRecords.length > 1) {
+        const recordsToDelete = allRecords.slice(1); // Garder le premier (le plus récent)
+        const idsToDelete = recordsToDelete.map(r => r.id);
+        
+        const { error: deleteError } = await supabase
+          .from('program_general')
+          .delete()
+          .in('id', idsToDelete);
+          
+        if (deleteError) {
+          console.warn('Erreur lors de la suppression des doublons:', deleteError);
+          // On continue quand même la sauvegarde
+        }
+      }
+      
+      // Récupérer l'enregistrement unique (ou null s'il n'existe pas)
+      const { data: existingRecord, error: checkError } = await supabase
         .from('program_general')
         .select('id')
-        .limit(1);
+        .maybeSingle();
         
-      if (checkError) throw checkError;
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
       
-      let saveError;
-      
-      if (existingData && existingData.length > 0) {
-        // Update existing record
-        const { error } = await supabase
+      if (existingRecord) {
+        // Mettre à jour l'enregistrement existant
+        const { error: updateError } = await supabase
           .from('program_general')
           .update({ 
             content: serializedContent,
@@ -116,12 +144,12 @@ export default function GeneralPresentationEditor() {
             file_path: filePath,
             updated_at: new Date().toISOString()
           })
-          .eq('id', existingData[0].id);
+          .eq('id', existingRecord.id);
           
-        saveError = error;
+        if (updateError) throw updateError;
       } else {
-        // Insert new record
-        const { error } = await supabase
+        // Créer un nouvel enregistrement
+        const { error: insertError } = await supabase
           .from('program_general')
           .insert({ 
             content: serializedContent,
@@ -131,10 +159,8 @@ export default function GeneralPresentationEditor() {
             updated_at: new Date().toISOString()
           });
           
-        saveError = error;
+        if (insertError) throw insertError;
       }
-      
-      if (saveError) throw saveError;
       
       toast({
         title: "Sauvegarde réussie",
