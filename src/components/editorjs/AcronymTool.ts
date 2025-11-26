@@ -11,6 +11,8 @@ interface LexiconEntry {
 
 interface AcronymToolConfig {
   placeholder?: string;
+  onCreateEntry?: (searchTerm: string) => void;
+  onReloadRequested?: () => void;
 }
 
 interface API {
@@ -89,6 +91,17 @@ export default class AcronymTool {
       this.lexiconEntries = data || [];
     } catch (error) {
       console.error('Erreur lors du chargement du lexique:', error);
+    }
+  }
+
+  /**
+   * Recharge les entrées du lexique (méthode publique pour permettre le rechargement depuis l'extérieur)
+   */
+  public async reloadLexiconEntries(): Promise<void> {
+    await this.loadLexiconEntries();
+    // Si le dropdown est ouvert, mettre à jour la liste affichée
+    if (this.dropdown && this.searchInput && this.savedRange) {
+      this.filterEntries();
     }
   }
 
@@ -419,12 +432,58 @@ export default class AcronymTool {
     });
 
     if (filteredEntries.length === 0) {
+      const noResultsContainer = document.createElement('div');
+      noResultsContainer.style.cssText = `
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+      `;
+      
       const noResults = document.createElement('div');
-      noResults.style.padding = '8px';
-      noResults.style.color = '#6b7280';
-      noResults.style.fontSize = '14px';
+      noResults.style.cssText = `
+        color: #6b7280;
+        font-size: 14px;
+        text-align: center;
+      `;
       noResults.textContent = 'Aucune entrée trouvée';
-      entriesList.appendChild(noResults);
+      noResultsContainer.appendChild(noResults);
+      
+      // Bouton pour créer une nouvelle entrée
+      if (this.config.onCreateEntry && searchTerm.trim()) {
+        const createButton = document.createElement('button');
+        createButton.textContent = `Créer "${searchTerm}"`;
+        createButton.style.cssText = `
+          padding: 8px 16px;
+          background-color: #10b981;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        `;
+        
+        createButton.addEventListener('mouseenter', () => {
+          createButton.style.backgroundColor = '#059669';
+        });
+        
+        createButton.addEventListener('mouseleave', () => {
+          createButton.style.backgroundColor = '#10b981';
+        });
+        
+        createButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.config.onCreateEntry?.(searchTerm);
+          this.closeDropdown();
+        });
+        
+        noResultsContainer.appendChild(createButton);
+      }
+      
+      entriesList.appendChild(noResultsContainer);
       return;
     }
 

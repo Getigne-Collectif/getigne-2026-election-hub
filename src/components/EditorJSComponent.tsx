@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, memo, useState } from 'react';
+import React, { useEffect, useRef, memo, useState, useCallback } from 'react';
 import EditorJS, { OutputData } from '@editorjs/editorjs';
 import Header from '@editorjs/header';
 import List from '@editorjs/list';
@@ -21,6 +21,9 @@ import Strikethrough from 'editorjs-strikethrough';
 import TextAlignTool from '@/components/editorjs/TextAlignTool';
 import TextSizeTool from '@/components/editorjs/TextSizeTool';
 import ProgramLinkTool from '@/components/editorjs/ProgramLinkTool';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import LexiconEntryForm from '@/components/admin/lexicon/LexiconEntryForm';
+import { useToast } from '@/components/ui/use-toast';
 
 interface EditorJSComponentProps {
   value: OutputData | string;
@@ -43,6 +46,10 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
   const isUserChangeRef = useRef(false);
   const [initialValueKey, setInitialValueKey] = useState<string>('');
   const [isReady, setIsReady] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [newEntrySearchTerm, setNewEntrySearchTerm] = useState('');
+  const [isCreatingEntry, setIsCreatingEntry] = useState(false);
+  const { toast } = useToast();
 
   const parseValue = (val: OutputData | string): OutputData => {
     // Si c'est une chaîne vide ou null/undefined, retourner un contenu vide
@@ -113,6 +120,75 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       lastValueRef.current = currentValueKey;
     }
   }, [currentValueKey, initialValueKey]);
+
+  // Fonction pour gérer l'ouverture du drawer de création
+  const handleCreateEntry = useCallback((searchTerm: string) => {
+    setNewEntrySearchTerm(searchTerm);
+    setIsDrawerOpen(true);
+  }, []);
+
+  // Fonction pour recharger les entrées du lexique
+  const reloadLexiconEntries = useCallback(async () => {
+    if (editorRef.current) {
+      try {
+        // Accéder au tool via l'API d'EditorJS
+        const inlineToolbar = (editorRef.current as any).inlineToolbar;
+        if (inlineToolbar && inlineToolbar.tools) {
+          const acronymTool = inlineToolbar.tools.get('acronym');
+          if (acronymTool && typeof acronymTool.reloadLexiconEntries === 'function') {
+            await acronymTool.reloadLexiconEntries();
+          }
+        }
+      } catch (e) {
+        console.error('Erreur lors du rechargement des entrées:', e);
+      }
+    }
+  }, []);
+
+  // Fonction pour gérer la création d'une nouvelle entrée
+  const handleSubmitNewEntry = useCallback(async (formData: {
+    name: string;
+    acronym: string;
+    content: OutputData;
+    external_link: string;
+    logo_url: string | null;
+  }) => {
+    setIsCreatingEntry(true);
+    try {
+      const { error } = await supabase
+        .from('lexicon_entries')
+        .insert({
+          name: formData.name,
+          acronym: formData.acronym || null,
+          content: formData.content,
+          external_link: formData.external_link || null,
+          logo_url: formData.logo_url || null,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Succès',
+        description: 'L\'entrée du lexique a été créée avec succès',
+      });
+
+      // Recharger les entrées du lexique dans le tool
+      await reloadLexiconEntries();
+
+      // Fermer seulement le drawer, pas la dialog parente
+      setIsDrawerOpen(false);
+      setNewEntrySearchTerm('');
+    } catch (error) {
+      console.error('Erreur lors de la création de l\'entrée:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: 'Impossible de créer l\'entrée du lexique',
+      });
+    } finally {
+      setIsCreatingEntry(false);
+    }
+  }, [reloadLexiconEntries, toast]);
 
   useEffect(() => {
     if (!holderRef.current) return;
@@ -189,7 +265,11 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           class: Marker
         },
         acronym: {
-          class: AcronymTool
+          class: AcronymTool,
+          config: {
+            onCreateEntry: handleCreateEntry,
+            onReloadRequested: reloadLexiconEntries
+          }
         },
         strikethrough: {
           class: Strikethrough
@@ -373,6 +453,7 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
       },
       onReady: () => {
         setIsReady(true);
+        
         // Appliquer l'alignement et la taille sauvegardés aux blocs
         setTimeout(() => {
           if (editorRef.current && initialData.blocks) {
@@ -427,7 +508,7 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
         holderRef.current.innerHTML = '';
       }
     };
-  }, [initialValueKey]); // Dépendre de la clé initiale pour recréer seulement lors d'un changement externe
+  }, [initialValueKey, handleCreateEntry, reloadLexiconEntries]); // Dépendre de la clé initiale pour recréer seulement lors d'un changement externe
 
 
   return (
@@ -577,6 +658,85 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           justify-content: center;
         }
       `}</style>
+      
+      {/* Drawer pour créer une nouvelle entrée du lexique */}
+      <Sheet 
+        open={isDrawerOpen} 
+        onOpenChange={(open) => {
+          // Empêcher la fermeture si on est en train de créer
+          if (!isCreatingEntry) {
+            setIsDrawerOpen(open);
+            if (!open) {
+              setNewEntrySearchTerm('');
+            }
+          }
+        }}
+        modal={true}
+      >
+        <SheetContent 
+          side="right" 
+          className="w-full sm:max-w-3xl overflow-y-auto !z-[60]"
+          onInteractOutside={(e) => {
+            // Empêcher la fermeture lors d'un clic à l'extérieur si on est en train de créer
+            if (isCreatingEntry) {
+              e.preventDefault();
+            }
+            // Empêcher la propagation vers la dialog parente
+            e.stopPropagation();
+          }}
+          onEscapeKeyDown={(e) => {
+            // Empêcher la fermeture avec Escape si on est en train de créer
+            if (isCreatingEntry) {
+              e.preventDefault();
+            }
+            // Empêcher la propagation vers la dialog parente
+            e.stopPropagation();
+          }}
+          onPointerDownOutside={(e) => {
+            // Empêcher la propagation vers la dialog parente
+            e.stopPropagation();
+            // Empêcher la fermeture si on est en train de créer
+            if (isCreatingEntry) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <SheetHeader>
+            <SheetTitle>Créer une nouvelle entrée du lexique</SheetTitle>
+            <SheetDescription>
+              {newEntrySearchTerm && `Créer une entrée pour "${newEntrySearchTerm}"`}
+            </SheetDescription>
+          </SheetHeader>
+          <div 
+            className="mt-6"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <LexiconEntryForm
+              onSubmit={handleSubmitNewEntry}
+              onCancel={() => {
+                if (!isCreatingEntry) {
+                  setIsDrawerOpen(false);
+                  setNewEntrySearchTerm('');
+                }
+              }}
+              defaultValues={{
+                name: newEntrySearchTerm,
+                acronym: '',
+                content: {
+                  time: Date.now(),
+                  blocks: [],
+                  version: '2.28.0',
+                },
+                external_link: '',
+                logo_url: null,
+              }}
+              isSubmitting={isCreatingEntry}
+              submitLabel="Créer l'entrée"
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

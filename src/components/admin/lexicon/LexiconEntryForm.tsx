@@ -141,6 +141,7 @@ const LexiconEntryForm: React.FC<LexiconEntryFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Empêcher la propagation vers les éléments parents (comme la dialog)
 
     // Validation
     if (!formData.name.trim()) {

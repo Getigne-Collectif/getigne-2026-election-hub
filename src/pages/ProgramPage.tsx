@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar, Sparkles, Pencil } from 'lucide-react';
+import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar, Sparkles, Pencil, Edit } from 'lucide-react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
@@ -29,6 +29,14 @@ import FlagshipProjectEditModal from '@/components/program/FlagshipProjectEditMo
 import { fetchFlagshipProjects } from '@/services/programFlagshipProjects';
 import { generateProgramPDF } from '@/utils/generateProgramPDF';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import ProgramItemForm, { ProgramItemFormValues } from '@/components/admin/program/ProgramItemForm';
 
 type ProgramPointRow = Tables<'program_points'> & {
   competent_entity?: ProgramCompetentEntity | null;
@@ -116,6 +124,9 @@ const ProgramPage = () => {
   const [editingFlagshipProject, setEditingFlagshipProject] = useState<ProgramFlagshipProject | null>(null);
   const [flagshipEditModalOpen, setFlagshipEditModalOpen] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [editingSection, setEditingSection] = useState<ProgramItemWithPoints | null>(null);
+  const [sectionEditDialogOpen, setSectionEditDialogOpen] = useState(false);
+  const [isSubmittingSection, setIsSubmittingSection] = useState(false);
   const { settings } = useAppSettings();
   
   // Refs pour le sticky header de la section mesures
@@ -554,6 +565,61 @@ const ProgramPage = () => {
     }
   };
 
+  const handleEditSection = (item: ProgramItemWithPoints) => {
+    setEditingSection(item);
+    setSectionEditDialogOpen(true);
+  };
+
+  const handleSectionSubmit = async (values: ProgramItemFormValues) => {
+    if (!editingSection) return;
+
+    setIsSubmittingSection(true);
+    try {
+      const programData = {
+        title: values.title,
+        description: values.description,
+        icon: values.icon,
+        image: values.image || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from('program_items')
+        .update(programData)
+        .eq('id', editingSection.id);
+
+      if (error) throw error;
+
+      toast.success("Section mise à jour avec succès");
+      setSectionEditDialogOpen(false);
+      setEditingSection(null);
+      refetchProgramItems();
+    } catch (error: any) {
+      toast.error(`Erreur: ${error.message}`);
+    } finally {
+      setIsSubmittingSection(false);
+    }
+  };
+
+  const getSectionDefaultValues = (): Partial<ProgramItemFormValues> | undefined => {
+    if (!editingSection) return undefined;
+
+    const rawDescription = editingSection.description;
+    const normalizedDescription =
+      typeof rawDescription === 'string'
+        ? rawDescription
+        : rawDescription
+        ? JSON.stringify(rawDescription)
+        : '';
+
+    return {
+      title: editingSection.title,
+      description: normalizedDescription,
+      icon: editingSection.icon || '',
+      image: editingSection.image || '',
+    };
+  };
+
   if (!canAccessProgram) {
     return (
       <HelmetProvider>
@@ -794,6 +860,30 @@ const ProgramPage = () => {
           </>
         )}
 
+        {/* Dialog de modification de section */}
+        <Dialog open={sectionEditDialogOpen} onOpenChange={setSectionEditDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Modifier la section</DialogTitle>
+              <DialogDescription>
+                Modifiez les informations de cette section du programme
+              </DialogDescription>
+            </DialogHeader>
+            {editingSection && (
+              <ProgramItemForm
+                defaultValues={getSectionDefaultValues()}
+                onSubmit={handleSectionSubmit}
+                onCancel={() => {
+                  setSectionEditDialogOpen(false);
+                  setEditingSection(null);
+                }}
+                isSubmitting={isSubmittingSection}
+                submitLabel="Mettre à jour"
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
         {/* Section Nos mesures - Pleine largeur sans container */}
         <div ref={measuresSectionRef} className="w-full">
           {/* Sticky header léger */}
@@ -879,7 +969,7 @@ const ProgramPage = () => {
                           }`}>
                             <DynamicIcon name={item.icon} className={`w-5 h-5 ${activeSectionId === item.slug ? 'text-white' : 'text-getigne-700'}`} />
                           </span>
-                          <span className="text-left text-sm font-medium line-clamp-2">{item.title}</span>
+                          <span className="text-left text-sm font-medium line-clamp-2 uppercase">{item.title}</span>
                         </button>
                       ))}
                     </nav>
@@ -952,9 +1042,22 @@ const ProgramPage = () => {
                               <DynamicIcon name={item.icon} className="w-6 h-6 md:w-7 md:h-7" />
                             </div>
                             <div className="flex-1">
-                              <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-getigne-900 leading-tight">
-                                {item.title}
-                              </h2>
+                              <div className="flex items-center gap-3">
+                                <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-getigne-900 leading-tight">
+                                  {item.title}
+                                </h2>
+                                {showAdminControls && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEditSection(item)}
+                                    className="h-8 w-8 p-0"
+                                    aria-label="Modifier la section"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                             <div className="hidden md:block flex-shrink-0">
                               <ProgramLikeButton programId={item.id} />
