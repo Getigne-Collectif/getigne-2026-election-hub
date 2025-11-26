@@ -128,13 +128,6 @@ const ProgramPage = () => {
     userRoles.includes('admin') || 
     userRoles.includes('program_manager');
 
-  useEffect(() => {
-    // Ne scroller en haut que s'il n'y a pas d'ancre dans l'URL
-    if (!window.location.hash) {
-      window.scrollTo(0, 0);
-    }
-  }, []);
-
   const scrollToSection = async (slug: string) => {
     const el = document.getElementById(`section-${slug}`);
     if (el) {
@@ -286,6 +279,108 @@ const ProgramPage = () => {
     },
     enabled: !!user,
   });
+
+  // Gestion du scroll automatique au chargement avec hash
+  useEffect(() => {
+    const handleHashScroll = async () => {
+      const hash = window.location.hash;
+      
+      if (!hash) {
+        // Pas d'ancre, scroller en haut
+        window.scrollTo(0, 0);
+        return;
+      }
+
+      // Retirer le # du hash
+      const anchorId = hash.substring(1);
+      
+      // Vérifier si c'est une ancre de point de programme ou flagship
+      if (anchorId.startsWith('program-point-') || anchorId.startsWith('flagship-')) {
+        // Attendre que les données soient chargées
+        if (isLoadingItems || isLoadingFlagship) {
+          return;
+        }
+
+        // Attendre un peu que le DOM soit rendu
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const element = document.getElementById(anchorId);
+        if (element) {
+          // Attendre que les images soient chargées
+          const images = Array.from(element.querySelectorAll('img'));
+          const imagePromises = images
+            .filter(img => !img.complete)
+            .map(img => 
+              new Promise<void>(resolve => {
+                img.addEventListener('load', () => resolve());
+                img.addEventListener('error', () => resolve());
+                setTimeout(() => resolve(), 1000);
+              })
+            );
+          
+          if (imagePromises.length > 0) {
+            await Promise.all(imagePromises);
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
+          // Calculer la position avec un offset de 80px vers le haut
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementPosition - 120;
+          
+          // Scroller vers la position calculée
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+          
+          // Si c'est un point de programme, ouvrir automatiquement après le scroll
+          if (anchorId.startsWith('program-point-')) {
+            setTimeout(() => {
+              // Trouver le header cliquable dans la card et le cliquer pour ouvrir
+              const header = element.querySelector('[class*="cursor-pointer"]') as HTMLElement;
+              if (header) {
+                // Vérifier si le contenu n'est pas déjà ouvert en regardant les classes
+                const contentDiv = element.querySelector('[class*="grid"]') as HTMLElement;
+                if (contentDiv && !contentDiv.classList.contains('grid-rows-[1fr]')) {
+                  header.click();
+                }
+              }
+            }, 600);
+          }
+        }
+      } else if (anchorId.startsWith('section-')) {
+        // Ancre de section existante (gestion existante)
+        const slug = anchorId.replace('section-', '');
+        const sectionEl = document.getElementById(`section-${slug}`);
+        if (sectionEl) {
+          // Attendre un peu que les images de la section cible soient chargées
+          const sectionImages = Array.from(sectionEl.querySelectorAll('img'));
+          const imagePromises = sectionImages
+            .filter(img => !img.complete)
+            .map(img => 
+              new Promise<void>(resolve => {
+                img.addEventListener('load', () => resolve());
+                img.addEventListener('error', () => resolve());
+                setTimeout(() => resolve(), 1000);
+              })
+            );
+          
+          if (imagePromises.length > 0) {
+            await Promise.all(imagePromises);
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          
+          sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          window.history.pushState(null, '', `#${slug}`);
+        }
+      } else {
+        // Autre type d'ancre, scroller en haut par défaut
+        window.scrollTo(0, 0);
+      }
+    };
+
+    handleHashScroll();
+  }, [isLoadingItems, isLoadingFlagship]);
 
   const isProgramAdmin = isAdmin || userRoles.includes('program_manager');
   const showAdminControls = isProgramAdmin && isEditMode;

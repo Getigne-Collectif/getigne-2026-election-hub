@@ -27,6 +27,19 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
   const [commentCount, setCommentCount] = useState<number>(0);
   const [likeCount, setLikeCount] = useState<number>(0);
 
+  // Ouvrir automatiquement si on arrive via un maillage (hash dans l'URL)
+  useEffect(() => {
+    const pointId = `program-point-${point.id}`;
+    const hash = window.location.hash.substring(1);
+    
+    if (hash === pointId) {
+      // Attendre un peu que le scroll soit terminé avant d'ouvrir
+      setTimeout(() => {
+        setShowContent(true);
+      }, 500);
+    }
+  }, [point.id]);
+
   const downloadFile = (fileUrl: string) => {
     const link = document.createElement('a');
     link.href = fileUrl;
@@ -88,7 +101,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
         }))) as ProgramPointFileMeta[];
 
   return (
-    <Card key={point.id} className="border-getigne-200">
+    <Card key={point.id} id={`program-point-${point.id}`} className="border-getigne-200">
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-4 cursor-pointer" onClick={() => setShowContent(!showContent)}>
           <div className="flex items-center gap-3">

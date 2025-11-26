@@ -20,6 +20,7 @@ import AcronymTool from '@/components/editorjs/AcronymTool';
 import Strikethrough from 'editorjs-strikethrough';
 import TextAlignTool from '@/components/editorjs/TextAlignTool';
 import TextSizeTool from '@/components/editorjs/TextSizeTool';
+import ProgramLinkTool from '@/components/editorjs/ProgramLinkTool';
 
 interface EditorJSComponentProps {
   value: OutputData | string;
@@ -280,6 +281,9 @@ const EditorJSComponent: React.FC<EditorJSComponentProps> = ({
           config: {
             placeholder: 'Ajouter un carousel d\'images'
           }
+        },
+        programLink: {
+          class: ProgramLinkTool
         }
       },
       onChange: async () => {

@@ -64,7 +64,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
   const hasImage = Boolean(project.image_url);
 
   return (
-    <section className="relative py-16 md:py-24 lg:py-32 bg-gray-50">
+    <section id={`flagship-${project.id}`} className="relative py-16 md:py-24 lg:py-32 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Badge numéro */}

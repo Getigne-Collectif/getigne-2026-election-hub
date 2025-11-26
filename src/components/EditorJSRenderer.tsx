@@ -3,6 +3,9 @@ import { OutputData, OutputBlockData } from '@editorjs/editorjs';
 import ImageCarousel from '@/components/ImageCarousel';
 import AcronymTooltip from '@/components/AcronymTooltip';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { DynamicIcon } from '@/components/ui/dynamic-icon';
+import { ChevronRight } from 'lucide-react';
 
 interface EditorJSRendererProps {
   data: OutputData | string;
@@ -394,6 +397,17 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
           />
         );
 
+      case 'programLink':
+        return (
+          <ProgramLinkCard
+            key={index}
+            targetType={block.data.targetType}
+            targetId={block.data.targetId}
+            cachedTitle={block.data.title}
+            slug={block.data.slug}
+          />
+        );
+
       default:
         console.warn(`Unknown block type: ${block.type}`);
         return null;
@@ -403,6 +417,242 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
   return (
     <div className={`rich-content ${className}`}>
       {parsedData.blocks.map((block, index) => renderBlock(block, index))}
+    </div>
+  );
+};
+
+interface ProgramLinkCardProps {
+  targetType: 'program_point' | 'flagship' | 'event' | 'article' | 'page';
+  targetId: string;
+  cachedTitle?: string;
+  slug?: string;
+}
+
+const ProgramLinkCard: React.FC<ProgramLinkCardProps> = ({ targetType, targetId, cachedTitle, slug }) => {
+  const [title, setTitle] = useState<string>(cachedTitle || '');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [icon, setIcon] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(!cachedTitle);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        if (targetType === 'program_point') {
+          const { data, error } = await supabase
+            .from('program_points')
+            .select('title, program_items(icon)')
+            .eq('id', targetId)
+            .single();
+
+          if (error) throw error;
+          if (data) {
+            setTitle(data.title);
+            // Récupérer l'icône de la section associée
+            // program_items peut être un objet ou un tableau selon la relation
+            const programItem = Array.isArray(data.program_items) 
+              ? data.program_items[0] 
+              : (data.program_items as any);
+            if (programItem?.icon) {
+              setIcon(programItem.icon);
+            }
+          }
+        } else if (targetType === 'flagship') {
+          const { data, error } = await supabase
+            .from('program_flagship_projects')
+            .select('title, image_url')
+            .eq('id', targetId)
+            .single();
+
+          if (error) throw error;
+          if (data) {
+            setTitle(data.title);
+            if (data.image_url) {
+              setImageUrl(data.image_url);
+            }
+          }
+        } else if (targetType === 'event') {
+          const { data, error } = await supabase
+            .from('events')
+            .select('title, image')
+            .eq('id', targetId)
+            .single();
+
+          if (error) throw error;
+          if (data) {
+            setTitle(data.title);
+            if (data.image) {
+              setImageUrl(data.image);
+            }
+          }
+        } else if (targetType === 'article') {
+          const { data, error } = await supabase
+            .from('news')
+            .select('title, image')
+            .eq('id', targetId)
+            .single();
+
+          if (error) throw error;
+          if (data) {
+            setTitle(data.title);
+            if (data.image) {
+              setImageUrl(data.image);
+            }
+          }
+        } else if (targetType === 'page') {
+          // Pour les pages statiques, utiliser le titre depuis le slug
+          const pageTitles: Record<string, string> = {
+            'programme': 'Programme',
+            'contact': 'Contact',
+            'agenda': 'Agenda',
+            'news': 'Actualités'
+          };
+          setTitle(pageTitles[slug || targetId] || 'Page');
+          setIsLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+        setTitle('Point de programme');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (cachedTitle) {
+      setTitle(cachedTitle);
+      // Charger quand même les données supplémentaires (image/icône) sauf pour les pages
+      if (targetType !== 'page') {
+        loadData();
+      } else {
+        setIsLoading(false);
+      }
+    } else {
+      loadData();
+    }
+  }, [targetType, targetId, cachedTitle, slug]);
+
+  const handleNavigate = () => {
+    if (targetType === 'program_point' || targetType === 'flagship') {
+      const anchorId = targetType === 'program_point' 
+        ? `program-point-${targetId}`
+        : `flagship-${targetId}`;
+
+      if (window.location.pathname === '/programme') {
+        // On est déjà sur la page programme, scroller
+        const element = document.getElementById(anchorId);
+        if (element) {
+          // Mettre à jour l'URL avec le hash d'abord
+          window.history.pushState(null, '', `#${anchorId}`);
+          
+          // Calculer la position avec un offset de 80px vers le haut
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementPosition - 120;
+          
+          // Scroller vers la position calculée
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+          
+          // Si c'est un point de programme, déclencher l'ouverture après le scroll
+          if (targetType === 'program_point') {
+            setTimeout(() => {
+              // Trouver le bouton d'expansion dans la card et le cliquer
+              const header = element.querySelector('[class*="cursor-pointer"]') as HTMLElement;
+              if (header && !header.closest('.ce-block')) {
+                // Vérifier si le contenu n'est pas déjà ouvert
+                const contentDiv = element.querySelector('[class*="grid"]') as HTMLElement;
+                if (contentDiv && !contentDiv.classList.contains('grid-rows-[1fr]')) {
+                  header.click();
+                }
+              }
+            }, 600);
+          }
+        }
+      } else {
+        // Naviguer vers la page programme avec l'ancre
+        window.location.href = `/programme#${anchorId}`;
+      }
+    } else if (targetType === 'event') {
+      // Naviguer vers la page de l'événement
+      const eventPath = slug ? `/agenda/${slug}` : `/agenda/${targetId}`;
+      window.location.href = eventPath;
+    } else if (targetType === 'article') {
+      // Naviguer vers la page de l'article
+      const articlePath = slug ? `/news/${slug}` : `/news/${targetId}`;
+      window.location.href = articlePath;
+    } else if (targetType === 'page') {
+      // Naviguer vers la page statique
+      const pagePath = `/${slug || targetId}`;
+      window.location.href = pagePath;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-getigne-accent/10 to-cyan-500/10 border-2 border-getigne-accent/20 rounded-xl mb-4">
+        <div className="w-16 h-16 bg-gray-200 rounded-lg animate-pulse flex-shrink-0"></div>
+        <div className="flex-1">
+          <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse mb-2"></div>
+          <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+        </div>
+        <Button size="sm" disabled className="flex-shrink-0">
+          Chargement...
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      onClick={handleNavigate}
+      className="flex items-center gap-4 p-4 bg-gradient-to-r from-getigne-accent/10 via-cyan-500/10 to-getigne-accent/10 border-2 border-getigne-accent/30 rounded-xl mb-4 hover:border-getigne-accent/50 hover:shadow-lg transition-all group cursor-pointer"
+    >
+      {/* Image ou icône */}
+      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-getigne-accent to-cyan-500 flex items-center justify-center shadow-md">
+        {(targetType === 'flagship' || targetType === 'event' || targetType === 'article') && imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Si l'image ne charge pas, afficher l'icône par défaut
+              (e.currentTarget as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : icon ? (
+          <DynamicIcon name={icon} className="w-8 h-8 text-white" />
+        ) : targetType === 'page' ? (
+          <ChevronRight className="w-8 h-8 text-white" />
+        ) : (
+          <span className="text-white text-2xl font-bold">
+            {targetType === 'program_point' ? '📋' : targetType === 'flagship' ? '⭐' : targetType === 'event' ? '📅' : '📰'}
+          </span>
+        )}
+      </div>
+
+      {/* Contenu */}
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-semibold text-getigne-accent uppercase mb-1 tracking-wide">
+          {targetType === 'program_point' ? 'Point de programme' : targetType === 'flagship' ? 'Projet phare' : targetType === 'event' ? 'Événement' : targetType === 'article' ? 'Article' : 'Page'}
+        </div>
+        <div className="font-bold text-gray-900 text-base leading-tight group-hover:text-getigne-accent transition-colors">
+          {title || 'Point de programme'}
+        </div>
+      </div>
+
+      {/* Bouton */}
+      <Button
+        size="sm"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleNavigate();
+        }}
+        className="flex-shrink-0 bg-gradient-to-r from-getigne-accent to-cyan-500 text-white hover:from-getigne-accent/90 hover:to-cyan-500/90 shadow-md hover:shadow-lg transition-all whitespace-nowrap"
+      >
+        Voir →
+      </Button>
     </div>
   );
 };
