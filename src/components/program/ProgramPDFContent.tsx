@@ -283,7 +283,12 @@ const ProgramPDFContent: React.FC<ProgramPDFContentProps> = ({
 
         {programItems.map((item) => {
           const validatedPoints = item.program_points.filter(
-            (point) => !point.status || point.status === 'validated'
+            (point) => {
+              const status = point.status;
+              // Inclure les points validés, pending, to_discuss, ou sans statut (null/undefined)
+              // Exclure seulement les drafts
+              return !status || status === 'validated' || status === 'pending' || status === 'to_discuss';
+            }
           );
 
           return (

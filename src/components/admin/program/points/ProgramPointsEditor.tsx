@@ -122,7 +122,13 @@ export default function ProgramPointsEditor({
         )
       );
       
-      toast.success(`Statut mis à jour vers "${newStatus === 'draft' ? 'Brouillon' : newStatus === 'pending' ? 'À valider' : 'Validé'}"`);
+      const statusLabels: Record<ProgramPointStatus, string> = {
+        draft: 'Brouillon',
+        pending: 'À valider',
+        to_discuss: 'À discuter',
+        validated: 'Validé'
+      };
+      toast.success(`Statut mis à jour vers "${statusLabels[newStatus]}"`);
       onPointsUpdated?.();
     } catch (error: any) {
       toast.error(`Erreur lors de la mise à jour du statut: ${error.message}`);
@@ -224,6 +230,12 @@ export default function ProgramPointsEditor({
               <div className="flex items-center gap-1">
                 <StatusBadge status="pending" className="text-xs" disabled />
                 <span className="text-muted-foreground">({statusStats.pending})</span>
+              </div>
+            )}
+            {statusStats.to_discuss && (
+              <div className="flex items-center gap-1">
+                <StatusBadge status="to_discuss" className="text-xs" disabled />
+                <span className="text-muted-foreground">({statusStats.to_discuss})</span>
               </div>
             )}
             {statusStats.validated && (

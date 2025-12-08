@@ -1,7 +1,7 @@
 
 import type { OutputData } from '@editorjs/editorjs';
 
-export type ProgramPointStatus = 'draft' | 'pending' | 'validated';
+export type ProgramPointStatus = 'draft' | 'pending' | 'to_discuss' | 'validated';
 
 export interface ProgramPointFileMeta {
   url: string;

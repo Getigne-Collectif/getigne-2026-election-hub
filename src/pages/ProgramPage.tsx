@@ -133,15 +133,26 @@ const ProgramPage = () => {
   const measuresSectionRef = React.useRef<HTMLDivElement>(null);
   const measuresHeaderRef = React.useRef<HTMLDivElement>(null);
   const [showMeasuresSticky, setShowMeasuresSticky] = useState(false);
+  
+  // Refs pour le menu mobile horizontal
+  const mobileMenuContainerRef = React.useRef<HTMLDivElement>(null);
+  const mobileMenuButtonRefs = React.useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [isManualHorizontalScroll, setIsManualHorizontalScroll] = useState(false);
+  const [isManualVerticalScroll, setIsManualVerticalScroll] = useState(false);
 
   const canAccessProgram = 
     settings.showProgram || 
     userRoles.includes('admin') || 
     userRoles.includes('program_manager');
 
-  const scrollToSection = async (slug: string) => {
+  const scrollToSection = async (slug: string, isManual = true) => {
     const el = document.getElementById(`section-${slug}`);
     if (el) {
+      // Marquer comme scroll manuel si c'est le cas
+      if (isManual) {
+        setIsManualVerticalScroll(true);
+      }
+      
       // Attendre un peu que les images de la section cible soient chargées
       const sectionImages = Array.from(el.querySelectorAll('img'));
       const imagePromises = sectionImages
@@ -162,6 +173,13 @@ const ProgramPage = () => {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       // Mettre à jour l'URL avec l'ancre
       window.history.pushState(null, '', `#${slug}`);
+      
+      // Réinitialiser le flag après le scroll
+      if (isManual) {
+        setTimeout(() => {
+          setIsManualVerticalScroll(false);
+        }, 1000);
+      }
     }
   };
 
@@ -399,8 +417,8 @@ const ProgramPage = () => {
     programItems?.reduce((count, item) => {
       const points = Array.isArray(item.program_points) ? item.program_points : [];
       const validatedPoints = points.filter((point) => {
-        const status = (point.status as 'draft' | 'pending' | 'validated' | null) ?? 'validated';
-        return status === 'validated';
+        const status = (point.status as 'draft' | 'pending' | 'to_discuss' | 'validated' | null) ?? 'validated';
+        return status === 'validated' || status === 'pending' || status === 'to_discuss';
       });
       return count + validatedPoints.length;
     }, 0) ?? 0;
@@ -526,6 +544,122 @@ const ProgramPage = () => {
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, [programItems]);
+
+  // Scroll horizontal automatique du menu mobile quand activeSectionId change (scroll vertical)
+  useEffect(() => {
+    // Ne pas scroller horizontalement si c'est un scroll horizontal manuel qui a déclenché le changement
+    if (isManualHorizontalScroll || !activeSectionId || !mobileMenuContainerRef.current) return;
+    
+    const button = mobileMenuButtonRefs.current.get(activeSectionId);
+    if (!button) return;
+    
+    const container = mobileMenuContainerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
+    
+    // Vérifier si le bouton est déjà visible dans le viewport
+    const buttonLeft = buttonRect.left;
+    const buttonRight = buttonRect.right;
+    const containerLeft = containerRect.left;
+    const containerRight = containerRect.right;
+    
+    // Si le bouton n'est pas complètement visible, scroller pour le centrer
+    const isFullyVisible = buttonLeft >= containerLeft && buttonRight <= containerRight;
+    
+    if (!isFullyVisible) {
+      // Calculer la position pour centrer le bouton dans le conteneur
+      const scrollLeft = button.offsetLeft - container.offsetLeft - (containerRect.width / 2) + (buttonRect.width / 2);
+      
+      // Scroller en douceur vers le bouton actif
+      container.scrollTo({
+        left: Math.max(0, scrollLeft),
+        behavior: 'smooth'
+      });
+    }
+  }, [activeSectionId, isManualHorizontalScroll]);
+
+  // Détection du scroll horizontal dans le menu mobile pour déclencher un scroll vertical
+  useEffect(() => {
+    const container = mobileMenuContainerRef.current;
+    if (!container) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+    let lastScrollLeft = container.scrollLeft;
+    let isScrolling = false;
+
+    const handleHorizontalScroll = () => {
+      // Réinitialiser le timeout à chaque scroll
+      clearTimeout(scrollTimeout);
+      isScrolling = true;
+      
+      const currentScrollLeft = container.scrollLeft;
+      const scrollDelta = Math.abs(currentScrollLeft - lastScrollLeft);
+      
+      // Ignorer les très petits scrolls (glitches)
+      if (scrollDelta < 5) {
+        isScrolling = false;
+        return;
+      }
+      
+      // Attendre que le scroll se stabilise
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        
+        // Trouver quel bouton est actuellement le plus visible au centre du viewport
+        const containerRect = container.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
+        
+        let closestButton: { element: HTMLButtonElement; distance: number; slug: string; visibility: number } | null = null;
+        
+        mobileMenuButtonRefs.current.forEach((button, slug) => {
+          const buttonRect = button.getBoundingClientRect();
+          const buttonCenter = buttonRect.left + buttonRect.width / 2;
+          const distance = Math.abs(containerCenter - buttonCenter);
+          
+          // Calculer la visibilité du bouton dans le viewport
+          const buttonLeft = Math.max(containerRect.left, buttonRect.left);
+          const buttonRight = Math.min(containerRect.right, buttonRect.right);
+          const visibleWidth = Math.max(0, buttonRight - buttonLeft);
+          const visibility = visibleWidth / buttonRect.width;
+          
+          // Préférer le bouton le plus proche du centre, avec bonus pour visibilité
+          const score = distance - (visibility * 100);
+          
+          if (!closestButton || score < closestButton.distance) {
+            closestButton = {
+              element: button,
+              distance: score,
+              slug,
+              visibility
+            };
+          }
+        });
+        
+        // Si on a trouvé un bouton visible et qu'il n'est pas déjà actif
+        if (closestButton && closestButton.visibility > 0.3 && closestButton.slug !== activeSectionId) {
+          setIsManualHorizontalScroll(true);
+          setIsManualVerticalScroll(true);
+          
+          scrollToSection(closestButton.slug, false).then(() => {
+            // Réinitialiser les flags après un court délai
+            setTimeout(() => {
+              setIsManualHorizontalScroll(false);
+              setIsManualVerticalScroll(false);
+            }, 800);
+          });
+        }
+      }, 150);
+      
+      lastScrollLeft = currentScrollLeft;
+    };
+
+    container.addEventListener('scroll', handleHorizontalScroll, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', handleHorizontalScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [activeSectionId, programItems]);
 
   const handleEditModeToggle = (checked: boolean) => {
     setIsEditMode(checked);
@@ -928,12 +1062,22 @@ const ProgramPage = () => {
               {/* Navigation Mobile (horizontale) */}
               {programItems && programItems.length > 0 && (
                 <div className="md:hidden sticky top-16 z-20 -mx-4 px-4 bg-white/80 backdrop-blur-lg py-4 mb-8 border-b border-gray-200 shadow-sm">
-                  <div className="flex gap-3 overflow-x-auto no-scrollbar">
+                  <div 
+                    ref={mobileMenuContainerRef}
+                    className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth"
+                  >
                     {programItems.map((item) => (
                       <button
                         key={item.id}
+                        ref={(el) => {
+                          if (el) {
+                            mobileMenuButtonRefs.current.set(item.slug, el);
+                          } else {
+                            mobileMenuButtonRefs.current.delete(item.slug);
+                          }
+                        }}
                         onClick={() => scrollToSection(item.slug)}
-                        className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                        className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium border transition-all flex-shrink-0 ${
                           activeSectionId === item.slug
                             ? 'bg-gradient-to-r from-getigne-accent to-cyan-500 text-white border-transparent shadow-lg'
                             : 'bg-white text-gray-700 border-gray-200 hover:border-getigne-accent/30'
@@ -995,8 +1139,8 @@ const ProgramPage = () => {
                   {programItems?.map((item) => {
                     const allPoints = Array.isArray(item.program_points) ? item.program_points : [];
                     const visitorPoints = allPoints.filter((point) => {
-                      const status = (point.status as 'draft' | 'pending' | 'validated' | null) ?? null;
-                      return status === null || status === 'validated' || status === 'pending';
+                      const status = (point.status as 'draft' | 'pending' | 'to_discuss' | 'validated' | null) ?? null;
+                      return status === null || status === 'validated' || status === 'pending' || status === 'to_discuss';
                     });
                     const pointsToDisplay = showAdminControls ? allPoints : visitorPoints;
                     const hasDescriptionContent = (() => {
@@ -1113,7 +1257,7 @@ const ProgramPage = () => {
                                     content: point.content as unknown as string,
                                     position: point.position,
                                     program_item_id: point.program_item_id,
-                                    status: (point.status as 'draft' | 'pending' | 'validated') || 'validated',
+                                    status: (point.status as 'draft' | 'pending' | 'to_discuss' | 'validated') || 'validated',
                                   competent_entity_id:
                                     (point as unknown as { competent_entity_id?: string | null }).competent_entity_id ?? null,
                                   competent_entity:
@@ -1178,17 +1322,17 @@ const ProgramPage = () => {
               {/* Frise chronologique du processus (version publique) */}
               <div className="mt-16 md:mt-20">
                 <div className="bg-white rounded-xl md:rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
-                  <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 p-6 md:p-8">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm">
-                        <Clock className="w-6 h-6 text-white" />
+                  <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 p-4 md:p-6 lg:p-8">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/20 backdrop-blur-sm flex-shrink-0">
+                        <Clock className="w-5 h-5 md:w-6 md:h-6 text-white" />
                       </div>
-                      <h3 className="text-2xl md:text-3xl font-extrabold text-white">
+                      <h3 className="text-xl md:text-2xl lg:text-3xl font-extrabold text-white leading-tight">
                         Les étapes de l'élaboration de ce programme
                       </h3>
                     </div>
                   </div>
-                  <div className="p-6 md:p-8 lg:p-10">
+                  <div className="p-4 md:p-6 lg:p-8 xl:p-10">
                     <ProgramTimeline 
                       mini={false}
                       showToggle={false}

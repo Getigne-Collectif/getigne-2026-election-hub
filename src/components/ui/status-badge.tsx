@@ -28,6 +28,11 @@ const statusConfig = {
     variant: 'outline' as const,
     className: 'bg-yellow-50 text-yellow-700 border-yellow-200'
   },
+  to_discuss: {
+    label: 'À discuter',
+    variant: 'outline' as const,
+    className: 'bg-orange-50 text-orange-700 border-orange-200'
+  },
   validated: {
     label: 'Validé',
     variant: 'default' as const,
