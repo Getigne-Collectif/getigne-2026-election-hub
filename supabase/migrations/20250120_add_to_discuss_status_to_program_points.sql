@@ -7,3 +7,4 @@ ALTER TABLE public.program_points
   ADD CONSTRAINT program_points_status_check 
   CHECK (status IN ('draft', 'pending', 'to_discuss', 'validated'));
 
+
