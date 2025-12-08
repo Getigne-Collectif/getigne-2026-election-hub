@@ -25,12 +25,57 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const resourceType: ResourceType = newsId ? 'news' : 'program';
   const resourceId = newsId || programItemId || '';
 
+  // Helper function to organize comments into a tree structure
+  const organizeComments = (comments: Comment[]): Comment[] => {
+    const commentMap = new Map<string, Comment>();
+    const rootComments: Comment[] = [];
+
+    // First pass: create a map of all comments
+    comments.forEach((comment) => {
+      commentMap.set(comment.id, { ...comment, replies: [] });
+    });
+
+    // Second pass: organize into tree
+    comments.forEach((comment) => {
+      const commentWithReplies = commentMap.get(comment.id)!;
+      if (comment.parent_comment_id) {
+        const parent = commentMap.get(comment.parent_comment_id);
+        if (parent) {
+          if (!parent.replies) {
+            parent.replies = [];
+          }
+          parent.replies.push(commentWithReplies);
+        }
+      } else {
+        rootComments.push(commentWithReplies);
+      }
+    });
+
+    // Sort root comments by created_at (newest first)
+    rootComments.sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    // Sort replies by created_at (oldest first)
+    const sortReplies = (comment: Comment) => {
+      if (comment.replies && comment.replies.length > 0) {
+        comment.replies.sort((a, b) => 
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        comment.replies.forEach(sortReplies);
+      }
+    };
+    rootComments.forEach(sortReplies);
+
+    return rootComments;
+  };
+
   const fetchComments = async () => {
     setLoading(true);
     
     try {
       if (resourceType === 'news') {
-        // Modification importante: ne pas utiliser la relation directe, mais plutôt deux requêtes séparées
+        // Fetch all comments (including replies)
         const { data: commentsData, error: commentsError } = await supabase
           .from('comments')
           .select('*')
@@ -42,16 +87,49 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           throw commentsError;
         }
 
+        // Fetch likes count for all comments
+        const { data: likesData, error: likesError } = await supabase
+          .from('comment_likes')
+          .select('comment_id, user_id')
+          .in('comment_id', commentsData.map(c => c.id));
 
-        // Maintenant, récupérons les profils utilisateur séparément
+        if (likesError) {
+          console.warn('Error fetching likes:', likesError);
+        }
+
+        // Create a map of likes count and check if current user liked
+        const likesMap = new Map<string, { count: number; isLiked: boolean }>();
+        commentsData.forEach((comment) => {
+          const commentLikes = likesData?.filter(l => l.comment_id === comment.id) || [];
+          likesMap.set(comment.id, {
+            count: commentLikes.length,
+            isLiked: user ? commentLikes.some(l => l.user_id === user.id) : false,
+          });
+        });
+
+        // Fetch profiles and add likes info
         const commentWithProfiles = await Promise.all(
           commentsData.map(async (comment) => {
             try {
+              // Si user_id est null, c'est un utilisateur supprimé
+              if (!comment.user_id) {
+                const likesInfo = likesMap.get(comment.id) || { count: 0, isLiked: false };
+                return {
+                  ...comment,
+                  status: comment.status as CommentStatus,
+                  profiles: null,
+                  likes_count: likesInfo.count,
+                  is_liked: false, // Un utilisateur supprimé ne peut pas avoir liké
+                } as Comment;
+              }
+
               const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('id, first_name, last_name, avatar_url')
                 .eq('id', comment.user_id)
                 .single();
+
+              const likesInfo = likesMap.get(comment.id) || { count: 0, isLiked: false };
 
               if (profileError) {
                 console.warn('Error fetching profile for user_id:', comment.user_id, profileError);
@@ -62,33 +140,42 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
                     id: comment.user_id,
                     first_name: 'Utilisateur',
                     last_name: ''
-                  }
+                  },
+                  likes_count: likesInfo.count,
+                  is_liked: likesInfo.isLiked,
                 } as Comment;
               }
 
               return {
                 ...comment,
                 status: comment.status as CommentStatus,
-                profiles: profileData
+                profiles: profileData,
+                likes_count: likesInfo.count,
+                is_liked: likesInfo.isLiked,
               } as Comment;
             } catch (err) {
               console.error('Error processing comment:', err);
+              const likesInfo = likesMap.get(comment.id) || { count: 0, isLiked: false };
               return {
                 ...comment,
                 status: comment.status as CommentStatus,
-                profiles: {
+                profiles: comment.user_id ? {
                   id: comment.user_id,
                   first_name: 'Utilisateur',
                   last_name: ''
-                }
+                } : null,
+                likes_count: likesInfo.count,
+                is_liked: comment.user_id ? likesInfo.isLiked : false,
               } as Comment;
             }
           })
         );
 
-        setComments(commentWithProfiles);
+        // Organize comments into tree structure
+        const organizedComments = organizeComments(commentWithProfiles);
+        setComments(organizedComments);
       } else {
-        // For program comments, we need to use a different approach
+        // For program comments
         const { data, error } = await supabase
           .from('program_comments')
           .select('*')
@@ -108,15 +195,49 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
           filteredData = data.filter(comment => comment.program_point_id === null);
         }
 
-        // Now fetch the profile information for each comment
+        // Fetch likes count for all comments
+        const { data: likesData, error: likesError } = await supabase
+          .from('program_comment_likes')
+          .select('comment_id, user_id')
+          .in('comment_id', filteredData.map(c => c.id));
+
+        if (likesError) {
+          console.warn('Error fetching program comment likes:', likesError);
+        }
+
+        // Create a map of likes count and check if current user liked
+        const likesMap = new Map<string, { count: number; isLiked: boolean }>();
+        filteredData.forEach((comment) => {
+          const commentLikes = likesData?.filter(l => l.comment_id === comment.id) || [];
+          likesMap.set(comment.id, {
+            count: commentLikes.length,
+            isLiked: user ? commentLikes.some(l => l.user_id === user.id) : false,
+          });
+        });
+
+        // Fetch profiles and add likes info
         const commentsWithProfiles = await Promise.all(
           filteredData.map(async (comment) => {
             try {
+              // Si user_id est null, c'est un utilisateur supprimé
+              if (!comment.user_id) {
+                const likesInfo = likesMap.get(comment.id) || { count: 0, isLiked: false };
+                return {
+                  ...comment,
+                  status: comment.status as CommentStatus,
+                  profiles: null,
+                  likes_count: likesInfo.count,
+                  is_liked: false, // Un utilisateur supprimé ne peut pas avoir liké
+                } as Comment;
+              }
+
               const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('id, first_name, last_name, avatar_url')
                 .eq('id', comment.user_id)
                 .single();
+
+              const likesInfo = likesMap.get(comment.id) || { count: 0, isLiked: false };
 
               if (profileError) {
                 console.warn('Error fetching profile for program comment user_id:', comment.user_id, profileError);
@@ -127,31 +248,40 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
                     id: comment.user_id,
                     first_name: 'Utilisateur',
                     last_name: ''
-                  }
+                  },
+                  likes_count: likesInfo.count,
+                  is_liked: likesInfo.isLiked,
                 } as Comment;
               }
 
               return {
                 ...comment,
                 status: comment.status as CommentStatus,
-                profiles: profileData
+                profiles: profileData,
+                likes_count: likesInfo.count,
+                is_liked: likesInfo.isLiked,
               } as Comment;
             } catch (err) {
               console.error('Error processing program comment:', err);
+              const likesInfo = likesMap.get(comment.id) || { count: 0, isLiked: false };
               return {
                 ...comment,
                 status: comment.status as CommentStatus,
-                profiles: {
+                profiles: comment.user_id ? {
                   id: comment.user_id,
                   first_name: 'Utilisateur',
                   last_name: ''
-                }
+                } : null,
+                likes_count: likesInfo.count,
+                is_liked: comment.user_id ? likesInfo.isLiked : false,
               } as Comment;
             }
           })
         );
 
-        setComments(commentsWithProfiles);
+        // Organize comments into tree structure
+        const organizedComments = organizeComments(commentsWithProfiles);
+        setComments(organizedComments);
       }
     } catch (err: any) {
       console.error('Error in fetchComments:', err);
@@ -171,7 +301,60 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   }, [resourceId, resourceType, programPointId]);
 
   const handleAddComment = (newComment: Comment) => {
-    setComments([newComment, ...comments]);
+    // If it's a reply, we need to refresh to get the tree structure
+    if (newComment.parent_comment_id) {
+      fetchComments();
+    } else {
+      // If it's a root comment, add it to the beginning
+      setComments([newComment, ...comments]);
+    }
+  };
+
+  const handleCommentUpdated = (updatedComment: Comment) => {
+    // Helper function to update a comment in the tree
+    const updateCommentInTree = (comments: Comment[]): Comment[] => {
+      return comments.map((comment) => {
+        if (comment.id === updatedComment.id) {
+          return { ...comment, ...updatedComment };
+        }
+        if (comment.replies && comment.replies.length > 0) {
+          return {
+            ...comment,
+            replies: updateCommentInTree(comment.replies),
+          };
+        }
+        return comment;
+      });
+    };
+
+    setComments(updateCommentInTree(comments));
+  };
+
+  const handleCommentDeleted = (commentId: string) => {
+    // Helper function to remove or mark a comment as deleted in the tree
+    const deleteCommentInTree = (comments: Comment[]): Comment[] => {
+      return comments
+        .map((comment) => {
+          if (comment.id === commentId) {
+            // Si le commentaire a des réponses, on le marque comme deleted
+            // Sinon, on le retire complètement (retourne null pour le filtrer)
+            if (comment.replies && comment.replies.length > 0) {
+              return { ...comment, status: 'deleted' as CommentStatus };
+            }
+            return null; // Retirer complètement si pas de réponses
+          }
+          if (comment.replies && comment.replies.length > 0) {
+            return {
+              ...comment,
+              replies: deleteCommentInTree(comment.replies),
+            };
+          }
+          return comment;
+        })
+        .filter((comment): comment is Comment => comment !== null);
+    };
+
+    setComments(deleteCommentInTree(comments));
   };
 
   const handleModerateComment = async (commentId: string, status: CommentStatus) => {
@@ -208,7 +391,8 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
     }
   };
 
-  const approvedComments = comments.filter((c) => c.status === 'approved');
+  // Inclure les commentaires approuvés et supprimés (pour garder la structure)
+  const approvedComments = comments.filter((c) => c.status === 'approved' || c.status === 'deleted');
   const pendingComments = comments.filter((c) => c.status === 'pending');
 
   return (
@@ -229,8 +413,15 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
       {approvedComments.length > 0 && (
         <div>
           <UserView
-          comments={approvedComments}
-          loading={loading}
+            comments={approvedComments}
+            loading={loading}
+            resourceType={resourceType}
+            newsId={newsId}
+            programItemId={programItemId}
+            programPointId={programPointId}
+            onCommentAdded={handleAddComment}
+            onCommentUpdated={handleCommentUpdated}
+            onCommentDeleted={handleCommentDeleted}
           />
         </div>
       )}

@@ -1,5 +1,5 @@
 
-export type CommentStatus = 'pending' | 'approved' | 'rejected';
+export type CommentStatus = 'pending' | 'approved' | 'rejected' | 'deleted';
 
 export interface Profile {
   first_name: string;
@@ -11,12 +11,17 @@ export interface Profile {
 // Base comment interface with common properties
 export interface BaseComment {
   id: string;
-  user_id: string;
+  user_id: string | null; // Peut être null si l'utilisateur a supprimé son compte
   content: string;
   created_at: string;
   updated_at?: string;
+  edited_at?: string;
   status: CommentStatus;
   profiles?: Profile | null;
+  parent_comment_id?: string | null;
+  likes_count?: number;
+  is_liked?: boolean;
+  replies?: Comment[];
 }
 
 // Type for news comments

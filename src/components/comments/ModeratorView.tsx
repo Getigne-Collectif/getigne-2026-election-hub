@@ -152,9 +152,16 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
                   </div>
                 </div>
                 
-                <p className="mt-2 text-getigne-700">
+                <p className="mt-2 text-getigne-700 whitespace-pre-wrap">
                   {comment.content}
                 </p>
+                
+                {/* Afficher le nombre de likes si disponible */}
+                {comment.likes_count !== undefined && comment.likes_count > 0 && (
+                  <div className="mt-2 text-sm text-getigne-600">
+                    {comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}
+                  </div>
+                )}
 
                 <div className="mt-2 text-sm">
                   <span className={`px-2 py-1 rounded-full ${

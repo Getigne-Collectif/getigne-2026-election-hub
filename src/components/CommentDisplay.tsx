@@ -114,7 +114,7 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({
             )}
           </div>
           
-          <p className="text-getigne-700">{comment.content}</p>
+          <p className="text-getigne-700 whitespace-pre-wrap">{comment.content}</p>
           
           {/* Indicateur de statut pour les commentaires de l'utilisateur */}
           {comment.user_id === user?.id && comment.status !== 'approved' && (

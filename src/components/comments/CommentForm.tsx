@@ -14,6 +14,8 @@ interface CommentFormProps {
   programPointId?: string;
   onCommentAdded: (comment: Comment) => void;
   resourceType: ResourceType;
+  parentCommentId?: string | null;
+  onCancel?: () => void;
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({ 
@@ -21,7 +23,9 @@ const CommentForm: React.FC<CommentFormProps> = ({
   programItemId,
   programPointId,
   onCommentAdded,
-  resourceType
+  resourceType,
+  parentCommentId,
+  onCancel
 }) => {
   const { user, isAdmin, userRoles } = useAuth();
   const [content, setContent] = useState<string>('');
@@ -61,16 +65,21 @@ const CommentForm: React.FC<CommentFormProps> = ({
       if (resourceType === 'news') {
         
         // Insert into comments table for news
+        const commentInsert: any = {
+          user_id: user.id,
+          news_id: newsId,
+          content,
+          status: initialStatus,
+        };
+
+        // Add parent_comment_id if this is a reply
+        if (parentCommentId) {
+          commentInsert.parent_comment_id = parentCommentId;
+        }
+
         const { data: commentData, error: commentError } = await supabase
           .from('comments')
-          .insert([
-            {
-              user_id: user.id,
-              news_id: newsId,
-              content,
-              status: initialStatus,
-            },
-          ])
+          .insert([commentInsert])
           .select()
           .single();
 
@@ -130,6 +139,11 @@ const CommentForm: React.FC<CommentFormProps> = ({
           commentData.program_point_id = programPointId;
         }
 
+        // Add parent_comment_id if this is a reply
+        if (parentCommentId) {
+          commentData.parent_comment_id = parentCommentId;
+        }
+
         const { data: insertedComment, error: commentError } = await supabase
           .from(TABLES.PROGRAM_COMMENTS)
           .insert([commentData])
@@ -182,14 +196,19 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
       setContent('');
 
+      // Call onCancel if this was a reply
+      if (parentCommentId && onCancel) {
+        onCancel();
+      }
+
       if (initialStatus === 'pending') {
         toast({
-          title: "Commentaire envoyé",
+          title: parentCommentId ? "Réponse envoyée" : "Commentaire envoyé",
           description: "Votre commentaire sera visible après modération.",
         });
       } else {
         toast({
-          title: "Commentaire publié",
+          title: parentCommentId ? "Réponse publiée" : "Commentaire publié",
           description: "Votre commentaire a été publié avec succès.",
         });
       }
@@ -209,14 +228,14 @@ const CommentForm: React.FC<CommentFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Textarea
-          placeholder="Qu'est-ce que cela vous inspire... ajoutez un commentaire"
+          placeholder={parentCommentId ? "Écrivez votre réponse..." : "Qu'est-ce que cela vous inspire... ajoutez un commentaire"}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          rows={4}
+          rows={parentCommentId ? 3 : 4}
           className="w-full p-3 border rounded-md focus:ring-getigne-accent focus:border-getigne-accent"
         />
       </div>
-      <div>
+      <div className="flex gap-2">
         <Button 
           type="submit" 
           disabled={submitting}
@@ -228,9 +247,19 @@ const CommentForm: React.FC<CommentFormProps> = ({
               Envoi en cours...
             </>
           ) : (
-            "Publier un commentaire"
+            parentCommentId ? "Publier la réponse" : "Publier un commentaire"
           )}
         </Button>
+        {parentCommentId && onCancel && (
+          <Button 
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={submitting}
+          >
+            Annuler
+          </Button>
+        )}
       </div>
     </form>
   );
