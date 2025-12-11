@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar, Sparkles, Pencil, Edit } from 'lucide-react';
+import { ChevronDown, ChevronRight, MessageSquare, Heart, Users, Target, BookOpen, FileDown, Bell, Clock, FileText, Presentation, Calendar, Sparkles, Pencil, Edit, Copy } from 'lucide-react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
@@ -47,6 +47,9 @@ type ProgramItemWithPoints = Tables<'program_items'> & {
 };
 
 const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
+const PROGRAM_SHARE_TOKEN = (import.meta.env.VITE_PROGRAM_SHARE_TOKEN as string | undefined)?.trim();
+const SHARE_TOKEN_PARAM = 'program_share';
+const SHARE_TOKEN_STORAGE_KEY = 'program_share_token';
 
 const steps = [
   {
@@ -127,6 +130,8 @@ const ProgramPage = () => {
   const [editingSection, setEditingSection] = useState<ProgramItemWithPoints | null>(null);
   const [sectionEditDialogOpen, setSectionEditDialogOpen] = useState(false);
   const [isSubmittingSection, setIsSubmittingSection] = useState(false);
+  const [hasShareAccess, setHasShareAccess] = useState(false);
+  const [shareLink, setShareLink] = useState('');
   const { settings } = useAppSettings();
   
   // Refs pour le sticky header de la section mesures
@@ -140,10 +145,56 @@ const ProgramPage = () => {
   const [isManualHorizontalScroll, setIsManualHorizontalScroll] = useState(false);
   const [isManualVerticalScroll, setIsManualVerticalScroll] = useState(false);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !PROGRAM_SHARE_TOKEN) return;
+
+    const updateAccessFromToken = (tokenValue: string) => {
+      if (tokenValue === PROGRAM_SHARE_TOKEN) {
+        setHasShareAccess(true);
+        try {
+          localStorage.setItem(SHARE_TOKEN_STORAGE_KEY, tokenValue);
+        } catch {
+          // Ignore storage errors (quota/permissions)
+        }
+      }
+    };
+
+    // 1. Vérifier un token déjà stocké
+    try {
+      const storedToken = localStorage.getItem(SHARE_TOKEN_STORAGE_KEY);
+      if (storedToken) {
+        updateAccessFromToken(storedToken);
+      }
+    } catch {
+      // Ignore storage errors
+    }
+
+    // 2. Vérifier la présence dans l'URL puis nettoyer
+    const url = new URL(window.location.href);
+    const shareParam = url.searchParams.get(SHARE_TOKEN_PARAM);
+    if (shareParam) {
+      updateAccessFromToken(shareParam);
+
+      url.searchParams.delete(SHARE_TOKEN_PARAM);
+      const newSearch = url.searchParams.toString();
+      const cleanedUrl = `${url.pathname}${newSearch ? `?${newSearch}` : ''}${url.hash}`;
+      window.history.replaceState(null, '', cleanedUrl);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !PROGRAM_SHARE_TOKEN) return;
+
+    const url = new URL(Routes.PROGRAM, window.location.origin);
+    url.searchParams.set(SHARE_TOKEN_PARAM, PROGRAM_SHARE_TOKEN);
+    setShareLink(url.toString());
+  }, []);
+
   const canAccessProgram = 
     settings.showProgram || 
     userRoles.includes('admin') || 
-    userRoles.includes('program_manager');
+    userRoles.includes('program_manager') ||
+    hasShareAccess;
 
   const scrollToSection = async (slug: string, isManual = true) => {
     const el = document.getElementById(`section-${slug}`);
@@ -905,6 +956,27 @@ const ProgramPage = () => {
                   >
                     <FileDown className="w-4 h-4 mr-2" />
                     {isGeneratingPDF ? 'Génération...' : 'Télécharger le PDF complet'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      if (!shareLink) {
+                        toast.error("Lien de partage non configuré. Ajoutez VITE_PROGRAM_SHARE_TOKEN.");
+                        return;
+                      }
+
+                      try {
+                        await navigator.clipboard.writeText(shareLink);
+                        toast.success("Lien de partage copié");
+                      } catch (error: any) {
+                        toast.error(error?.message || "Impossible de copier le lien");
+                      }
+                    }}
+                    disabled={!shareLink}
+                    className="border-getigne-200 text-getigne-700 hover:text-getigne-900"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copier le lien public
                   </Button>
                   {showAdminControls && (
                     <Button asChild>
