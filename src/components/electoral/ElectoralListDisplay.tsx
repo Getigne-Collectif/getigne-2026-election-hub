@@ -8,10 +8,10 @@ interface ElectoralListDisplayProps {
 
 const ElectoralListDisplay = ({ positions }: ElectoralListDisplayProps) => {
   const titularPositions = positions.filter(
-    (p) => p.position <= 27 && p.member !== null
+    (p) => p.position <= 27 && p.member !== null && p.member.team_member.max_engagement_level !== null
   );
   const substitutePositions = positions.filter(
-    (p) => p.position > 27 && p.member !== null
+    (p) => p.position > 27 && p.member !== null && p.member.team_member.max_engagement_level !== null
   );
 
   return (

@@ -495,11 +495,11 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
               <div>
                 <Label htmlFor="max_engagement_level">Niveau d'engagement max envisagé sur la liste</Label>
                 <Select
-                  value={formData.max_engagement_level || ''}
+                  value={formData.max_engagement_level || 'none'}
                   onValueChange={(value) =>
                     setFormData({ 
                       ...formData, 
-                      max_engagement_level: (value || null) as 'positions_1_8' | 'positions_9_21' | 'positions_22_29' | null
+                      max_engagement_level: (value === 'none' ? null : (value || null)) as 'positions_1_8' | 'positions_9_21' | 'positions_22_29' | null
                     })
                   }
                 >
@@ -507,13 +507,14 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
                     <SelectValue placeholder="Sélectionner un niveau" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">Aucun</SelectItem>
                     <SelectItem value="positions_1_8">8 premières places</SelectItem>
                     <SelectItem value="positions_9_21">Places 9 à 21</SelectItem>
                     <SelectItem value="positions_22_29">Places 22 à 29</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Si la position sur la liste est supérieure, la carte sera surlignée en rouge. Si inférieure ou égale, en bleu.
+                  Si la position sur la liste est supérieure, la carte sera surlignée en rouge. Si inférieure ou égale, en bleu. Les personnes avec "Aucun" ne seront pas affichées dans la liste électorale.
                 </p>
               </div>
 

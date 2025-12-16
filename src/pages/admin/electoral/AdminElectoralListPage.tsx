@@ -144,11 +144,12 @@ const AdminElectoralListPage = () => {
       setAllMembers(allMembersData || []);
 
       // Filtrer les membres non assignés en utilisant positionsArray (pas positions qui est l'ancien état)
+      // Exclure aussi les membres avec max_engagement_level null (pas d'engagement)
       const assignedIds = new Set(
         positionsArray.filter((p) => p.member).map((p) => p.member!.team_member_id)
       );
       const unassigned = (allMembersData || []).filter(
-        (m) => !assignedIds.has(m.id)
+        (m) => !assignedIds.has(m.id) && m.max_engagement_level !== null
       );
       setUnassignedMembers(unassigned);
 
