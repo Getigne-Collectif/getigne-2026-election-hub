@@ -9,6 +9,7 @@ interface UserViewProps {
   newsId?: string;
   programItemId?: string;
   programPointId?: string;
+  flagshipProjectId?: string;
   onCommentAdded: (comment: Comment) => void;
   onCommentUpdated?: (comment: Comment) => void;
   onCommentDeleted?: (commentId: string) => void;
@@ -21,6 +22,7 @@ const UserView: React.FC<UserViewProps> = ({
   newsId,
   programItemId,
   programPointId,
+  flagshipProjectId,
   onCommentAdded,
   onCommentUpdated,
   onCommentDeleted
@@ -47,6 +49,7 @@ const UserView: React.FC<UserViewProps> = ({
           newsId={newsId}
           programItemId={programItemId}
           programPointId={programPointId}
+          flagshipProjectId={flagshipProjectId}
           onCommentAdded={onCommentAdded}
           onCommentUpdated={onCommentUpdated}
           onCommentDeleted={onCommentDeleted}

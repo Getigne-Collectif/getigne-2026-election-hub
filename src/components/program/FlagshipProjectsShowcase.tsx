@@ -3,8 +3,10 @@ import type { ProgramFlagshipProject, FlagshipProjectEffect, FlagshipProjectTime
 import EditorJSRenderer from '@/components/EditorJSRenderer';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { Button } from '@/components/ui/button';
-import { FileDown, Sparkles, Clock, Pencil } from 'lucide-react';
+import { FileDown, Sparkles, Clock, Pencil, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
+import Comments from '@/components/comments';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FlagshipProjectsShowcaseProps {
   projects: ProgramFlagshipProject[];
@@ -62,6 +64,32 @@ interface ProjectSectionProps {
 
 function ProjectSection({ project, index, isProgramAdmin, onEditProject }: ProjectSectionProps) {
   const hasImage = Boolean(project.image_url);
+  const [showComments, setShowComments] = useState(false);
+  const [commentCount, setCommentCount] = useState<number>(0);
+
+  // Fetch comment count
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const query = supabase
+          .from('program_comments')
+          .select('*', { count: 'exact', head: true }) as any;
+        
+        const { count, error } = await query
+          .eq('flagship_project_id', project.id)
+          .eq('status', 'approved');
+            
+        if (!error && count !== null) {
+          setCommentCount(count);
+        }
+      } catch (error) {
+        console.error('Error fetching comment count:', error);
+      }
+    };
+
+    fetchCommentCount();
+  }, [project.id]);
 
   return (
     <section id={`flagship-${project.id}`} className="relative py-16 md:py-24 lg:py-32 bg-gray-50">
@@ -217,6 +245,36 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
                 )}
               </aside>
             ) : null}
+          </div>
+
+          {/* Section commentaires avec accordéon */}
+          <div className="mt-8 border-t border-gray-200 pt-8">
+            <Button
+              variant="ghost"
+              className="w-full justify-between p-4 h-auto hover:bg-gray-50"
+              onClick={() => setShowComments(!showComments)}
+            >
+              <div className="flex items-center gap-3">
+                <MessageSquare className="w-5 h-5 text-getigne-accent" />
+                <span className="font-semibold text-getigne-900">Commenter</span>
+                {commentCount > 0 && (
+                  <span className="text-sm text-gray-500">
+                    ({commentCount} {commentCount === 1 ? 'message' : 'messages'})
+                  </span>
+                )}
+              </div>
+              {showComments ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </Button>
+
+            {showComments && (
+              <div className="mt-4">
+                <Comments flagshipProjectId={project.id} />
+              </div>
+            )}
           </div>
         </div>
       </div>

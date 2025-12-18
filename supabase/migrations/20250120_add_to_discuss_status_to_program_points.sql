@@ -8,3 +8,8 @@ ALTER TABLE public.program_points
   CHECK (status IN ('draft', 'pending', 'to_discuss', 'validated'));
 
 
+
+
+
+
+

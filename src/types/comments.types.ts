@@ -33,8 +33,9 @@ export interface NewsComment extends BaseComment {
 
 // Type for program comments
 export interface ProgramComment extends BaseComment {
-  program_item_id: string;
+  program_item_id?: string | null;
   program_point_id?: string | null;
+  flagship_project_id?: string | null;
   news_id?: never;
 }
 

@@ -12,6 +12,7 @@ interface CommentFormProps {
   newsId?: string;
   programItemId?: string;
   programPointId?: string;
+  flagshipProjectId?: string;
   onCommentAdded: (comment: Comment) => void;
   resourceType: ResourceType;
   parentCommentId?: string | null;
@@ -22,6 +23,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
   newsId, 
   programItemId,
   programPointId,
+  flagshipProjectId,
   onCommentAdded,
   resourceType,
   parentCommentId,
@@ -126,13 +128,20 @@ const CommentForm: React.FC<CommentFormProps> = ({
         });
       } else {
         
-        // Insert into program_comments table for program items or points
+        // Insert into program_comments table for program items, points, or flagship projects
         const commentData: any = {
           user_id: user.id,
-          program_item_id: programItemId,
           content,
           status: initialStatus,
         };
+
+        // Add flagship_project_id if applicable
+        if (flagshipProjectId) {
+          commentData.flagship_project_id = flagshipProjectId;
+        } else if (programItemId) {
+          // Only add program_item_id if not a flagship project
+          commentData.program_item_id = programItemId;
+        }
 
         // Add the program_point_id if applicable
         if (programPointId) {

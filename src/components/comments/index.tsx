@@ -11,9 +11,10 @@ interface CommentsProps {
   newsId?: string;
   programItemId?: string;
   programPointId?: string;
+  flagshipProjectId?: string;
 }
 
-const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPointId }) => {
+const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPointId, flagshipProjectId }) => {
   const { user, isAdmin, isModerator } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -176,10 +177,24 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         setComments(organizedComments);
       } else {
         // For program comments
-        const { data, error } = await supabase
+        let query = supabase
           .from('program_comments')
-          .select('*')
-          .eq('program_item_id', resourceId);
+          .select('*');
+
+        // Si c'est pour un projet phare, filtrer par flagship_project_id
+        if (flagshipProjectId) {
+          query = query.eq('flagship_project_id', flagshipProjectId);
+        } else if (programItemId) {
+          // Sinon, utiliser program_item_id comme avant
+          query = query.eq('program_item_id', programItemId);
+        } else {
+          // Si ni l'un ni l'autre, retourner un tableau vide
+          setComments([]);
+          setLoading(false);
+          return;
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           console.error('Error fetching program comments:', error);
@@ -187,12 +202,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         }
 
         // If this is for a program point, filter by program_point_id
-        let filteredData = data;
+        let filteredData = data || [];
         if (programPointId) {
-          filteredData = data.filter(comment => comment.program_point_id === programPointId);
-        } else {
-          // If not for a specific point, only get comments without a point id
-          filteredData = data.filter(comment => comment.program_point_id === null);
+          filteredData = filteredData.filter(comment => comment.program_point_id === programPointId);
+        } else if (!flagshipProjectId) {
+          // If not for a specific point and not a flagship project, only get comments without a point id
+          filteredData = filteredData.filter(comment => comment.program_point_id === null);
         }
 
         // Fetch likes count for all comments
@@ -298,7 +313,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
   useEffect(() => {
     fetchComments();
-  }, [resourceId, resourceType, programPointId]);
+  }, [resourceId, resourceType, programPointId, flagshipProjectId]);
 
   const handleAddComment = (newComment: Comment) => {
     // If it's a reply, we need to refresh to get the tree structure
@@ -419,6 +434,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
             newsId={newsId}
             programItemId={programItemId}
             programPointId={programPointId}
+            flagshipProjectId={flagshipProjectId}
             onCommentAdded={handleAddComment}
             onCommentUpdated={handleCommentUpdated}
             onCommentDeleted={handleCommentDeleted}
@@ -433,6 +449,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
             newsId={newsId}
             programItemId={programItemId}
             programPointId={programPointId}
+            flagshipProjectId={flagshipProjectId}
             onCommentAdded={handleAddComment}
             resourceType={resourceType}
           />

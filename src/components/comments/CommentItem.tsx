@@ -29,6 +29,7 @@ interface CommentItemProps {
   newsId?: string;
   programItemId?: string;
   programPointId?: string;
+  flagshipProjectId?: string;
   onCommentAdded: (comment: Comment) => void;
   onCommentUpdated?: (comment: Comment) => void;
   onCommentDeleted?: (commentId: string) => void;
@@ -41,6 +42,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   newsId,
   programItemId,
   programPointId,
+  flagshipProjectId,
   onCommentAdded,
   onCommentUpdated,
   onCommentDeleted,
@@ -213,6 +215,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 newsId={newsId}
                 programItemId={programItemId}
                 programPointId={programPointId}
+                flagshipProjectId={flagshipProjectId}
                 onCommentAdded={handleReplyAdded}
                 resourceType={resourceType}
                 parentCommentId={comment.id}
@@ -275,6 +278,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               newsId={newsId}
               programItemId={programItemId}
               programPointId={programPointId}
+              flagshipProjectId={flagshipProjectId}
               onCommentAdded={onCommentAdded}
               onCommentUpdated={onCommentUpdated}
               onCommentDeleted={onCommentDeleted}
