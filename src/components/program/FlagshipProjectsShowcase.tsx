@@ -7,6 +7,9 @@ import { FileDown, Sparkles, Clock, Pencil, MessageSquare, ChevronDown, ChevronU
 import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
 import Comments from '@/components/comments';
 import { supabase } from '@/integrations/supabase/client';
+import CommentCountBadge from '@/components/comments/CommentCountBadge';
+import { getUnreadCommentCount } from '@/utils/commentViews';
+import { useAuth } from '@/context/auth';
 
 interface FlagshipProjectsShowcaseProps {
   projects: ProgramFlagshipProject[];
@@ -63,9 +66,18 @@ interface ProjectSectionProps {
 }
 
 function ProjectSection({ project, index, isProgramAdmin, onEditProject }: ProjectSectionProps) {
+  const { user } = useAuth();
   const hasImage = Boolean(project.image_url);
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  // Réinitialiser le badge quand la section se ferme
+  useEffect(() => {
+    if (!showComments) {
+      setUnreadCount(0);
+    }
+  }, [showComments]);
 
   // Fetch comment count
   useEffect(() => {
@@ -82,6 +94,18 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
             
         if (!error && count !== null) {
           setCommentCount(count);
+          
+          // Récupérer le nombre de commentaires non lus
+          if (user && count > 0) {
+            const unread = await getUnreadCommentCount(
+              '',
+              'program',
+              user.id,
+              undefined,
+              project.id
+            );
+            setUnreadCount(unread);
+          }
         }
       } catch (error) {
         console.error('Error fetching comment count:', error);
@@ -89,7 +113,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
     };
 
     fetchCommentCount();
-  }, [project.id]);
+  }, [project.id, user]);
 
   return (
     <section id={`flagship-${project.id}`} className="relative py-16 md:py-24 lg:py-32 bg-gray-50">
@@ -258,9 +282,11 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
                 <MessageSquare className="w-5 h-5 text-getigne-accent" />
                 <span className="font-semibold text-getigne-900">Commenter</span>
                 {commentCount > 0 && (
-                  <span className="text-sm text-gray-500">
-                    ({commentCount} {commentCount === 1 ? 'message' : 'messages'})
-                  </span>
+                  <CommentCountBadge
+                    totalCount={commentCount}
+                    unreadCount={unreadCount}
+                    showIcon={false}
+                  />
                 )}
               </div>
               {showComments ? (

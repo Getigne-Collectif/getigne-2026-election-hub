@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from './utils';
 import { Comment, ResourceType } from '@/types/comments.types';
@@ -33,6 +33,7 @@ interface CommentItemProps {
   onCommentAdded: (comment: Comment) => void;
   onCommentUpdated?: (comment: Comment) => void;
   onCommentDeleted?: (commentId: string) => void;
+  onMarkAsViewed?: (commentId: string) => void;
   depth?: number;
 }
 
@@ -46,6 +47,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onCommentAdded,
   onCommentUpdated,
   onCommentDeleted,
+  onMarkAsViewed,
   depth = 0,
 }) => {
   const { user, isAdmin } = useAuth();
@@ -54,11 +56,40 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const commentRef = useRef<HTMLDivElement>(null);
   const maxDepth = 3; // Limite la profondeur des réponses
 
   const isOwner = user?.id === comment.user_id;
   const canEditOrDelete = (isOwner || isAdmin) && comment.user_id !== null; // Ne pas permettre l'édition si user_id est null
   const isDeleted = comment.status === 'deleted';
+
+  // IntersectionObserver pour marquer le commentaire comme vu quand il devient visible
+  useEffect(() => {
+    if (!onMarkAsViewed || !commentRef.current || comment.is_viewed || !user) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            onMarkAsViewed(comment.id);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        threshold: 0.5, // 50% du commentaire doit être visible
+        rootMargin: '0px',
+      }
+    );
+
+    observer.observe(commentRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [comment.id, comment.is_viewed, onMarkAsViewed, user]);
 
   const handleReplyAdded = (newReply: Comment) => {
     onCommentAdded(newReply);
@@ -127,7 +158,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
   };
 
   return (
-    <div className={`${depth > 0 ? 'ml-6 mt-3 border-l-2 border-getigne-100 pl-4' : ''}`}>
+    <div 
+      ref={commentRef}
+      className={`${depth > 0 ? 'ml-6 mt-3 border-l-2 border-getigne-100 pl-4' : ''}`}
+    >
       <div className="flex gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
         <Avatar className="h-8 w-8 bg-getigne-100 flex-shrink-0">
           {comment.profiles?.avatar_url ? (
@@ -282,6 +316,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               onCommentAdded={onCommentAdded}
               onCommentUpdated={onCommentUpdated}
               onCommentDeleted={onCommentDeleted}
+              onMarkAsViewed={onMarkAsViewed}
               depth={depth + 1}
             />
           ))}

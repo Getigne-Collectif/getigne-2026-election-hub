@@ -6,6 +6,7 @@ import { supabase, TABLES } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Comment, CommentStatus, ResourceType } from '@/types/comments.types';
 import CommentForm from './CommentForm';
+import { useCommentViews } from '@/hooks/useCommentViews';
 
 interface CommentsProps {
   newsId?: string;
@@ -21,10 +22,27 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const [showAllComments, setShowAllComments] = useState(false);
+  const [isSectionOpen, setIsSectionOpen] = useState(true); // Section considérée ouverte quand le composant est monté
 
   // Determine which resource type we're dealing with
   const resourceType: ResourceType = newsId ? 'news' : 'program';
   const resourceId = newsId || programItemId || '';
+
+  // Hook pour gérer le suivi de lecture
+  const { viewedIds, markAsViewed, isViewed } = useCommentViews({
+    comments,
+    resourceType,
+    isSectionOpen,
+  });
+
+  // Fonction helper pour marquer is_viewed dans l'arbre de commentaires
+  const markViewedInTree = (commentList: Comment[]): Comment[] => {
+    return commentList.map(comment => ({
+      ...comment,
+      is_viewed: isViewed(comment.id),
+      replies: comment.replies ? markViewedInTree(comment.replies) : undefined,
+    }));
+  };
 
   // Helper function to organize comments into a tree structure
   const organizeComments = (comments: Comment[]): Comment[] => {
@@ -174,7 +192,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
         // Organize comments into tree structure
         const organizedComments = organizeComments(commentWithProfiles);
-        setComments(organizedComments);
+        
+        // Marquer is_viewed pour chaque commentaire
+        const commentsWithViews = markViewedInTree(organizedComments);
+        setComments(commentsWithViews);
       } else {
         // For program comments
         let query = supabase
@@ -296,7 +317,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
 
         // Organize comments into tree structure
         const organizedComments = organizeComments(commentsWithProfiles);
-        setComments(organizedComments);
+        
+        // Marquer is_viewed pour chaque commentaire
+        const commentsWithViews = markViewedInTree(organizedComments);
+        setComments(commentsWithViews);
       }
     } catch (err: any) {
       console.error('Error in fetchComments:', err);
@@ -438,6 +462,7 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
             onCommentAdded={handleAddComment}
             onCommentUpdated={handleCommentUpdated}
             onCommentDeleted={handleCommentDeleted}
+            onMarkAsViewed={markAsViewed}
           />
         </div>
       )}

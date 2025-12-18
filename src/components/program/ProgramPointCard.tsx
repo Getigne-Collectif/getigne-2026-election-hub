@@ -9,6 +9,9 @@ import EditorJSRenderer from '@/components/EditorJSRenderer';
 import { ProgramPoint, ProgramPointFileMeta } from '@/types/program.types';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { supabase } from '@/integrations/supabase/client';
+import CommentCountBadge from '../comments/CommentCountBadge';
+import { getUnreadCommentCount } from '@/utils/commentViews';
+import { useAuth } from '@/context/auth';
 import {
   Tooltip,
   TooltipContent,
@@ -23,9 +26,18 @@ interface ProgramPointCardProps {
 }
 
 export default function ProgramPointCard({ point, programItemId, icon }: ProgramPointCardProps) {
+  const { user } = useAuth();
   const [showContent, setShowContent] = useState(false);
   const [commentCount, setCommentCount] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [likeCount, setLikeCount] = useState<number>(0);
+
+  // Réinitialiser le badge quand la section se ferme
+  useEffect(() => {
+    if (!showContent) {
+      setUnreadCount(0);
+    }
+  }, [showContent]);
 
   // Ouvrir automatiquement si on arrive via un maillage (hash dans l'URL)
   useEffect(() => {
@@ -64,6 +76,17 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             
           if (!error && count !== null) {
             setCommentCount(count);
+            
+            // Récupérer le nombre de commentaires non lus
+            if (user && count > 0) {
+              const unread = await getUnreadCommentCount(
+                programItemId,
+                'program',
+                user.id,
+                point.id
+              );
+              setUnreadCount(unread);
+            }
           }
         } catch (error) {
           console.error('Error fetching comment count:', error);
@@ -104,7 +127,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
     <Card key={point.id} id={`program-point-${point.id}`} className="border-getigne-200">
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-4 cursor-pointer" onClick={() => setShowContent(!showContent)}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             {point.competent_entity && (
               <TooltipProvider delayDuration={150}>
                 <Tooltip>
@@ -132,12 +155,22 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                 </Tooltip>
               </TooltipProvider>
             )}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 flex-1">
               <h3
                 className="cursor-pointer text-lg font-semibold text-getigne-800"
               >
                 {point.title}
               </h3>
+              {/* Badge de nouveaux commentaires sous le titre */}
+              {!showContent && commentCount > 0 && (
+                <div className="mt-1">
+                  <CommentCountBadge
+                    totalCount={commentCount}
+                    unreadCount={unreadCount}
+                    showIcon={false}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-3">

@@ -21,7 +21,17 @@ export interface BaseComment {
   parent_comment_id?: string | null;
   likes_count?: number;
   is_liked?: boolean;
+  is_viewed?: boolean; // Indique si l'utilisateur actuel a vu ce commentaire
   replies?: Comment[];
+}
+
+// Interface pour les vues de commentaires
+export interface CommentView {
+  id: string;
+  comment_id: string;
+  user_id: string;
+  comment_type: ResourceType;
+  created_at: string;
 }
 
 // Type for news comments

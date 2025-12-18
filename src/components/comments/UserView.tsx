@@ -13,6 +13,7 @@ interface UserViewProps {
   onCommentAdded: (comment: Comment) => void;
   onCommentUpdated?: (comment: Comment) => void;
   onCommentDeleted?: (commentId: string) => void;
+  onMarkAsViewed?: (commentId: string) => void;
 }
 
 const UserView: React.FC<UserViewProps> = ({ 
@@ -25,7 +26,8 @@ const UserView: React.FC<UserViewProps> = ({
   flagshipProjectId,
   onCommentAdded,
   onCommentUpdated,
-  onCommentDeleted
+  onCommentDeleted,
+  onMarkAsViewed
 }) => {
   if (loading) {
     return (
@@ -53,6 +55,7 @@ const UserView: React.FC<UserViewProps> = ({
           onCommentAdded={onCommentAdded}
           onCommentUpdated={onCommentUpdated}
           onCommentDeleted={onCommentDeleted}
+          onMarkAsViewed={onMarkAsViewed}
         />
       ))}
     </div>

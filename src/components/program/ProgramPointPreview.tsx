@@ -9,6 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/auth';
 import { useToast } from '@/components/ui/use-toast';
 import AuthModal from '@/components/auth/AuthModal';
+import CommentCountBadge from '../comments/CommentCountBadge';
+import { getUnreadCommentCount } from '@/utils/commentViews';
 
 interface ProgramPointPreviewProps {
   point: {
@@ -30,8 +32,16 @@ const ProgramPointPreview: React.FC<ProgramPointPreviewProps> = ({
   const { toast } = useToast();
   const [showContent, setShowContent] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [likeCount, setLikeCount] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // Réinitialiser le badge quand la section se ferme
+  useEffect(() => {
+    if (!showContent) {
+      setUnreadCount(0);
+    }
+  }, [showContent]);
 
   useEffect(() => {
     if (user) {
@@ -45,10 +55,23 @@ const ProgramPointPreview: React.FC<ProgramPointPreviewProps> = ({
       const { count, error } = await supabase
         .from('program_comments')
         .select('*', { count: 'exact' })
-        .eq('program_point_id', point.id);
+        .eq('program_point_id', point.id)
+        .eq('status', 'approved');
 
       if (error) throw error;
-      setCommentCount(count || 0);
+      const totalCount = count || 0;
+      setCommentCount(totalCount);
+      
+      // Récupérer le nombre de commentaires non lus
+      if (user && totalCount > 0 && programItemId) {
+        const unread = await getUnreadCommentCount(
+          programItemId,
+          'program',
+          user.id,
+          point.id
+        );
+        setUnreadCount(unread);
+      }
     } catch (err) {
       console.error('Error fetching comment count:', err);
     }
@@ -150,9 +173,12 @@ const ProgramPointPreview: React.FC<ProgramPointPreviewProps> = ({
             )}
 
             {commentCount > 0 && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
-                <MessageSquare className="h-4 w-4" />
-                <span>{commentCount} commentaire{commentCount !== 1 ? 's' : ''}</span>
+              <div className="mt-4">
+                <CommentCountBadge
+                  totalCount={commentCount}
+                  unreadCount={unreadCount}
+                  showIcon={true}
+                />
               </div>
             )}
 

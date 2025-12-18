@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import ProgramCommentsSection from '@/components/program/ProgramCommentsSection';
 import ProgramLikeButton from '@/components/program/ProgramLikeButton';
 import ProgramPointCard from '@/components/program/ProgramPointCard';
+import CommentCountBadge from '@/components/comments/CommentCountBadge';
+import { getUnreadCommentCount } from '@/utils/commentViews';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
@@ -125,6 +127,7 @@ const ProgramPage = () => {
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(() => readEditModeFromCookie());
   const [editingFlagshipProject, setEditingFlagshipProject] = useState<ProgramFlagshipProject | null>(null);
+  const [commentCounts, setCommentCounts] = useState<Record<string, { total: number; unread: number }>>({});
   const [flagshipEditModalOpen, setFlagshipEditModalOpen] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [editingSection, setEditingSection] = useState<ProgramItemWithPoints | null>(null);
@@ -475,6 +478,48 @@ const ProgramPage = () => {
     }, 0) ?? 0;
   const shouldDisplayCounter = validatedPointsCount >= 10;
   const hasFlagshipProjects = (flagshipProjects?.length ?? 0) > 0;
+
+  // Fetch comment counts for each program item
+  useEffect(() => {
+    if (!programItems || programItems.length === 0 || !user) return;
+
+    const fetchCommentCounts = async () => {
+      const counts: Record<string, { total: number; unread: number }> = {};
+
+      for (const item of programItems) {
+        try {
+          // Fetch total count
+          const { count, error } = await supabase
+            .from('program_comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('program_item_id', item.id)
+            .is('program_point_id', null)
+            .eq('status', 'approved');
+
+          if (!error && count !== null) {
+            const total = count;
+            let unread = 0;
+
+            if (total > 0) {
+              unread = await getUnreadCommentCount(
+                item.id,
+                'program',
+                user.id
+              );
+            }
+
+            counts[item.id] = { total, unread };
+          }
+        } catch (error) {
+          console.error(`Error fetching comment count for item ${item.id}:`, error);
+        }
+      }
+
+      setCommentCounts(counts);
+    };
+
+    fetchCommentCounts();
+  }, [programItems, user]);
 
   // Observe sections to highlight the active one in the sidebar
   useEffect(() => {
@@ -1368,10 +1413,19 @@ const ProgramPage = () => {
                               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-getigne-accent to-cyan-500 text-white">
                                 <MessageSquare className="w-5 h-5" />
                               </div>
-                              <div>
-                                <h3 className="text-xl md:text-2xl font-bold text-getigne-900">
-                                  Vos réactions
-                                </h3>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3">
+                                  <h3 className="text-xl md:text-2xl font-bold text-getigne-900">
+                                    Vos réactions
+                                  </h3>
+                                  {commentCounts[item.id] && commentCounts[item.id].total > 0 && (
+                                    <CommentCountBadge
+                                      totalCount={commentCounts[item.id].total}
+                                      unreadCount={commentCounts[item.id].unread}
+                                      showIcon={false}
+                                    />
+                                  )}
+                                </div>
                                 <p className="text-sm text-gray-600 mt-0.5">
                                   Participez à l'élaboration de ce thème
                                 </p>

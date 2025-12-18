@@ -9,6 +9,9 @@ import { Separator } from '@/components/ui/separator';
 import ProgramLikeButton from './ProgramLikeButton';
 import ProgramPointCard from './ProgramPointCard';
 import ProgramCommentsSection from './ProgramCommentsSection';
+import CommentCountBadge from '../comments/CommentCountBadge';
+import { getUnreadCommentCount } from '@/utils/commentViews';
+import { useAuth } from '@/context/auth';
 import placeholder from '/placeholder.svg';
 
 interface ProgramContentComponentProps {
@@ -17,8 +20,11 @@ interface ProgramContentComponentProps {
 }
 
 export default function ProgramContentComponent({ programItemId, value }: ProgramContentComponentProps) {
+  const { user } = useAuth();
   const [programPoints, setProgramPoints] = useState<any[]>([]);
   const [showComments, setShowComments] = useState(false);
+  const [commentCount, setCommentCount] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   // Fetch program item details
   const { data: programItem, isLoading: isLoadingItem } = useQuery({
@@ -64,7 +70,49 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
   useEffect(() => {
     // Reset comments visibility when changing tabs
     setShowComments(false);
+    setUnreadCount(0);
   }, [programItemId]);
+
+  // Fetch comment count
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('program_comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('program_item_id', programItemId)
+          .is('program_point_id', null)
+          .eq('status', 'approved');
+          
+        if (!error && count !== null) {
+          setCommentCount(count);
+          
+          // Récupérer le nombre de commentaires non lus
+          if (user && count > 0) {
+            const unread = await getUnreadCommentCount(
+              programItemId,
+              'program',
+              user.id
+            );
+            setUnreadCount(unread);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching comment count:', error);
+      }
+    };
+
+    if (programItemId) {
+      fetchCommentCount();
+    }
+  }, [programItemId, user]);
+
+  // Réinitialiser le badge quand la section se ferme
+  useEffect(() => {
+    if (!showComments) {
+      setUnreadCount(0);
+    }
+  }, [showComments]);
 
   if (isLoadingItem || isLoadingPoints) {
     return (
@@ -106,6 +154,13 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
               >
                 <MessageSquare className="h-5 w-5" />
                 {showComments ? "Masquer les commentaires" : "Commenter"}
+                {commentCount > 0 && (
+                  <CommentCountBadge
+                    totalCount={commentCount}
+                    unreadCount={unreadCount}
+                    showIcon={false}
+                  />
+                )}
               </Button>
             </div>
           </div>
