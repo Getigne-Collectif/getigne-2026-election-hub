@@ -124,9 +124,14 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
         }))) as ProgramPointFileMeta[];
 
   return (
-    <Card key={point.id} id={`program-point-${point.id}`} className="border-getigne-200">
+    <Card 
+      key={point.id} 
+      id={`program-point-${point.id}`} 
+      className="border-getigne-200 hover:border-getigne-accent hover:shadow-lg transition-all duration-200 cursor-pointer group"
+      onClick={() => setShowContent(!showContent)}
+    >
       <CardContent className="p-4">
-        <div className="flex items-center justify-between gap-4 cursor-pointer" onClick={() => setShowContent(!showContent)}>
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1">
             {point.competent_entity && (
               <TooltipProvider delayDuration={150}>
@@ -156,11 +161,11 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
               </TooltipProvider>
             )}
             <div className="flex flex-col gap-1 flex-1">
-              <h3
-                className="cursor-pointer text-lg font-semibold text-getigne-800"
-              >
-                {point.title}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-getigne-800">
+                  {point.title}
+                </h3>
+              </div>
               {/* Badge de nouveaux commentaires sous le titre */}
               {!showContent && commentCount > 0 && (
                 <div className="mt-1">
@@ -173,13 +178,20 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+          <div className="flex items-center gap-2">
+            <div 
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                showContent 
+                  ? 'bg-getigne-accent/10 text-getigne-accent' 
+                  : 'bg-gray-100 text-gray-400 group-hover:bg-getigne-accent/10 group-hover:text-getigne-accent'
+              }`}
             >
-              {!showContent ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
+              {!showContent ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </div>
           </div>
         </div>
         
@@ -215,7 +227,10 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                       <Button
                         size="sm"
                         className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
-                        onClick={() => downloadFile(fileMeta.url)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadFile(fileMeta.url);
+                        }}
                       >
                         <FileDown className="h-4 w-4 mr-2" />
                         Télécharger
