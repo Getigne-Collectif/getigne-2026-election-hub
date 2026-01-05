@@ -213,7 +213,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
       if (initialStatus === 'pending') {
         toast({
           title: parentCommentId ? "Réponse envoyée" : "Commentaire envoyé",
-          description: "Votre commentaire sera visible après modération.",
+          description: "Votre commentaire est en attente de modération et sera visible pour tous après approbation.",
         });
       } else {
         toast({

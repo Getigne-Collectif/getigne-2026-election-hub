@@ -62,6 +62,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const isOwner = user?.id === comment.user_id;
   const canEditOrDelete = (isOwner || isAdmin) && comment.user_id !== null; // Ne pas permettre l'édition si user_id est null
   const isDeleted = comment.status === 'deleted';
+  const isPending = comment.status === 'pending' && isOwner;
 
   // IntersectionObserver pour marquer le commentaire comme vu quand il devient visible
   useEffect(() => {
@@ -162,7 +163,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
       ref={commentRef}
       className={`${depth > 0 ? 'ml-6 mt-3 border-l-2 border-getigne-100 pl-4' : ''}`}
     >
-      <div className="flex gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
+      <div className={`flex gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors ${
+        isPending ? 'border border-amber-200 bg-amber-50/50' : ''
+      }`}>
         <Avatar className="h-8 w-8 bg-getigne-100 flex-shrink-0">
           {comment.profiles?.avatar_url ? (
             <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
@@ -190,6 +193,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
             {comment.edited_at && (
               <span className="text-muted-foreground text-xs font-bold">
                 modifié
+              </span>
+            )}
+            {isPending && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 font-medium">
+                En attente de modération
               </span>
             )}
             {canEditOrDelete && !isDeleted && (

@@ -44,6 +44,31 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
     }));
   };
 
+  // Helper function to filter replies recursively: only show pending replies if they belong to the current user
+  const filterReplies = (comment: Comment, currentUserId: string | undefined): Comment => {
+    if (!comment.replies || comment.replies.length === 0) {
+      return comment;
+    }
+
+    // Filter replies: show approved/deleted to everyone, pending only to author
+    const filteredReplies = comment.replies
+      .filter(reply => {
+        if (reply.status === 'approved' || reply.status === 'deleted') {
+          return true;
+        }
+        if (reply.status === 'pending' && reply.user_id === currentUserId) {
+          return true;
+        }
+        return false;
+      })
+      .map(reply => filterReplies(reply, currentUserId));
+
+    return {
+      ...comment,
+      replies: filteredReplies.length > 0 ? filteredReplies : undefined
+    };
+  };
+
   // Helper function to organize comments into a tree structure
   const organizeComments = (comments: Comment[]): Comment[] => {
     const commentMap = new Map<string, Comment>();
@@ -344,8 +369,12 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
     if (newComment.parent_comment_id) {
       fetchComments();
     } else {
-      // If it's a root comment, add it to the beginning
-      setComments([newComment, ...comments]);
+      // If it's a root comment, add it to the beginning with proper structure
+      const commentWithStructure: Comment = {
+        ...newComment,
+        replies: newComment.replies || []
+      };
+      setComments([commentWithStructure, ...comments]);
     }
   };
 
@@ -430,8 +459,23 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
     }
   };
 
-  // Inclure les commentaires approuvés et supprimés (pour garder la structure)
-  const approvedComments = comments.filter((c) => c.status === 'approved' || c.status === 'deleted');
+  // Inclure les commentaires approuvés, supprimés, et les commentaires root pending de l'utilisateur connecté
+  // Pour les réponses pending, elles seront filtrées dans filterReplies
+  const approvedComments = comments.filter((c) => {
+    // Toujours afficher les commentaires approuvés et supprimés
+    if (c.status === 'approved' || c.status === 'deleted') {
+      return true;
+    }
+    // Afficher les commentaires root pending uniquement pour leur auteur
+    if (c.status === 'pending' && !c.parent_comment_id && c.user_id === user?.id) {
+      return true;
+    }
+    return false;
+  });
+  
+  // Filtrer les réponses pending dans l'arbre (sauf celles de l'utilisateur)
+  const filteredApprovedComments = approvedComments.map(comment => filterReplies(comment, user?.id));
+  
   const pendingComments = comments.filter((c) => c.status === 'pending');
 
   return (
@@ -449,10 +493,10 @@ const Comments: React.FC<CommentsProps> = ({ newsId, programItemId, programPoint
         </div>
       )}
       
-      {approvedComments.length > 0 && (
+      {filteredApprovedComments.length > 0 && (
         <div>
           <UserView
-            comments={approvedComments}
+            comments={filteredApprovedComments}
             loading={loading}
             resourceType={resourceType}
             newsId={newsId}
