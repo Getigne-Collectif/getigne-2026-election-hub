@@ -635,7 +635,7 @@ const ProgramLinkCard: React.FC<ProgramLinkCardProps> = ({ targetType, targetId,
       {/* Contenu */}
       <div className="flex-1 min-w-0">
         <div className="text-xs font-semibold text-getigne-accent uppercase mb-1 tracking-wide">
-          {targetType === 'program_point' ? 'Point de programme' : targetType === 'flagship' ? 'Projet phare' : targetType === 'event' ? 'Événement' : targetType === 'article' ? 'Article' : 'Page'}
+          Voir aussi
         </div>
         <div className="font-bold text-gray-900 text-base leading-tight group-hover:text-getigne-accent transition-colors">
           {title || 'Point de programme'}

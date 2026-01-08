@@ -206,7 +206,7 @@ export default class ProgramLinkTool {
           </div>
           <div style="flex: 1; min-width: 0;">
             <div style="font-size: 11px; font-weight: 600; color: #10b981; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
-              ${this.data.targetType === 'program_point' ? 'Point de programme' : this.data.targetType === 'flagship' ? 'Projet phare' : this.data.targetType === 'event' ? 'Événement' : this.data.targetType === 'article' ? 'Article' : 'Page'}
+              Voir aussi
             </div>
             <div style="font-weight: 700; color: #111827; font-size: 16px; line-height: 1.3;">
               ${this.data.title}
@@ -269,7 +269,7 @@ export default class ProgramLinkTool {
             </div>
             <div style="flex: 1; min-width: 0;">
               <div style="font-size: 11px; color: #10b981; margin-bottom: 4px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">
-                ${this.data.targetType === 'program_point' ? 'Point de programme' : this.data.targetType === 'flagship' ? 'Projet phare' : this.data.targetType === 'event' ? 'Événement' : this.data.targetType === 'article' ? 'Article' : 'Page'}
+                Voir aussi
               </div>
               <div style="font-weight: 700; color: #111827; font-size: 16px; line-height: 1.3;">
                 ${this.data.title}
