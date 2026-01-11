@@ -24,7 +24,8 @@ import {
   X,
   FileText as FileTextIcon,
   Users as UsersIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  HelpCircle
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -93,6 +94,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
           title: 'Lexique',
           href: '/admin/lexicon',
           icon: BookOpen,
+        },
+        {
+          title: 'FAQ',
+          href: '/admin/faq',
+          icon: HelpCircle,
         },
       ],
     },

@@ -21,6 +21,7 @@ import type { Tables } from '@/integrations/supabase/types';
 import type { ProgramPoint, ProgramCompetentEntity, ProgramFlagshipProject } from '@/types/program.types';
 import ProgramAlertForm from '@/components/program/ProgramAlertForm';
 import ProgramTimeline from '@/components/program/ProgramTimeline';
+import FAQDisplay from '@/components/faq/FAQDisplay';
 import { Routes } from '@/routes';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import ProgramPointsEditor from '@/components/admin/program/points/ProgramPointsEditor';
@@ -1445,28 +1446,8 @@ const ProgramPage = () => {
                 </main>
               </div>
 
-              {/* Frise chronologique du processus (version publique) */}
-              <div className="mt-16 md:mt-20">
-                <div className="bg-white rounded-xl md:rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
-                  <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 p-4 md:p-6 lg:p-8">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/20 backdrop-blur-sm flex-shrink-0">
-                        <Clock className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                      </div>
-                      <h3 className="text-xl md:text-2xl lg:text-3xl font-extrabold text-white leading-tight">
-                        Les étapes de l'élaboration de ce programme
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="p-4 md:p-6 lg:p-8 xl:p-10">
-                    <ProgramTimeline 
-                      mini={false}
-                      showToggle={false}
-                      steps={steps}
-                    />
-                  </div>
-                </div>
-              </div>
+              {/* FAQ */}
+              <FAQDisplay slug="faq-programme" />
             </div>
           </div>
           </div>

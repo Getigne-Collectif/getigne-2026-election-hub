@@ -42,6 +42,8 @@ const AdminTeamMemberNewPage = lazy(() => import("./pages/admin/team/AdminTeamMe
 const AdminTeamMemberEditPage = lazy(() => import("./pages/admin/team/AdminTeamMemberEditPage"));
 const AdminThematicRolesPage = lazy(() => import("./pages/admin/roles/AdminThematicRolesPage"));
 const AdminElectoralListPage = lazy(() => import("./pages/admin/electoral/AdminElectoralListPage"));
+const AdminFAQPage = lazy(() => import("./pages/admin/faq/AdminFAQPage"));
+const AdminFAQEditorPage = lazy(() => import("./pages/admin/faq/AdminFAQEditorPage"));
 
 // Other pages
 const NewsPage = lazy(() => import("./pages/NewsPage"));
@@ -184,6 +186,10 @@ function App() {
                       
                       {/* Electoral List */}
                       <Route path={AppRoutes.ADMIN_ELECTORAL_LIST} element={<AdminElectoralListPage />} />
+                      
+                      {/* FAQ */}
+                      <Route path={AppRoutes.ADMIN_FAQ} element={<AdminFAQPage />} />
+                      <Route path={AppRoutes.ADMIN_FAQ_EDIT} element={<AdminFAQEditorPage />} />
                       
                       {/* Settings */}
                       <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />

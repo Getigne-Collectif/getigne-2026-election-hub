@@ -9,15 +9,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ChevronDown, Check } from 'lucide-react';
 import { ProgramPointStatus } from '@/types/program.types';
+import { FAQItemStatus } from '@/types/faq.types';
+
+type StatusType = ProgramPointStatus | FAQItemStatus;
 
 interface StatusBadgeProps {
-  status: ProgramPointStatus;
-  onStatusChange?: (newStatus: ProgramPointStatus) => void;
+  status: StatusType;
+  onStatusChange?: (newStatus: StatusType) => void;
   className?: string;
   disabled?: boolean;
 }
 
-const statusConfig = {
+const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline'; className: string }> = {
   draft: {
     label: 'Brouillon',
     variant: 'secondary' as const,
@@ -68,21 +71,30 @@ export function StatusBadge({ status, onStatusChange, className = '', disabled =
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        {Object.entries(statusConfig).map(([statusKey, statusConfigItem]) => (
-          <DropdownMenuItem
-            key={statusKey}
-            onClick={() => onStatusChange(statusKey as ProgramPointStatus)}
-            className="flex items-center justify-between cursor-pointer hover:bg-muted/50"
-          >
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${statusConfigItem.className.split(' ')[0]}`} />
-              <span>{statusConfigItem.label}</span>
-            </div>
-            {status === statusKey && (
-              <Check className="h-4 w-4 text-green-600" />
-            )}
-          </DropdownMenuItem>
-        ))}
+        {Object.entries(statusConfig)
+          .filter(([statusKey]) => {
+            // Si le status actuel n'est pas 'to_discuss', exclure 'to_discuss' des options
+            // (car FAQItemStatus n'a pas 'to_discuss', seulement ProgramPointStatus)
+            if (status !== 'to_discuss' && statusKey === 'to_discuss') {
+              return false;
+            }
+            return true;
+          })
+          .map(([statusKey, statusConfigItem]) => (
+            <DropdownMenuItem
+              key={statusKey}
+              onClick={() => onStatusChange(statusKey as StatusType)}
+              className="flex items-center justify-between cursor-pointer hover:bg-muted/50"
+            >
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${statusConfigItem.className.split(' ')[0]}`} />
+                <span>{statusConfigItem.label}</span>
+              </div>
+              {status === statusKey && (
+                <Check className="h-4 w-4 text-green-600" />
+              )}
+            </DropdownMenuItem>
+          ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
