@@ -216,3 +216,4 @@ COMMENT ON COLUMN public.faq_items.answer IS 'Réponse au format EditorJS (Outpu
 COMMENT ON COLUMN public.faq_items.status IS 'Statut de l''item: draft (brouillon), pending (à valider), validated (validé)';
 COMMENT ON COLUMN public.faq_items.position IS 'Position de l''item dans la catégorie (pour l''ordre)';
 
+

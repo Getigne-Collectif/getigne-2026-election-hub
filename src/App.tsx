@@ -34,6 +34,7 @@ const AdminProgramPage = lazy(() => import("./pages/admin/program/AdminProgramPa
 const AdminProgramEditorPage = lazy(() => import("./pages/admin/program/AdminProgramEditorPage"));
 const AdminProjectsPage = lazy(() => import("./pages/admin/projects/AdminProjectsPage"));
 const AdminProjectEditorPage = lazy(() => import("./pages/admin/projects/AdminProjectEditorPage"));
+const AdminSupportCommitteePage = lazy(() => import("./pages/admin/AdminSupportCommitteePage"));
 const AdminLexiconPage = lazy(() => import("./pages/admin/AdminLexiconPage"));
 const AdminLexiconEditorPage = lazy(() => import("./pages/admin/AdminLexiconEditorPage"));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
@@ -112,6 +113,7 @@ function App() {
                     <Route path={AppRoutes.COMMITTEE_DETAIL} element={<CommitteePage />} />
                     <Route path={AppRoutes.PROGRAM} element={<ProgramPage />} />
                     <Route path={AppRoutes.PROJECTS} element={<ProjectsPage />} />
+                    <Route path={AppRoutes.SUPPORT_COMMITTEE} element={<JoinPage />} />
                     <Route path={AppRoutes.JOIN} element={<JoinPage />} />
                     <Route path={AppRoutes.CONTACT} element={<ContactPage />} />
                     <Route path={AppRoutes.LEGAL} element={<LegalPage />} />
@@ -175,6 +177,9 @@ function App() {
                       <Route path={AppRoutes.ADMIN_LEXICON} element={<AdminLexiconPage />} />
                       <Route path={AppRoutes.ADMIN_LEXICON_NEW} element={<AdminLexiconEditorPage />} />
                       <Route path={AppRoutes.ADMIN_LEXICON_EDIT} element={<AdminLexiconEditorPage />} />
+                      
+                      {/* Support Committee */}
+                      <Route path={AppRoutes.ADMIN_SUPPORT_COMMITTEE} element={<AdminSupportCommitteePage />} />
                       
                       {/* Team Members */}
                       <Route path={AppRoutes.ADMIN_TEAM_MEMBERS} element={<AdminTeamMembersPage />} />

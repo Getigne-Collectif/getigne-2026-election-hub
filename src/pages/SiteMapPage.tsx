@@ -76,7 +76,7 @@ const SiteMapPage = () => {
                   </li>
                   <li>
                     <Link to={Routes.JOIN} className="text-getigne-accent hover:underline">
-                      Adhérer
+                      Soutenir
                     </Link>
                   </li>
                 </ul>

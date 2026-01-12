@@ -83,7 +83,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
   useEffect(() => {
     const fetchCommentCount = async () => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const query = supabase
           .from('program_comments')
           .select('*', { count: 'exact', head: true }) as any;

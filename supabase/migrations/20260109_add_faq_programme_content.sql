@@ -231,3 +231,4 @@ INNER JOIN public.faqs f ON fc.faq_id = f.id
 WHERE f.slug = 'faq-programme' AND fc.name = 'L''équipe'
 ON CONFLICT DO NOTHING;
 
+

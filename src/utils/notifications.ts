@@ -74,7 +74,7 @@ export const createDiscordEvent = async (eventData: {
 }) => {
   try {
     // Limiter la taille des données envoyées si l'image est en base64
-    let processedData = { ...eventData };
+    const processedData = { ...eventData };
     
     // Si l'image est en base64 et trop grande, ne pas l'envoyer
     if (processedData.image && processedData.image.startsWith('data:') && processedData.image.length > 1024 * 1024) {

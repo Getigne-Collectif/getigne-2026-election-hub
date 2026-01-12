@@ -1578,6 +1578,36 @@ export type Database = {
         }
         Relationships: []
       }
+      support_committee: {
+        Row: {
+          city: string | null
+          created_at: string
+          email: string
+          first_name: string
+          id: number
+          last_name: string
+          subscribed_to_newsletter: boolean
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          email: string
+          first_name: string
+          id?: number
+          last_name: string
+          subscribed_to_newsletter?: boolean
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: number
+          last_name?: string
+          subscribed_to_newsletter?: boolean
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
           address: string | null

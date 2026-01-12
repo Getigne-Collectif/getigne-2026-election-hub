@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, Heart, Calendar } from 'lucide-react';
+import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, HandHeart, Calendar } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useAuth } from '@/context/auth';
 import { Routes } from '@/routes';
@@ -104,13 +104,13 @@ const Campaign = () => {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
             <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
-              <Heart size={18} className="text-getigne-accent" /> Soutenez le collectif
+              <HandHeart size={18} className="text-getigne-accent" /> Soutenez le collectif
             </h3>
             <p className="text-getigne-700 mb-4">
-              Adhérez ou faites un don pour financer la campagne.
+              Signez le comité de soutien, adhérez ou faites un don.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <a href={HELLOASSO_JOIN_URL} target="_blank" rel="noopener noreferrer" onClick={handleHelloAssoClick}>Adhérer ou faire un don</a>
+              <Link to={Routes.JOIN}>Nous rejoindre</Link>
             </Button>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">

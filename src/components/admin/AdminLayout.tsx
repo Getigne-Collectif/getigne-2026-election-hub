@@ -40,12 +40,12 @@ interface AdminLayoutProps {
 interface MenuItem {
   title: string;
   href: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<any>;
 }
 
 interface MenuSection {
   title: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<any>;
   color: 'blue' | 'purple' | 'emerald';
   items: MenuItem[];
 }
@@ -121,6 +121,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
           title: 'Liste électorale',
           href: '/admin/electoral-list',
           icon: ListChecks,
+        },
+        {
+          title: 'Comité de soutien',
+          href: '/admin/comite-de-soutien',
+          icon: Users,
         },
       ],
     },

@@ -80,7 +80,7 @@ const DynamicPage = () => {
         }
         
         let currentPage = pageData;
-        let hierarchyPath = [currentSlug];
+        const hierarchyPath = [currentSlug];
         
         while (currentPage.parent_id) {
           const { data: parentData, error: parentError } = await supabase

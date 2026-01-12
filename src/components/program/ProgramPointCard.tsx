@@ -174,6 +174,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                     unreadCount={unreadCount}
                     showIcon={false}
                   />
+                  
                 </div>
               )}
             </div>

@@ -49,7 +49,7 @@ export function markdownToEditorJS(markdown: string): OutputData {
   };
 
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
+    const line = lines[i];
     const trimmed = line.trim();
 
     // Ligne vide

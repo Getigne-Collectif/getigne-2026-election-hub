@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, Settings, FileText, Car, Coffee } from 'lucide-react';
+import { Menu, ChevronDown, Settings, FileText, Car, Coffee, HandHeart, PenLineIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -14,9 +14,12 @@ import AuthButton from './AuthButton';
 import { useAuth } from '@/context/auth';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Routes } from '@/routes';
+import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [supportersCount, setSupportersCount] = useState<number | null>(null);
   const location = useLocation();
   const { isAdmin, user, refreshUserRoles, userRoles, isRefreshingRoles } = useAuth();
   const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
@@ -39,6 +42,36 @@ const Navbar = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchSupportersCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('support_committee')
+          .select('*', { count: 'exact', head: true });
+        
+        if (!error && count !== null) {
+          setSupportersCount(count);
+        }
+      } catch (error) {
+        console.error('Error fetching supporters count:', error);
+      }
+    };
+
+    fetchSupportersCount();
+    
+    // S'abonner aux changements pour mettre à jour le compteur en temps réel
+    const channel = supabase
+      .channel('support_committee_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_committee' }, () => {
+        fetchSupportersCount();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const isActive = (path: string) => {
@@ -115,12 +148,6 @@ const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </li>
-      
-      <li>
-        <Link to={Routes.JOIN} className={isActive(Routes.JOIN)}>
-          Adhérer
-        </Link>
-      </li>
       <li>
         <Link to={Routes.CONTACT} className={isActive(Routes.CONTACT)}>
           Contact
@@ -157,6 +184,19 @@ const Navbar = () => {
     );
   };
 
+  const SupportButton = ({ className = "" }: { className?: string }) => (
+    <Button asChild className={`bg-getigne-accent hover:bg-getigne-accent/90 text-white shadow-sm transition-all hover:scale-105 active:scale-95 relative ${className}`}>
+      <Link to={Routes.JOIN} className="flex items-center gap-2">
+        <span>Je soutiens</span>
+        {supportersCount !== null && supportersCount > 0 && (
+          <Badge variant="secondary" className="ml-1 bg-white text-getigne-accent hover:bg-white px-1.5 py-0 min-w-[1.2rem] h-5 flex items-center justify-center rounded-full text-[10px] font-bold border-none">
+            {supportersCount}
+          </Badge>
+        )}
+      </Link>
+    </Button>
+  );
+
   return (
     <header
       className={`fixed w-full top-0 left-0 z-50 py-3 transition-all duration-300 ${
@@ -173,13 +213,17 @@ const Navbar = () => {
             />
           </Link>
 
-          <nav className="hidden md:block">
+          <nav className="hidden lg:block">
             <ul className="flex space-x-8 items-center">
               <NavLinks />
             </ul>
           </nav>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 md:space-x-4">
+            <div className="hidden sm:block">
+              <SupportButton />
+            </div>
+            
             <AuthButton />
 
             <Sheet>
@@ -187,7 +231,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="md:hidden"
+                  className="lg:hidden"
                   aria-label="Menu"
                 >
                   <Menu className="h-6 w-6" />
@@ -197,6 +241,9 @@ const Navbar = () => {
                 <nav className="mt-8">
                   <ul className="space-y-6 text-lg">
                     <NavLinks />
+                    <li className="pt-2 sm:hidden">
+                      <SupportButton className="w-full py-6 text-lg" />
+                    </li>
                     <AdminLinks />
                   </ul>
                 </nav>
