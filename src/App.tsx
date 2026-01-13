@@ -45,6 +45,7 @@ const AdminThematicRolesPage = lazy(() => import("./pages/admin/roles/AdminThema
 const AdminElectoralListPage = lazy(() => import("./pages/admin/electoral/AdminElectoralListPage"));
 const AdminFAQPage = lazy(() => import("./pages/admin/faq/AdminFAQPage"));
 const AdminFAQEditorPage = lazy(() => import("./pages/admin/faq/AdminFAQEditorPage"));
+const DirectoryPage = lazy(() => import("./pages/DirectoryPage"));
 
 // Other pages
 const NewsPage = lazy(() => import("./pages/NewsPage"));
@@ -130,6 +131,8 @@ function App() {
                     
                     {/* Admin Routes - All protected by AdminRoute via nested routes */}
                     <Route element={<AdminProtectedOutlet />}>
+                      {/* Directory */}
+                      <Route path={AppRoutes.DIRECTORY} element={<DirectoryPage />} />
                       <Route path={AppRoutes.ADMIN} element={<AdminDashboardPage />} />
                       
                       {/* News */}

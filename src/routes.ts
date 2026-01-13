@@ -28,6 +28,7 @@ export enum Routes {
   AUTH_CALLBACK = "/auth/callback",
   AUTH_RESET_PASSWORD = "/auth/reset-password",
   PROFILE = "/profile",
+  DIRECTORY = "/annuaire",
 
   // Routes d'administration
   ADMIN = "/admin",

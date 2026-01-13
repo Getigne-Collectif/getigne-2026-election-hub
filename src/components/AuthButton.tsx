@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, UserCog, Settings} from 'lucide-react';
+import {LogIn, LogOut, UserCog, Settings, BookUser} from 'lucide-react';
 import { Routes } from '@/routes';
 import {
   DropdownMenu,
@@ -43,6 +43,10 @@ const AuthButton = () => {
 
   const handleAdminClick = () => {
     navigate(Routes.ADMIN);
+  };
+
+  const handleDirectoryClick = () => {
+    navigate(Routes.DIRECTORY);
   };
 
   // Pas d'utilisateur - afficher bouton connexion
@@ -93,6 +97,16 @@ const AuthButton = () => {
           <UserCog className="h-4 w-4 mr-2" />
           Mon profil
         </DropdownMenuItem>
+
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleDirectoryClick} className="flex items-center">
+              <BookUser className="h-4 w-4 mr-2" />
+              Annuaire
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator />
 
