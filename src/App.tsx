@@ -45,6 +45,10 @@ const AdminThematicRolesPage = lazy(() => import("./pages/admin/roles/AdminThema
 const AdminElectoralListPage = lazy(() => import("./pages/admin/electoral/AdminElectoralListPage"));
 const AdminFAQPage = lazy(() => import("./pages/admin/faq/AdminFAQPage"));
 const AdminFAQEditorPage = lazy(() => import("./pages/admin/faq/AdminFAQEditorPage"));
+const AdminExternalContactsPage = lazy(() => import("./pages/admin/external/AdminExternalContactsPage"));
+const AdminExternalContactFormPage = lazy(() => import("./pages/admin/external/AdminExternalContactFormPage"));
+const AdminExternalGroupsPage = lazy(() => import("./pages/admin/external/AdminExternalGroupsPage"));
+const AdminExternalGroupFormPage = lazy(() => import("./pages/admin/external/AdminExternalGroupFormPage"));
 const DirectoryPage = lazy(() => import("./pages/DirectoryPage"));
 
 // Other pages
@@ -133,6 +137,8 @@ function App() {
                     <Route element={<AdminProtectedOutlet />}>
                       {/* Directory */}
                       <Route path={AppRoutes.DIRECTORY} element={<DirectoryPage />} />
+                      <Route path={AppRoutes.DIRECTORY_INTERNAL} element={<DirectoryPage />} />
+                      <Route path={AppRoutes.DIRECTORY_EXTERNAL} element={<DirectoryPage />} />
                       <Route path={AppRoutes.ADMIN} element={<AdminDashboardPage />} />
                       
                       {/* News */}
@@ -198,6 +204,14 @@ function App() {
                       {/* FAQ */}
                       <Route path={AppRoutes.ADMIN_FAQ} element={<AdminFAQPage />} />
                       <Route path={AppRoutes.ADMIN_FAQ_EDIT} element={<AdminFAQEditorPage />} />
+                      
+                      {/* External Directory */}
+                      <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS} element={<AdminExternalContactsPage />} />
+                      <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_NEW} element={<AdminExternalContactFormPage />} />
+                      <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_EDIT} element={<AdminExternalContactFormPage />} />
+                      <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS} element={<AdminExternalGroupsPage />} />
+                      <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_NEW} element={<AdminExternalGroupFormPage />} />
+                      <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_EDIT} element={<AdminExternalGroupFormPage />} />
                       
                       {/* Settings */}
                       <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />

@@ -249,3 +249,145 @@ export function generateVCardDataUrl(member: TeamMember): string {
   const vCardContent = generateVCard(member);
   return `data:text/vcard;charset=utf-8,${encodeURIComponent(vCardContent)}`;
 }
+
+// ============================================================================
+// Fonctions pour les contacts externes
+// ============================================================================
+
+import type { ExternalContactWithGroups } from '@/types/external-directory.types';
+
+/**
+ * Génère le contenu vCard (RFC 6350) pour un contact externe
+ */
+export function generateExternalContactVCard(contact: ExternalContactWithGroups): string {
+  const lines: string[] = [];
+  
+  // En-tête vCard
+  lines.push('BEGIN:VCARD');
+  lines.push('VERSION:4.0');
+  
+  // Nom complet
+  const fullName = contact.last_name 
+    ? `${contact.first_name} ${contact.last_name}`
+    : contact.first_name;
+  lines.push(`FN:${escapeVCardValue(fullName)}`);
+  
+  // Nom structuré (Nom;Prénom;Autre;Préfixe;Suffixe)
+  lines.push(`N:${escapeVCardValue(contact.last_name || '')};${escapeVCardValue(contact.first_name)};;;`);
+  
+  // Email
+  if (contact.email) {
+    lines.push(`EMAIL;TYPE=work:${escapeVCardValue(contact.email)}`);
+  }
+  
+  // Téléphone
+  if (contact.phone) {
+    const formattedPhone = formatPhoneNumber(contact.phone);
+    lines.push(`TEL;TYPE=cell:${formattedPhone}`);
+  }
+  
+  // Ville (comme adresse simplifiée)
+  if (contact.city) {
+    // Format ADR: ;;rue;ville;région;code postal;pays
+    lines.push(`ADR;TYPE=work:;;;${escapeVCardValue(contact.city)};;;France`);
+  }
+  
+  // Organisation(s) - liste des groupes
+  if (contact.groups && contact.groups.length > 0) {
+    const organizations = contact.groups.map(g => g.group.name).join(', ');
+    lines.push(`ORG:${escapeVCardValue(organizations)}`);
+    
+    // Rôles dans les organisations
+    const roles = contact.groups
+      .filter(g => g.role)
+      .map(g => `${g.role} (${g.group.name})`)
+      .join(', ');
+    if (roles) {
+      lines.push(`ROLE:${escapeVCardValue(roles)}`);
+    }
+  }
+  
+  // Catégories (tags)
+  if (contact.tags && contact.tags.length > 0) {
+    lines.push(`CATEGORIES:${contact.tags.map(escapeVCardValue).join(',')}`);
+  }
+  
+  // Notes
+  const notes: string[] = [];
+  if (contact.note) {
+    notes.push(contact.note);
+  }
+  if (contact.groups && contact.groups.length > 0) {
+    const groupInfo = contact.groups.map(g => {
+      return g.role ? `${g.group.name} (${g.role})` : g.group.name;
+    }).join(' | ');
+    notes.push(`Groupes: ${groupInfo}`);
+  }
+  if (notes.length > 0) {
+    lines.push(`NOTE:${escapeVCardValue(notes.join(' | '))}`);
+  }
+  
+  // Photo (URL)
+  if (contact.photo_url) {
+    lines.push(`PHOTO;MEDIATYPE=image/jpeg:${contact.photo_url}`);
+  }
+  
+  // Métadonnées
+  lines.push(`REV:${new Date().toISOString()}`);
+  lines.push(`UID:external-contact-${contact.id}`);
+  
+  // Fin vCard
+  lines.push('END:VCARD');
+  
+  return lines.join('\r\n');
+}
+
+/**
+ * Déclenche le téléchargement d'une vCard pour un contact externe
+ */
+export function downloadExternalContactVCard(contact: ExternalContactWithGroups): void {
+  const vCardContent = generateExternalContactVCard(contact);
+  const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  
+  const fullName = contact.last_name 
+    ? `${contact.first_name}_${contact.last_name}`
+    : contact.first_name;
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${fullName.replace(/\s+/g, '_')}.vcf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Déclenche le téléchargement de vCards multiples pour contacts externes
+ */
+export function downloadMultipleExternalVCards(contacts: ExternalContactWithGroups[]): void {
+  if (contacts.length === 0) return;
+  
+  const vCards = contacts.map(contact => generateExternalContactVCard(contact));
+  const combinedContent = vCards.join('\r\n');
+  
+  const blob = new Blob([combinedContent], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `annuaire_externe_${contacts.length}_contacts.vcf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Génère une URL de données pour une vCard de contact externe
+ */
+export function generateExternalContactVCardDataUrl(contact: ExternalContactWithGroups): string {
+  const vCardContent = generateExternalContactVCard(contact);
+  return `data:text/vcard;charset=utf-8,${encodeURIComponent(vCardContent)}`;
+}

@@ -29,6 +29,8 @@ export enum Routes {
   AUTH_RESET_PASSWORD = "/auth/reset-password",
   PROFILE = "/profile",
   DIRECTORY = "/annuaire",
+  DIRECTORY_INTERNAL = "/annuaire/internes",
+  DIRECTORY_EXTERNAL = "/annuaire/externes",
 
   // Routes d'administration
   ADMIN = "/admin",
@@ -68,6 +70,14 @@ export enum Routes {
   ADMIN_ELECTORAL_LIST = "/admin/electoral-list",
   ADMIN_FAQ = "/admin/faq",
   ADMIN_FAQ_EDIT = "/admin/faq/edit/:id?",
+  
+  // Routes d'administration - Annuaire externe
+  ADMIN_EXTERNAL_CONTACTS = "/admin/external-contacts",
+  ADMIN_EXTERNAL_CONTACTS_NEW = "/admin/external-contacts/new",
+  ADMIN_EXTERNAL_CONTACTS_EDIT = "/admin/external-contacts/:id/edit",
+  ADMIN_EXTERNAL_GROUPS = "/admin/external-groups",
+  ADMIN_EXTERNAL_GROUPS_NEW = "/admin/external-groups/new",
+  ADMIN_EXTERNAL_GROUPS_EDIT = "/admin/external-groups/:id/edit",
 
   // Routes spéciales
   DYNAMIC_PAGE = "/:slug",
@@ -92,5 +102,7 @@ export const generateRoutes = {
   adminLexiconEdit: (id: string) => `/admin/lexicon/${id}/edit`,
   adminTeamMembersEdit: (id: string) => `/admin/team-members/${id}/edit`,
   adminFAQEdit: (id: string) => `/admin/faq/edit/${id}`,
+  adminExternalContactsEdit: (id: string) => `/admin/external-contacts/${id}/edit`,
+  adminExternalGroupsEdit: (id: string) => `/admin/external-groups/${id}/edit`,
   dynamicPage: (slug: string) => `/${slug}`,
 };

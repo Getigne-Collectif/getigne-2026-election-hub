@@ -1,20 +1,24 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useAuth } from '@/context/auth';
 import { useToast } from '@/components/ui/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { BookUser, Users, Building2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import InternalContactsList from '@/components/directory/InternalContactsList';
 import ExternalContactsPlaceholder from '@/components/directory/ExternalContactsPlaceholder';
+import { Routes } from '@/routes';
+import { cn } from '@/lib/utils';
 
 const DirectoryPage = () => {
   const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  
+  // Déterminer l'onglet actif depuis l'URL
+  const activeTab = location.pathname === Routes.DIRECTORY_EXTERNAL ? 'external' : 'internal';
 
   useEffect(() => {
     if (!authChecked) return;
@@ -29,7 +33,12 @@ const DirectoryPage = () => {
       });
       return;
     }
-  }, [authChecked, isAdmin, navigate, toast, isRefreshingRoles]);
+
+    // Rediriger vers /annuaire/internes si on est sur /annuaire
+    if (location.pathname === Routes.DIRECTORY) {
+      navigate(Routes.DIRECTORY_INTERNAL, { replace: true });
+    }
+  }, [authChecked, isAdmin, navigate, toast, isRefreshingRoles, location.pathname]);
 
   // Ne rien afficher tant qu'on n'a pas vérifié l'authentification
   if (!authChecked || isRefreshingRoles) {
@@ -67,30 +76,39 @@ const DirectoryPage = () => {
               </p>
             </div>
 
-            {/* Onglets */}
-            <Tabs defaultValue="internal" className="space-y-6">
-              <TabsList className="grid w-full max-w-md grid-cols-2">
-                <TabsTrigger value="internal" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
+            {/* Onglets avec navigation par URL */}
+            <div className="space-y-6">
+              <div className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+                <Link
+                  to={Routes.DIRECTORY_INTERNAL}
+                  className={cn(
+                    "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                    activeTab === 'internal' && "bg-background text-foreground shadow-sm"
+                  )}
+                >
+                  <Users className="h-4 w-4 mr-2" />
                   <span>Contacts Internes</span>
-                </TabsTrigger>
-                <TabsTrigger value="external" className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
+                </Link>
+                <Link
+                  to={Routes.DIRECTORY_EXTERNAL}
+                  className={cn(
+                    "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                    activeTab === 'external' && "bg-background text-foreground shadow-sm"
+                  )}
+                >
+                  <Building2 className="h-4 w-4 mr-2" />
                   <span>Contacts Externes</span>
-                  <Badge variant="secondary" className="ml-1 text-xs">
-                    Bientôt
-                  </Badge>
-                </TabsTrigger>
-              </TabsList>
+                </Link>
+              </div>
 
-              <TabsContent value="internal" className="space-y-6">
-                <InternalContactsList />
-              </TabsContent>
-
-              <TabsContent value="external" className="space-y-6">
-                <ExternalContactsPlaceholder />
-              </TabsContent>
-            </Tabs>
+              <div className="mt-6">
+                {activeTab === 'internal' ? (
+                  <InternalContactsList />
+                ) : (
+                  <ExternalContactsPlaceholder />
+                )}
+              </div>
+            </div>
           </div>
         </main>
 

@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -22,19 +24,55 @@ import {
 import type { TeamMember } from '@/types/electoral.types';
 import { downloadVCard, downloadMultipleVCards } from '@/utils/vcard';
 import { cn } from '@/lib/utils';
+import { generateRoutes } from '@/routes';
+import InternalContactDetailDialog from './InternalContactDetailDialog';
+
+// Helpers pour gérer les cookies
+const setCookie = (name: string, value: string, days: number = 30) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+};
+
+const getCookie = (name: string): string | null => {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) {
+      return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+  }
+  return null;
+};
 
 const InternalContactsList = () => {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Initialiser la recherche depuis les cookies
+  const [searchQuery, setSearchQuery] = useState(() => getCookie('internalDirectory_search') || '');
   const [activeLetter, setActiveLetter] = useState('A');
+  
+  // État pour la dialog de détails
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchMembers();
   }, []);
+
+  // Sauvegarder la recherche dans les cookies à chaque changement
+  useEffect(() => {
+    setCookie('internalDirectory_search', searchQuery);
+  }, [searchQuery]);
 
   const fetchMembers = async () => {
     setLoading(true);
@@ -143,12 +181,22 @@ const InternalContactsList = () => {
     });
   };
 
-  const handleDownloadSingle = (member: TeamMember) => {
+  const handleDownloadSingle = (member: TeamMember, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     downloadVCard(member);
     toast({
       title: 'vCard téléchargée',
       description: `Contact de ${member.name} exporté avec succès`,
     });
+  };
+
+  const handleMemberClick = (member: TeamMember) => {
+    setSelectedMember(member);
+    setDetailDialogOpen(true);
+  };
+
+  const handleEditMember = (memberId: string) => {
+    navigate(generateRoutes.adminTeamMembersEdit(memberId));
   };
 
   const formatDate = (dateString: string | null) => {
@@ -276,7 +324,11 @@ const InternalContactsList = () => {
                 {/* Grille de contacts */}
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {groupedMembers[letter].map((member) => (
-                    <Card key={member.id} className="overflow-hidden hover:shadow-md transition-all hover:border-getigne-300">
+                    <Card 
+                      key={member.id} 
+                      className="overflow-hidden hover:shadow-md transition-all hover:border-getigne-300 cursor-pointer"
+                      onClick={() => handleMemberClick(member)}
+                    >
                       <CardContent className="p-0">
                         <div className="flex gap-3 p-3">
                           {/* Photo compacte */}
@@ -393,7 +445,7 @@ const InternalContactsList = () => {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleDownloadSingle(member)}
+                              onClick={(e) => handleDownloadSingle(member, e)}
                               title="Télécharger vCard"
                             >
                               <Download className="h-4 w-4" />
@@ -409,6 +461,14 @@ const InternalContactsList = () => {
           </div>
         </div>
       )}
+
+      {/* Dialog de détails du membre */}
+      <InternalContactDetailDialog
+        member={selectedMember}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        onEdit={handleEditMember}
+      />
     </div>
   );
 };

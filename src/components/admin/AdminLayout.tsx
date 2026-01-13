@@ -25,7 +25,9 @@ import {
   FileText as FileTextIcon,
   Users as UsersIcon,
   Settings as SettingsIcon,
-  HelpCircle
+  HelpCircle,
+  Building2,
+  Contact
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -116,6 +118,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
           title: 'Membres de l\'équipe',
           href: '/admin/team-members',
           icon: UserCircle,
+        },
+        {
+          title: 'Contacts externes',
+          href: '/admin/external-contacts',
+          icon: Contact,
+        },
+        {
+          title: 'Groupes externes',
+          href: '/admin/external-groups',
+          icon: Building2,
         },
         {
           title: 'Liste électorale',
