@@ -199,7 +199,7 @@ const JoinPage = () => {
                       className="bg-getigne-accent hover:bg-getigne-accent/90 text-white w-full sm:w-auto"
                       onClick={() => setIsSupportFormOpen(true)}
                     >
-                      Je signe le comité de soutien
+                      Je rejoins le comité de soutien
                     </Button>
                   </div>
                   <div className="bg-white rounded-3xl p-8 md:p-10 border border-getigne-100 shadow-xl shadow-getigne-100/50 overflow-hidden h-full min-h-[450px] flex flex-col relative">

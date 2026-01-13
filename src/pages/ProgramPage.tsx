@@ -124,7 +124,7 @@ const persistEditModeToCookie = (value: boolean) => {
 };
 
 const ProgramPage = () => {
-  const { user, isAdmin, userRoles } = useAuth();
+  const { user, isAdmin, userRoles, loading: authLoading } = useAuth();
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(() => readEditModeFromCookie());
   const [editingFlagshipProject, setEditingFlagshipProject] = useState<ProgramFlagshipProject | null>(null);
@@ -136,7 +136,7 @@ const ProgramPage = () => {
   const [isSubmittingSection, setIsSubmittingSection] = useState(false);
   const [hasShareAccess, setHasShareAccess] = useState(false);
   const [shareLink, setShareLink] = useState('');
-  const { settings } = useAppSettings();
+  const { settings, isLoading: isLoadingSettings } = useAppSettings();
   
   // Refs pour le sticky header de la section mesures
   const measuresSectionRef = React.useRef<HTMLDivElement>(null);
@@ -465,6 +465,9 @@ const ProgramPage = () => {
 
     handleHashScroll();
   }, [isLoadingItems, isLoadingFlagship]);
+
+  // État de chargement global de la page
+  const isPageLoading = isLoadingSettings || authLoading || (isLoadingGeneral && !programGeneral) || (isLoadingItems && !programItems) || (isLoadingFlagship && !flagshipProjects);
 
   const isProgramAdmin = isAdmin || userRoles.includes('program_manager');
   const showAdminControls = isProgramAdmin && isEditMode;
@@ -851,6 +854,27 @@ const ProgramPage = () => {
     };
   };
 
+  // Affichage du loader général tant que les vérifications ne sont pas terminées
+  if (isPageLoading) {
+    return (
+      <HelmetProvider>
+        <div className="min-h-screen bg-getigne-50 flex flex-col">
+          <Navbar />
+          <div className="flex-grow flex flex-col items-center justify-center p-4">
+            <div className="text-center animate-in fade-in duration-500">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-getigne-accent/10 rounded-full mb-4">
+                <BookOpen className="w-8 h-8 text-getigne-accent animate-pulse" />
+              </div>
+              <h2 className="text-xl font-bold text-getigne-900 mb-2">Chargement du programme...</h2>
+              <p className="text-getigne-600 max-w-xs mx-auto">Vérification de l'accès et récupération des dernières propositions.</p>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      </HelmetProvider>
+    );
+  }
+
   if (!canAccessProgram) {
     return (
       <HelmetProvider>
@@ -947,24 +971,6 @@ const ProgramPage = () => {
             </div>
           </div>
           
-          <Footer />
-        </div>
-      </HelmetProvider>
-    );
-  }
-
-  if (isLoadingGeneral || isLoadingItems || isLoadingFlagship) {
-    return (
-      <HelmetProvider>
-        <div className="min-h-screen bg-gradient-to-br from-getigne-50 to-getigne-100">
-          <Navbar />
-          <div className="pt-20 pb-16">
-            <div className="container mx-auto px-4">
-              <div className="text-center">
-                <p>Chargement du programme...</p>
-              </div>
-            </div>
-          </div>
           <Footer />
         </div>
       </HelmetProvider>
