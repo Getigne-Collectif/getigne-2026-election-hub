@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import {LogIn, LogOut, UserCog, Settings, BookUser} from 'lucide-react';
+import {LogIn, LogOut, UserCog, Settings, BookUser, ChevronDown} from 'lucide-react';
 import { Routes } from '@/routes';
 import {
   DropdownMenu,
@@ -76,6 +76,7 @@ const AuthButton = () => {
               Nouveau
             </span>
           )}
+          <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

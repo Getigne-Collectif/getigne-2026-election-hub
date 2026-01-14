@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown, Settings, FileText, Car, Coffee, HandHeart, PenLineIcon } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, ChevronDown, Settings, FileText, Car, Coffee, HandHeart, PenLineIcon, BookUser, UserCog, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,15 +12,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import AuthButton from './AuthButton';
+import UserAvatar, { getUserNames } from '@/components/UserAvatar';
 import { useAuth } from '@/context/auth';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Routes } from '@/routes';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { toast } from '@/components/ui/use-toast';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [supportersCount, setSupportersCount] = useState<number | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isAdmin, user, refreshUserRoles, userRoles, isRefreshingRoles } = useAuth();
   const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
@@ -156,29 +160,94 @@ const Navbar = () => {
     </>
   );
 
-  const AdminLinks = () => {
-    if (!isAdmin && !isRefreshingRoles) return null;
-    if (!isAdmin && isRefreshingRoles && userRoles.length === 0) return null;
+  const UserMenuLinks = ({ onNavigate }: { onNavigate?: () => void }) => {
+    const navigate = useNavigate();
+    const { user, profile, signOut, isAdmin, isInvitedUser } = useAuth();
+
+    if (!user) return null;
+
+    const { firstName, lastName, displayName } = getUserNames(user, profile);
+
+    const handleSignOut = async () => {
+      try {
+        await signOut();
+        if (onNavigate) onNavigate();
+        toast({
+          title: "Déconnexion réussie",
+          description: "Vous avez été déconnecté avec succès"
+        });
+      } catch (error) {
+        console.error('Error during sign out:', error);
+        toast({
+          title: "Erreur lors de la déconnexion",
+          description: "Une erreur est survenue lors de la déconnexion",
+          variant: "destructive"
+        });
+      }
+    };
 
     return (
       <>
-        <li className="pt-2 pb-2 border-t border-gray-200 mt-4">
-          <span className="text-sm text-muted-foreground">Administration</span>
+        <li className="pt-4 pb-2 border-t border-gray-200 mt-4">
+          <span className="text-sm text-muted-foreground px-2">Mon compte</span>
+        </li>
+        <li className="px-2 py-3 bg-muted/50 rounded-lg">
+          <div className="flex items-center gap-3">
+            <UserAvatar user={user} profile={profile} size="md" />
+            <div className="flex-1 min-w-0">
+              {firstName ? (
+                <>
+                  <p className="font-medium text-sm truncate">{`${firstName} ${lastName}`}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                </>
+              ) : (
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              )}
+            </div>
+          </div>
         </li>
         <li>
-          <Link to={Routes.ADMIN} className={isActive(Routes.ADMIN)}>
-            Dashboard
+          <Link 
+            to={Routes.PROFILE} 
+            className={`flex items-center gap-2 py-2 ${isActive(Routes.PROFILE)}`}
+            onClick={onNavigate}
+          >
+            <UserCog className="h-4 w-4" />
+            Mon profil
           </Link>
         </li>
+        {isAdmin && (
+          <>
+            <li>
+              <Link 
+                to={Routes.DIRECTORY} 
+                className={`flex items-center gap-2 py-2 ${isActive(Routes.DIRECTORY)}`}
+                onClick={onNavigate}
+              >
+                <BookUser className="h-4 w-4" />
+                Annuaire
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to={Routes.ADMIN} 
+                className={`flex items-center gap-2 py-2 ${isActive(Routes.ADMIN)}`}
+                onClick={onNavigate}
+              >
+                <Settings className="h-4 w-4" />
+                Administration
+              </Link>
+            </li>
+          </>
+        )}
         <li>
-          <Link to={Routes.ADMIN_PAGES} className={isActive(Routes.ADMIN_PAGES)}>
-            Pages
-          </Link>
-        </li>
-        <li>
-          <Link to={Routes.ADMIN_MENU} className={isActive(Routes.ADMIN_MENU)}>
-            Menu
-          </Link>
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center gap-2 py-2 text-destructive w-full text-left"
+          >
+            <LogOut className="h-4 w-4" />
+            Se déconnecter
+          </button>
         </li>
       </>
     );
@@ -224,9 +293,11 @@ const Navbar = () => {
               <SupportButton />
             </div>
             
-            <AuthButton />
+            <div className="hidden lg:block">
+              <AuthButton />
+            </div>
 
-            <Sheet>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
@@ -239,12 +310,12 @@ const Navbar = () => {
               </SheetTrigger>
               <SheetContent side="right">
                 <nav className="mt-8">
-                  <ul className="space-y-6 text-lg">
+                  <ul className="space-y-4 text-lg">
                     <NavLinks />
-                    <li className="pt-2 sm:hidden">
+                    <li className="pt-4">
                       <SupportButton className="w-full py-6 text-lg" />
                     </li>
-                    <AdminLinks />
+                    <UserMenuLinks onNavigate={() => setIsOpen(false)} />
                   </ul>
                 </nav>
               </SheetContent>
