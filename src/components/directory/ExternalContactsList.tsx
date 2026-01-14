@@ -842,48 +842,52 @@ const ExternalContactsList = () => {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        {/* Ligne 1 : Nom + Tags + Membres + Actions */}
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-sm truncate flex-shrink min-w-0">{group.name}</h3>
-                          {group.city && (
-                            <span className="text-xs text-muted-foreground whitespace-nowrap">• {group.city}</span>
-                          )}
-                          <div className="flex items-center gap-1 ml-auto flex-shrink-0">
-                            {group.tags && group.tags.length > 0 && (
-                              <Badge variant="outline" className="text-xs px-1.5 py-0">
-                                {group.tags[0]}
-                              </Badge>
+                        {/* Ligne 1 : Nom + Ville + Actions */}
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm truncate">{group.name}</h3>
+                            {group.city && (
+                              <span className="text-xs text-muted-foreground whitespace-nowrap">• {group.city}</span>
                             )}
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Users className="h-3 w-3" />
-                              <span>{group.contacts.length}</span>
+                          </div>
+                          {isAdmin && (
+                            <div className="flex items-center gap-0.5 flex-shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 hover:text-blue-600"
+                                onClick={(e) => handleEditGroup(group.id, e)}
+                                title="Modifier"
+                              >
+                                <Edit className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 hover:text-red-600"
+                                onClick={(e) => handleDeleteClick('group', group.id, group.name, e)}
+                                title="Supprimer"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
                             </div>
-                            {isAdmin && (
-                              <div className="flex items-center gap-0.5 ml-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 hover:text-blue-600"
-                                  onClick={(e) => handleEditGroup(group.id, e)}
-                                  title="Modifier"
-                                >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 hover:text-red-600"
-                                  onClick={(e) => handleDeleteClick('group', group.id, group.name, e)}
-                                  title="Supprimer"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            )}
+                          )}
+                        </div>
+
+                        {/* Ligne 2 : Tags + Nombre de membres */}
+                        <div className="flex items-center gap-2 mb-1">
+                          {group.tags && group.tags.length > 0 && (
+                            <Badge variant="outline" className="text-xs px-1.5 py-0">
+                              {group.tags[0]}
+                            </Badge>
+                          )}
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Users className="h-3 w-3" />
+                            <span>{group.contacts.length} membre{group.contacts.length > 1 ? 's' : ''}</span>
                           </div>
                         </div>
 
-                        {/* Ligne 2 : Email + Description (si présents) */}
+                        {/* Ligne 3 : Email + Description (si présents) */}
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           {group.contact_email && (
                             <>

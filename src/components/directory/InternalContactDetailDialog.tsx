@@ -27,8 +27,14 @@ import { useAuth } from '@/context/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+// Type étendu pour inclure les positions électorales
+type TeamMemberWithPosition = TeamMember & {
+  electoral_position?: number | null;
+  substitute_position?: number | null;
+};
+
 interface InternalContactDetailDialogProps {
-  member: TeamMember | null;
+  member: TeamMemberWithPosition | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit?: (memberId: string) => void;

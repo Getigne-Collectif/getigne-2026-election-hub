@@ -27,6 +27,12 @@ import { cn } from '@/lib/utils';
 import { generateRoutes } from '@/routes';
 import InternalContactDetailDialog from './InternalContactDetailDialog';
 
+// Type étendu pour inclure les positions électorales
+type TeamMemberWithPosition = TeamMember & {
+  electoral_position?: number | null;
+  substitute_position?: number | null;
+};
+
 // Helpers pour gérer les cookies
 const setCookie = (name: string, value: string, days: number = 30) => {
   const expires = new Date();
@@ -48,7 +54,7 @@ const getCookie = (name: string): string | null => {
 };
 
 const InternalContactsList = () => {
-  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [members, setMembers] = useState<TeamMemberWithPosition[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Initialiser la recherche depuis les cookies
@@ -57,7 +63,7 @@ const InternalContactsList = () => {
   
   // État pour la dialog de détails
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<TeamMemberWithPosition | null>(null);
   
   const { toast } = useToast();
   const { isAdmin } = useAuth();
@@ -77,13 +83,46 @@ const InternalContactsList = () => {
   const fetchMembers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Récupérer d'abord la liste électorale active
+      const { data: activeList } = await supabase
+        .from('electoral_list')
+        .select('id')
+        .eq('is_active', true)
+        .single();
+
+      // Récupérer les membres
+      const { data: membersData, error: membersError } = await supabase
         .from('team_members')
         .select('*')
         .order('name');
 
-      if (error) throw error;
-      setMembers(data || []);
+      if (membersError) throw membersError;
+
+      // Si on a une liste active, récupérer les positions
+      if (activeList) {
+        const { data: listMembers } = await supabase
+          .from('electoral_list_members')
+          .select('team_member_id, position')
+          .eq('electoral_list_id', activeList.id);
+
+        // Ajouter les positions aux membres
+        const membersWithPositions = (membersData || []).map(member => {
+          const listMember = listMembers?.find(lm => lm.team_member_id === member.id);
+          if (listMember) {
+            // Position 1-27 = titulaires, 28-29 = remplaçants
+            if (listMember.position <= 27) {
+              return { ...member, electoral_position: listMember.position };
+            } else {
+              return { ...member, substitute_position: listMember.position - 27 };
+            }
+          }
+          return member;
+        });
+        
+        setMembers(membersWithPositions);
+      } else {
+        setMembers(membersData || []);
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération des membres:', error);
       toast({
@@ -181,7 +220,7 @@ const InternalContactsList = () => {
     });
   };
 
-  const handleDownloadSingle = (member: TeamMember, e?: React.MouseEvent) => {
+  const handleDownloadSingle = (member: TeamMemberWithPosition, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     downloadVCard(member);
     toast({
@@ -190,7 +229,7 @@ const InternalContactsList = () => {
     });
   };
 
-  const handleMemberClick = (member: TeamMember) => {
+  const handleMemberClick = (member: TeamMemberWithPosition) => {
     setSelectedMember(member);
     setDetailDialogOpen(true);
   };
