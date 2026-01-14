@@ -264,6 +264,16 @@ const InternalContactsList = () => {
     'bac_plus_6_plus': 'Bac+6 et plus',
   };
 
+  const getListPosition = (member: TeamMemberWithPosition): number | null => {
+    if (typeof member.electoral_position === 'number') {
+      return member.electoral_position;
+    }
+    if (typeof member.substitute_position === 'number') {
+      return member.substitute_position + 27;
+    }
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-16">
@@ -395,6 +405,14 @@ const InternalContactsList = () => {
                                 {member.name}
                               </h3>
                               <div className="flex flex-wrap gap-1.5">
+                                {(() => {
+                                  const position = getListPosition(member);
+                                  return position !== null ? (
+                                    <Badge className="bg-getigne-600 text-white text-xs px-2 py-0 h-5 font-semibold">
+                                      #{position}
+                                    </Badge>
+                                  ) : null;
+                                })()}
                                 {member.role && (
                                   <Badge variant="secondary" className="bg-getigne-100 text-getigne-700 text-xs px-2 py-0 h-5">
                                     {member.role}

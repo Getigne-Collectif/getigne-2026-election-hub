@@ -97,10 +97,10 @@ const InternalContactDetailDialog = ({
   };
 
   const getListPosition = () => {
-    if (member.electoral_position !== null) {
+    if (typeof member.electoral_position === 'number') {
       return member.electoral_position;
     }
-    if (member.substitute_position !== null) {
+    if (typeof member.substitute_position === 'number') {
       return member.substitute_position + 27;
     }
     return null;
@@ -248,7 +248,7 @@ const InternalContactDetailDialog = ({
           )}
 
           {/* Position électorale */}
-          {(listPosition !== null || member.max_engagement_level) && (
+          {listPosition !== null && (
             <>
               <Separator />
               <div className="space-y-3">
@@ -257,14 +257,12 @@ const InternalContactDetailDialog = ({
                   Position électorale
                 </h3>
                 <div className="space-y-2">
-                  {listPosition !== null && (
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground mb-1">Position actuelle</p>
-                      <p className="text-sm font-medium">
-                        Sur la liste (position {listPosition})
-                      </p>
-                    </div>
-                  )}
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">Position actuelle</p>
+                    <p className="text-sm font-medium">
+                      Sur la liste (position {listPosition})
+                    </p>
+                  </div>
                   {member.max_engagement_level && (
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-xs text-muted-foreground mb-1">Niveau d'engagement max envisagé</p>
