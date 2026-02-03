@@ -271,6 +271,7 @@ const ProgramPage = () => {
           *,
           program_points (
             id,
+            number,
             title,
             content,
             position,
@@ -303,6 +304,7 @@ const ProgramPage = () => {
 
             return {
               ...point,
+              number: (point as unknown as { number?: number }).number,
               files: Array.isArray(point.files) ? (point.files as string[]) : [],
               files_metadata: Array.isArray(point.files_metadata)
                 ? (point.files_metadata as { url?: string | null; label?: string | null; path?: string | null }[])
@@ -1377,6 +1379,7 @@ const ProgramPage = () => {
                                 {pointsToDisplay.map((point: Tables<'program_points'>) => {
                                   const normalizedPoint: ProgramPoint = {
                                     id: point.id,
+                                    number: (point as unknown as { number?: number }).number,
                                     title: point.title as unknown as string,
                                     content: point.content as unknown as string,
                                     position: point.position,

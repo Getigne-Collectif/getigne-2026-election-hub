@@ -161,7 +161,13 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
               </TooltipProvider>
             )}
             <div className="flex flex-col gap-1 flex-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {point.number != null && (
+                  <span className="shrink-0 text-sm font-medium text-getigne-600 tabular-nums" aria-label={`Mesure #${point.number}`}>
+                    #{point.number}
+                  </span>
+                )}
+                {point.number != null && <span className="text-getigne-300 select-none">·</span>}
                 <h3 className="text-lg font-semibold text-getigne-800">
                   {point.title}
                 </h3>

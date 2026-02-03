@@ -1004,9 +1004,10 @@ export async function generateProgramPDF(
           pdf.setFontSize(12);
           pdf.setTextColor(31, 41, 55);
           pdf.setFont('helvetica', 'bold');
-          const pointTitle = point.competent_entity
+          const numberPrefix = point.number != null ? `#${point.number} – ` : '';
+          const pointTitle = numberPrefix + (point.competent_entity
             ? `[${point.competent_entity.name}] ${point.title}`
-            : point.title;
+            : point.title);
           currentY = addTextWithPagination(pdf, pointTitle, {
             fontSize: 12,
             y: currentY + 5,
@@ -1075,7 +1076,7 @@ export async function generateProgramPDF(
           for (const file of point.files_metadata) {
             allAttachedFiles.push({
               file,
-              pointTitle: point.title,
+              pointTitle: (point.number != null ? `#${point.number} – ` : '') + point.title,
               sectionTitle: item.title,
             });
           }

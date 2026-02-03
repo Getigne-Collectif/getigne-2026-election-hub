@@ -58,6 +58,7 @@ export default function ProgramPointsEditor({
       // Convert the files from Json to string[] if needed and ensure status exists
       const transformedData = data?.map(point => ({
         ...point,
+        number: (point as { number?: number }).number,
         files: Array.isArray(point.files) ? point.files : [],
         files_metadata: Array.isArray(point.files_metadata)
           ? point.files_metadata.map((file: any) => ({
@@ -135,6 +136,30 @@ export default function ProgramPointsEditor({
       console.error("Status change error:", error);
       // En cas d'erreur, rafraîchir depuis la base
       refetch();
+    }
+  };
+
+  const handleNumberChange = async (pointId: string, number: number) => {
+    try {
+      const { error } = await supabase
+        .from('program_points')
+        .update({ number, updated_at: new Date().toISOString() })
+        .eq('id', pointId);
+
+      if (error) throw error;
+
+      setPoints(prevPoints =>
+        prevPoints.map(point =>
+          point.id === pointId ? { ...point, number } : point
+        )
+      );
+      toast.success('Numéro mis à jour');
+      onPointsUpdated?.();
+    } catch (error: any) {
+      toast.error(`Erreur lors de la mise à jour du numéro: ${error.message}`);
+      console.error("Number change error:", error);
+      refetch();
+      throw error;
     }
   };
 
@@ -262,6 +287,7 @@ export default function ProgramPointsEditor({
             onEdit={handleEditClick} 
             onDelete={handleDeletePoint} 
             onStatusChange={handleStatusChange}
+            onNumberChange={handleNumberChange}
             isReordering={isReordering}
           />
         </DragDropContext>

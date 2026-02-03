@@ -11,6 +11,8 @@ export interface ProgramPointFileMeta {
 
 export interface ProgramPoint {
   id: string;
+  /** Numéro unique attribué en base, non modifiable. */
+  number?: number;
   title: string;
   content: OutputData | string;
   position: number;

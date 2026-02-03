@@ -12,11 +12,13 @@ interface PointListProps {
   onEdit: (point: ProgramPoint) => void;
   onDelete: (pointId: string) => void;
   onStatusChange: (pointId: string, newStatus: ProgramPointStatus) => void;
+  onNumberChange: (pointId: string, number: number) => Promise<void>;
   isReordering: boolean;
 }
 
-export default function PointList({ points, onEdit, onDelete, onStatusChange, isReordering }: PointListProps) {
+export default function PointList({ points, onEdit, onDelete, onStatusChange, onNumberChange, isReordering }: PointListProps) {
   const [expandedPoints, setExpandedPoints] = useState<Set<string>>(new Set());
+  const [savingNumberFor, setSavingNumberFor] = useState<string | null>(null);
 
   const toggleExpand = (pointId: string) => {
     setExpandedPoints(prev => {
@@ -65,7 +67,39 @@ export default function PointList({ points, onEdit, onDelete, onStatusChange, is
                         <div className="flex-1">
                           <div className="mb-2 flex items-start justify-between gap-2">
                             <div className="flex flex-col gap-1">
-                              <h4 className="font-medium text-getigne-800">{point.title}</h4>
+                              <div className="flex items-center gap-2">
+                                {point.number != null && (
+                                  <>
+                                    <label className="sr-only" htmlFor={`point-number-${point.id}`}>
+                                      Numéro de la mesure
+                                    </label>
+                                    <input
+                                      id={`point-number-${point.id}`}
+                                      type="number"
+                                      min={1}
+                                      step={1}
+                                      defaultValue={point.number}
+                                      key={`${point.id}-${point.number}`}
+                                      disabled={savingNumberFor === point.id}
+                                      onBlur={async (e) => {
+                                        const raw = (e.target as HTMLInputElement).value;
+                                        const n = parseInt(raw, 10);
+                                        if (Number.isNaN(n) || n < 1) return;
+                                        if (n === point.number) return;
+                                        setSavingNumberFor(point.id);
+                                        try {
+                                          await onNumberChange(point.id, n);
+                                        } finally {
+                                          setSavingNumberFor(null);
+                                        }
+                                      }}
+                                      className="w-14 shrink-0 h-8 px-2 rounded border border-input bg-background text-sm text-center tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                      aria-label={`Numéro mesure #${point.number}`}
+                                    />
+                                  </>
+                                )}
+                                <h4 className="font-medium text-getigne-800">{point.title}</h4>
+                              </div>
                               {point.competent_entity && (
                                 <span className="text-xs uppercase tracking-wide text-muted-foreground">
                                   {point.competent_entity.name}

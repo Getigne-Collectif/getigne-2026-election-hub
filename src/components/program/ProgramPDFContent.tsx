@@ -459,6 +459,11 @@ const ProgramPDFContent: React.FC<ProgramPDFContentProps> = ({
                             flex: 1,
                           }}
                         >
+                          {point.number != null && (
+                            <span style={{ marginRight: '8px', color: '#6b7280', fontWeight: 600 }}>
+                              #{point.number}
+                            </span>
+                          )}
                           {point.title}
                         </h5>
                       </div>
