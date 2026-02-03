@@ -12,13 +12,11 @@ interface PointListProps {
   onEdit: (point: ProgramPoint) => void;
   onDelete: (pointId: string) => void;
   onStatusChange: (pointId: string, newStatus: ProgramPointStatus) => void;
-  onNumberChange: (pointId: string, number: number) => Promise<void>;
   isReordering: boolean;
 }
 
-export default function PointList({ points, onEdit, onDelete, onStatusChange, onNumberChange, isReordering }: PointListProps) {
+export default function PointList({ points, onEdit, onDelete, onStatusChange, isReordering }: PointListProps) {
   const [expandedPoints, setExpandedPoints] = useState<Set<string>>(new Set());
-  const [savingNumberFor, setSavingNumberFor] = useState<string | null>(null);
 
   const toggleExpand = (pointId: string) => {
     setExpandedPoints(prev => {
@@ -69,34 +67,9 @@ export default function PointList({ points, onEdit, onDelete, onStatusChange, on
                             <div className="flex flex-col gap-1">
                               <div className="flex items-center gap-2">
                                 {point.number != null && (
-                                  <>
-                                    <label className="sr-only" htmlFor={`point-number-${point.id}`}>
-                                      Numéro de la mesure
-                                    </label>
-                                    <input
-                                      id={`point-number-${point.id}`}
-                                      type="number"
-                                      min={1}
-                                      step={1}
-                                      defaultValue={point.number}
-                                      key={`${point.id}-${point.number}`}
-                                      disabled={savingNumberFor === point.id}
-                                      onBlur={async (e) => {
-                                        const raw = (e.target as HTMLInputElement).value;
-                                        const n = parseInt(raw, 10);
-                                        if (Number.isNaN(n) || n < 1) return;
-                                        if (n === point.number) return;
-                                        setSavingNumberFor(point.id);
-                                        try {
-                                          await onNumberChange(point.id, n);
-                                        } finally {
-                                          setSavingNumberFor(null);
-                                        }
-                                      }}
-                                      className="w-14 shrink-0 h-8 px-2 rounded border border-input bg-background text-sm text-center tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                      aria-label={`Numéro mesure #${point.number}`}
-                                    />
-                                  </>
+                                  <span className="shrink-0 inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1 rounded bg-muted text-muted-foreground text-xs font-medium">
+                                    n°{point.number}
+                                  </span>
                                 )}
                                 <h4 className="font-medium text-getigne-800">{point.title}</h4>
                               </div>

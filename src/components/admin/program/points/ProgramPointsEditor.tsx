@@ -139,30 +139,6 @@ export default function ProgramPointsEditor({
     }
   };
 
-  const handleNumberChange = async (pointId: string, number: number) => {
-    try {
-      const { error } = await supabase
-        .from('program_points')
-        .update({ number, updated_at: new Date().toISOString() })
-        .eq('id', pointId);
-
-      if (error) throw error;
-
-      setPoints(prevPoints =>
-        prevPoints.map(point =>
-          point.id === pointId ? { ...point, number } : point
-        )
-      );
-      toast.success('Numéro mis à jour');
-      onPointsUpdated?.();
-    } catch (error: any) {
-      toast.error(`Erreur lors de la mise à jour du numéro: ${error.message}`);
-      console.error("Number change error:", error);
-      refetch();
-      throw error;
-    }
-  };
-
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
     
@@ -287,7 +263,6 @@ export default function ProgramPointsEditor({
             onEdit={handleEditClick} 
             onDelete={handleDeletePoint} 
             onStatusChange={handleStatusChange}
-            onNumberChange={handleNumberChange}
             isReordering={isReordering}
           />
         </DragDropContext>
