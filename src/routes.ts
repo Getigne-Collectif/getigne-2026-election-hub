@@ -17,6 +17,7 @@ export enum Routes {
   PROGRAM = "/programme",
   PROJECTS = "/projets",
   SUPPORT_COMMITTEE = "/comite-de-soutien",
+  PROXY = "/procuration",
   JOIN = "/nous-rejoindre",
   CONTACT = "/contact",
   LEGAL = "/mentions-legales",
@@ -70,7 +71,8 @@ export enum Routes {
   ADMIN_ELECTORAL_LIST = "/admin/electoral-list",
   ADMIN_FAQ = "/admin/faq",
   ADMIN_FAQ_EDIT = "/admin/faq/edit/:id?",
-  
+  ADMIN_PROXY = "/admin/procuration",
+
   // Routes d'administration - Annuaire externe
   ADMIN_EXTERNAL_CONTACTS = "/admin/external-contacts",
   ADMIN_EXTERNAL_CONTACTS_NEW = "/admin/external-contacts/new",

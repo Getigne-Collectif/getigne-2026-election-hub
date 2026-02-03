@@ -49,6 +49,7 @@ const AdminExternalContactsPage = lazy(() => import("./pages/admin/external/Admi
 const AdminExternalContactFormPage = lazy(() => import("./pages/admin/external/AdminExternalContactFormPage"));
 const AdminExternalGroupsPage = lazy(() => import("./pages/admin/external/AdminExternalGroupsPage"));
 const AdminExternalGroupFormPage = lazy(() => import("./pages/admin/external/AdminExternalGroupFormPage"));
+const AdminProcurationPage = lazy(() => import("./pages/admin/AdminProcurationPage"));
 const DirectoryPage = lazy(() => import("./pages/DirectoryPage"));
 
 // Other pages
@@ -73,6 +74,7 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const DynamicPage = lazy(() => import("./pages/DynamicPage"));
 const LiftPage = lazy(() => import("./pages/LiftPage"));
+const ProcurationPage = lazy(() => import("./pages/ProcurationPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -132,6 +134,7 @@ function App() {
                       </AuthenticatedRoute>
                     } />
                     <Route path={AppRoutes.LIFT} element={<LiftPage />} />
+                    <Route path={AppRoutes.PROXY} element={<ProcurationPage />} />
                     
                     {/* Admin Routes - All protected by AdminRoute via nested routes */}
                     <Route element={<AdminProtectedOutlet />}>
@@ -204,6 +207,9 @@ function App() {
                       {/* FAQ */}
                       <Route path={AppRoutes.ADMIN_FAQ} element={<AdminFAQPage />} />
                       <Route path={AppRoutes.ADMIN_FAQ_EDIT} element={<AdminFAQEditorPage />} />
+                      
+                      {/* Procuration */}
+                      <Route path={AppRoutes.ADMIN_PROXY} element={<AdminProcurationPage />} />
                       
                       {/* External Directory */}
                       <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS} element={<AdminExternalContactsPage />} />

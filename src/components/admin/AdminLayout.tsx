@@ -27,7 +27,8 @@ import {
   Settings as SettingsIcon,
   HelpCircle,
   Building2,
-  Contact
+  Contact,
+  UserCheck
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -138,6 +139,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
           title: 'Comité de soutien',
           href: '/admin/comite-de-soutien',
           icon: Users,
+        },
+        {
+          title: 'Procuration',
+          href: '/admin/procuration',
+          icon: UserCheck,
         },
       ],
     },

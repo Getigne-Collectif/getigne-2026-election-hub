@@ -153,6 +153,11 @@ const Navbar = () => {
         </DropdownMenu>
       </li>
       <li>
+        <Link to={Routes.PROXY} className={isActive(Routes.PROXY)}>
+          Espace procuration
+        </Link>
+      </li>
+      <li>
         <Link to={Routes.CONTACT} className={isActive(Routes.CONTACT)}>
           Contact
         </Link>
