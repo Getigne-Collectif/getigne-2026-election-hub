@@ -28,7 +28,8 @@ import {
   HelpCircle,
   Building2,
   Contact,
-  UserCheck
+  UserCheck,
+  Tags
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -102,6 +103,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
           title: 'FAQ',
           href: '/admin/faq',
           icon: HelpCircle,
+        },
+        {
+          title: 'Rôles thématiques',
+          href: '/admin/thematic-roles',
+          icon: Tags,
         },
       ],
     },

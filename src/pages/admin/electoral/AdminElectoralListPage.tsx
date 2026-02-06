@@ -5,13 +5,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Loader2 } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ElectoralListGrid from '@/components/admin/electoral/ElectoralListGrid';
 import UnassignedMembersList from '@/components/admin/electoral/UnassignedMembersList';
 import EditMemberModal from '@/components/admin/electoral/EditMemberModal';
 import ElectoralListAnalysis from '@/components/admin/electoral/ElectoralListAnalysis';
+import { Button } from '@/components/ui/button';
 import type {
   ElectoralList,
   ElectoralListMemberWithDetails,
@@ -19,6 +20,7 @@ import type {
   ThematicRole,
   ElectoralPosition,
 } from '@/types/electoral.types';
+import * as XLSX from 'xlsx';
 
 const AdminElectoralListPage = () => {
   const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
@@ -38,6 +40,32 @@ const AdminElectoralListPage = () => {
   const [selectedMember, setSelectedMember] = useState<ElectoralListMemberWithDetails | null>(
     null
   );
+
+  const getEducationLabel = (level: string | null): string => {
+    if (!level) return 'Non renseigné';
+    const labels: Record<string, string> = {
+      brevet: 'Brevet / Fin de collège',
+      cap_bep: 'CAP / BEP',
+      bac_general: 'Bac général',
+      bac_technologique: 'Bac technologique',
+      bac_professionnel: 'Bac professionnel',
+      bac_plus_1_2: 'Bac +1 / Bac +2',
+      bac_plus_3: 'Bac +3',
+      bac_plus_4_5: 'Bac +4 / Bac +5',
+      bac_plus_6_plus: 'Bac +6 et plus',
+    };
+    return labels[level] || level;
+  };
+
+  const getGenderLabel = (gender: string | null): string => {
+    if (!gender) return '';
+    const labels: Record<string, string> = {
+      femme: 'Femme',
+      homme: 'Homme',
+      autre: 'Autre',
+    };
+    return labels[gender] || gender;
+  };
 
   // Gestion de l'onglet actif depuis l'URL
   const activeTab = searchParams.get('tab') || 'construction';
@@ -776,6 +804,81 @@ const AdminElectoralListPage = () => {
     }
   };
 
+  const handleExportXlsx = () => {
+    const assignedMembers = positions
+      .filter((p) => p.member)
+      .sort((a, b) => a.position - b.position) as Array<ElectoralPosition & { member: ElectoralListMemberWithDetails }>;
+
+    if (assignedMembers.length === 0) {
+      toast({
+        title: 'Aucun membre à exporter',
+        description: 'La liste électorale ne contient pas encore de membres.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const rows = assignedMembers.map((position) => {
+      const member = position.member.team_member;
+      const thematicRoles = position.member.roles
+        .slice()
+        .sort((a, b) => Number(b.is_primary) - Number(a.is_primary))
+        .map((role) => role.thematic_role.name)
+        .join(', ');
+
+      return {
+        'Numéro': position.position,
+        'Nom complet': member.name || '',
+        'Profession': member.profession || '',
+        'Numéro National d\'Electeur': member.national_elector_number || '',
+        'Genre': getGenderLabel(member.gender),
+        'Date de naissance': member.birth_date || '',
+        'Email': member.email || '',
+        'Téléphone': member.phone || '',
+        'Adresse postale': member.address || '',
+        'Niveau d\'étude': getEducationLabel(member.education_level),
+        'Rôles thématiques': thematicRoles,
+      };
+    });
+
+    const headers = [
+      'Numéro',
+      'Nom complet',
+      'Profession',
+      'Numéro National d\'Electeur',
+      'Genre',
+      'Date de naissance',
+      'Email',
+      'Téléphone',
+      'Adresse postale',
+      'Niveau d\'étude',
+      'Rôles thématiques',
+    ];
+
+    const worksheet = XLSX.utils.json_to_sheet(rows, { header: headers });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Liste électorale');
+
+    const workbookArray = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([workbookArray], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `liste-electorale-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Export XLSX réussi',
+      description: `${assignedMembers.length} membre(s) exporté(s).`,
+    });
+  };
+
   if (!isAdmin) {
     return null;
   }
@@ -788,11 +891,17 @@ const AdminElectoralListPage = () => {
 
       <AdminLayout noContainer>
         <div className="py-8">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Liste électorale</h1>
-            <p className="text-muted-foreground">
-              Composez la liste pour les élections municipales de Mars 2026
-            </p>
+          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Liste électorale</h1>
+              <p className="text-muted-foreground">
+                Composez la liste pour les élections municipales de Mars 2026
+              </p>
+            </div>
+            <Button type="button" variant="outline" onClick={handleExportXlsx}>
+              <Download className="mr-2 h-4 w-4" />
+              Exporter en XLSX
+            </Button>
           </div>
 
           {loading ? (

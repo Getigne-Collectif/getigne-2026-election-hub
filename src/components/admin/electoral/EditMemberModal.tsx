@@ -58,6 +58,7 @@ const EditMemberModal = ({
     image: '',
     email: '',
     phone: '',
+    national_elector_number: '',
     gender: '',
     birth_date: '',
     address: '',
@@ -81,6 +82,7 @@ const EditMemberModal = ({
         image: member.team_member.image || '',
         email: member.team_member.email || '',
         phone: member.team_member.phone || '',
+        national_elector_number: member.team_member.national_elector_number || '',
         gender: member.team_member.gender || '',
         birth_date: member.team_member.birth_date || '',
         address: member.team_member.address || '',
@@ -260,6 +262,7 @@ const EditMemberModal = ({
         bio: formData.bio?.trim() || null,
         email: formData.email?.trim() || null,
         phone: formData.phone?.trim() || null,
+        national_elector_number: formData.national_elector_number?.trim() || null,
         gender: formData.gender || null,
         birth_date: formData.birth_date || null,
         address: formData.address?.trim() || null,
@@ -433,6 +436,21 @@ const EditMemberModal = ({
                     }
                     placeholder="06 12 34 56 78"
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="national_elector_number">Numéro national d'électeur</Label>
+                  <Input
+                    id="national_elector_number"
+                    value={formData.national_elector_number}
+                    onChange={(e) =>
+                      setFormData({ ...formData, national_elector_number: e.target.value })
+                    }
+                    placeholder="Numéro sur la carte électorale"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Optionnel, utilisé pour l'export XLSX de la liste
+                  </p>
                 </div>
 
                 <div>

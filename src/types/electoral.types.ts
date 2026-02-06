@@ -17,9 +17,15 @@ export type ElectoralMemberRole = Database["public"]["Tables"]["electoral_member
 export type ElectoralMemberRoleInsert = Database["public"]["Tables"]["electoral_member_roles"]["Insert"];
 export type ElectoralMemberRoleUpdate = Database["public"]["Tables"]["electoral_member_roles"]["Update"];
 
-export type TeamMember = Database["public"]["Tables"]["team_members"]["Row"];
-export type TeamMemberInsert = Database["public"]["Tables"]["team_members"]["Insert"];
-export type TeamMemberUpdate = Database["public"]["Tables"]["team_members"]["Update"];
+export type TeamMember = Database["public"]["Tables"]["team_members"]["Row"] & {
+  national_elector_number: string | null;
+};
+export type TeamMemberInsert = Database["public"]["Tables"]["team_members"]["Insert"] & {
+  national_elector_number?: string | null;
+};
+export type TeamMemberUpdate = Database["public"]["Tables"]["team_members"]["Update"] & {
+  national_elector_number?: string | null;
+};
 
 // Types étendus avec jointures
 

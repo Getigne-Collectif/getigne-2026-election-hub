@@ -39,6 +39,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
     image: '',
     email: '',
     phone: '',
+    national_elector_number: '',
     gender: null,
     birth_date: null,
     is_board_member: false,
@@ -229,6 +230,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
           image: formData.image || null,
           email: formData.email || null,
           phone: formData.phone || null,
+          national_elector_number: formData.national_elector_number || null,
           gender: formData.gender || null,
           birth_date: formData.birth_date || null,
           is_board_member: formData.is_board_member,
@@ -262,6 +264,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
           image: formData.image || null,
           email: formData.email || null,
           phone: formData.phone || null,
+          national_elector_number: formData.national_elector_number || null,
           gender: formData.gender || null,
           birth_date: formData.birth_date || null,
           is_board_member: formData.is_board_member || false,
@@ -401,6 +404,21 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
                   }
                   placeholder="06 12 34 56 78"
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="national_elector_number">Numéro national d'électeur</Label>
+                <Input
+                  id="national_elector_number"
+                  value={formData.national_elector_number || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, national_elector_number: e.target.value })
+                  }
+                  placeholder="Numéro sur la carte électorale"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Optionnel, utilisé pour l'export XLSX de la liste
+                </p>
               </div>
 
               <div>
