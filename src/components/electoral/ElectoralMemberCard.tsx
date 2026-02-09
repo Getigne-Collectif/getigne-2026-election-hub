@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { Badge } from '@/components/ui/badge';
 import type { ElectoralListMemberWithDetails } from '@/types/electoral.types';
 
 interface ElectoralMemberCardProps {
@@ -17,6 +16,15 @@ const calculateAge = (birthDate?: string | null): number | null => {
     age--;
   }
   return age;
+};
+
+const getInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('');
 };
 
 const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => {
@@ -45,9 +53,12 @@ const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => 
     };
   }, []);
 
-  const primaryRole = member.roles.find((r) => r.is_primary);
-  const secondaryRoles = member.roles.filter((r) => !r.is_primary);
   const age = calculateAge(member.team_member.birth_date);
+  const profession = member.team_member.profession?.trim();
+  const metaParts = [
+    age !== null ? `${age} ans` : null,
+    profession || null,
+  ].filter(Boolean);
 
   return (
     <div
@@ -77,8 +88,8 @@ const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => 
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-              <span className="text-6xl text-getigne-400">
-                {member.team_member.name.charAt(0)}
+              <span className="text-4xl text-getigne-400 font-semibold">
+                {getInitials(member.team_member.name)}
               </span>
             </div>
           )}
@@ -87,49 +98,9 @@ const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => 
 
       {/* Contenu */}
       <div className="p-6">
-        <h3 className="font-bold text-xl mb-1">{member.team_member.name}
-        </h3>
-
-        <p className="text-getigne-700 text-sm mb-2">
-          <small className="text-sm text-getigne-500">{age !== null && `${age} ans, `}</small>
-          {member.team_member.profession}
-        </p>
-        {/* Rôle principal */}
-        {primaryRole && (
-          <div className="mb-3">
-            <Badge
-              className="text-sm font-medium px-3 py-1"
-              style={{
-                backgroundColor: primaryRole.thematic_role.color || undefined,
-              }}
-            >
-              {primaryRole.thematic_role.name}
-            </Badge>
-          </div>
-        )}
-
-        {/* Rôles secondaires */}
-        {secondaryRoles.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {secondaryRoles.map((role) => (
-              <Badge
-                key={role.id}
-                variant="outline"
-                className="text-xs"
-                style={{
-                  borderColor: role.thematic_role.color || undefined,
-                  color: role.thematic_role.color || undefined,
-                }}
-              >
-                {role.thematic_role.name}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Bio */}
-        <p className="text-getigne-700 text-sm line-clamp-3">
-          {member.team_member.bio}
+        <h3 className="font-bold text-xl mb-2">{member.team_member.name}</h3>
+        <p className="text-getigne-700 text-sm">
+          {metaParts.length > 0 ? metaParts.join(' · ') : 'Âge et profession non renseignés'}
         </p>
       </div>
     </div>

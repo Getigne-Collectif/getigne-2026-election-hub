@@ -38,17 +38,14 @@ const AdminSupportCommitteePage = lazy(() => import("./pages/admin/AdminSupportC
 const AdminLexiconPage = lazy(() => import("./pages/admin/AdminLexiconPage"));
 const AdminLexiconEditorPage = lazy(() => import("./pages/admin/AdminLexiconEditorPage"));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
-const AdminTeamMembersPage = lazy(() => import("./pages/admin/team/AdminTeamMembersPage"));
 const AdminTeamMemberNewPage = lazy(() => import("./pages/admin/team/AdminTeamMemberNewPage"));
 const AdminTeamMemberEditPage = lazy(() => import("./pages/admin/team/AdminTeamMemberEditPage"));
-const AdminThematicRolesPage = lazy(() => import("./pages/admin/roles/AdminThematicRolesPage"));
 const AdminElectoralListPage = lazy(() => import("./pages/admin/electoral/AdminElectoralListPage"));
 const AdminFAQPage = lazy(() => import("./pages/admin/faq/AdminFAQPage"));
 const AdminFAQEditorPage = lazy(() => import("./pages/admin/faq/AdminFAQEditorPage"));
-const AdminExternalContactsPage = lazy(() => import("./pages/admin/external/AdminExternalContactsPage"));
 const AdminExternalContactFormPage = lazy(() => import("./pages/admin/external/AdminExternalContactFormPage"));
-const AdminExternalGroupsPage = lazy(() => import("./pages/admin/external/AdminExternalGroupsPage"));
 const AdminExternalGroupFormPage = lazy(() => import("./pages/admin/external/AdminExternalGroupFormPage"));
+const AdminExternalDirectoryPage = lazy(() => import("./pages/admin/external/AdminExternalDirectoryPage"));
 const AdminProcurationPage = lazy(() => import("./pages/admin/AdminProcurationPage"));
 const DirectoryPage = lazy(() => import("./pages/DirectoryPage"));
 
@@ -194,15 +191,11 @@ function App() {
                       <Route path={AppRoutes.ADMIN_SUPPORT_COMMITTEE} element={<AdminSupportCommitteePage />} />
                       
                       {/* Team Members */}
-                      <Route path={AppRoutes.ADMIN_TEAM_MEMBERS} element={<AdminTeamMembersPage />} />
                       <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_NEW} element={<AdminTeamMemberNewPage />} />
                       <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_EDIT} element={<AdminTeamMemberEditPage />} />
                       
-                      {/* Thematic Roles */}
-                      <Route path={AppRoutes.ADMIN_THEMATIC_ROLES} element={<AdminThematicRolesPage />} />
-                      
-                      {/* Electoral List */}
-                      <Route path={AppRoutes.ADMIN_ELECTORAL_LIST} element={<AdminElectoralListPage />} />
+                      {/* Team */}
+                      <Route path={AppRoutes.ADMIN_TEAM} element={<AdminElectoralListPage />} />
                       
                       {/* FAQ */}
                       <Route path={AppRoutes.ADMIN_FAQ} element={<AdminFAQPage />} />
@@ -212,10 +205,9 @@ function App() {
                       <Route path={AppRoutes.ADMIN_PROXY} element={<AdminProcurationPage />} />
                       
                       {/* External Directory */}
-                      <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS} element={<AdminExternalContactsPage />} />
+                      <Route path={AppRoutes.ADMIN_EXTERNAL_DIRECTORY} element={<AdminExternalDirectoryPage />} />
                       <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_NEW} element={<AdminExternalContactFormPage />} />
                       <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_EDIT} element={<AdminExternalContactFormPage />} />
-                      <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS} element={<AdminExternalGroupsPage />} />
                       <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_NEW} element={<AdminExternalGroupFormPage />} />
                       <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_EDIT} element={<AdminExternalGroupFormPage />} />
                       

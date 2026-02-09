@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import type { TeamMember, ElectoralPosition } from '@/types/electoral.types';
 
 interface UnassignedMembersListProps {
@@ -89,8 +90,13 @@ const UnassignedMemberItem = ({
         <div className="flex-1 min-w-0">
           <div className="font-medium text-sm line-clamp-1">{member.name}</div>
           {member.profession && (
-            <div className="text-xs text-gray-500 line-clamp-1">
-              {member.profession}
+            <div className="mt-1">
+              <Badge
+                variant="outline"
+                className="text-[10px] text-getigne-600 border-getigne-200 rounded-[4px]"
+              >
+                {member.profession}
+              </Badge>
             </div>
           )}
         </div>

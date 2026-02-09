@@ -119,7 +119,7 @@ const AdminExternalContactFormPage = () => {
         description: 'Impossible de récupérer les informations du contact.',
         variant: 'destructive',
       });
-      navigate(Routes.ADMIN_EXTERNAL_CONTACTS);
+      navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=contacts`);
     } finally {
       setLoading(false);
     }
@@ -274,7 +274,7 @@ const AdminExternalContactFormPage = () => {
           : 'Le contact a été créé avec succès.',
       });
 
-      navigate(Routes.ADMIN_EXTERNAL_CONTACTS);
+      navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=contacts`);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       toast({
@@ -312,7 +312,7 @@ const AdminExternalContactFormPage = () => {
           <div className="mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate(Routes.ADMIN_EXTERNAL_CONTACTS)}
+              onClick={() => navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=contacts`)}
               className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -470,7 +470,7 @@ const AdminExternalContactFormPage = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate(Routes.ADMIN_EXTERNAL_CONTACTS)}
+                onClick={() => navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=contacts`)}
               >
                 Annuler
               </Button>

@@ -141,11 +141,11 @@ const TeamPage = () => {
             <ElectoralListDisplay positions={positions} />
 
             {/* Section Gouvernance */}
-            {electoralList?.governance_content && (
+            {/*electoralList?.governance_content && (
               <GovernanceSection
                 content={electoralList.governance_content as OutputData}
               />
-            )}
+            )*/}
           </>
         )}
 

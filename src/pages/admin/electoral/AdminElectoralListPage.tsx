@@ -13,6 +13,8 @@ import UnassignedMembersList from '@/components/admin/electoral/UnassignedMember
 import EditMemberModal from '@/components/admin/electoral/EditMemberModal';
 import ElectoralListAnalysis from '@/components/admin/electoral/ElectoralListAnalysis';
 import { Button } from '@/components/ui/button';
+import ThematicRolesAdminSection from '@/components/admin/roles/ThematicRolesAdminSection';
+import TeamMembersAdminSection from '@/components/admin/team/TeamMembersAdminSection';
 import type {
   ElectoralList,
   ElectoralListMemberWithDetails,
@@ -886,16 +888,16 @@ const AdminElectoralListPage = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>Gestion de la liste électorale | Admin</title>
+        <title>Gestion de l'équipe | Admin</title>
       </Helmet>
 
       <AdminLayout noContainer>
         <div className="py-8">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Liste électorale</h1>
+              <h1 className="text-2xl font-bold">Équipe</h1>
               <p className="text-muted-foreground">
-                Composez la liste pour les élections municipales de Mars 2026
+                Composez l'équipe pour les élections municipales de Mars 2026
               </p>
             </div>
             <Button type="button" variant="outline" onClick={handleExportXlsx}>
@@ -910,9 +912,11 @@ const AdminElectoralListPage = () => {
             </div>
           ) : (
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="construction">Construction de la liste</TabsTrigger>
                 <TabsTrigger value="analysis">Analyse de la liste</TabsTrigger>
+                <TabsTrigger value="roles">Rôles</TabsTrigger>
+                <TabsTrigger value="team">Équipe</TabsTrigger>
               </TabsList>
 
               <TabsContent value="construction">
@@ -961,6 +965,14 @@ const AdminElectoralListPage = () => {
                   onUpdateMemberCoordinates={handleUpdateMemberCoordinates}
                   getExpectedGenderForPosition={getExpectedGenderForPosition}
                 />
+              </TabsContent>
+
+              <TabsContent value="roles">
+                <ThematicRolesAdminSection showHeader={false} />
+              </TabsContent>
+
+              <TabsContent value="team">
+                <TeamMembersAdminSection showHeader={false} />
               </TabsContent>
             </Tabs>
           )}

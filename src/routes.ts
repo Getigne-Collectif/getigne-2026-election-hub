@@ -63,21 +63,18 @@ export enum Routes {
   ADMIN_LEXICON_NEW = "/admin/lexicon/new",
   ADMIN_LEXICON_EDIT = "/admin/lexicon/:id/edit",
   ADMIN_SETTINGS = "/admin/settings",
-  ADMIN_TEAM_MEMBERS = "/admin/team-members",
   ADMIN_TEAM_MEMBERS_NEW = "/admin/team-members/new",
   ADMIN_TEAM_MEMBERS_EDIT = "/admin/team-members/:id/edit",
   ADMIN_SUPPORT_COMMITTEE = "/admin/comite-de-soutien",
-  ADMIN_THEMATIC_ROLES = "/admin/thematic-roles",
-  ADMIN_ELECTORAL_LIST = "/admin/electoral-list",
+  ADMIN_TEAM = "/admin/team",
   ADMIN_FAQ = "/admin/faq",
   ADMIN_FAQ_EDIT = "/admin/faq/edit/:id?",
   ADMIN_PROXY = "/admin/procuration",
 
   // Routes d'administration - Annuaire externe
-  ADMIN_EXTERNAL_CONTACTS = "/admin/external-contacts",
+  ADMIN_EXTERNAL_DIRECTORY = "/admin/external-directory",
   ADMIN_EXTERNAL_CONTACTS_NEW = "/admin/external-contacts/new",
   ADMIN_EXTERNAL_CONTACTS_EDIT = "/admin/external-contacts/:id/edit",
-  ADMIN_EXTERNAL_GROUPS = "/admin/external-groups",
   ADMIN_EXTERNAL_GROUPS_NEW = "/admin/external-groups/new",
   ADMIN_EXTERNAL_GROUPS_EDIT = "/admin/external-groups/:id/edit",
 

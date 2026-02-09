@@ -5,9 +5,28 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 
+const getAge = (birthDate) => {
+  if (!birthDate) return null;
+  const date = new Date(birthDate);
+  if (Number.isNaN(date.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDiff = today.getMonth() - date.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) {
+    age -= 1;
+  }
+  return age;
+};
+
 const TeamMember = ({ member, index }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
+  const age = getAge(member.birth_date);
+  const profession = member.profession?.trim();
+  const metaParts = [
+    age !== null ? `${age} ans` : null,
+    profession || null,
+  ].filter(Boolean);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -49,9 +68,10 @@ const TeamMember = ({ member, index }) => {
         />
       </div>
       <div className="p-6">
-        <h3 className="font-medium text-xl mb-1">{member.name}</h3>
-        <div className="text-getigne-accent font-medium text-sm mb-3">{member.role}</div>
-        <p className="text-getigne-700 mb-4">{member.bio}</p>
+        <h3 className="font-medium text-xl mb-2">{member.name}</h3>
+        <div className="text-getigne-700 text-sm">
+          {metaParts.length > 0 ? metaParts.join(' · ') : 'Âge et profession non renseignés'}
+        </div>
       </div>
     </div>
   );
@@ -116,7 +136,7 @@ const Team = () => {
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
           {teamMembers.map((member, index) => (
             <TeamMember key={member.id} member={member} index={index} />
           ))}

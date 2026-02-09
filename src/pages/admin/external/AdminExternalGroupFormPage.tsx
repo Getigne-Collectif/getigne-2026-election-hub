@@ -95,7 +95,7 @@ const AdminExternalGroupFormPage = () => {
         description: 'Impossible de récupérer les informations du groupe.',
         variant: 'destructive',
       });
-      navigate(Routes.ADMIN_EXTERNAL_GROUPS);
+      navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=groups`);
     } finally {
       setLoading(false);
     }
@@ -222,7 +222,7 @@ const AdminExternalGroupFormPage = () => {
         });
       }
 
-      navigate(Routes.ADMIN_EXTERNAL_GROUPS);
+      navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=groups`);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       toast({
@@ -260,7 +260,7 @@ const AdminExternalGroupFormPage = () => {
           <div className="mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate(Routes.ADMIN_EXTERNAL_GROUPS)}
+              onClick={() => navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=groups`)}
               className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -379,7 +379,7 @@ const AdminExternalGroupFormPage = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate(Routes.ADMIN_EXTERNAL_GROUPS)}
+                onClick={() => navigate(`${Routes.ADMIN_EXTERNAL_DIRECTORY}?tab=groups`)}
               >
                 Annuler
               </Button>

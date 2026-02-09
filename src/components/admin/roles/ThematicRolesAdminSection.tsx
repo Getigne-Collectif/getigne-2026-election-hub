@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -7,12 +7,8 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useNavigate } from 'react-router-dom';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/context/AuthContext';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,9 +49,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
   Dialog,
@@ -128,9 +121,11 @@ const SortableRoleCard = ({
   );
 };
 
-const AdminThematicRolesPage = () => {
-  const { isAdmin, authChecked, isRefreshingRoles } = useAuth();
-  const navigate = useNavigate();
+type ThematicRolesAdminSectionProps = {
+  showHeader?: boolean;
+};
+
+const ThematicRolesAdminSection = ({ showHeader = true }: ThematicRolesAdminSectionProps) => {
   const { toast } = useToast();
   const [roles, setRoles] = useState<ThematicRoleWithMembers[]>([]);
   const [availableMembers, setAvailableMembers] = useState<ElectoralListMemberWithTeam[]>([]);
@@ -147,22 +142,9 @@ const AdminThematicRolesPage = () => {
   const [primaryMemberIds, setPrimaryMemberIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!authChecked) return;
-    if (isRefreshingRoles) return;
-
-    if (!isAdmin) {
-      navigate('/');
-      toast({
-        title: 'Accès refusé',
-        description: "Vous n'avez pas les droits pour accéder à cette page.",
-        variant: 'destructive',
-      });
-      return;
-    }
-
     fetchRoles();
     fetchAvailableMembers();
-  }, [authChecked, isAdmin, navigate, toast, isRefreshingRoles]);
+  }, []);
 
   const fetchRoles = async () => {
     setLoading(true);
@@ -366,7 +348,6 @@ const AdminThematicRolesPage = () => {
   const handleSave = async () => {
     if (!editingRole) return;
 
-    // Validation
     if (!editingRole.name?.trim()) {
       toast({
         title: 'Erreur',
@@ -380,7 +361,6 @@ const AdminThematicRolesPage = () => {
     try {
       let roleId = editingRole.id;
       if (editingRole.id) {
-        // Mise à jour
         const { error } = await supabase
           .from('thematic_roles')
           .update({
@@ -403,7 +383,6 @@ const AdminThematicRolesPage = () => {
           description: 'Le rôle thématique a été mis à jour avec succès.',
         });
       } else {
-        // Création
         const maxSortOrder = roles.length > 0 
           ? Math.max(...roles.map(r => r.sort_order)) 
           : 0;
@@ -527,165 +506,163 @@ const AdminThematicRolesPage = () => {
     }
   };
 
-  if (!isAdmin) {
-    return null;
-  }
-
   return (
-    <HelmetProvider>
-      <Helmet>
-        <title>Gestion des rôles thématiques | Admin</title>
-      </Helmet>
+    <div className="py-4">
+      {showHeader && (
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Rôles thématiques</h1>
+          <p className="text-muted-foreground">
+            Gérez les rôles thématiques pour la liste électorale
+          </p>
+        </div>
+      )}
 
-      <AdminLayout>
-        <div className="py-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold">Rôles thématiques</h1>
-              <p className="text-muted-foreground">
-                Gérez les rôles thématiques pour la liste électorale
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <ToggleGroup
-                type="single"
-                value={viewMode}
-                onValueChange={(value) => {
-                  if (value) setViewMode(value as 'list' | 'circles');
-                }}
-                variant="outline"
-                size="sm"
-                className="gap-0"
-              >
-                <ToggleGroupItem
-                  value="list"
-                  className="rounded-l-md rounded-r-none border-r-0"
-                >
-                  Liste
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="circles"
-                  className="rounded-l-none rounded-r-md -ml-px"
-                >
-                  Organigramme
-                </ToggleGroupItem>
-              </ToggleGroup>
-              <Button onClick={openCreateDialog}>
-                <Plus className="mr-2 h-4 w-4" />
-                Nouveau rôle
-              </Button>
-            </div>
-          </div>
+      <div
+        className={`flex flex-col gap-4 sm:flex-row sm:items-center mb-6 ${
+          showHeader ? 'sm:justify-between' : 'sm:justify-end'
+        }`}
+      >
+        {showHeader && <div />}
+        <div className="flex items-center gap-2">
+          <ToggleGroup
+            type="single"
+            value={viewMode}
+            onValueChange={(value) => {
+              if (value) setViewMode(value as 'list' | 'circles');
+            }}
+            variant="outline"
+            size="sm"
+            className="gap-0"
+          >
+            <ToggleGroupItem
+              value="list"
+              className="rounded-l-md rounded-r-none border-r-0"
+            >
+              Liste
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="circles"
+              className="rounded-l-none rounded-r-md -ml-px"
+            >
+              Organigramme
+            </ToggleGroupItem>
+          </ToggleGroup>
+          <Button onClick={openCreateDialog}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouveau rôle
+          </Button>
+        </div>
+      </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
-            </div>
-          ) : viewMode === 'circles' ? (
-            <div className="rounded-lg border bg-white p-4">
-              <ThematicRolesCircleView
-                roles={roles}
-                onSelectRole={(roleId) => {
-                  const selected = roles.find((role) => role.id === roleId);
-                  if (selected) openEditDialog(selected);
-                }}
-              />
-            </div>
-          ) : (
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext
-                items={roles.map((role) => role.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="grid gap-4">
-                  {roles.map((role) => (
-                    <SortableRoleCard key={role.id} roleId={role.id}>
-                      {({ attributes, listeners }) => (
-                        <Card>
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-4">
-                              <GripVertical
-                                className="h-5 w-5 text-gray-400 cursor-grab active:cursor-grabbing"
-                                {...attributes}
-                                {...listeners}
-                              />
-                      
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: role.color || '#ccc' }}
-                      />
-                      
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-lg">{role.name}</h3>
-                          {role.acronym && (
-                            <span className="text-xs text-muted-foreground">
-                              ({role.acronym})
-                            </span>
-                          )}
-                          {role.is_commission && (
-                            <Badge variant="secondary">Commission</Badge>
-                          )}
-                        </div>
-                        {role.description && (
-                          <p className="text-sm text-muted-foreground">
-                            {role.description}
-                          </p>
-                        )}
-                        {role.parent_role_id && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Rôle parent :{' '}
-                            {roles.find((parent) => parent.id === role.parent_role_id)?.name ||
-                              'Non défini'}
-                          </p>
-                        )}
-                        <div className="mt-2">
-                          <TooltipProvider>
-                            <div className="flex flex-wrap gap-2">
-                              {(role.electoral_member_roles || [])
-                                .slice()
-                                .sort((a, b) => Number(b.is_primary) - Number(a.is_primary))
-                                .filter((assignment) => assignment.electoral_list_member?.team_member)
-                                .map((assignment) => {
-                                  const member = assignment.electoral_list_member!.team_member;
-                                  const isPrimary = assignment.is_primary;
-                                  return (
-                                    <Tooltip key={member.id}>
-                                      <TooltipTrigger asChild>
-                                        <Avatar
-                                          className="h-7 w-7 shadow-sm"
-                                          style={{
-                                            borderWidth: isPrimary ? 3 : 1,
-                                            borderColor: isPrimary
-                                              ? role.color || '#9CA3AF'
-                                              : '#FFFFFF',
-                                          }}
-                                        >
-                                          <AvatarImage
-                                            src={member.image || undefined}
-                                            alt={member.name}
-                                          />
-                                          <AvatarFallback className="text-[10px]">
-                                            {getInitials(member.name)}
-                                          </AvatarFallback>
-                                        </Avatar>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>{member.name}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  );
-                                })}
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+        </div>
+      ) : viewMode === 'circles' ? (
+        <div className="rounded-lg border bg-white p-4">
+          <ThematicRolesCircleView
+            roles={roles}
+            onSelectRole={(roleId) => {
+              const selected = roles.find((role) => role.id === roleId);
+              if (selected) openEditDialog(selected);
+            }}
+          />
+        </div>
+      ) : (
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={roles.map((role) => role.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="grid gap-4">
+              {roles.map((role) => (
+                <SortableRoleCard key={role.id} roleId={role.id}>
+                  {({ attributes, listeners }) => (
+                    <Card>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <GripVertical
+                            className="h-5 w-5 text-gray-400 cursor-grab active:cursor-grabbing"
+                            {...attributes}
+                            {...listeners}
+                          />
+
+                          <div
+                            className="w-4 h-4 rounded-full"
+                            style={{ backgroundColor: role.color || '#ccc' }}
+                          />
+
+                          <div className="flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-semibold text-lg">{role.name}</h3>
+                              {role.acronym && (
+                                <span className="text-xs text-muted-foreground">
+                                  ({role.acronym})
+                                </span>
+                              )}
+                              {role.is_commission && (
+                                <Badge variant="secondary">Commission</Badge>
+                              )}
                             </div>
-                          </TooltipProvider>
-                          {(role.electoral_member_roles || []).length === 0 && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Aucun membre associé
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      
+                            {role.description && (
+                              <p className="text-sm text-muted-foreground">
+                                {role.description}
+                              </p>
+                            )}
+                            {role.parent_role_id && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Rôle parent :{' '}
+                                {roles.find((parent) => parent.id === role.parent_role_id)?.name ||
+                                  'Non défini'}
+                              </p>
+                            )}
+                            <div className="mt-2">
+                              <TooltipProvider>
+                                <div className="flex flex-wrap gap-2">
+                                  {(role.electoral_member_roles || [])
+                                    .slice()
+                                    .sort((a, b) => Number(b.is_primary) - Number(a.is_primary))
+                                    .filter((assignment) => assignment.electoral_list_member?.team_member)
+                                    .map((assignment) => {
+                                      const member = assignment.electoral_list_member!.team_member;
+                                      const isPrimary = assignment.is_primary;
+                                      return (
+                                        <Tooltip key={member.id}>
+                                          <TooltipTrigger asChild>
+                                            <Avatar
+                                              className="h-7 w-7 shadow-sm"
+                                              style={{
+                                                borderWidth: isPrimary ? 3 : 1,
+                                                borderColor: isPrimary
+                                                  ? role.color || '#9CA3AF'
+                                                  : '#FFFFFF',
+                                              }}
+                                            >
+                                              <AvatarImage
+                                                src={member.image || undefined}
+                                                alt={member.name}
+                                              />
+                                              <AvatarFallback className="text-[10px]">
+                                                {getInitials(member.name)}
+                                              </AvatarFallback>
+                                            </Avatar>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>{member.name}</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      );
+                                    })}
+                                </div>
+                              </TooltipProvider>
+                              {(role.electoral_member_roles || []).length === 0 && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Aucun membre associé
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
                           <div className="flex gap-2">
                             <Button
                               variant="outline"
@@ -707,29 +684,26 @@ const AdminThematicRolesPage = () => {
                             </Button>
                           </div>
                         </div>
-                          </CardContent>
-                        </Card>
-                      )}
-                  </SortableRoleCard>
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-          )}
+                      </CardContent>
+                    </Card>
+                  )}
+                </SortableRoleCard>
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
 
-          {!loading && roles.length === 0 && (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">
-                  Aucun rôle thématique. Commencez par en ajouter un.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </AdminLayout>
+      {!loading && roles.length === 0 && (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">
+              Aucun rôle thématique. Commencez par en ajouter un.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Dialog de création/édition */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -968,7 +942,6 @@ const AdminThematicRolesPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog de suppression */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -989,15 +962,8 @@ const AdminThematicRolesPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </HelmetProvider>
+    </div>
   );
 };
 
-export default AdminThematicRolesPage;
-
-
-
-
-
-
-
+export default ThematicRolesAdminSection;

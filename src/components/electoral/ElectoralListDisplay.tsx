@@ -26,7 +26,7 @@ const ElectoralListDisplay = ({ positions }: ElectoralListDisplayProps) => {
                 Les 27 candidat·es titulaires au conseil municipal
               </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
               {titularPositions.map((position) => (
                 <ElectoralMemberCard
                   key={position.position}

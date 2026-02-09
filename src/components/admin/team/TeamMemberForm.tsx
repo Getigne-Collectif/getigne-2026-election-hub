@@ -131,7 +131,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
         description: 'Impossible de récupérer les informations du membre.',
         variant: 'destructive',
       });
-      navigate(Routes.ADMIN_TEAM_MEMBERS);
+      navigate(`${Routes.ADMIN_TEAM}?tab=team`);
     } finally {
       setLoading(false);
     }
@@ -289,7 +289,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
         });
       }
 
-      navigate(Routes.ADMIN_TEAM_MEMBERS);
+      navigate(`${Routes.ADMIN_TEAM}?tab=team`);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       toast({
@@ -656,7 +656,7 @@ const TeamMemberForm = ({ memberId }: TeamMemberFormProps) => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => navigate(Routes.ADMIN_TEAM_MEMBERS)}
+          onClick={() => navigate(`${Routes.ADMIN_TEAM}?tab=team`)}
           disabled={loading}
         >
           Annuler
