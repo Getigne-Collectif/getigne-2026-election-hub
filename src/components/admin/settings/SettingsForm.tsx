@@ -205,9 +205,18 @@ export default function SettingsForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Dominante</FormLabel>
-                    <FormControl>
-                      <Input placeholder="#34b190" {...field} />
-                    </FormControl>
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Input placeholder="#34b190" {...field} />
+                      </FormControl>
+                      <Input
+                        type="color"
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                        className="h-10 w-14 p-1"
+                        aria-label="Choisir la couleur dominante"
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -218,9 +227,18 @@ export default function SettingsForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Accentuation</FormLabel>
-                    <FormControl>
-                      <Input placeholder="#34b190" {...field} />
-                    </FormControl>
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Input placeholder="#34b190" {...field} />
+                      </FormControl>
+                      <Input
+                        type="color"
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                        className="h-10 w-14 p-1"
+                        aria-label="Choisir la couleur d'accentuation"
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -231,9 +249,18 @@ export default function SettingsForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Proximité</FormLabel>
-                    <FormControl>
-                      <Input placeholder="#f97316" {...field} />
-                    </FormControl>
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Input placeholder="#f97316" {...field} />
+                      </FormControl>
+                      <Input
+                        type="color"
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                        className="h-10 w-14 p-1"
+                        aria-label="Choisir la couleur de proximité"
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -244,9 +271,18 @@ export default function SettingsForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confiance</FormLabel>
-                    <FormControl>
-                      <Input placeholder="#2563eb" {...field} />
-                    </FormControl>
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Input placeholder="#2563eb" {...field} />
+                      </FormControl>
+                      <Input
+                        type="color"
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                        className="h-10 w-14 p-1"
+                        aria-label="Choisir la couleur de confiance"
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -257,9 +293,18 @@ export default function SettingsForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Attention / danger</FormLabel>
-                    <FormControl>
-                      <Input placeholder="#dc2626" {...field} />
-                    </FormControl>
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Input placeholder="#dc2626" {...field} />
+                      </FormControl>
+                      <Input
+                        type="color"
+                        value={field.value}
+                        onChange={(event) => field.onChange(event.target.value)}
+                        className="h-10 w-14 p-1"
+                        aria-label="Choisir la couleur d'attention"
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
