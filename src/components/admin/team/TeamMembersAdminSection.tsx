@@ -140,7 +140,7 @@ const TeamMembersAdminSection = ({ showHeader = true }: TeamMembersAdminSectionP
 
       {loading ? (
         <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand" />
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -154,8 +154,8 @@ const TeamMembersAdminSection = ({ showHeader = true }: TeamMembersAdminSectionP
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-                    <span className="text-4xl text-getigne-400">
+                  <div className="w-full h-full flex items-center justify-center bg-brand-100">
+                    <span className="text-4xl text-brand-400">
                       {member.name.charAt(0)}
                     </span>
                   </div>
@@ -168,7 +168,7 @@ const TeamMembersAdminSection = ({ showHeader = true }: TeamMembersAdminSectionP
                     {member.profession && (
                       <Badge
                         variant="outline"
-                        className="text-xs text-getigne-600 border-getigne-200 rounded-[4px]"
+                        className="text-xs text-brand-600 border-brand-200 rounded-[4px]"
                       >
                         {member.profession}
                       </Badge>
@@ -176,7 +176,7 @@ const TeamMembersAdminSection = ({ showHeader = true }: TeamMembersAdminSectionP
                     {member.role && (
                       <Badge
                         variant="secondary"
-                        className="text-xs text-getigne-accent rounded-[4px]"
+                        className="text-xs text-brand rounded-[4px]"
                       >
                         {member.role}
                       </Badge>

@@ -23,7 +23,7 @@ export function CtaBanner({
   buttonLabel,
   buttonHref,
   buttonTarget = '_blank',
-  className = 'from-getigne-600 to-getigne-accent',
+  className = 'from-brand-600 to-brand',
   compact = false,
   download = false,
   downloadName,
@@ -57,7 +57,7 @@ export function CtaBanner({
           </div>
         </div>
         <div>
-          <Button onClick={handleClick} className={`bg-white text-getigne-900 hover:bg-white/90 ${compact ? 'w-full' : ''}`} size={compact ? 'sm' : 'default'}>
+          <Button onClick={handleClick} className={`bg-white text-brand-900 hover:bg-white/90 ${compact ? 'w-full' : ''}`} size={compact ? 'sm' : 'default'}>
             {iconName && <DynamicIcon name={iconName} className="w-4 h-4 mr-2" />}
             {buttonLabel}
           </Button>

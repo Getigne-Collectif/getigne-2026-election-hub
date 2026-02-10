@@ -57,7 +57,7 @@ const DirectoryPage = () => {
         <meta name="description" content="Annuaire des contacts internes et externes du collectif" />
       </Helmet>
 
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-getigne-50/30">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-brand-50/30">
         <Navbar />
         
         <main className="flex-1 pt-24 pb-12">
@@ -65,10 +65,10 @@ const DirectoryPage = () => {
             {/* En-tête */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-3">
-                <div className="rounded-lg bg-getigne-100 p-2.5">
-                  <BookUser className="h-6 w-6 text-getigne-600" />
+                <div className="rounded-lg bg-brand-100 p-2.5">
+                  <BookUser className="h-6 w-6 text-brand-600" />
                 </div>
-                <h1 className="text-3xl font-bold text-getigne-900">Annuaire</h1>
+                <h1 className="text-3xl font-bold text-brand-900">Annuaire</h1>
               </div>
               <p className="text-lg text-muted-foreground max-w-3xl">
                 Retrouvez tous les contacts du collectif. Exportez les coordonnées au format vCard 

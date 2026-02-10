@@ -18,7 +18,7 @@ const CookieBanner: React.FC = () => {
             Nous utilisons des cookies pour mesurer l'audience de notre site. 
             <a 
               href="/mentions-legales" 
-              className="text-getigne-accent hover:underline ml-1"
+              className="text-brand hover:underline ml-1"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -38,7 +38,7 @@ const CookieBanner: React.FC = () => {
             <Button
               onClick={acceptCookies}
               size="sm"
-              className="bg-getigne-accent hover:bg-getigne-accent/90 text-white text-xs px-3 py-1 h-7 flex-1 sm:flex-none sm:w-auto"
+              className="bg-brand hover:bg-brand/90 text-brand-fg text-xs px-3 py-1 h-7 flex-1 sm:flex-none sm:w-auto"
             >
               Accepter
             </Button>

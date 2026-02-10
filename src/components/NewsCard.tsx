@@ -76,7 +76,7 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
     <Link to={articleUrl} className="block h-full">
       <article 
         ref={ref}
-        className={`bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift h-full ${
+        className={`bg-white rounded-xl overflow-hidden shadow-sm border border-brand-100 hover-lift h-full ${
           isVisible 
             ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
             : 'opacity-0 translate-y-10'
@@ -91,7 +91,7 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
           />
         </div>
         <div className="p-6">
-          <div className="flex items-center text-getigne-500 text-sm mb-3 gap-3">
+          <div className="flex items-center text-brand-500 text-sm mb-3 gap-3">
             <div className="flex items-center">
               <Calendar size={14} className="mr-1" />
               <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
@@ -110,7 +110,7 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
           </div>
           <h3 className="font-medium text-xl mb-2">{article.title}</h3>
           <p
-            className="text-getigne-700 mb-4 line-clamp-2"
+            className="text-brand-700 mb-4 line-clamp-2"
             style={{
               display: '-webkit-box',
               WebkitLineClamp: 5,
@@ -123,7 +123,7 @@ export const NewsCard = ({ article, index = 0 }: NewsCardProps) => {
           >
             {article.excerpt}
           </p>
-          <div className="text-getigne-accent flex items-center text-sm font-medium group">
+          <div className="text-brand flex items-center text-sm font-medium group">
             Lire la suite
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
           </div>

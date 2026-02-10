@@ -277,7 +277,7 @@ const InternalContactsList = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand" />
       </div>
     );
   }
@@ -306,7 +306,7 @@ const InternalContactsList = () => {
             onClick={handleDownloadAll}
             disabled={filteredMembers.length === 0}
             size="sm"
-            className="bg-getigne-accent hover:bg-getigne-accent/90"
+            className="bg-brand hover:bg-brand/90"
           >
             <Download className="mr-2 h-3 w-3" />
             Exporter
@@ -342,9 +342,9 @@ const InternalContactsList = () => {
                     className={cn(
                       "text-xs font-medium w-6 h-6 rounded flex items-center justify-center transition-all",
                       hasMembers 
-                        ? "hover:bg-getigne-100 cursor-pointer" 
+                        ? "hover:bg-brand-100 cursor-pointer" 
                         : "text-muted-foreground/30 cursor-not-allowed",
-                      isActive && hasMembers && "bg-getigne-accent text-white hover:bg-getigne-accent"
+                      isActive && hasMembers && "bg-brand text-brand-fg hover:bg-brand"
                     )}
                   >
                     {letter}
@@ -364,10 +364,10 @@ const InternalContactsList = () => {
               >
                 {/* En-tête de section */}
                 <div className="flex items-center gap-3 mb-3 sticky top-20 bg-gradient-to-r from-white via-white to-transparent z-10 py-2">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-getigne-accent text-white font-bold text-xl shadow-sm">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-brand text-brand-fg font-bold text-xl shadow-sm">
                     {letter}
                   </div>
-                  <div className="h-px bg-gradient-to-r from-getigne-200 to-transparent flex-1" />
+                  <div className="h-px bg-gradient-to-r from-brand-200 to-transparent flex-1" />
                 </div>
 
                 {/* Grille de contacts */}
@@ -375,13 +375,13 @@ const InternalContactsList = () => {
                   {groupedMembers[letter].map((member) => (
                     <Card 
                       key={member.id} 
-                      className="overflow-hidden hover:shadow-md transition-all hover:border-getigne-300 cursor-pointer"
+                      className="overflow-hidden hover:shadow-md transition-all hover:border-brand-300 cursor-pointer"
                       onClick={() => handleMemberClick(member)}
                     >
                       <CardContent className="p-0">
                         <div className="flex gap-3 p-3">
                           {/* Photo compacte */}
-                          <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-getigne-100 to-getigne-50">
+                          <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-brand-100 to-brand-50">
                             {member.image ? (
                               <img
                                 src={member.image}
@@ -390,7 +390,7 @@ const InternalContactsList = () => {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <span className="text-2xl font-bold text-getigne-400">
+                                <span className="text-2xl font-bold text-brand-400">
                                   {member.name.charAt(0)}
                                 </span>
                               </div>
@@ -401,20 +401,20 @@ const InternalContactsList = () => {
                           <div className="flex-1 min-w-0 space-y-2">
                             {/* Nom et badges */}
                             <div className="space-y-1">
-                              <h3 className="font-semibold text-base text-getigne-900 truncate">
+                              <h3 className="font-semibold text-base text-brand-900 truncate">
                                 {member.name}
                               </h3>
                               <div className="flex flex-wrap gap-1.5">
                                 {(() => {
                                   const position = getListPosition(member);
                                   return position !== null ? (
-                                    <Badge className="bg-getigne-600 text-white text-xs px-2 py-0 h-5 font-semibold">
+                                    <Badge className="bg-brand-600 text-white text-xs px-2 py-0 h-5 font-semibold">
                                       #{position}
                                     </Badge>
                                   ) : null;
                                 })()}
                                 {member.role && (
-                                  <Badge variant="secondary" className="bg-getigne-100 text-getigne-700 text-xs px-2 py-0 h-5">
+                                  <Badge variant="secondary" className="bg-brand-100 text-brand-700 text-xs px-2 py-0 h-5">
                                     {member.role}
                                   </Badge>
                                 )}
@@ -445,7 +445,7 @@ const InternalContactsList = () => {
                                   <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                                   <a 
                                     href={`mailto:${member.email}`}
-                                    className="text-getigne-600 hover:text-getigne-800 hover:underline truncate"
+                                    className="text-brand-600 hover:text-brand-800 hover:underline truncate"
                                     title={member.email}
                                   >
                                     {member.email}
@@ -458,7 +458,7 @@ const InternalContactsList = () => {
                                   <Phone className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                                   <a 
                                     href={`tel:${member.phone}`}
-                                    className="text-getigne-600 hover:text-getigne-800 hover:underline"
+                                    className="text-brand-600 hover:text-brand-800 hover:underline"
                                   >
                                     {member.phone}
                                   </a>

@@ -33,9 +33,9 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
       case 'completed':
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
       case 'current':
-        return <Clock className="w-5 h-5 text-getigne-accent animate-pulse" />;
+        return <Clock className="w-5 h-5 text-brand animate-pulse" />;
       case 'upcoming':
-        return <Clock className="w-5 h-5 text-getigne-300" />;
+        return <Clock className="w-5 h-5 text-brand-300" />;
     }
   };
 
@@ -44,9 +44,9 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
       case 'completed':
         return 'text-green-600 bg-green-50 border-green-200';
       case 'current':
-        return 'text-getigne-700 bg-getigne-accent/10 border-getigne-accent';
+        return 'text-brand-700 bg-brand/10 border-brand';
       case 'upcoming':
-        return 'text-getigne-500 bg-white border-getigne-200';
+        return 'text-brand-500 bg-white border-brand-200';
     }
   };
 
@@ -55,9 +55,9 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
       case 'completed':
         return 'bg-green-500 text-white';
       case 'current':
-        return 'bg-getigne-accent text-white';
+        return 'bg-brand text-brand-fg';
       case 'upcoming':
-        return 'bg-getigne-200 text-getigne-600';
+        return 'bg-brand-200 text-brand-600';
     }
   };
 
@@ -74,12 +74,12 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
               {steps.map((step, index) => (
                 <div key={step.id} className="relative">
                   {/* Ligne verticale à gauche */}
-                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-getigne-200 to-getigne-300 -ml-px">
+                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-brand-200 to-brand-300 -ml-px">
                     {step.status === 'completed' && (
                       <div className="absolute inset-0 bg-gradient-to-b from-green-400 to-green-300"></div>
                     )}
                     {step.status === 'current' && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-getigne-accent to-getigne-accent/60 animate-pulse"></div>
+                      <div className="absolute inset-0 bg-gradient-to-b from-brand to-brand/60 animate-pulse"></div>
                     )}
                   </div>
                   
@@ -94,25 +94,25 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                     {/* Contenu */}
                     <div className="flex-1 pt-1">
                       {/* Titre */}
-                      <h3 className="text-lg font-bold text-getigne-900 mb-2">{step.title}</h3>
+                      <h3 className="text-lg font-bold text-brand-900 mb-2">{step.title}</h3>
                       
                       {/* Période avec badge stylé */}
                       <div className="mb-2">
-                        <span className="inline-block px-3 py-1 bg-getigne-accent/10 text-getigne-700 text-xs font-semibold rounded-full border border-getigne-accent/20">
+                        <span className="inline-block px-3 py-1 bg-brand/10 text-brand-700 text-xs font-semibold rounded-full border border-brand/20">
                           {step.period}
                         </span>
                       </div>
                       
                       {/* Description */}
-                      <p className="text-sm text-getigne-700 leading-relaxed mb-3">{step.description}</p>
+                      <p className="text-sm text-brand-700 leading-relaxed mb-3">{step.description}</p>
                       
                       {/* Statut avec animation */}
                       <div className="flex items-center gap-2">
                         {getStatusIcon(step.status)}
                         <span className={`text-xs font-medium px-3 py-1 rounded-full ${
                           step.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          step.status === 'current' ? 'bg-getigne-accent/20 text-getigne-700' :
-                          'bg-getigne-100 text-getigne-600'
+                          step.status === 'current' ? 'bg-brand/20 text-brand-700' :
+                          'bg-brand-100 text-brand-600'
                         }`}>
                           {step.status === 'completed' ? 'Terminé' :
                            step.status === 'current' ? 'En cours' : 'À venir'}
@@ -137,25 +137,25 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                     </div>
                     
                     {/* Titre */}
-                    <h3 className="text-lg font-bold text-getigne-900 mb-2">{step.title}</h3>
+                    <h3 className="text-lg font-bold text-brand-900 mb-2">{step.title}</h3>
                     
                     {/* Période avec badge stylé */}
                     <div className="mb-3">
-                      <span className="inline-block px-3 py-1 bg-getigne-accent/10 text-getigne-700 text-sm font-semibold rounded-full border border-getigne-accent/20">
+                      <span className="inline-block px-3 py-1 bg-brand/10 text-brand-700 text-sm font-semibold rounded-full border border-brand/20">
                         {step.period}
                       </span>
                     </div>
                     
                     {/* Description */}
-                    <p className="text-sm text-getigne-700 leading-relaxed max-w-xs mb-3">{step.description}</p>
+                    <p className="text-sm text-brand-700 leading-relaxed max-w-xs mb-3">{step.description}</p>
                     
                     {/* Statut avec animation */}
                     <div className="flex items-center gap-2">
                       {getStatusIcon(step.status)}
                       <span className={`text-xs font-medium px-3 py-1 rounded-full ${
                         step.status === 'completed' ? 'bg-green-100 text-green-700' :
-                        step.status === 'current' ? 'bg-getigne-accent/20 text-getigne-700' :
-                        'bg-getigne-100 text-getigne-600'
+                        step.status === 'current' ? 'bg-brand/20 text-brand-700' :
+                        'bg-brand-100 text-brand-600'
                       }`}>
                         {step.status === 'completed' ? 'Terminé' :
                          step.status === 'current' ? 'En cours' : 'À venir'}
@@ -166,8 +166,8 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                   {/* Ligne de connexion avec effet */}
                   {index < steps.length - 1 && (
                     <div className="flex-1 relative">
-                      <div className="h-1 bg-gradient-to-r from-getigne-200 to-getigne-300 rounded-full mx-4 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-getigne-accent/20 to-getigne-accent/40 animate-pulse"></div>
+                      <div className="h-1 bg-gradient-to-r from-brand-200 to-brand-300 rounded-full mx-4 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-brand/20 to-brand/40 animate-pulse"></div>
                       </div>
                     </div>
                   )}
@@ -180,8 +180,8 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
           {steps.some(step => step.details && step.details.length > 0) && (
             <div className="mt-8 md:mt-12">
               <div className="text-center mb-6 md:mb-8">
-                <h3 className="text-xl md:text-2xl font-bold text-getigne-900 mb-2">Détails de chaque étape</h3>
-                <p className="text-sm md:text-base text-getigne-700">Découvrez le contenu spécifique de chaque phase du processus</p>
+                <h3 className="text-xl md:text-2xl font-bold text-brand-900 mb-2">Détails de chaque étape</h3>
+                <p className="text-sm md:text-base text-brand-700">Découvrez le contenu spécifique de chaque phase du processus</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -189,19 +189,19 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                   step.details && step.details.length > 0 && (
                     <div key={`details-${step.id}`} className="group relative">
                       {/* Carte avec effet de survol */}
-                      <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border-2 border-getigne-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-getigne-accent/30">
+                      <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border-2 border-brand-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-brand/30">
                         {/* En-tête de la carte */}
                         <div className="mb-4">
-                          <h4 className="font-bold text-getigne-900 text-base md:text-lg mb-2">{step.title}</h4>
-                          <p className="text-xs md:text-sm text-getigne-600 font-medium">{step.period}</p>
+                          <h4 className="font-bold text-brand-900 text-base md:text-lg mb-2">{step.title}</h4>
+                          <p className="text-xs md:text-sm text-brand-600 font-medium">{step.period}</p>
                         </div>
                         
                         {/* Liste des détails avec design moderne */}
                         <ul className="space-y-2 md:space-y-3">
                           {step.details.map((detail, detailIndex) => (
                             <li key={detailIndex} className="flex items-start gap-3 group/item">
-                              <div className="w-2 h-2 bg-getigne-accent rounded-full mt-2.5 flex-shrink-0 group-hover/item:scale-125 transition-transform duration-200" />
-                              <span className="text-xs md:text-sm text-getigne-700 leading-relaxed group-hover/item:text-getigne-900 transition-colors duration-200">
+                              <div className="w-2 h-2 bg-brand rounded-full mt-2.5 flex-shrink-0 group-hover/item:scale-125 transition-transform duration-200" />
+                              <span className="text-xs md:text-sm text-brand-700 leading-relaxed group-hover/item:text-brand-900 transition-colors duration-200">
                                 {detail}
                               </span>
                             </li>
@@ -209,12 +209,12 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                         </ul>
                         
                         {/* Badge de statut en bas */}
-                        <div className="mt-4 pt-4 border-t border-getigne-100">
+                        <div className="mt-4 pt-4 border-t border-brand-100">
                           <div className="flex items-center justify-between">
                             <span className={`text-xs font-semibold px-2 md:px-3 py-1 rounded-full ${
                               step.status === 'completed' ? 'bg-green-100 text-green-700' :
-                              step.status === 'current' ? 'bg-getigne-accent/20 text-getigne-700' :
-                              'bg-getigne-100 text-getigne-600'
+                              step.status === 'current' ? 'bg-brand/20 text-brand-700' :
+                              'bg-brand-100 text-brand-600'
                             }`}>
                               {step.status === 'completed' ? '✓ Terminé' :
                                step.status === 'current' ? '🔄 En cours' : '⏳ À venir'}
@@ -236,7 +236,7 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
             variant="outline"
             size="sm"
             onClick={() => setIsExpanded(false)}
-            className="text-getigne-700 hover:text-getigne-900"
+            className="text-brand-700 hover:text-brand-900"
           >
             <ChevronUp className="w-4 h-4 mr-2" />
             Voir moins
@@ -278,7 +278,7 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
               </div>
               
               {index < steps.length - 1 && (
-                <div className="w-6 h-0.5 bg-getigne-200 rounded-full" />
+                <div className="w-6 h-0.5 bg-brand-200 rounded-full" />
               )}
             </React.Fragment>
           ))}
@@ -290,7 +290,7 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
               variant="outline"
               size="sm"
               onClick={() => setIsExpanded(true)}
-              className="text-getigne-700 hover:text-getigne-900"
+              className="text-brand-700 hover:text-brand-900"
             >
               <ChevronDown className="w-4 h-4 mr-2" />
               En savoir plus
@@ -322,7 +322,7 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                 </div>
                 
                 {index < steps.length - 1 && (
-                  <div className="w-6 h-0.5 bg-getigne-200 rounded-full flex-shrink-0" />
+                  <div className="w-6 h-0.5 bg-brand-200 rounded-full flex-shrink-0" />
                 )}
               </React.Fragment>
             ))}
@@ -345,7 +345,7 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
               </div>
               
               {index < steps.length - 1 && (
-                <div className="w-10 h-0.5 bg-getigne-200 rounded-full" />
+                <div className="w-10 h-0.5 bg-brand-200 rounded-full" />
               )}
             </React.Fragment>
           ))}
@@ -357,7 +357,7 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
               variant="outline"
               size="sm"
               onClick={() => setIsExpanded(true)}
-              className="text-getigne-700 hover:text-getigne-900"
+              className="text-brand-700 hover:text-brand-900"
             >
               <ChevronDown className="w-4 h-4 mr-2" />
               En savoir plus
@@ -378,12 +378,12 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
           {steps.map((step, index) => (
             <div key={step.id} className="relative">
               {/* Ligne verticale à gauche */}
-              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-getigne-200 to-getigne-300 -ml-px">
+              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-brand-200 to-brand-300 -ml-px">
                 {step.status === 'completed' && (
                   <div className="absolute inset-0 bg-gradient-to-b from-green-400 to-green-300"></div>
                 )}
                 {step.status === 'current' && (
-                  <div className="absolute inset-0 bg-gradient-to-b from-getigne-accent to-getigne-accent/60 animate-pulse"></div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-brand to-brand/60 animate-pulse"></div>
                 )}
               </div>
               
@@ -398,25 +398,25 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                 {/* Contenu */}
                 <div className="flex-1 pt-1">
                   {/* Titre */}
-                  <h3 className="text-lg font-bold text-getigne-900 mb-2">{step.title}</h3>
+                  <h3 className="text-lg font-bold text-brand-900 mb-2">{step.title}</h3>
                   
                   {/* Période avec badge stylé */}
                   <div className="mb-2">
-                    <span className="inline-block px-3 py-1 bg-getigne-accent/10 text-getigne-700 text-xs font-semibold rounded-full border border-getigne-accent/20">
+                    <span className="inline-block px-3 py-1 bg-brand/10 text-brand-700 text-xs font-semibold rounded-full border border-brand/20">
                       {step.period}
                     </span>
                   </div>
                   
                   {/* Description */}
-                  <p className="text-sm text-getigne-700 leading-relaxed mb-3">{step.description}</p>
+                  <p className="text-sm text-brand-700 leading-relaxed mb-3">{step.description}</p>
                   
                   {/* Statut avec animation */}
                   <div className="flex items-center gap-2">
                     {getStatusIcon(step.status)}
                     <span className={`text-xs font-medium px-3 py-1 rounded-full ${
                       step.status === 'completed' ? 'bg-green-100 text-green-700' :
-                      step.status === 'current' ? 'bg-getigne-accent/20 text-getigne-700' :
-                      'bg-getigne-100 text-getigne-600'
+                      step.status === 'current' ? 'bg-brand/20 text-brand-700' :
+                      'bg-brand-100 text-brand-600'
                     }`}>
                       {step.status === 'completed' ? 'Terminé' :
                        step.status === 'current' ? 'En cours' : 'À venir'}
@@ -442,26 +442,26 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                 
                 {/* Titre avec icône */}
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-bold text-getigne-900">{step.title}</h3>
+                  <h3 className="text-lg font-bold text-brand-900">{step.title}</h3>
                 </div>
                 
                 {/* Période avec badge stylé */}
                 <div className="mb-3">
-                  <span className="inline-block px-3 py-1 bg-getigne-accent/10 text-getigne-700 text-sm font-semibold rounded-full border border-getigne-accent/20">
+                  <span className="inline-block px-3 py-1 bg-brand/10 text-brand-700 text-sm font-semibold rounded-full border border-brand/20">
                     {step.period}
                   </span>
                 </div>
                 
                 {/* Description */}
-                <p className="text-sm text-getigne-700 leading-relaxed max-w-xs mb-3">{step.description}</p>
+                <p className="text-sm text-brand-700 leading-relaxed max-w-xs mb-3">{step.description}</p>
                 
                 {/* Statut avec animation */}
                 <div className="flex items-center gap-2">
                   {getStatusIcon(step.status)}
                   <span className={`text-xs font-medium px-3 py-1 rounded-full ${
                     step.status === 'completed' ? 'bg-green-100 text-green-700' :
-                    step.status === 'current' ? 'bg-getigne-accent/20 text-getigne-700' :
-                    'bg-getigne-100 text-getigne-600'
+                    step.status === 'current' ? 'bg-brand/20 text-brand-700' :
+                    'bg-brand-100 text-brand-600'
                   }`}>
                     {step.status === 'completed' ? 'Terminé' :
                      step.status === 'current' ? 'En cours' : 'À venir'}
@@ -472,8 +472,8 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
               {/* Ligne de connexion avec effet */}
               {index < steps.length - 1 && (
                 <div className="flex-1 relative">
-                  <div className="h-1 bg-gradient-to-r from-getigne-200 to-getigne-300 rounded-full mx-4 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-getigne-accent/20 to-getigne-accent/40 animate-pulse"></div>
+                  <div className="h-1 bg-gradient-to-r from-brand-200 to-brand-300 rounded-full mx-4 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-brand/20 to-brand/40 animate-pulse"></div>
                   </div>
                 </div>
               )}
@@ -486,8 +486,8 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
       {steps.some(step => step.details && step.details.length > 0) && (
         <div className="mt-8 md:mt-12">
           <div className="text-center mb-6 md:mb-8">
-            <h3 className="text-xl md:text-2xl font-bold text-getigne-900 mb-2">Détails de chaque étape</h3>
-            <p className="text-sm md:text-base text-getigne-700">Découvrez le contenu spécifique de chaque phase du processus</p>
+            <h3 className="text-xl md:text-2xl font-bold text-brand-900 mb-2">Détails de chaque étape</h3>
+            <p className="text-sm md:text-base text-brand-700">Découvrez le contenu spécifique de chaque phase du processus</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -495,19 +495,19 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
               step.details && step.details.length > 0 && (
                 <div key={`details-${step.id}`} className="group relative">
                   {/* Carte avec effet de survol */}
-                  <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border-2 border-getigne-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-getigne-accent/30">
+                  <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 border-2 border-brand-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-brand/30">
                     {/* En-tête de la carte */}
                     <div className="mb-4">
-                      <h4 className="font-bold text-getigne-900 text-base md:text-lg mb-2">{step.title}</h4>
-                      <p className="text-xs md:text-sm text-getigne-600 font-medium">{step.period}</p>
+                      <h4 className="font-bold text-brand-900 text-base md:text-lg mb-2">{step.title}</h4>
+                      <p className="text-xs md:text-sm text-brand-600 font-medium">{step.period}</p>
                     </div>
                     
                     {/* Liste des détails avec design moderne */}
                     <ul className="space-y-2 md:space-y-3">
                       {step.details.map((detail, detailIndex) => (
                         <li key={detailIndex} className="flex items-start gap-3 group/item">
-                          <div className="w-2 h-2 bg-getigne-accent rounded-full mt-2.5 flex-shrink-0 group-hover/item:scale-125 transition-transform duration-200" />
-                          <span className="text-xs md:text-sm text-getigne-700 leading-relaxed group-hover/item:text-getigne-900 transition-colors duration-200">
+                          <div className="w-2 h-2 bg-brand rounded-full mt-2.5 flex-shrink-0 group-hover/item:scale-125 transition-transform duration-200" />
+                          <span className="text-xs md:text-sm text-brand-700 leading-relaxed group-hover/item:text-brand-900 transition-colors duration-200">
                             {detail}
                           </span>
                         </li>
@@ -515,12 +515,12 @@ const ProgramTimeline: React.FC<ProgramTimelineProps> = ({
                     </ul>
                     
                     {/* Badge de statut en bas */}
-                    <div className="mt-4 pt-4 border-t border-getigne-100">
+                    <div className="mt-4 pt-4 border-t border-brand-100">
                       <div className="flex items-center justify-between">
                         <span className={`text-xs font-semibold px-2 md:px-3 py-1 rounded-full ${
                           step.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          step.status === 'current' ? 'bg-getigne-accent/20 text-getigne-700' :
-                          'bg-getigne-100 text-getigne-600'
+                          step.status === 'current' ? 'bg-brand/20 text-brand-700' :
+                          'bg-brand-100 text-brand-600'
                         }`}>
                           {step.status === 'completed' ? '✓ Terminé' :
                            step.status === 'current' ? '🔄 En cours' : '⏳ À venir'}

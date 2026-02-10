@@ -140,7 +140,7 @@ const CalendarSync: React.FC = () => {
         <div className="space-y-4">
           <div>
             <h3 className="font-medium mb-1">Synchronisation de calendrier</h3>
-            <p className="text-sm text-getigne-700">
+            <p className="text-sm text-brand-700">
               Ajoutez vos événements à votre calendrier personnel pour ne rien manquer.
             </p>
           </div>
@@ -169,7 +169,7 @@ const CalendarSync: React.FC = () => {
             </Button>
           </div>
           
-          <div className="text-xs text-getigne-700">
+          <div className="text-xs text-brand-700">
             <p className="font-medium mb-1">Comment utiliser ce lien :</p>
             <ul className="list-disc pl-4 space-y-1">
               <li>Google Calendar : Paramètres → Ajouter un calendrier → Depuis une URL</li>

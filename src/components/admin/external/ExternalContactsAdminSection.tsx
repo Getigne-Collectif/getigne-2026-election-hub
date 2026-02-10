@@ -170,7 +170,7 @@ const ExternalContactsAdminSection = ({ showHeader = true }: ExternalContactsAdm
 
       {loading ? (
         <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand" />
         </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -178,7 +178,7 @@ const ExternalContactsAdminSection = ({ showHeader = true }: ExternalContactsAdm
             <Card key={contact.id} className="overflow-hidden hover:shadow-md transition-shadow">
               <CardContent className="p-0">
                 <div className="flex gap-3 p-3">
-                  <div className="w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-getigne-100 to-getigne-50">
+                  <div className="w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-brand-100 to-brand-50">
                     {contact.photo_url ? (
                       <img
                         src={contact.photo_url}
@@ -187,7 +187,7 @@ const ExternalContactsAdminSection = ({ showHeader = true }: ExternalContactsAdm
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <User className="h-6 w-6 text-getigne-600" />
+                        <User className="h-6 w-6 text-brand-600" />
                       </div>
                     )}
                   </div>

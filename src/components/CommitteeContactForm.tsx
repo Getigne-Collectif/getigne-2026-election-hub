@@ -80,7 +80,7 @@ ${formData.message}
   return (
     <div className={`bg-white shadow-sm rounded-xl p-6 border ${themeColor.border}`}>
       <h2 className="text-2xl font-bold mb-6">Contacter la commission</h2>
-      <p className="text-getigne-700 mb-6">
+      <p className="text-brand-700 mb-6">
         Vous souhaitez joindre (ou rejoindre 😉) la commission {committeeName} ?
         Remplissez ce formulaire, nous vous répondrons dans les plus brefs délais.
       </p>
@@ -88,7 +88,7 @@ ${formData.message}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label htmlFor="firstName" className="text-sm font-medium text-getigne-700">
+            <label htmlFor="firstName" className="text-sm font-medium text-brand-700">
               Prénom
             </label>
             <input
@@ -98,11 +98,11 @@ ${formData.message}
               required
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full border border-getigne-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-getigne-accent"
+              className="w-full border border-brand-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-brand"
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="lastName" className="text-sm font-medium text-getigne-700">
+            <label htmlFor="lastName" className="text-sm font-medium text-brand-700">
               Nom
             </label>
             <input
@@ -112,14 +112,14 @@ ${formData.message}
               required
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full border border-getigne-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-getigne-accent"
+              className="w-full border border-brand-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-brand"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-getigne-700">
+            <label htmlFor="email" className="text-sm font-medium text-brand-700">
               Email
             </label>
             <input
@@ -129,11 +129,11 @@ ${formData.message}
               required
               value={formData.email}
               onChange={handleChange}
-              className="w-full border border-getigne-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-getigne-accent"
+              className="w-full border border-brand-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-brand"
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="phone" className="text-sm font-medium text-getigne-700">
+            <label htmlFor="phone" className="text-sm font-medium text-brand-700">
               Téléphone
             </label>
             <input
@@ -142,13 +142,13 @@ ${formData.message}
               type="tel"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full border border-getigne-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-getigne-accent"
+              className="w-full border border-brand-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-brand"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="message" className="text-sm font-medium text-getigne-700">
+          <label htmlFor="message" className="text-sm font-medium text-brand-700">
             Message
           </label>
           <textarea
@@ -158,7 +158,7 @@ ${formData.message}
             required
             value={formData.message}
             onChange={handleChange}
-            className="w-full border border-getigne-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-getigne-accent"
+            className="w-full border border-brand-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-brand"
             placeholder="Partagez vos motivations ou posez vos questions..."
           />
         </div>

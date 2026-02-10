@@ -341,7 +341,7 @@ const ExternalContactDetailDialog = ({
           <div className="space-y-6">
             {/* En-tête avec photo et nom */}
             <div className="flex items-start gap-4">
-            <div className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-getigne-200 to-getigne-100 border-4 border-getigne-300">
+            <div className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-brand-200 to-brand-100 border-4 border-brand-300">
               {contact.photo_url ? (
                 <img
                   src={contact.photo_url}
@@ -350,13 +350,13 @@ const ExternalContactDetailDialog = ({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <User className="h-12 w-12 text-getigne-700" />
+                  <User className="h-12 w-12 text-brand-700" />
                 </div>
               )}
             </div>
 
             <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-bold text-getigne-900">{fullName}</h2>
+              <h2 className="text-2xl font-bold text-brand-900">{fullName}</h2>
               {contact.city && (
                 <p className="text-muted-foreground flex items-center gap-1 mt-1">
                   <MapPin className="h-4 w-4" />
@@ -383,7 +383,7 @@ const ExternalContactDetailDialog = ({
           {/* Coordonnées */}
           <div className="space-y-3">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Mail className="h-5 w-5 text-getigne-600" />
+              <Mail className="h-5 w-5 text-brand-600" />
               Coordonnées
             </h3>
             <div className="grid gap-3">
@@ -394,7 +394,7 @@ const ExternalContactDetailDialog = ({
                     <p className="text-xs text-muted-foreground">Email</p>
                     <a 
                       href={`mailto:${contact.email}`}
-                      className="text-sm font-medium hover:text-getigne-600 truncate block"
+                      className="text-sm font-medium hover:text-brand-600 truncate block"
                     >
                       {contact.email}
                     </a>
@@ -408,7 +408,7 @@ const ExternalContactDetailDialog = ({
                     <p className="text-xs text-muted-foreground">Téléphone</p>
                     <a 
                       href={`tel:${contact.phone}`}
-                      className="text-sm font-medium hover:text-getigne-600"
+                      className="text-sm font-medium hover:text-brand-600"
                     >
                       {contact.phone}
                     </a>
@@ -485,7 +485,7 @@ const ExternalContactDetailDialog = ({
               <Separator />
               <div className="space-y-3">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-getigne-600" />
+                  <FileText className="h-5 w-5 text-brand-600" />
                   Note
                 </h3>
                 <div className="p-4 bg-muted/50 rounded-lg">

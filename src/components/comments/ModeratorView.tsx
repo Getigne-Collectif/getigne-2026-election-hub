@@ -28,7 +28,7 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
   
   if (loading) {
     return (
-      <div className="text-center py-8 text-getigne-500">
+      <div className="text-center py-8 text-brand-500">
         Chargement des commentaires...
       </div>
     );
@@ -36,7 +36,7 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
 
   if (comments.length === 0) {
     return (
-      <div className="text-center py-8 text-getigne-500">
+      <div className="text-center py-8 text-brand-500">
         {showAllComments ? "Aucun commentaire" : "Aucun commentaire en attente"}
       </div>
     );
@@ -72,7 +72,7 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
             className={`p-4 rounded-lg ${
               comment.status === 'pending' ? 'border-l-4 border-amber-500 bg-amber-50' :
               comment.status === 'rejected' ? 'border-l-4 border-red-500 bg-red-50' :
-              'border border-getigne-200 bg-white'
+              'border border-brand-200 bg-white'
             }`}
           >
             <div className="flex items-start gap-3">
@@ -80,7 +80,7 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
                 {comment.profiles?.avatar_url ? (
                   <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
                 ) : null}
-                <AvatarFallback className="bg-getigne-100 text-getigne-700">
+                <AvatarFallback className="bg-brand-100 text-brand-700">
                   {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
                 </AvatarFallback>
               </Avatar>
@@ -91,7 +91,7 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
                     <h4 className="font-medium">
                       {comment.profiles ? `${comment.profiles.first_name} ${comment.profiles.last_name}` : 'Utilisateur inconnu'}
                     </h4>
-                    <time className="text-sm text-getigne-500">
+                    <time className="text-sm text-brand-500">
                       {new Date(comment.created_at).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'long',
@@ -152,13 +152,13 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
                   </div>
                 </div>
                 
-                <p className="mt-2 text-getigne-700 whitespace-pre-wrap">
+                <p className="mt-2 text-brand-700 whitespace-pre-wrap">
                   {comment.content}
                 </p>
                 
                 {/* Afficher le nombre de likes si disponible */}
                 {comment.likes_count !== undefined && comment.likes_count > 0 && (
-                  <div className="mt-2 text-sm text-getigne-600">
+                  <div className="mt-2 text-sm text-brand-600">
                     {comment.likes_count} {comment.likes_count === 1 ? 'like' : 'likes'}
                   </div>
                 )}
@@ -172,7 +172,7 @@ const ModeratorView: React.FC<ModeratorViewProps> = ({
                     {comment.status === 'pending' ? 'En attente' :
                      comment.status === 'rejected' ? 'Rejeté' : 'Approuvé'}
                   </span>
-                  <span className="ml-2 text-getigne-500">
+                  <span className="ml-2 text-brand-500">
                     • {sourceType === 'news' ? 'Article' : 
                       sourceType === 'program_point' ? 'Point de programme' : 
                       'Section de programme'}

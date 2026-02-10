@@ -158,7 +158,7 @@ export default function AdminProgramEditorPage() {
             </div>
           </ResizablePanel>
           
-          <ResizableHandle withHandle className="bg-getigne-100" />
+          <ResizableHandle withHandle className="bg-brand-100" />
           
           <ResizablePanel defaultSize={65} minSize={45}>
             <div className="p-6 h-full overflow-auto">

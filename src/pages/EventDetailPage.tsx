@@ -110,7 +110,7 @@ const EventDetailPage = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         
-        <div className="pt-24 pb-4 bg-getigne-50">
+        <div className="pt-24 pb-4 bg-brand-50">
           <div className="container mx-auto px-4">
             <div className="mb-4">
               <Button

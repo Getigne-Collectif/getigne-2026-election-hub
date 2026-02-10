@@ -283,7 +283,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               />
               <label 
                 htmlFor="image-upload"
-                className="flex items-center px-3 py-1 text-sm bg-getigne-50 text-getigne-800 rounded hover:bg-getigne-100 cursor-pointer"
+                className="flex items-center px-3 py-1 text-sm bg-brand-50 text-brand-800 rounded hover:bg-brand-100 cursor-pointer"
               >
                 Insérer une image
               </label>

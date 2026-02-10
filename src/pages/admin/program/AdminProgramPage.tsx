@@ -220,7 +220,7 @@ export default function AdminProgramPage() {
                                     </TableCell>
                                     <TableCell>
                                       <div className="flex justify-center items-center">
-                                        <div className="w-8 h-8 flex items-center justify-center text-getigne-500 bg-getigne-50 rounded-full">
+                                        <div className="w-8 h-8 flex items-center justify-center text-brand-500 bg-brand-50 rounded-full">
                                           {item.icon ? (
                                             <DynamicIcon name={item.icon} size={16} />
                                           ) : (

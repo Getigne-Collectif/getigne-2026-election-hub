@@ -71,14 +71,14 @@ const ProjectsPage = () => {
       <div className="page-content">
         <Navbar />
 
-        <div className="pt-24 bg-getigne-50">
+        <div className="pt-24 bg-brand-50">
           <div className="container mx-auto px-4 py-16">
             <div className="max-w-3xl mx-auto text-center mb-12">
-              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+              <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
                 Initiatives locales
               </span>
               <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos projets citoyens</h1>
-              <p className="text-getigne-700 text-lg">
+              <p className="text-brand-700 text-lg">
                 Des initiatives concrètes pour une commune plus solidaire, écologique et participative.
                 Découvrez nos projets citoyens portés et soutenus par le collectif et rejoignez-nous !
               </p>
@@ -91,7 +91,7 @@ const ProjectsPage = () => {
               {isLoading ? (
                 <div className="text-center py-12">Chargement des projets...</div>
               ) : activeProjects.length === 0 ? (
-                <div className="text-center py-12 text-getigne-700">Aucun projet actif pour le moment.</div>
+                <div className="text-center py-12 text-brand-700">Aucun projet actif pour le moment.</div>
               ) : (
                 activeProjects.map((project, index) => (
                   <ProjectCard
@@ -111,7 +111,7 @@ const ProjectsPage = () => {
               {isLoading ? (
                 <div className="text-center py-12">Chargement des projets...</div>
               ) : developmentProjects.length === 0 ? (
-                <div className="text-center py-12 text-getigne-700">Aucun projet en développement pour le moment.</div>
+                <div className="text-center py-12 text-brand-700">Aucun projet en développement pour le moment.</div>
               ) : (
                 <div className="space-y-16">
                   {developmentProjects.map((project, index) => (
@@ -127,9 +127,9 @@ const ProjectsPage = () => {
             </div>
 
             {/* Appel à l'action */}
-            <div className="bg-getigne-accent/5 rounded-xl p-8 text-center">
+            <div className="bg-brand/5 rounded-xl p-8 text-center">
               <h2 className="text-2xl font-bold mb-4">Vous avez une idée de projet pour Gétigné ?</h2>
-              <p className="text-getigne-700 mb-6 max-w-2xl mx-auto">
+              <p className="text-brand-700 mb-6 max-w-2xl mx-auto">
                 Nous sommes ouverts à toutes les initiatives qui contribuent à rendre notre commune
                 plus vivante, forte, solidaire, durable... Partagez vos idées avec nous !
               </p>

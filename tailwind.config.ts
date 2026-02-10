@@ -65,7 +65,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-        getigne: {
+        brand: {
 					'50': '#f5f5f7',
 					'100': '#e3e3e8',
 					'200': '#c8c9d6',
@@ -76,13 +76,12 @@ export default {
 					'700': '#4a4a5d',
 					'800': '#40404f',
 					'900': '#1d1d1f',
-          'accent': 'hsl(var(--getigne-accent))',
-					'green': {
-						'100': '#DCFCE7',
-						'500': '#34b190',
-						'600': '#059669',
-						'700': '#047857'
-					}
+					'950': '#121214',
+					DEFAULT: 'hsl(var(--primary))',
+					'fg': 'var(--site-dominant-fg)',
+					'darker': 'hsl(var(--site-dominant-darker))',
+					'light': 'hsl(var(--site-dominant-light))',
+					'gradient-end': 'var(--site-dominant-gradient-end)'
 				}
 			},
 			borderRadius: {

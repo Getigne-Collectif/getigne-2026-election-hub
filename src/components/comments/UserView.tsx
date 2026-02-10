@@ -31,7 +31,7 @@ const UserView: React.FC<UserViewProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className="text-center py-8 text-getigne-500">
+      <div className="text-center py-8 text-brand-500">
         Chargement des commentaires...
       </div>
     );

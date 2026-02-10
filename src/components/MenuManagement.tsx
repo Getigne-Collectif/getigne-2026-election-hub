@@ -326,7 +326,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({
                       href={renderPageUrl(item)} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex items-center text-getigne-accent hover:underline"
+                      className="flex items-center text-brand hover:underline"
                     >
                       {item.page_id ? (
                         <>

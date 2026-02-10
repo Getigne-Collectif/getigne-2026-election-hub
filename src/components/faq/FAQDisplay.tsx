@@ -64,7 +64,7 @@ const FAQDisplay: React.FC<FAQDisplayProps> = ({ slug, showDraft = false }) => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-getigne-900 tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-brand-900 tracking-tight">
               {faq.name || 'Questions Fréquentes'}
             </h2>
             <p className="mt-4 text-lg text-gray-600">
@@ -80,8 +80,8 @@ const FAQDisplay: React.FC<FAQDisplayProps> = ({ slug, showDraft = false }) => {
                 onClick={() => setEditDialogOpen(true)}
                 className="group"
               >
-                <Edit className="w-4 h-4 mr-2 text-gray-500 group-hover:text-getigne-accent transition-colors" />
-                <span className="text-gray-700 group-hover:text-getigne-accent transition-colors">
+                <Edit className="w-4 h-4 mr-2 text-gray-500 group-hover:text-brand transition-colors" />
+                <span className="text-gray-700 group-hover:text-brand transition-colors">
                   Éditer la FAQ
                 </span>
               </Button>
@@ -95,11 +95,11 @@ const FAQDisplay: React.FC<FAQDisplayProps> = ({ slug, showDraft = false }) => {
 
                 return (
                   <div key={category.id}>
-                    <h3 className="text-2xl font-bold text-getigne-800 mb-6 flex items-center gap-3">
+                    <h3 className="text-2xl font-bold text-brand-800 mb-6 flex items-center gap-3">
                       {category.icon && (
                         <DynamicIcon 
                           name={category.icon} 
-                          className="w-7 h-7 text-getigne-accent" 
+                          className="w-7 h-7 text-brand" 
                         />
                       )}
                       <span>{category.name}</span>
@@ -111,7 +111,7 @@ const FAQDisplay: React.FC<FAQDisplayProps> = ({ slug, showDraft = false }) => {
                           value={`faq-item-${item.id}`}
                           className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
                         >
-                          <AccordionTrigger className="w-full text-left font-semibold text-lg text-getigne-900 px-6 py-4 hover:no-underline group">
+                          <AccordionTrigger className="w-full text-left font-semibold text-lg text-brand-900 px-6 py-4 hover:no-underline group">
                             <span className="flex-grow">{item.question}</span>
                           </AccordionTrigger>
                           <AccordionContent className="px-6 pb-4 pt-0 text-gray-700 leading-relaxed">
@@ -138,7 +138,7 @@ const FAQDisplay: React.FC<FAQDisplayProps> = ({ slug, showDraft = false }) => {
 
           <div className="mt-16 pt-12 border-t border-gray-200">
             <div className="text-center">
-              <h3 className="text-2xl md:text-3xl font-bold text-getigne-900">
+              <h3 className="text-2xl md:text-3xl font-bold text-brand-900">
                 Vous ne trouvez pas votre réponse ?
               </h3>
               <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">

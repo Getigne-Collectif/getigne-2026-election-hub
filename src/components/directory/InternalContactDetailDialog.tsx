@@ -121,7 +121,7 @@ const InternalContactDetailDialog = ({
         <div className="space-y-6">
           {/* En-tête avec photo et nom */}
           <div className="flex items-start gap-4">
-            <div className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-getigne-200 to-getigne-100 border-4 border-getigne-300">
+            <div className="w-24 h-24 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-brand-200 to-brand-100 border-4 border-brand-300">
               {member.photo_url ? (
                 <img
                   src={member.photo_url}
@@ -130,7 +130,7 @@ const InternalContactDetailDialog = ({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-getigne-700">
+                  <span className="text-2xl font-bold text-brand-700">
                     {getInitials(member.name)}
                   </span>
                 </div>
@@ -138,9 +138,9 @@ const InternalContactDetailDialog = ({
             </div>
 
             <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-bold text-getigne-900">{member.name}</h2>
+              <h2 className="text-2xl font-bold text-brand-900">{member.name}</h2>
               {member.role && (
-                <p className="text-lg text-getigne-600 font-medium mt-1 flex items-center gap-2">
+                <p className="text-lg text-brand-600 font-medium mt-1 flex items-center gap-2">
                   <Award className="h-5 w-5" />
                   {member.role}
                 </p>
@@ -171,7 +171,7 @@ const InternalContactDetailDialog = ({
           {/* Coordonnées */}
           <div className="space-y-3">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Mail className="h-5 w-5 text-getigne-600" />
+              <Mail className="h-5 w-5 text-brand-600" />
               Coordonnées
             </h3>
             <div className="grid gap-3">
@@ -182,7 +182,7 @@ const InternalContactDetailDialog = ({
                     <p className="text-xs text-muted-foreground">Email</p>
                     <a 
                       href={`mailto:${member.email}`}
-                      className="text-sm font-medium hover:text-getigne-600 truncate block"
+                      className="text-sm font-medium hover:text-brand-600 truncate block"
                     >
                       {member.email}
                     </a>
@@ -196,7 +196,7 @@ const InternalContactDetailDialog = ({
                     <p className="text-xs text-muted-foreground">Téléphone</p>
                     <a 
                       href={`tel:${member.phone}`}
-                      className="text-sm font-medium hover:text-getigne-600"
+                      className="text-sm font-medium hover:text-brand-600"
                     >
                       {member.phone}
                     </a>
@@ -221,7 +221,7 @@ const InternalContactDetailDialog = ({
               <Separator />
               <div className="space-y-3">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-getigne-600" />
+                  <Calendar className="h-5 w-5 text-brand-600" />
                   Date de naissance
                 </h3>
                 <div className="p-3 bg-muted/50 rounded-lg">
@@ -237,7 +237,7 @@ const InternalContactDetailDialog = ({
               <Separator />
               <div className="space-y-3">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-getigne-600" />
+                  <FileText className="h-5 w-5 text-brand-600" />
                   Biographie
                 </h3>
                 <div className="p-4 bg-muted/50 rounded-lg">
@@ -253,7 +253,7 @@ const InternalContactDetailDialog = ({
               <Separator />
               <div className="space-y-3">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Award className="h-5 w-5 text-getigne-600" />
+                  <Award className="h-5 w-5 text-brand-600" />
                   Position électorale
                 </h3>
                 <div className="space-y-2">

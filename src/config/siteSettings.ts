@@ -27,12 +27,18 @@ export enum BrandColorKey {
   Danger = 'danger',
 }
 
+export type ColorPair = {
+  bg: string;
+  fg: string;
+};
+
 export type BrandColors = {
-  dominant: string;
-  accent: string;
-  proximity: string;
-  trust: string;
-  danger: string;
+  dominant: ColorPair;
+  accent: ColorPair;
+  proximity: ColorPair;
+  trust: ColorPair;
+  danger: ColorPair;
+  footer: ColorPair;
 };
 
 export type BrandingSettings = {
@@ -40,6 +46,8 @@ export type BrandingSettings = {
   slogan: string;
   logoUrl: string;
   city: string;
+  /** Couleur de fin du gradient (complément du dominant), ex. #06b6d4 */
+  gradientEnd: string;
   colors: BrandColors;
   images: {
     hero: string;
@@ -103,12 +111,14 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     slogan: 'Élections municipales 2026',
     logoUrl: '/images/getigne-collectif-logo.png',
     city: 'Gétigné',
+    gradientEnd: '#06b6d4',
     colors: {
-      dominant: '#34b190',
-      accent: '#34b190',
-      proximity: '#f97316',
-      trust: '#2563eb',
-      danger: '#dc2626',
+      dominant: { bg: '#34b190', fg: '#ffffff' },
+      accent: { bg: '#34b190', fg: '#ffffff' },
+      proximity: { bg: '#f97316', fg: '#ffffff' },
+      trust: { bg: '#2563eb', fg: '#ffffff' },
+      danger: { bg: '#dc2626', fg: '#ffffff' },
+      footer: { bg: '#1d1d1f', fg: '#ffffff' },
     },
     images: {
       hero: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80',
@@ -152,18 +162,21 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
 };
 
 const colorSchema = z.string().min(1);
+const colorPairSchema = z.object({ bg: colorSchema, fg: colorSchema });
 
 const brandingSchema = z.object({
   name: z.string().min(1),
   slogan: z.string().min(1),
   logoUrl: z.string().min(1),
   city: z.string().min(1),
+  gradientEnd: colorSchema.default('#06b6d4'),
   colors: z.object({
-    dominant: colorSchema,
-    accent: colorSchema,
-    proximity: colorSchema,
-    trust: colorSchema,
-    danger: colorSchema,
+    dominant: colorPairSchema,
+    accent: colorPairSchema,
+    proximity: colorPairSchema,
+    trust: colorPairSchema,
+    danger: colorPairSchema,
+    footer: colorPairSchema,
   }),
   images: z.object({
     hero: z.string().min(1),
@@ -236,9 +249,14 @@ export function mergeSiteSettings(
     branding: {
       ...defaults.branding,
       ...overrides.branding,
+      gradientEnd: overrides.branding?.gradientEnd ?? defaults.branding.gradientEnd,
       colors: {
-        ...defaults.branding.colors,
-        ...overrides.branding?.colors,
+        dominant: { ...defaults.branding.colors.dominant, ...overrides.branding?.colors?.dominant },
+        accent: { ...defaults.branding.colors.accent, ...overrides.branding?.colors?.accent },
+        proximity: { ...defaults.branding.colors.proximity, ...overrides.branding?.colors?.proximity },
+        trust: { ...defaults.branding.colors.trust, ...overrides.branding?.colors?.trust },
+        danger: { ...defaults.branding.colors.danger, ...overrides.branding?.colors?.danger },
+        footer: { ...defaults.branding.colors.footer, ...overrides.branding?.colors?.footer },
       },
       images: {
         ...defaults.branding.images,
@@ -353,19 +371,30 @@ function normalizeBrandingValue(value: unknown): BrandingSettings {
     };
   };
 
-  const legacyColors = raw.colors ?? {};
-  const colors = {
-    dominant: raw.colors?.dominant ?? legacyColors.green ?? DEFAULT_SITE_SETTINGS.branding.colors.dominant,
-    accent: raw.colors?.accent ?? legacyColors.green ?? DEFAULT_SITE_SETTINGS.branding.colors.accent,
-    proximity: raw.colors?.proximity ?? legacyColors.orange ?? DEFAULT_SITE_SETTINGS.branding.colors.proximity,
-    trust: raw.colors?.trust ?? legacyColors.blue ?? DEFAULT_SITE_SETTINGS.branding.colors.trust,
-    danger: raw.colors?.danger ?? legacyColors.red ?? DEFAULT_SITE_SETTINGS.branding.colors.danger,
+  const D = DEFAULT_SITE_SETTINGS.branding.colors;
+  const legacyColors = (raw.colors ?? {}) as Partial<BrandColors> & { green?: string; orange?: string; blue?: string; red?: string };
+  const fromLegacy = (val: string | ColorPair | undefined, fallback: ColorPair): ColorPair => {
+    if (val == null) return fallback;
+    if (typeof val === 'string') return { bg: val, fg: fallback.fg };
+    return { bg: val.bg ?? fallback.bg, fg: val.fg ?? fallback.fg };
+  };
+  const colors: BrandColors = {
+    dominant: fromLegacy(raw.colors?.dominant ?? legacyColors.green, D.dominant),
+    accent: fromLegacy(raw.colors?.accent ?? legacyColors.green, D.accent),
+    proximity: fromLegacy(raw.colors?.proximity ?? legacyColors.orange, D.proximity),
+    trust: fromLegacy(raw.colors?.trust ?? legacyColors.blue, D.trust),
+    danger: fromLegacy(raw.colors?.danger ?? legacyColors.red, D.danger),
+    footer: fromLegacy(raw.colors?.footer, D.footer),
   };
 
+  const gradientEnd = typeof raw.gradientEnd === 'string' && raw.gradientEnd.length > 0
+    ? raw.gradientEnd
+    : DEFAULT_SITE_SETTINGS.branding.gradientEnd;
   const merged = mergeSiteSettings(DEFAULT_SITE_SETTINGS, {
     branding: {
       ...raw,
-      colors,
+      gradientEnd,
+      colors: colors,
       images: {
         ...raw.images,
       },
@@ -426,24 +455,66 @@ function hexToHsl(value: string): string | null {
   return `${hDeg} ${sPct}% ${lPct}%`;
 }
 
+/** Parse "H S% L%" and return [h, s, l] or null. */
+function parseHsl(hsl: string): [number, number, number] | null {
+  const m = hsl.trim().match(/^(\d+)\s+(\d+)%\s+(\d+)%$/);
+  if (!m) return null;
+  return [Number(m[1]), Number(m[2]), Number(m[3])];
+}
+
+/** Returns same HSL with L reduced by reducePercent (clamped 0–100). Format "H S% L%". */
+function hslDarker(hsl: string, reducePercent: number): string {
+  const parsed = parseHsl(hsl);
+  if (!parsed) return hsl;
+  const [h, s, l] = parsed;
+  const newL = Math.max(0, Math.min(100, l - reducePercent));
+  return `${h} ${s}% ${newL}%`;
+}
+
+/** Returns same HSL with L increased by addPercent (clamped 0–100). Format "H S% L%". */
+function hslLighter(hsl: string, addPercent: number): string {
+  const parsed = parseHsl(hsl);
+  if (!parsed) return hsl;
+  const [h, s, l] = parsed;
+  const newL = Math.max(0, Math.min(100, l + addPercent));
+  return `${h} ${s}% ${newL}%`;
+}
+
 export function applySiteTheme(settings: SiteSettings) {
   if (typeof document === 'undefined') return;
 
   const root = document.documentElement;
-  root.style.setProperty('--site-dominant', settings.branding.colors.dominant);
-  root.style.setProperty('--site-accent', settings.branding.colors.accent);
-  root.style.setProperty('--site-proximity', settings.branding.colors.proximity);
-  root.style.setProperty('--site-trust', settings.branding.colors.trust);
-  root.style.setProperty('--site-danger', settings.branding.colors.danger);
+  const c = settings.branding.colors;
+  root.style.setProperty('--site-dominant', c.dominant.bg);
+  root.style.setProperty('--site-dominant-fg', c.dominant.fg);
+  root.style.setProperty('--site-accent', c.accent.bg);
+  root.style.setProperty('--site-accent-fg', c.accent.fg);
+  root.style.setProperty('--site-proximity', c.proximity.bg);
+  root.style.setProperty('--site-proximity-fg', c.proximity.fg);
+  root.style.setProperty('--site-trust', c.trust.bg);
+  root.style.setProperty('--site-trust-fg', c.trust.fg);
+  root.style.setProperty('--site-danger', c.danger.bg);
+  root.style.setProperty('--site-danger-fg', c.danger.fg);
+  root.style.setProperty('--site-footer', c.footer.bg);
+  root.style.setProperty('--site-footer-fg', c.footer.fg);
 
-  const dominantHsl = hexToHsl(settings.branding.colors.dominant);
+  const dominantHsl = hexToHsl(c.dominant.bg);
   if (dominantHsl) {
     root.style.setProperty('--primary', dominantHsl);
     root.style.setProperty('--ring', dominantHsl);
+    root.style.setProperty('--site-dominant-darker', hslDarker(dominantHsl, 12));
+    root.style.setProperty('--site-dominant-light', hslLighter(dominantHsl, 10));
+  }
+  const dominantFgHsl = hexToHsl(c.dominant.fg);
+  if (dominantFgHsl) {
+    root.style.setProperty('--primary-foreground', dominantFgHsl);
   }
 
-  const accentHsl = hexToHsl(settings.branding.colors.accent);
+  // Accent reste configurable (ex. pour variante) mais l’UI "brand" utilise la dominante
+  const accentHsl = hexToHsl(c.accent.bg);
   if (accentHsl) {
-    root.style.setProperty('--getigne-accent', accentHsl);
+    root.style.setProperty('--site-accent-hsl', accentHsl);
   }
+
+  root.style.setProperty('--site-dominant-gradient-end', settings.branding.gradientEnd);
 }

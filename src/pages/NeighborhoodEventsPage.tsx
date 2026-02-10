@@ -143,28 +143,28 @@ const NeighborhoodEventsPage = () => {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="space-y-2 text-sm text-getigne-700">
+        <div className="space-y-2 text-sm text-brand-700">
           <div className="flex items-center">
-            <Calendar className="w-4 h-4 mr-2 text-getigne-accent" />
+            <Calendar className="w-4 h-4 mr-2 text-brand" />
             <span className={isPast ? 'line-through text-gray-500' : ''}>{formatDate(event.date)}</span>
           </div>
           <div className="flex items-center">
-            <Clock className="w-4 h-4 mr-2 text-getigne-accent" />
+            <Clock className="w-4 h-4 mr-2 text-brand" />
             <span className={isPast ? 'line-through text-gray-500' : ''}>{formatTime(event.date)}</span>
           </div>
           <div className="flex items-center">
-            <MapPin className="w-4 h-4 mr-2 text-getigne-accent" />
+            <MapPin className="w-4 h-4 mr-2 text-brand" />
             <span>{event.location}</span>
           </div>
         </div>
 
         {selectedEvent?.id === event.id && (
-          <div className="mt-4 pt-4 border-t border-getigne-100">
-            <p className="text-getigne-700 mb-4">{event.description}</p>
+          <div className="mt-4 pt-4 border-t border-brand-100">
+            <p className="text-brand-700 mb-4">{event.description}</p>
             
             <div className="flex flex-wrap gap-2 mb-4">
               {event.kit_provided && (
-                <span className="bg-getigne-accent/10 text-getigne-accent px-2 py-1 rounded-full text-xs flex items-center">
+                <span className="bg-brand/10 text-brand px-2 py-1 rounded-full text-xs flex items-center">
                   <Package className="w-3 h-3 mr-1" />
                   Kit fourni
                 </span>
@@ -213,7 +213,7 @@ const NeighborhoodEventsPage = () => {
         
         <main className="pt-20">
           {/* En-tête avec breadcrumb et hero coloré */}
-          <section className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-getigne-50 py-8 overflow-hidden">
+          <section className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-brand-50 py-8 overflow-hidden">
             {/* Éléments décoratifs */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-200/20 rounded-full -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-200/20 rounded-full translate-y-1/2 -translate-x-1/2"></div>
@@ -255,26 +255,26 @@ const NeighborhoodEventsPage = () => {
                     Rencontres de voisinage
                   </div>
                   
-                  <h1 className="text-5xl font-bold text-getigne-900 leading-tight">
+                  <h1 className="text-5xl font-bold text-brand-900 leading-tight">
                     Cafés de 
                     <span className="text-amber-600"> quartier</span>
                   </h1>
                   
-                  <p className="text-xl text-getigne-700 leading-relaxed">
+                  <p className="text-xl text-brand-700 leading-relaxed">
                     Des moments <span className="font-semibold text-amber-700">conviviaux</span> pour se retrouver, 
                     échanger et construire ensemble l'avenir de notre commune.
                   </p>
                   
                   <div className="flex flex-wrap gap-4 pt-4">
-                    <div className="flex items-center text-getigne-600">
+                    <div className="flex items-center text-brand-600">
                       <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
                       <span className="text-sm">Rencontres chez l'habitant</span>
                     </div>
-                    <div className="flex items-center text-getigne-600">
+                    <div className="flex items-center text-brand-600">
                       <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
                       <span className="text-sm">Ambiance décontractée</span>
                     </div>
-                    <div className="flex items-center text-getigne-600">
+                    <div className="flex items-center text-brand-600">
                       <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
                       <span className="text-sm">Échanges constructifs</span>
                     </div>
@@ -291,10 +291,10 @@ const NeighborhoodEventsPage = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                     <div className="absolute bottom-4 left-4 right-4">
                       <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
-                        <p className="text-sm font-medium text-getigne-900">
+                        <p className="text-sm font-medium text-brand-900">
                           ☕ Prochaine rencontre dans votre quartier ?
                         </p>
-                        <p className="text-xs text-getigne-600 mt-1">
+                        <p className="text-xs text-brand-600 mt-1">
                           Organisez la vôtre ou rejoignez vos voisins
                         </p>
                       </div>
@@ -316,10 +316,10 @@ const NeighborhoodEventsPage = () => {
                 <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
                   <div className="space-y-6">
                     <div>
-                      <h2 className="text-3xl font-bold text-getigne-900 mb-6">
+                      <h2 className="text-3xl font-bold text-brand-900 mb-6">
                         Le concept des cafés de quartier
                       </h2>
-                      <div className="space-y-4 text-getigne-700 text-lg leading-relaxed">
+                      <div className="space-y-4 text-brand-700 text-lg leading-relaxed">
                         <p>
                           Les cafés de quartier sont des <span className="font-semibold text-amber-700">rencontres informelles</span> organisées par et pour les habitants 
                           de Gétigné. L'objectif ? Créer du lien social, échanger sur la vie locale et imaginer 
@@ -353,7 +353,7 @@ const NeighborhoodEventsPage = () => {
                   </div>
 
                   <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-100">
-                    <h3 className="text-xl font-semibold text-getigne-900 mb-6 flex items-center">
+                    <h3 className="text-xl font-semibold text-brand-900 mb-6 flex items-center">
                       <Package className="w-6 h-6 mr-3 text-amber-600" />
                       Ce qui vous attend
                     </h3>
@@ -363,8 +363,8 @@ const NeighborhoodEventsPage = () => {
                           <Package className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-getigne-900 mb-1">Kit d'organisation</h4>
-                          <p className="text-getigne-700 text-sm">Supports, conseils et matériel pour réussir votre rencontre</p>
+                          <h4 className="font-medium text-brand-900 mb-1">Kit d'organisation</h4>
+                          <p className="text-brand-700 text-sm">Supports, conseils et matériel pour réussir votre rencontre</p>
                         </div>
                       </div>
                       
@@ -373,8 +373,8 @@ const NeighborhoodEventsPage = () => {
                           <UserCheck className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-getigne-900 mb-1">Accompagnement</h4>
-                          <p className="text-getigne-700 text-sm">Un membre du collectif peut vous accompagner</p>
+                          <h4 className="font-medium text-brand-900 mb-1">Accompagnement</h4>
+                          <p className="text-brand-700 text-sm">Un membre du collectif peut vous accompagner</p>
                         </div>
                       </div>
                       
@@ -383,8 +383,8 @@ const NeighborhoodEventsPage = () => {
                           <Coffee className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-getigne-900 mb-1">Moment convivial</h4>
-                          <p className="text-getigne-700 text-sm">Échange décontracté dans une ambiance chaleureuse</p>
+                          <h4 className="font-medium text-brand-900 mb-1">Moment convivial</h4>
+                          <p className="text-brand-700 text-sm">Échange décontracté dans une ambiance chaleureuse</p>
                         </div>
                       </div>
                     </div>
@@ -433,7 +433,7 @@ const NeighborhoodEventsPage = () => {
                         {futureEvents.length > 0 && (
                           <div>
                             <h3 className="text-xl font-semibold mb-4 flex items-center">
-                              <Calendar className="w-5 h-5 mr-2 text-getigne-accent" />
+                              <Calendar className="w-5 h-5 mr-2 text-brand" />
                               Prochains cafés de quartier
                             </h3>
                             <div className="space-y-4">
@@ -450,7 +450,7 @@ const NeighborhoodEventsPage = () => {
                             <CollapsibleTrigger asChild>
                               <Button variant="ghost" className="w-full justify-between p-0 h-auto">
                                 <h3 className="text-xl font-semibold flex items-center">
-                                  <Clock className="w-5 h-5 mr-2 text-getigne-500" />
+                                  <Clock className="w-5 h-5 mr-2 text-brand-500" />
                                   Cafés de quartier passés ({pastEvents.length})
                                 </h3>
                                 {isPastEventsOpen ? (
@@ -474,8 +474,8 @@ const NeighborhoodEventsPage = () => {
                           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
                             <Coffee className="w-10 h-10 text-amber-600" />
                           </div>
-                          <h3 className="text-2xl font-semibold mb-3 text-getigne-900">Aucun Café de quartier programmé</h3>
-                          <p className="text-getigne-700 mb-6 leading-relaxed">
+                          <h3 className="text-2xl font-semibold mb-3 text-brand-900">Aucun Café de quartier programmé</h3>
+                          <p className="text-brand-700 mb-6 leading-relaxed">
                             Soyez le <span className="font-semibold text-amber-700">premier</span> à organiser une rencontre conviviale dans votre voisinage !
                           </p>
                           
@@ -486,7 +486,7 @@ const NeighborhoodEventsPage = () => {
                                 Organiser le premier café
                               </Link>
                             </Button>
-                            <p className="text-xs text-getigne-500">
+                            <p className="text-xs text-brand-500">
                               Nous vous fournirons tout le nécessaire pour réussir votre rencontre
                             </p>
                           </div>

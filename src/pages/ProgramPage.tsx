@@ -859,15 +859,15 @@ const ProgramPage = () => {
   if (isPageLoading) {
     return (
       <HelmetProvider>
-        <div className="min-h-screen bg-getigne-50 flex flex-col">
+        <div className="min-h-screen bg-brand-50 flex flex-col">
           <Navbar />
           <div className="flex-grow flex flex-col items-center justify-center p-4">
             <div className="text-center animate-in fade-in duration-500">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-getigne-accent/10 rounded-full mb-4">
-                <BookOpen className="w-8 h-8 text-getigne-accent animate-pulse" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-accent/10 rounded-full mb-4">
+                <BookOpen className="w-8 h-8 text-brand-accent animate-pulse" />
               </div>
-              <h2 className="text-xl font-bold text-getigne-900 mb-2">Chargement du programme...</h2>
-              <p className="text-getigne-600 max-w-xs mx-auto">Vérification de l'accès et récupération des dernières propositions.</p>
+              <h2 className="text-xl font-bold text-brand-900 mb-2">Chargement du programme...</h2>
+              <p className="text-brand-600 max-w-xs mx-auto">Vérification de l'accès et récupération des dernières propositions.</p>
             </div>
           </div>
           <Footer />
@@ -884,7 +884,7 @@ const ProgramPage = () => {
           <meta name="description" content="Découvrez le programme politique de Gétigné Collectif pour 2026" />
         </Helmet>
         
-        <div className="min-h-screen bg-gradient-to-br from-getigne-50 to-getigne-100">
+        <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100">
           <Navbar />
           
           <div className="pt-20 pb-16">
@@ -892,20 +892,20 @@ const ProgramPage = () => {
               <div className="max-w-5xl mx-auto">
                 {/* En-tête principal avec illustration */}
                 <div className="text-center mb-12">
-                  <div className="inline-flex items-center justify-center w-24 h-24 bg-getigne-accent/10 rounded-full mb-6">
-                    <Clock className="w-12 h-12 text-getigne-accent" />
+                  <div className="inline-flex items-center justify-center w-24 h-24 bg-brand-accent/10 rounded-full mb-6">
+                    <Clock className="w-12 h-12 text-brand-accent" />
                   </div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-getigne-900 mb-4">
+                  <h1 className="text-4xl md:text-5xl font-bold text-brand-900 mb-4">
                     Tic... Tac...
                   </h1>
-                  <p className="text-xl text-getigne-700 max-w-4xl mx-auto leading-relaxed mb-6">
+                  <p className="text-xl text-brand-700 max-w-4xl mx-auto leading-relaxed mb-6">
                     L'équipe programme finalise actuellement la synthèse des travaux de nos 5 commissions thématiques, 
                     composées d'une vingtaine de personnes qui travaillent depuis plus d'un an sur des propositions concrètes 
                     pour l'avenir de Gétigné.
                   </p>
                   
                   {/* Aperçu du timing */}
-                  <div className="inline-flex items-center gap-4 bg-getigne-accent/10 text-getigne-700 px-6 py-3 rounded-full text-sm font-medium">
+                  <div className="inline-flex items-center gap-4 bg-brand-accent/10 text-brand-700 px-6 py-3 rounded-full text-sm font-medium">
                     <span>📅 Mai 2024 - Mai 2025 : Travaux des commissions</span>
                     <span>•</span>
                     <span>📝 Printemps/Été 2025 : Synthèse</span>
@@ -915,10 +915,10 @@ const ProgramPage = () => {
                 </div>
 
                 {/* Frise chronologique du processus */}
-                <div className="bg-white rounded-xl shadow-lg border border-getigne-100 p-6 mb-8">
+                <div className="bg-white rounded-xl shadow-lg border border-brand-100 p-6 mb-8">
                   <div className="text-center mb-6">
-                    <h2 className="text-xl font-bold text-getigne-900 mb-2">Notre processus de travail</h2>
-                    <p className="text-getigne-700 text-sm">
+                    <h2 className="text-xl font-bold text-brand-900 mb-2">Notre processus de travail</h2>
+                    <p className="text-brand-700 text-sm">
                       Découvrez comment nous élaborons ensemble ce programme, étape par étape.
                     </p>
                   </div>
@@ -940,7 +940,7 @@ const ProgramPage = () => {
 
                   {/* Carte : Rejoignez-nous sur 1 colonne */}
                   <div className="lg:col-span-1">
-                    <div className="bg-gradient-to-br from-getigne-accent to-cyan-500 text-white rounded-xl shadow-lg p-6 text-center h-full flex flex-col gap-4">
+                    <div className="bg-gradient-to-br from-brand to-brand-gradient-end text-white rounded-xl shadow-lg p-6 text-center h-full flex flex-col gap-4">
                       <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <MessageSquare className="w-8 h-8 text-white" />
                       </div>
@@ -950,7 +950,7 @@ const ProgramPage = () => {
                       </p>
                       <Button 
                         asChild 
-                        className="bg-white text-getigne-900 hover:bg-white/90"
+                        className="bg-white text-brand-900 hover:bg-white/90"
                       >
                         <a href={Routes.AGENDA}>Voir nos événements</a>
                       </Button>
@@ -985,7 +985,7 @@ const ProgramPage = () => {
         <meta name="description" content="Découvrez le programme politique de Gétigné Collectif pour 2026" />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-getigne-50 to-getigne-100">
+      <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100">
         <Navbar />
         
         <div className="pt-20 pb-16">
@@ -993,8 +993,8 @@ const ProgramPage = () => {
             <div className="max-w-6xl mx-auto">
               {isProgramAdmin && (
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-end mb-8">
-                  <div className="flex items-center gap-3 bg-white border border-getigne-200 rounded-full px-4 py-2 shadow-sm">
-                    <span className="text-sm font-medium text-getigne-700">Mode édition</span>
+                  <div className="flex items-center gap-3 bg-white border border-brand-200 rounded-full px-4 py-2 shadow-sm">
+                    <span className="text-sm font-medium text-brand-700">Mode édition</span>
                     <Switch
                       id="program-edit-mode-toggle"
                       checked={isEditMode}
@@ -1005,7 +1005,7 @@ const ProgramPage = () => {
                   <Button
                     onClick={handleGeneratePDF}
                     disabled={isGeneratingPDF || !programGeneral || !programItems || !flagshipProjects}
-                    className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
+                    className="bg-brand-accent text-white hover:bg-brand-accent/90"
                   >
                     <FileDown className="w-4 h-4 mr-2" />
                     {isGeneratingPDF ? 'Génération...' : 'Télécharger le PDF complet'}
@@ -1026,7 +1026,7 @@ const ProgramPage = () => {
                       }
                     }}
                     disabled={!shareLink}
-                    className="border-getigne-200 text-getigne-700 hover:text-getigne-900"
+                    className="border-brand-200 text-brand-700 hover:text-brand-900"
                   >
                     <Copy className="w-4 h-4 mr-2" />
                     Copier le lien public
@@ -1040,8 +1040,8 @@ const ProgramPage = () => {
               )}
 
               {programGeneral && (
-                <div className="mb-12 overflow-hidden rounded-2xl border border-getigne-accent/20 shadow-xl">
-                  <div className="relative bg-gradient-to-r from-getigne-accent to-cyan-500 text-white">
+                <div className="mb-12 overflow-hidden rounded-2xl border border-brand-accent/20 shadow-xl">
+                  <div className="relative bg-gradient-to-r from-brand to-brand-gradient-end text-white">
                     <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-white/10 blur-3xl md:block" aria-hidden />
                     <div className="relative px-6 py-10 md:px-12 md:py-14">
                       <div className="max-w-4xl">
@@ -1062,7 +1062,7 @@ const ProgramPage = () => {
                           <div className="mt-8">
                             <Button
                               size="lg"
-                              className="bg-white text-getigne-900 hover:bg-white/90"
+                              className="bg-white text-brand-900 hover:bg-white/90"
                               onClick={async () => {
                                 try {
                                   const pg = programGeneral as { file?: string | null; file_path?: string | null };
@@ -1086,7 +1086,7 @@ const ProgramPage = () => {
                   <div className="bg-white px-6 py-8 md:px-12 md:py-10">
                     <div className="max-w-4xl">
 
-                      <div className="rich-content prose max-w-none text-getigne-800">
+                      <div className="rich-content prose max-w-none text-brand-800">
                         <EditorJSRenderer data={programGeneral.content || ''} />
                       </div>
                     </div>
@@ -1151,7 +1151,7 @@ const ProgramPage = () => {
               showMeasuresSticky ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
             }`}
           >
-            <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 border-b border-white/20 shadow-md">
+            <div className="bg-gradient-to-r from-brand to-brand-gradient-end border-b border-white/20 shadow-md">
               <div className="container mx-auto px-4 py-3">
                 <div className="max-w-6xl mx-auto flex items-center gap-2 text-white">
                   <Target className="w-4 h-4" />
@@ -1163,7 +1163,7 @@ const ProgramPage = () => {
             </div>
           </div>
 
-          <div ref={measuresHeaderRef} className="bg-gradient-to-r from-getigne-accent to-cyan-500 py-12 md:py-16 lg:py-20">
+          <div ref={measuresHeaderRef} className="bg-gradient-to-r from-brand to-brand-gradient-end py-12 md:py-16 lg:py-20">
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto text-center">
                 <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full text-white text-xs md:text-sm font-medium mb-4 md:mb-6">
@@ -1204,8 +1204,8 @@ const ProgramPage = () => {
                         onClick={() => scrollToSection(item.slug)}
                         className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium border transition-all flex-shrink-0 ${
                           activeSectionId === item.slug
-                            ? 'bg-gradient-to-r from-getigne-accent to-cyan-500 text-white border-transparent shadow-lg'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-getigne-accent/30'
+                            ? 'bg-gradient-to-r from-brand to-brand-gradient-end text-white border-transparent shadow-lg'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-brand-accent/30'
                         }`}
                       >
                         {item.title}
@@ -1229,14 +1229,14 @@ const ProgramPage = () => {
                           onClick={() => scrollToSection(item.slug)}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
                             activeSectionId === item.slug
-                              ? 'bg-gradient-to-r from-getigne-accent to-cyan-500 text-white border-transparent shadow-lg'
-                              : 'bg-white text-getigne-800 border-gray-200 hover:border-getigne-accent/30 hover:shadow-md'
+                              ? 'bg-gradient-to-r from-brand to-brand-gradient-end text-white border-transparent shadow-lg'
+                              : 'bg-white text-brand-800 border-gray-200 hover:border-brand-accent/30 hover:shadow-md'
                           }`}
                         >
                           <span className={`inline-flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0 ${
                             activeSectionId === item.slug ? 'bg-white/20 backdrop-blur-sm' : 'bg-gray-50'
                           }`}>
-                            <DynamicIcon name={item.icon} className={`w-5 h-5 ${activeSectionId === item.slug ? 'text-white' : 'text-getigne-700'}`} />
+                            <DynamicIcon name={item.icon} className={`w-5 h-5 ${activeSectionId === item.slug ? 'text-white' : 'text-brand-700'}`} />
                           </span>
                           <span className="text-left text-sm font-medium line-clamp-2 uppercase">{item.title}</span>
                         </button>
@@ -1307,12 +1307,12 @@ const ProgramPage = () => {
                         <div className="p-6 md:p-8 lg:p-10">
                           {/* En-tête avec titre et icône */}
                           <div className="flex items-center gap-4 mb-6">
-                            <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-getigne-accent to-cyan-500 text-white shadow-lg flex-shrink-0">
+                            <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-brand to-brand-gradient-end text-white shadow-lg flex-shrink-0">
                               <DynamicIcon name={item.icon} className="w-6 h-6 md:w-7 md:h-7" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-3">
-                                <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-getigne-900 leading-tight">
+                                <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-brand-900 leading-tight">
                                   {item.title}
                                 </h2>
                                 {showAdminControls && (
@@ -1349,8 +1349,8 @@ const ProgramPage = () => {
                           )}
                           {showAdminControls ? (
                             <div className="mt-10 pt-8 border-t border-gray-200">
-                              <h3 className="text-xl font-bold text-getigne-900 mb-4 flex items-center gap-2">
-                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-getigne-accent/10 text-getigne-accent">
+                              <h3 className="text-xl font-bold text-brand-900 mb-4 flex items-center gap-2">
+                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-brand-accent/10 text-brand-accent">
                                   <Pencil className="w-4 h-4" />
                                 </span>
                                 Gestion des points de la section
@@ -1368,10 +1368,10 @@ const ProgramPage = () => {
                             pointsToDisplay && pointsToDisplay.length > 0 && (
                               <div className="mt-10 space-y-4">
                                 <div className="flex items-center gap-3 mb-6">
-                                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-getigne-accent to-cyan-500 text-white">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-brand to-brand-gradient-end text-white">
                                     <Target className="w-5 h-5" />
                                   </div>
-                                  <h3 className="text-xl md:text-2xl font-bold text-getigne-900">
+                                  <h3 className="text-xl md:text-2xl font-bold text-brand-900">
                                     Points du programme
                                   </h3>
                                 </div>
@@ -1419,12 +1419,12 @@ const ProgramPage = () => {
 
                           <div className="mt-10 pt-8 border-t border-gray-200">
                             <div className="flex items-center gap-3 mb-6">
-                              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-getigne-accent to-cyan-500 text-white">
+                              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-brand to-brand-gradient-end text-white">
                                 <MessageSquare className="w-5 h-5" />
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-3">
-                                  <h3 className="text-xl md:text-2xl font-bold text-getigne-900">
+                                  <h3 className="text-xl md:text-2xl font-bold text-brand-900">
                                     Vos réactions
                                   </h3>
                                   {commentCounts[item.id] && commentCounts[item.id].total > 0 && (

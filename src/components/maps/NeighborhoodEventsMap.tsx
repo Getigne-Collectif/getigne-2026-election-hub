@@ -151,7 +151,7 @@ const render = (status: Status) => {
       return (
         <div className="bg-gray-100 rounded-lg h-96 lg:h-[500px] flex items-center justify-center">
           <div className="text-center text-gray-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-getigne-accent mx-auto mb-2"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto mb-2"></div>
             <p>Chargement de la carte...</p>
           </div>
         </div>
@@ -209,10 +209,10 @@ const NeighborhoodEventsMap: React.FC<NeighborhoodEventsMapProps> = ({
   }, [events, onEventSelect]);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-getigne-100">
+    <div className="bg-white rounded-xl shadow-sm border border-brand-100">
       <div className="p-6">
         <h3 className="font-semibold mb-4 flex items-center">
-          <MapPin className="w-5 h-5 mr-2 text-getigne-accent" />
+          <MapPin className="w-5 h-5 mr-2 text-brand" />
           Carte des rencontres
         </h3>
         <div className="rounded-lg h-96 lg:h-[500px] overflow-hidden">
@@ -228,11 +228,11 @@ const NeighborhoodEventsMap: React.FC<NeighborhoodEventsMapProps> = ({
         </div>
         
         {events.length > 0 ? (
-          <div className="mt-4 text-sm text-getigne-600">
+          <div className="mt-4 text-sm text-brand-600">
             <p>{events.length} café(s) de quartier affiché(s) sur la carte</p>
           </div>
         ) : (
-          <div className="mt-4 text-sm text-getigne-500">
+          <div className="mt-4 text-sm text-brand-500">
             <p>Aucun Café de quartier à afficher sur la carte</p>
           </div>
         )}

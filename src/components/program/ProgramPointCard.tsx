@@ -127,7 +127,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
     <Card 
       key={point.id} 
       id={`program-point-${point.id}`} 
-      className="border-getigne-200 hover:border-getigne-accent hover:shadow-lg transition-all duration-200 cursor-pointer group"
+      className="border-brand-200 hover:border-brand hover:shadow-lg transition-all duration-200 cursor-pointer group"
       onClick={() => setShowContent(!showContent)}
     >
       <CardContent className="p-4">
@@ -137,7 +137,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
               <TooltipProvider delayDuration={150}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-getigne-200 bg-white">
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-brand-200 bg-white">
                       {point.competent_entity.logo_url ? (
                         <img
                           src={point.competent_entity.logo_url}
@@ -148,7 +148,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                           }}
                         />
                       ) : (
-                        <span className="flex h-full w-full items-center justify-center bg-getigne-50 text-sm font-semibold uppercase text-getigne-600">
+                        <span className="flex h-full w-full items-center justify-center bg-brand-50 text-sm font-semibold uppercase text-brand-600">
                           {((point.competent_entity?.name ?? '').slice(0, 2) || '??').toUpperCase()}
                         </span>
                       )}
@@ -163,12 +163,12 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             <div className="flex flex-col gap-1 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 {point.number != null && (
-                  <span className="shrink-0 text-sm font-medium text-getigne-600 tabular-nums" aria-label={`Mesure #${point.number}`}>
+                  <span className="shrink-0 text-sm font-medium text-brand-600 tabular-nums" aria-label={`Mesure #${point.number}`}>
                     #{point.number}
                   </span>
                 )}
-                {point.number != null && <span className="text-getigne-300 select-none">·</span>}
-                <h3 className="text-lg font-semibold text-getigne-800">
+                {point.number != null && <span className="text-brand-300 select-none">·</span>}
+                <h3 className="text-lg font-semibold text-brand-800">
                   {point.title}
                 </h3>
               </div>
@@ -189,8 +189,8 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             <div 
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                 showContent 
-                  ? 'bg-getigne-accent/10 text-getigne-accent' 
-                  : 'bg-gray-100 text-gray-400 group-hover:bg-getigne-accent/10 group-hover:text-getigne-accent'
+                  ? 'bg-brand/10 text-brand' 
+                  : 'bg-gray-100 text-gray-400 group-hover:bg-brand/10 group-hover:text-brand'
               }`}
             >
               {!showContent ? (
@@ -217,8 +217,8 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
             {filesToRender.length > 0 && (
               <div className="mt-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <Paperclip className="h-4 w-4 text-getigne-accent" />
-                  <h4 className="text-sm font-semibold text-getigne-900 uppercase tracking-wide">
+                  <Paperclip className="h-4 w-4 text-brand" />
+                  <h4 className="text-sm font-semibold text-brand-900 uppercase tracking-wide">
                     Fichiers attachés
                   </h4>
                 </div>
@@ -226,14 +226,14 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
                   {filesToRender.map((fileMeta, index) => (
                     <div
                       key={index}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-getigne-accent/30 bg-getigne-accent/10 px-4 py-3"
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-brand/30 bg-brand/10 px-4 py-3"
                     >
-                      <span className="text-sm font-medium text-getigne-900 truncate">
+                      <span className="text-sm font-medium text-brand-900 truncate">
                         {fileMeta.label}
                       </span>
                       <Button
                         size="sm"
-                        className="bg-getigne-accent text-white hover:bg-getigne-accent/90"
+                        className="bg-brand text-brand-fg hover:bg-brand/90"
                         onClick={(e) => {
                           e.stopPropagation();
                           downloadFile(fileMeta.url);
@@ -257,7 +257,7 @@ export default function ProgramPointCard({ point, programItemId, icon }: Program
 
             {/* Commentaires affichés seulement en mode ouvert pour limiter le coût */}
             {showContent && (
-              <div className="mt-4 pt-4 border-t border-getigne-100">
+              <div className="mt-4 pt-4 border-t border-brand-100">
                 <Comments 
                   programItemId={programItemId} 
                   programPointId={point.id}

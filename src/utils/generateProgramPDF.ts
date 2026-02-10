@@ -583,7 +583,7 @@ export async function generateProgramPDF(
         const gradientSteps = 200; // Beaucoup plus de bandes pour un gradient très lisse
         for (let i = 0; i < gradientSteps; i++) {
           const ratio = i / (gradientSteps - 1);
-          // Couleur principale: getigne-accent (#34b190 = RGB 52, 177, 144)
+          // Couleur principale: brand (#34b190 = RGB 52, 177, 144)
           // Couleur secondaire: cyan-500 (#06b6d4 = RGB 6, 182, 212)
           const r = Math.round(52 + (6 - 52) * ratio);
           const g = Math.round(177 + (182 - 177) * ratio);
@@ -623,7 +623,7 @@ export async function generateProgramPDF(
       
       // Contenu de la présentation générale avec formatage préservé
       pdf.setFontSize(10);
-      pdf.setTextColor(31, 41, 55); // Couleur getigne-800 approximative
+      pdf.setTextColor(31, 41, 55); // Couleur brand-800 approximative
       const contentStartY = currentY;
       currentY = addFormattedTextWithPagination(pdf, programGeneral.content || '', {
         fontSize: 10,
@@ -657,7 +657,7 @@ export async function generateProgramPDF(
 
     // Titre de la table des matières
     pdf.setFontSize(18);
-    pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+    pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
     pdf.setFont('helvetica', 'bold');
     currentY = addTextWithPagination(pdf, 'Table des matières', {
       fontSize: 18,
@@ -757,7 +757,7 @@ export async function generateProgramPDF(
       checkPageBreak(30);
       
       pdf.setFontSize(20);
-      pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+      pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
       pdf.setFont('helvetica', 'bold');
       currentY = addTextWithPagination(pdf, 'Trois projets phares pour l\'avenir', {
         fontSize: 20,
@@ -787,7 +787,7 @@ export async function generateProgramPDF(
         pdf.text(`${i + 1}.`, marginLeft, currentY + 5);
         
         pdf.setFontSize(16);
-        pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+        pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
         pdf.setFont('helvetica', 'bold');
         const titleLines = pdf.splitTextToSize(project.title, pageWidth - marginLeft - marginRight - 15);
         pdf.text(titleLines, marginLeft + 12, currentY + 5);
@@ -836,7 +836,7 @@ export async function generateProgramPDF(
         if (project.timeline && project.timeline.length > 0) {
           checkPageBreak(30);
           pdf.setFontSize(12);
-          pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+          pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
           pdf.setFont('helvetica', 'bold');
           currentY = addTextWithPagination(pdf, project.timeline_horizon || 'Calendrier', {
             fontSize: 12,
@@ -885,7 +885,7 @@ export async function generateProgramPDF(
     // Sections avec points
     checkPageBreak(30);
     pdf.setFontSize(20);
-    pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+    pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
     pdf.setFont('helvetica', 'bold');
     const measuresTitle = shouldDisplayCounter 
       ? `Nos ${validatedPointsCount} mesures pour Gétigné`
@@ -952,7 +952,7 @@ export async function generateProgramPDF(
       // Titre de section
       checkPageBreak(20);
       pdf.setFontSize(16);
-      pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+      pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
       pdf.setFont('helvetica', 'bold');
       currentY = addTextWithPagination(pdf, item.title, {
         fontSize: 16,
@@ -986,7 +986,7 @@ export async function generateProgramPDF(
       if (validatedPoints.length > 0) {
         checkPageBreak(20);
         pdf.setFontSize(12);
-        pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+        pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
         pdf.setFont('helvetica', 'bold');
         currentY = addTextWithPagination(pdf, 'Points du programme', {
           fontSize: 12,
@@ -1092,7 +1092,7 @@ export async function generateProgramPDF(
 
       // Titre de la section Annexes
       pdf.setFontSize(20);
-      pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - getigne-accent
+      pdf.setTextColor(52, 177, 144); // rgba(52, 177, 144, 0.9) - brand
       pdf.setFont('helvetica', 'bold');
       currentY = addTextWithPagination(pdf, 'Annexes - Fichiers joints', {
         fontSize: 20,
@@ -1158,7 +1158,7 @@ export async function generateProgramPDF(
         pdf.setPage(entry.page);
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(52, 177, 144); // Couleur getigne-accent pour les numéros de page
+        pdf.setTextColor(52, 177, 144); // Couleur brand pour les numéros de page
         // Ajouter le numéro de page à droite de la ligne, aligné à droite
         const pageNumberText = String(entry.pageNumber);
         const pageNumberX = pageWidth - marginRight;

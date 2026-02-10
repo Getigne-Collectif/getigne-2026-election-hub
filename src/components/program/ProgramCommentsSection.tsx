@@ -27,14 +27,14 @@ const ProgramCommentsSection: React.FC<ProgramCommentsSectionProps> = ({ program
   }, [programItemId, programPointId]);
   
   if (loading) {
-    return <div className="mt-12 border-t border-getigne-100 pt-8">Chargement des commentaires...</div>;
+    return <div className="mt-12 border-t border-brand-100 pt-8">Chargement des commentaires...</div>;
   }
   
   if (!commentsEnabled) {
     return (
-      <div className="mt-12 border-t border-getigne-100 pt-8">
+      <div className="mt-12 border-t border-brand-100 pt-8">
         <h3 className="text-2xl font-bold mb-6">Commentaires</h3>
-        <div className="text-center py-6 bg-getigne-50 rounded-lg">
+        <div className="text-center py-6 bg-brand-50 rounded-lg">
           Les commentaires sont désactivés pour cette section.
         </div>
       </div>

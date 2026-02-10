@@ -49,7 +49,7 @@ function FAQItemsByCategory({ faqId }: { faqId: string }) {
   if (isLoadingCategories) {
     return (
       <div className="text-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-getigne-accent mx-auto" />
+        <Loader2 className="h-6 w-6 animate-spin text-brand mx-auto" />
         <p className="text-sm text-muted-foreground mt-2">Chargement des catégories...</p>
       </div>
     );
@@ -164,7 +164,7 @@ export default function FAQEditDialog({
         
         {isLoading ? (
           <div className="text-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-getigne-accent mx-auto" />
+            <Loader2 className="h-8 w-8 animate-spin text-brand mx-auto" />
             <p className="text-sm text-muted-foreground mt-2">Chargement de la FAQ...</p>
           </div>
         ) : (

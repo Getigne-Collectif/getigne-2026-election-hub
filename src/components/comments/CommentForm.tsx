@@ -241,14 +241,14 @@ const CommentForm: React.FC<CommentFormProps> = ({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={parentCommentId ? 3 : 4}
-          className="w-full p-3 border rounded-md focus:ring-getigne-accent focus:border-getigne-accent"
+          className="w-full p-3 border rounded-md focus:ring-brand focus:border-brand"
         />
       </div>
       <div className="flex gap-2">
         <Button 
           type="submit" 
           disabled={submitting}
-          className="bg-getigne-accent hover:bg-getigne-accent/90"
+          className="bg-brand hover:bg-brand/90 text-brand-fg"
         >
           {submitting ? (
             <>

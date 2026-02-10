@@ -80,8 +80,8 @@ const UnassignedMemberItem = ({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-              <span className="text-lg text-getigne-400">
+            <div className="w-full h-full flex items-center justify-center bg-brand-100">
+              <span className="text-lg text-brand-400">
                 {member.name.charAt(0)}
               </span>
             </div>
@@ -93,7 +93,7 @@ const UnassignedMemberItem = ({
             <div className="mt-1">
               <Badge
                 variant="outline"
-                className="text-[10px] text-getigne-600 border-getigne-200 rounded-[4px]"
+                className="text-[10px] text-brand-600 border-brand-200 rounded-[4px]"
               >
                 {member.profession}
               </Badge>

@@ -442,7 +442,7 @@ const NeighborhoodKitPage = () => {
           <div className="flex-grow flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-getigne-700">Chargement de l'événement...</p>
+              <p className="text-brand-700">Chargement de l'événement...</p>
             </div>
           </div>
           <Footer />
@@ -489,7 +489,7 @@ const NeighborhoodKitPage = () => {
         
         <main className="pt-20">
           {/* En-tête avec breadcrumb et hero coloré */}
-          <section className="relative bg-gradient-to-br from-cyan-50 via-blue-50 to-getigne-50 py-8 overflow-hidden">
+          <section className="relative bg-gradient-to-br from-cyan-50 via-blue-50 to-brand-50 py-8 overflow-hidden">
             {/* Éléments décoratifs */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-200/20 rounded-full -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-200/20 rounded-full translate-y-1/2 -translate-x-1/2"></div>
@@ -540,23 +540,23 @@ const NeighborhoodKitPage = () => {
                     Guide pratique
                   </div>
                   
-                  <h1 className="text-5xl font-bold text-getigne-900 leading-tight">
+                  <h1 className="text-5xl font-bold text-brand-900 leading-tight">
                     Kit d'organisation de votre <br/>
                     <span className="text-amber-600"> Café de Quartier</span>
                   </h1>
                   
                   <div className="bg-gradient-to-r from-cyan-100 to-blue-100 rounded-xl p-6 border border-cyan-200">
-                    <p className="text-lg text-getigne-700 leading-relaxed mb-4">
+                    <p className="text-lg text-brand-700 leading-relaxed mb-4">
                       <span className="font-semibold text-cyan-800">Un grand merci à vous, {event.organizer_name || 'organisateur·rice'} !</span>
                     </p>
-                    <p className="text-getigne-700 leading-relaxed">
+                    <p className="text-brand-700 leading-relaxed">
                       Merci d'avoir accepté d'organiser un Café de Quartier dans votre quartier ou votre village. 
                       Grâce à des personnes comme vous, nous créons du lien, partageons des idées et renforçons 
                       la convivialité entre voisins.
                     </p>
                   </div>
                   
-                  <p className="text-xl text-getigne-700 leading-relaxed">
+                  <p className="text-xl text-brand-700 leading-relaxed">
                     Ce kit est là pour vous guider <span className="font-semibold text-emerald-700">pas à pas</span> et rendre 
                     l'organisation aussi simple et agréable que possible.
                   </p>
@@ -571,7 +571,7 @@ const NeighborhoodKitPage = () => {
                       <Download className="w-5 h-5 mr-2" />
                       Télécharger votre flyer personnalisé
                     </Button>
-                    <div className="text-sm text-getigne-600 flex items-center">
+                    <div className="text-sm text-brand-600 flex items-center">
                       <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
                       Prêt à imprimer • Format A5 • QR code inclus
                     </div>
@@ -588,10 +588,10 @@ const NeighborhoodKitPage = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                     <div className="absolute bottom-4 left-4 right-4">
                       <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
-                        <p className="text-sm font-medium text-getigne-900">
+                        <p className="text-sm font-medium text-brand-900">
                           ☕ Prêt à créer du lien dans votre quartier ?
                         </p>
-                        <p className="text-xs text-getigne-600 mt-1">
+                        <p className="text-xs text-brand-600 mt-1">
                           Suivez le guide pour organiser votre rencontre
                         </p>
                       </div>
@@ -611,10 +611,10 @@ const NeighborhoodKitPage = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-getigne-900 mb-4">
+                  <h2 className="text-3xl font-bold text-brand-900 mb-4">
                     Checklist pour organiser votre Café de Quartier
                   </h2>
-                  <p className="text-lg text-getigne-700 max-w-3xl mx-auto">
+                  <p className="text-lg text-brand-700 max-w-3xl mx-auto">
                     Suivez ces étapes dans l'ordre pour préparer au mieux votre rencontre de voisinage.
                   </p>
                 </div>
@@ -653,7 +653,7 @@ const NeighborhoodKitPage = () => {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <CardDescription className="text-getigne-700 leading-relaxed">
+                          <CardDescription className="text-brand-700 leading-relaxed">
                             {item.description}
                           </CardDescription>
                           
@@ -691,10 +691,10 @@ const NeighborhoodKitPage = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-getigne-900 mb-4">
+                  <h2 className="text-3xl font-bold text-brand-900 mb-4">
                     Déroulé de l'événement
                   </h2>
-                  <p className="text-lg text-getigne-700 max-w-3xl mx-auto">
+                  <p className="text-lg text-brand-700 max-w-3xl mx-auto">
                     Une proposition de déroulé testée et approuvée pour un événement réussi.
                   </p>
                 </div>
@@ -713,7 +713,7 @@ const NeighborhoodKitPage = () => {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-xl font-semibold text-getigne-900">
+                                <h3 className="text-xl font-semibold text-brand-900">
                                   {phase.phase}
                                 </h3>
                                 <Badge variant="secondary" className="text-sm">
@@ -721,7 +721,7 @@ const NeighborhoodKitPage = () => {
                                   {phase.duration}
                                 </Badge>
                               </div>
-                              <p className="text-getigne-700 leading-relaxed">
+                              <p className="text-brand-700 leading-relaxed">
                                 {phase.description}
                               </p>
                             </div>
@@ -740,10 +740,10 @@ const NeighborhoodKitPage = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-getigne-900 mb-4">
+                  <h2 className="text-3xl font-bold text-brand-900 mb-4">
                     Conseils pour organiser votre Café de quartier
                   </h2>
-                  <p className="text-lg text-getigne-700">
+                  <p className="text-lg text-brand-700">
                     Quelques astuces pour que tout se passe bien.
                   </p>
                 </div>
@@ -754,8 +754,8 @@ const NeighborhoodKitPage = () => {
                       <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Heart className="w-8 h-8 text-blue-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">Rassurez-vous</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">Rassurez-vous</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         <strong>Vous n'êtes pas seul·e</strong>. Une personne de Gétigné Collectif sera présente pour vous accompagner. Votre rôle est avant tout d'accueillir les gens.
                       </p>
                     </CardContent>
@@ -766,8 +766,8 @@ const NeighborhoodKitPage = () => {
                       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <MessageCircle className="w-8 h-8 text-green-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">Soyez à l'écoute</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">Soyez à l'écoute</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         Laissez la parole circuler et encouragez chacun·e à s'exprimer, à partager ses idées et ses besoins.
                       </p>
                     </CardContent>
@@ -778,8 +778,8 @@ const NeighborhoodKitPage = () => {
                       <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <FileText className="w-8 h-8 text-purple-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">Prévoyez un carnet</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">Prévoyez un carnet</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         Pour noter les idées, les questions et les contacts des personnes intéressées.
                       </p>
                     </CardContent>
@@ -794,10 +794,10 @@ const NeighborhoodKitPage = () => {
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-getigne-900 mb-4">
+                  <h2 className="text-3xl font-bold text-brand-900 mb-4">
                     Supports de communication
                   </h2>
-                  <p className="text-lg text-getigne-700 max-w-3xl mx-auto">
+                  <p className="text-lg text-brand-700 max-w-3xl mx-auto">
                     Téléchargez votre flyer prêt à imprimer avec toutes vos informations, plus des messages pour les réseaux sociaux.
                   </p>
                 </div>
@@ -856,7 +856,7 @@ const NeighborhoodKitPage = () => {
                         <div className="mt-6 bg-gray-50 rounded-lg p-6 font-mono text-sm leading-relaxed">
                           <div className="space-y-4">
                             <div className="text-center">
-                              <h3 className="text-xl font-bold text-getigne-900 mb-2">
+                              <h3 className="text-xl font-bold text-brand-900 mb-2">
                                 Café de Quartier - {event.location || '[Nom du Quartier/Village]'}
                               </h3>
                             </div>
@@ -876,7 +876,7 @@ const NeighborhoodKitPage = () => {
                             </div>
 
                             <div className="text-center py-2">
-                              <p className="font-semibold text-getigne-800">
+                              <p className="font-semibold text-brand-800">
                                 Venez partager un moment convivial entre voisins !
                               </p>
                             </div>
@@ -1009,10 +1009,10 @@ Au plaisir de vous y retrouver ! 😊
                     <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
                       <UserCheck className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-2xl font-bold text-getigne-900 mb-4">
+                    <h2 className="text-2xl font-bold text-brand-900 mb-4">
                       Rappel : Une personne du collectif sera présente
                     </h2>
-                    <p className="text-lg text-getigne-700 leading-relaxed mb-6">
+                    <p className="text-lg text-brand-700 leading-relaxed mb-6">
                       Un·e membre du collectif viendra pour vous aider à animer votre événement, 
                       répondre aux questions et présenter nos actions. 
                       <span className="font-semibold text-emerald-800">Vous n'êtes pas seul·e !</span>
@@ -1060,10 +1060,10 @@ Au plaisir de vous y retrouver ! 😊
             <div className="container mx-auto px-4">
               <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-getigne-900 mb-4">
+                  <h2 className="text-3xl font-bold text-brand-900 mb-4">
                     Après l'événement
                   </h2>
-                  <p className="text-lg text-getigne-700 max-w-3xl mx-auto">
+                  <p className="text-lg text-brand-700 max-w-3xl mx-auto">
                     Quelques étapes pour prolonger l'impact de votre rencontre
                   </p>
                 </div>
@@ -1074,8 +1074,8 @@ Au plaisir de vous y retrouver ! 😊
                       <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <FileText className="w-8 h-8 text-blue-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">Faites un retour</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">Faites un retour</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         Notez les idées, les questions et les contacts recueillis.
                       </p>
                     </CardContent>
@@ -1086,8 +1086,8 @@ Au plaisir de vous y retrouver ! 😊
                       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <MessageCircle className="w-8 h-8 text-green-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">Partagez vos impressions</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">Partagez vos impressions</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         Envoyez-nous un petit mail ou un message pour nous dire comment ça s'est passé.
                       </p>
                     </CardContent>
@@ -1098,8 +1098,8 @@ Au plaisir de vous y retrouver ! 😊
                       <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Calendar className="w-8 h-8 text-purple-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">Prévoyez la suite</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">Prévoyez la suite</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         Si l'envie est là, rejoignez-nous sur nos prochains événements !
                       </p>
                     </CardContent>
@@ -1110,17 +1110,17 @@ Au plaisir de vous y retrouver ! 😊
           </section>
 
           {/* Message de remerciement final */}
-          <section className="py-16 bg-gradient-to-br from-cyan-100 via-blue-100 to-getigne-50">
+          <section className="py-16 bg-gradient-to-br from-cyan-100 via-blue-100 to-brand-50">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-cyan-200">
                   <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Heart className="w-10 h-10 text-white" />
                   </div>
-                  <h2 className="text-3xl font-bold text-getigne-900 mb-4">
+                  <h2 className="text-3xl font-bold text-brand-900 mb-4">
                     Merci encore pour votre engagement
                   </h2>
-                  <p className="text-xl text-getigne-700 leading-relaxed mb-6">
+                  <p className="text-xl text-brand-700 leading-relaxed mb-6">
                     et <span className="font-semibold text-cyan-800">bon Café de Quartier</span> !
                   </p>
                 </div>

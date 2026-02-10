@@ -22,7 +22,7 @@ const ElectoralListDisplay = ({ positions }: ElectoralListDisplayProps) => {
           <div className="mb-16">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-2">Liste des titulaires</h2>
-              <p className="text-getigne-700">
+              <p className="text-brand-700">
                 Les 27 candidat·es titulaires au conseil municipal
               </p>
             </div>
@@ -43,7 +43,7 @@ const ElectoralListDisplay = ({ positions }: ElectoralListDisplayProps) => {
           <div>
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-2">Remplaçant·es</h2>
-              <p className="text-getigne-700">
+              <p className="text-brand-700">
                 Les 2 candidat·es remplaçant·es
               </p>
             </div>
@@ -61,7 +61,7 @@ const ElectoralListDisplay = ({ positions }: ElectoralListDisplayProps) => {
 
         {titularPositions.length === 0 && substitutePositions.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-getigne-700 text-lg">
+            <p className="text-brand-700 text-lg">
               La liste sera bientôt disponible.
             </p>
           </div>

@@ -53,7 +53,7 @@ const TeamMember = ({ member, index }) => {
   return (
     <div 
       ref={ref}
-      className={`bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift ${
+      className={`bg-white rounded-xl overflow-hidden shadow-sm border border-brand-100 hover-lift ${
         isVisible 
           ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
           : 'opacity-0 translate-y-10'
@@ -69,7 +69,7 @@ const TeamMember = ({ member, index }) => {
       </div>
       <div className="p-6">
         <h3 className="font-medium text-xl mb-2">{member.name}</h3>
-        <div className="text-getigne-700 text-sm">
+        <div className="text-brand-700 text-sm">
           {metaParts.length > 0 ? metaParts.join(' · ') : 'Âge et profession non renseignés'}
         </div>
       </div>
@@ -105,7 +105,7 @@ const Team = () => {
 
   if (loading) {
     return (
-      <section id="equipe" className="py-24 px-4 bg-getigne-50">
+      <section id="equipe" className="py-24 px-4 bg-brand-50">
         <div className="container mx-auto">
           <div className="text-center">Chargement des membres de l'équipe...</div>
         </div>
@@ -115,7 +115,7 @@ const Team = () => {
 
   if (error) {
     return (
-      <section id="equipe" className="py-24 px-4 bg-getigne-50">
+      <section id="equipe" className="py-24 px-4 bg-brand-50">
         <div className="container mx-auto">
           <div className="text-center text-red-500">Une erreur est survenue: {error}</div>
         </div>
@@ -124,14 +124,14 @@ const Team = () => {
   }
 
   return (
-    <section id="equipe" className="py-24 px-4 bg-getigne-50">
+    <section id="equipe" className="py-24 px-4 bg-brand-50">
       <div className="container mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+          <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
             Notre équipe
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Les membres du collectif</h2>
-          <p className="text-getigne-700 text-lg">
+          <p className="text-brand-700 text-lg">
             Découvrez les personnes engagées qui portent le projet pour les élections municipales de 2026.
           </p>
         </div>
@@ -145,7 +145,7 @@ const Team = () => {
         <div className="mt-12 text-center">
           <Button 
             asChild
-            className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+            className="bg-brand text-brand-fg rounded-md hover:bg-brand/90"
           >
             <Link to="/qui-sommes-nous">
               En savoir plus sur le collectif

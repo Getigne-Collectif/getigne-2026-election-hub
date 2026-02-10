@@ -256,7 +256,7 @@ const render = (status: Status) => {
       return (
         <div className="bg-gray-100 rounded-lg h-96 flex items-center justify-center">
           <div className="text-center text-gray-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-getigne-accent mx-auto mb-2"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto mb-2"></div>
             <p>Chargement de la carte...</p>
           </div>
         </div>
@@ -530,7 +530,7 @@ const ElectoralListAnalysis = ({ positions, onOpenEditModal, onUpdateMemberCoord
   const stats = calculateStats();
 
   const COLORS = [
-    '#d97706', // getigne-accent
+    '#d97706', // brand
     '#059669', // green
     '#2563eb', // blue
     '#dc2626', // red
@@ -636,7 +636,7 @@ const ElectoralListAnalysis = ({ positions, onOpenEditModal, onUpdateMemberCoord
                           </span>
                         ))}
                       </div>
-                      <div className="text-xs text-getigne-accent">
+                      <div className="text-xs text-brand">
                         Cliquer pour modifier →
                       </div>
                     </div>
@@ -700,7 +700,7 @@ const ElectoralListAnalysis = ({ positions, onOpenEditModal, onUpdateMemberCoord
             <div>
               <div className="text-sm text-muted-foreground mb-2">Âge moyen</div>
               {stats.averageAge !== null ? (
-                <div className="text-3xl font-bold text-getigne-accent">
+                <div className="text-3xl font-bold text-brand">
                   {stats.averageAge} ans
                 </div>
               ) : (

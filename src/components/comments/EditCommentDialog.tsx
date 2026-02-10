@@ -102,7 +102,7 @@ const EditCommentDialog: React.FC<EditCommentDialogProps> = ({
             <Button
               type="submit"
               disabled={submitting || !content.trim()}
-              className="bg-getigne-accent hover:bg-getigne-accent/90"
+              className="bg-brand hover:bg-brand/90 text-brand-fg"
             >
               {submitting ? (
                 <>

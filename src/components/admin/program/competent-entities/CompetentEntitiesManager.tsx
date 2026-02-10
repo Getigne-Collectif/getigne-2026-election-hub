@@ -272,7 +272,7 @@ export default function CompetentEntitiesManager() {
                 <TableRow key={entity.id}>
                   <TableCell>
                     {entity.logo_url ? (
-                      <div className="h-10 w-10 overflow-hidden rounded-full border border-getigne-100 bg-white">
+                      <div className="h-10 w-10 overflow-hidden rounded-full border border-brand-100 bg-white">
                         <img
                           src={entity.logo_url}
                           alt={entity.name}
@@ -283,7 +283,7 @@ export default function CompetentEntitiesManager() {
                         />
                       </div>
                     ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-getigne-200 text-getigne-400">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-brand-200 text-brand-400">
                         <ImageIcon className="h-5 w-5" />
                       </div>
                     )}
@@ -315,7 +315,7 @@ export default function CompetentEntitiesManager() {
             </TableBody>
           </Table>
         ) : (
-          <div className="rounded-lg border border-dashed border-getigne-200 bg-getigne-50/40 p-8 text-center text-sm text-muted-foreground">
+          <div className="rounded-lg border border-dashed border-brand-200 bg-brand-50/40 p-8 text-center text-sm text-muted-foreground">
             Aucune instance compétente enregistrée pour le moment.
           </div>
         )}
@@ -361,7 +361,7 @@ export default function CompetentEntitiesManager() {
               {(selectedEntity?.logo_url || formState.file) && (
                 <div className="flex items-center gap-4">
                   {formState.file ? (
-                    <div className="h-12 w-12 overflow-hidden rounded-full border border-getigne-100 bg-white">
+                    <div className="h-12 w-12 overflow-hidden rounded-full border border-brand-100 bg-white">
                       <img
                         src={URL.createObjectURL(formState.file)}
                         alt="Aperçu du nouveau logo"
@@ -369,7 +369,7 @@ export default function CompetentEntitiesManager() {
                       />
                     </div>
                   ) : selectedEntity?.logo_url ? (
-                    <div className="h-12 w-12 overflow-hidden rounded-full border border-getigne-100 bg-white">
+                    <div className="h-12 w-12 overflow-hidden rounded-full border border-brand-100 bg-white">
                       <img
                         src={selectedEntity.logo_url}
                         alt={`Logo actuel de ${selectedEntity.name}`}

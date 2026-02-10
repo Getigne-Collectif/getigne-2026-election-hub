@@ -191,7 +191,7 @@ export default function FlagshipProjectsManager() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-getigne-accent" />
+                <Sparkles className="h-5 w-5 text-brand" />
                 Projets phares
               </CardTitle>
               <CardDescription>
@@ -249,7 +249,7 @@ export default function FlagshipProjectsManager() {
                                       <Badge variant="secondary" className="text-xs">
                                         #{index + 1}
                                       </Badge>
-                                      <h3 className="text-xl font-bold text-getigne-900">
+                                      <h3 className="text-xl font-bold text-brand-900">
                                         {project.title}
                                       </h3>
                                     </div>

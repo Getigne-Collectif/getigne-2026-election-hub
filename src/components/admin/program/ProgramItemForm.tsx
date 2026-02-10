@@ -172,7 +172,7 @@ export default function ProgramItemForm({
               <FormLabel>Image de la section</FormLabel>
               <div className="space-y-4">
                 {imagePreview && (
-                  <div className="w-full h-40 relative rounded-md overflow-hidden border border-getigne-200">
+                  <div className="w-full h-40 relative rounded-md overflow-hidden border border-brand-200">
                     <img 
                       src={imagePreview} 
                       alt="Aperçu" 

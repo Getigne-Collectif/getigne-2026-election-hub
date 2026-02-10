@@ -25,27 +25,21 @@
     --ring: 159 54% 45%; /* Changé pour #34b190 */
     --radius: 0.5rem;
 
-    --getigne-50: 150 33% 97%;
-    --getigne-100: 150 33% 93%;
-    --getigne-200: 150 33% 83%;
-    --getigne-300: 150 33% 73%;
-    --getigne-400: 150 33% 63%;
-    --getigne-500: 150 33% 53%;
-    --getigne-600: 150 33% 43%;
-    --getigne-700: 150 33% 33%;
-    --getigne-800: 150 33% 23%;
-    --getigne-900: 150 33% 13%;
-    --getigne-950: 150 33% 6.5%;
-
-    --getigne-accent: 159 54% 45%; /* Changé pour #34b190 */
-    --getigne-accent-light: 159 54% 55%;
-    --getigne-accent-darker: 159 54% 35%;
-
     --site-dominant: #34b190;
+    --site-dominant-fg: #ffffff;
+    --site-dominant-darker: 159 54% 33%;
+    --site-dominant-light: 159 54% 55%;
+    --site-dominant-gradient-end: #06b6d4;
     --site-accent: #34b190;
+    --site-accent-fg: #ffffff;
     --site-proximity: #f97316;
+    --site-proximity-fg: #ffffff;
     --site-trust: #2563eb;
+    --site-trust-fg: #ffffff;
     --site-danger: #dc2626;
+    --site-danger-fg: #ffffff;
+    --site-footer: #1d1d1f;
+    --site-footer-fg: #ffffff;
   }
 
   .dark {

@@ -24,8 +24,8 @@ import {
 // Map committee names to colors
 const committeeColors = {
   "Environnement": "border-primary",
-  "Mobilité": "border-getigne-accent",
-  "Solidarité": "border-getigne-700",
+  "Mobilité": "border-brand",
+  "Solidarité": "border-brand-700",
   "Culture": "border-[#9b87f5]",
   "Économie": "border-[#0EA5E9]",
   "Éducation": "border-[#F97316]",
@@ -81,7 +81,7 @@ const EventCard = ({ event, index }) => {
             .single();
 
           if (!error && data) {
-            const color = committeeColors[data.title] || "border-getigne-100";
+            const color = committeeColors[data.title] || "border-brand-100";
             setCommitteeColor(color);
             setCommitteeData(data);
 
@@ -113,7 +113,7 @@ const EventCard = ({ event, index }) => {
     });
   };
 
-  const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
+  const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-brand-100";
   const IconComponent = committeeIcon || Users;
   
   // Utiliser le slug s'il existe, sinon utiliser l'ID
@@ -140,7 +140,7 @@ const EventCard = ({ event, index }) => {
         <div className="p-6">
           <div className="flex flex-wrap gap-2 mb-3">
             {committeeData && (
-              <div className={`flex items-center text-sm px-3 py-1 rounded-full ${committeeColor ? committeeColor.replace('border', 'bg').replace('getigne', 'getigne') : 'bg-getigne-50'} text-getigne-700`}>
+              <div className={`flex items-center text-sm px-3 py-1 rounded-full ${committeeColor ? committeeColor.replace('border', 'bg') : 'bg-brand-50'} text-brand-700`}>
                 <IconComponent size={14} className="mr-1" />
                 <span>Commission {committeeData.title}</span>
               </div>
@@ -149,35 +149,35 @@ const EventCard = ({ event, index }) => {
 
           <h3 className="font-medium text-xl mb-4">{event.title}</h3>
 
-          <div className="flex items-center gap-2 text-getigne-700 mb-2">
-            <Calendar size={16} className="text-getigne-accent" />
+          <div className="flex items-center gap-2 text-brand-700 mb-2">
+            <Calendar size={16} className="text-brand" />
             <span>{formatDate(event.date)}</span>
           </div>
-          <div className="flex items-center gap-2 text-getigne-700 mb-2">
-            <Clock size={16} className="text-getigne-accent" />
+          <div className="flex items-center gap-2 text-brand-700 mb-2">
+            <Clock size={16} className="text-brand" />
             <span>{formatTime(event.date)}</span>
           </div>
-          <div className="flex items-center gap-2 text-getigne-700 mb-4">
-            <MapPin size={16} className="text-getigne-accent" />
+          <div className="flex items-center gap-2 text-brand-700 mb-4">
+            <MapPin size={16} className="text-brand" />
             <span>{event.location}</span>
           </div>
 
           <div className="flex flex-wrap gap-2 mb-4">
             {event.is_members_only && (
-              <div className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-xs inline-flex items-center">
+              <div className="bg-brand-50 text-brand-700 px-3 py-1 rounded-full text-xs inline-flex items-center">
                 <Users size={12} className="mr-1" />
                 Réservé aux adhérents
               </div>
             )}
             {event.event_type === 'neighborhood' && (
-              <div className="bg-getigne-accent/10 text-getigne-accent px-3 py-1 rounded-full text-xs inline-flex items-center">
+              <div className="bg-brand/10 text-brand px-3 py-1 rounded-full text-xs inline-flex items-center">
                 <Coffee size={12} className="mr-1" />
                 Café de quartier
               </div>
             )}
           </div>
 
-          <div className="text-getigne-accent flex items-center text-sm font-medium group mt-4">
+          <div className="text-brand flex items-center text-sm font-medium group mt-4">
             En savoir plus
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
           </div>
@@ -265,7 +265,7 @@ const AgendaPage = () => {
 
         <div>
           {/* Header */}
-          <div className="pt-24 pb-12 bg-getigne-50">
+          <div className="pt-24 pb-12 bg-brand-50">
             <div className="container mx-auto px-4">
               <Breadcrumb>
                 <BreadcrumbList>
@@ -282,11 +282,11 @@ const AgendaPage = () => {
               </Breadcrumb>
               <div className="max-w-3xl mx-auto text-center">
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                  <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+                  <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
                     Agenda
                   </span>
                   <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Nos prochains événements</h1>
-                  <p className="text-getigne-700 text-lg mb-6">
+                  <p className="text-brand-700 text-lg mb-6">
                     Retrouvez toutes nos réunions publiques, ateliers participatifs et moments d'échanges
                     pour construire ensemble l'avenir de Gétigné.
                   </p>
@@ -301,15 +301,15 @@ const AgendaPage = () => {
             </div>
 
             {/* Filter section */}
-            <div className="border-t border-getigne-100 pt-8">
+            <div className="border-t border-brand-100 pt-8">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
                   <Card>
                     <CardContent className="p-6">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex items-center space-x-4">
-                          <Filter className="w-5 h-5 text-getigne-700" />
-                          <span className="font-medium text-getigne-900">Filtres</span>
+                          <Filter className="w-5 h-5 text-brand-700" />
+                          <span className="font-medium text-brand-900">Filtres</span>
                         </div>
                         <div className="flex items-center space-x-6">
                           <div className="flex items-center space-x-2">
@@ -322,7 +322,7 @@ const AgendaPage = () => {
                               htmlFor="neighborhood-events"
                               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex items-center"
                             >
-                              <Coffee className="w-4 h-4 mr-1 text-getigne-accent" />
+                              <Coffee className="w-4 h-4 mr-1 text-brand" />
                               Voir les cafés de quartier
                             </label>
                           </div>
@@ -356,18 +356,18 @@ const AgendaPage = () => {
                     ))}
                   </div>
                 ) : !showNeighborhoodEvents ? (
-                  <div className="text-center py-8 bg-getigne-50 rounded-lg">
+                  <div className="text-center py-8 bg-brand-50 rounded-lg">
                     <h3 className="text-xl font-medium mb-2">Aucun événement à venir</h3>
-                    <p className="text-getigne-700 mb-4">Revenez bientôt pour découvrir nos futurs événements</p>
-                    <p className="text-sm text-getigne-600">
+                    <p className="text-brand-700 mb-4">Revenez bientôt pour découvrir nos futurs événements</p>
+                    <p className="text-sm text-brand-600">
                       💡 Cochez "Voir les cafés de quartier" pour découvrir les rencontres de voisinage
                     </p>
                   </div>
                 ) : (
-                  <div className="text-center py-8 bg-getigne-50 rounded-lg">
-                    <Coffee className="w-12 h-12 mx-auto mb-4 text-getigne-300" />
+                  <div className="text-center py-8 bg-brand-50 rounded-lg">
+                    <Coffee className="w-12 h-12 mx-auto mb-4 text-brand-300" />
                     <h3 className="text-xl font-medium mb-2">Aucun Café de quartier à venir</h3>
-                    <p className="text-getigne-700 mb-4">
+                    <p className="text-brand-700 mb-4">
                       Les prochaines rencontres de voisinage seront bientôt programmées
                     </p>
                     <Button asChild variant="outline">
@@ -384,11 +384,11 @@ const AgendaPage = () => {
             {!loading && !error && filteredPastEvents.length > 0 && (
               <div className="mt-24">
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                  <span className="bg-getigne-700/10 text-getigne-700 font-medium px-4 py-1 rounded-full text-sm">
+                  <span className="bg-brand-700/10 text-brand-700 font-medium px-4 py-1 rounded-full text-sm">
                     Historique
                   </span>
                   <h2 className="text-3xl font-bold mt-4 mb-6">Événements passés</h2>
-                  <p className="text-getigne-700 text-lg">
+                  <p className="text-brand-700 text-lg">
                     Découvrez les événements que nous avons organisés récemment.
                   </p>
                 </div>

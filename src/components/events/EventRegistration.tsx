@@ -383,27 +383,27 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
 
   if (!allowRegistration) {
     return (
-      <div className="bg-getigne-50 p-4 rounded-lg mb-4">
-        <p className="text-getigne-700 text-sm">Les inscriptions sont fermées pour cet événement.</p>
+      <div className="bg-brand-50 p-4 rounded-lg mb-4">
+        <p className="text-brand-700 text-sm">Les inscriptions sont fermées pour cet événement.</p>
       </div>
     );
   }
 
   if (isPastEvent) {
     return (
-      <div className="bg-getigne-50 p-4 rounded-lg mb-4">
-        <p className="text-getigne-700 text-sm">Cet événement est déjà passé.</p>
+      <div className="bg-brand-50 p-4 rounded-lg mb-4">
+        <p className="text-brand-700 text-sm">Cet événement est déjà passé.</p>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="bg-getigne-50 p-4 rounded-lg mb-4">
-        <p className="text-getigne-700 mb-3">Connectez-vous pour vous inscrire à cet événement</p>
+      <div className="bg-brand-50 p-4 rounded-lg mb-4">
+        <p className="text-brand-700 mb-3">Connectez-vous pour vous inscrire à cet événement</p>
         <Button 
           asChild
-          className="bg-getigne-accent hover:bg-getigne-accent/90"
+          className="bg-brand hover:bg-brand/90 text-brand-fg"
         >
           <Link to="/auth">Se connecter / S'inscrire</Link>
         </Button>
@@ -413,10 +413,10 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
 
   if (isMembersOnly && !isMember) {
     return (
-      <div className="border border-getigne-100 p-4 rounded-lg mb-6">
+      <div className="border border-brand-100 p-4 rounded-lg mb-6">
         <div className="flex justify-between items-center mb-2">
           <h3 className="font-medium">Inscription à l'événement</h3>
-          <div className="text-getigne-500 text-sm flex items-center">
+          <div className="text-brand-500 text-sm flex items-center">
             <Users size={16} className="mr-1" />
             <span>
               {participantCount} participant{participantCount > 1 ? 's' : ''}
@@ -433,11 +433,11 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           <span>Événement réservé aux adhérents</span>
         </div>
         
-        <p className="text-getigne-700 mb-3 text-sm">Pour vous inscrire à cet événement, vous devez être adhérent de l'association.</p>
+        <p className="text-brand-700 mb-3 text-sm">Pour vous inscrire à cet événement, vous devez être adhérent de l'association.</p>
         
         <Button 
           asChild
-          className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
+          className="w-full bg-brand hover:bg-brand/90 text-brand-fg"
         >
           <Link to={Routes.JOIN}>Devenir adhérent</Link>
         </Button>
@@ -446,10 +446,10 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
   }
 
   return (
-    <div className="border border-getigne-100 p-4 rounded-lg mb-6">
+    <div className="border border-brand-100 p-4 rounded-lg mb-6">
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium">Inscription à l'événement</h3>
-        <div className="text-getigne-500 text-sm flex items-center">
+        <div className="text-brand-500 text-sm flex items-center">
           <Users size={16} className="mr-1" />
           <span>{participantCount} participant{participantCount > 1 ? 's' : ''}</span>
         </div>
@@ -463,12 +463,12 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           </div>
           
           {/* Sélecteur d'invités additionnels */}
-          <div className="mb-3 p-3 bg-getigne-50 rounded-lg">
+          <div className="mb-3 p-3 bg-brand-50 rounded-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-getigne-700">
+              <span className="text-sm font-medium text-brand-700">
                 Invités additionnels
               </span>
-              <span className="text-xs text-getigne-500">
+              <span className="text-xs text-brand-500">
                 {additionalGuests}/9
               </span>
             </div>
@@ -496,7 +496,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
               </Button>
             </div>
             {additionalGuests > 0 && (
-              <p className="text-xs text-getigne-600 mt-2 text-center">
+              <p className="text-xs text-brand-600 mt-2 text-center">
                 Vous venez avec {additionalGuests} invité{additionalGuests > 1 ? 's' : ''}
               </p>
             )}
@@ -509,7 +509,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           
           <Button 
             variant="outline" 
-            className="w-full border-getigne-200 text-getigne-700"
+            className="w-full border-brand-200 text-brand-700"
             onClick={handleUnregister}
             disabled={unregistering}
           >
@@ -527,12 +527,12 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
           ) : null}
           
           {/* Sélecteur d'invités additionnels pour l'inscription */}
-          <div className="mb-3 p-3 bg-getigne-50 rounded-lg">
+          <div className="mb-3 p-3 bg-brand-50 rounded-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-getigne-700">
+              <span className="text-sm font-medium text-brand-700">
                 Invités additionnels
               </span>
-              <span className="text-xs text-getigne-500">
+              <span className="text-xs text-brand-500">
                 {additionalGuests}/{maxGuestsAllowed}
               </span>
             </div>
@@ -574,7 +574,7 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
               </Button>
             </div>
             {additionalGuests > 0 && (
-              <p className="text-xs text-getigne-600 mt-2 text-center">
+              <p className="text-xs text-brand-600 mt-2 text-center">
                 Vous viendrez avec {additionalGuests} invité{additionalGuests > 1 ? 's' : ''}
               </p>
             )}
@@ -584,14 +584,14 @@ export const EventRegistration: React.FC<EventRegistrationProps> = ({
               </p>
             )}
             {event?.max_participants && maxGuestsAllowed > 0 && availableSpots !== null && (
-              <p className="text-xs text-getigne-500 mt-2 text-center">
+              <p className="text-xs text-brand-500 mt-2 text-center">
                 {availableSpots - additionalGuests - 1} place{availableSpots - additionalGuests - 1 > 1 ? 's' : ''} restante{availableSpots - additionalGuests - 1 > 1 ? 's' : ''} après votre inscription
               </p>
             )}
           </div>
           
           <Button 
-            className="w-full bg-getigne-accent hover:bg-getigne-accent/90"
+            className="w-full bg-brand hover:bg-brand/90 text-brand-fg"
             onClick={handleRegister}
             disabled={registering || (event?.max_participants && availableSpots !== null && availableSpots === 0)}
           >

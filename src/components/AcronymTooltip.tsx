@@ -120,7 +120,7 @@ const AcronymTooltip: React.FC<AcronymTooltipProps> = ({ entry, children }) => {
                   href={entry.external_link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-getigne-accent hover:text-getigne-accent-dark transition-colors"
+                  className="inline-flex items-center gap-1 text-sm text-brand hover:text-brand-dark transition-colors"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <span>En savoir plus</span>

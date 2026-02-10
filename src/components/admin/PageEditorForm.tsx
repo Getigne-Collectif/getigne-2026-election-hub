@@ -86,7 +86,7 @@ const PageEditorForm: React.FC<PageEditorFormProps> = ({ id }) => {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg border border-getigne-100 p-6 space-y-6 sticky top-24">
+              <div className="bg-white rounded-lg border border-brand-100 p-6 space-y-6 sticky top-24">
                 <div className="flex justify-between items-center">
                   <h3 className="font-bold text-lg">Paramètres de publication</h3>
                   <div className="flex gap-2">

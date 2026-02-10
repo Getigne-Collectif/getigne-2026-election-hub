@@ -198,7 +198,7 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
       <div className="flex flex-col space-y-2">
         {pilots.length > 0 && (
           <div>
-            <div className="text-sm text-getigne-500 mb-1">
+            <div className="text-sm text-brand-500 mb-1">
               {pilots.length > 1 ? 'Pilotes' : 'Pilote'}:
             </div>
             <div className="flex flex-wrap gap-2">
@@ -208,8 +208,8 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
                     {pilot.photo && pilot.photo !== 'placeholder.svg' ? (
                       <AvatarImage src={pilot.photo} alt={pilot.name} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-                        <User className="text-getigne-500 w-4 h-4" />
+                      <div className="w-full h-full flex items-center justify-center bg-brand-100">
+                        <User className="text-brand-500 w-4 h-4" />
                       </div>
                     )}
                   </Avatar>
@@ -220,7 +220,7 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
           </div>
         )}
         
-        <div className="text-sm text-getigne-500">
+        <div className="text-sm text-brand-500">
           {memberCount} {memberCount > 1 ? 'membres' : 'membre'} au total
         </div>
       </div>
@@ -242,18 +242,18 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {pilots.map(pilot => (
               <div key={pilot.id} className="flex flex-col items-center text-center relative">
-                <Avatar className="w-24 h-24 mb-3 border-2 border-getigne-accent">
+                <Avatar className="w-24 h-24 mb-3 border-2 border-brand">
                   {pilot.photo && pilot.photo !== 'placeholder.svg' ? (
                     <AvatarImage src={pilot.photo} alt={pilot.name} className="object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-                      <User className="text-getigne-500" />
+                    <div className="w-full h-full flex items-center justify-center bg-brand-100">
+                      <User className="text-brand-500" />
                     </div>
                   )}
                 </Avatar>
                 <div className="space-y-1">
                   <h4 className="font-medium">{pilot.name}</h4>
-                  <Badge className="bg-getigne-accent">Pilote</Badge>
+                  <Badge className="bg-brand">Pilote</Badge>
                 </div>
                 <div className="absolute top-0 right-0 flex space-x-1">
                   <Button 
@@ -289,12 +289,12 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {regularMembers.map(member => (
               <div key={member.id} className="flex flex-col items-center text-center relative">
-                <Avatar className="w-20 h-20 mb-3 border border-getigne-200">
+                <Avatar className="w-20 h-20 mb-3 border border-brand-200">
                   {member.photo && member.photo !== 'placeholder.svg' ? (
                     <AvatarImage src={member.photo} alt={member.name} className="object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-                      <User className="text-getigne-500" />
+                    <div className="w-full h-full flex items-center justify-center bg-brand-100">
+                      <User className="text-brand-500" />
                     </div>
                   )}
                 </Avatar>
@@ -327,7 +327,7 @@ const CommitteeMembers = ({ committeeId, simplified = false }: CommitteeMembersP
       )}
 
       {members.length === 0 && (
-        <div className="py-4 text-getigne-700">
+        <div className="py-4 text-brand-700">
           Aucun membre n'est encore associé à cette commission.
         </div>
       )}

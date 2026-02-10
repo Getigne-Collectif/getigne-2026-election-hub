@@ -109,16 +109,16 @@ const TeamPage = () => {
         <Navbar />
         
         {/* Hero Section */}
-        <section className="pt-32 pb-16 px-4 bg-gradient-to-br from-getigne-50 to-white">
+        <section className="pt-32 pb-16 px-4 bg-gradient-to-br from-brand-50 to-white">
           <div className="container mx-auto text-center">
-            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+            <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
               Élections municipales Mars 2026
             </span>
             <h1 className="text-5xl font-bold mt-4 mb-6">
               {electoralList?.title || 'Liste Gétigné Collectif'}
             </h1>
             {electoralList?.description && (
-              <p className="text-xl text-getigne-700 max-w-3xl mx-auto">
+              <p className="text-xl text-brand-700 max-w-3xl mx-auto">
                 {electoralList.description}
               </p>
             )}
@@ -127,7 +127,7 @@ const TeamPage = () => {
 
         {loading ? (
           <div className="flex justify-center items-center py-24">
-            <Loader2 className="h-12 w-12 animate-spin text-getigne-accent" />
+            <Loader2 className="h-12 w-12 animate-spin text-brand" />
           </div>
         ) : error ? (
           <div className="py-24 px-4">

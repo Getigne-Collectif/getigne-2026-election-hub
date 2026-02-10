@@ -34,7 +34,7 @@ const ProgramItem = ({ icon, title, description, delay, image }) => {
   return (
     <div 
       ref={ref}
-      className={`bg-white shadow-sm border border-getigne-100 rounded-xl p-6 hover-lift ${
+      className={`bg-white shadow-sm border border-brand-100 rounded-xl p-6 hover-lift ${
         isVisible 
           ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
           : 'opacity-0 translate-y-10'
@@ -42,8 +42,8 @@ const ProgramItem = ({ icon, title, description, delay, image }) => {
       style={{ transitionDelay: `${delay * 100}ms` }}
     >
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 bg-getigne-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-          {icon && <DynamicIcon name={icon} className="text-getigne-accent" size={24} />}
+        <div className="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center flex-shrink-0">
+          {icon && <DynamicIcon name={icon} className="text-brand" size={24} />}
         </div>
         <h3 className="text-lg font-medium">{title}</h3>
       </div>
@@ -63,8 +63,8 @@ const ProgramItem = ({ icon, title, description, delay, image }) => {
         </div>
       )}
       
-      <p className="text-getigne-700 mb-4">{description?.substring(0, 150) + (description?.length > 150 ? '...' : '')}</p>
-      <Link to="/objectif-2026/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
+      <p className="text-brand-700 mb-4">{description?.substring(0, 150) + (description?.length > 150 ? '...' : '')}</p>
+      <Link to="/objectif-2026/programme" className="text-brand flex items-center text-sm font-medium group">
         En savoir plus
         <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
       </Link>
@@ -124,11 +124,11 @@ const Program = () => {
     <section id="programme" className="py-24 px-4 relative overflow-hidden">
       <div className="container mx-auto relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+          <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
             Notre programme
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Des propositions concrètes pour notre commune</h2>
-          <p className="text-getigne-700 text-lg">
+          <p className="text-brand-700 text-lg">
             Découvrez nos engagements et propositions pour faire de Gétigné une commune où il fait bon vivre, 
             juste, dynamique et tournée vers l'avenir.
           </p>
@@ -148,7 +148,7 @@ const Program = () => {
         </div>
 
         <div className="flex flex-col md:flex-row gap-6 mt-10 items-center justify-center">
-          <div className="bg-getigne-50 p-6 rounded-xl flex items-center gap-4 max-w-lg w-full">
+          <div className="bg-brand-50 p-6 rounded-xl flex items-center gap-4 max-w-lg w-full">
             <img 
               src="/images/clisson-sevre-maine-aggloh.png" 
               alt="Logo de l'aggloh!" 
@@ -156,10 +156,10 @@ const Program = () => {
             />
             <div>
               <h3 className="text-lg font-medium mb-1">Gétigné au sein de l'aggloh!</h3>
-              <p className="text-getigne-700 text-sm mb-2">
+              <p className="text-brand-700 text-sm mb-2">
                 Découvrez nos propositions pour une meilleure coopération intercommunale.
               </p>
-              <Link to="/objectif-2026/programme" className="text-getigne-accent flex items-center text-sm font-medium group">
+              <Link to="/objectif-2026/programme" className="text-brand flex items-center text-sm font-medium group">
                 En savoir plus
                 <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
               </Link>
@@ -168,7 +168,7 @@ const Program = () => {
 
           <Button 
             asChild
-            className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+            className="bg-brand text-brand-fg rounded-md hover:bg-brand/90"
           >
             <Link to="/objectif-2026/programme">
               Programme complet

@@ -295,7 +295,7 @@ const AdminExternalContactFormPage = () => {
     return (
       <AdminLayout>
         <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand" />
         </div>
       </AdminLayout>
     );

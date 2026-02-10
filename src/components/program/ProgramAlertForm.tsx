@@ -94,13 +94,13 @@ const ProgramAlertForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-getigne-100 p-6">
+    <div className="bg-white rounded-lg border border-brand-100 p-6">
       <div className="flex flex-col items-center mb-4">
-        <div className="w-12 h-12 bg-getigne-accent/10 rounded-full flex items-center justify-center mb-3">
-          <Bell className="h-6 w-6 text-getigne-accent" />
+        <div className="w-12 h-12 bg-brand/10 rounded-full flex items-center justify-center mb-3">
+          <Bell className="h-6 w-6 text-brand" />
         </div>
         <h3 className="text-lg font-semibold mb-2 text-center">Soyez informé en premier !</h3>
-        <p className="text-getigne-700 text-sm text-center max-w-sm mx-auto">
+        <p className="text-brand-700 text-sm text-center max-w-sm mx-auto">
           Laissez-nous vos coordonnées et vous recevrez un email
           dès que le programme sera publié.
         </p>
@@ -118,7 +118,7 @@ const ProgramAlertForm = () => {
                   <FormControl>
                     <div className="relative">
                       <Input placeholder="Votre prénom" {...field} className="pl-9 h-10" />
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-getigne-500">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-500">
                         <BookOpen className="h-4 w-4" />
                       </div>
                     </div>
@@ -137,7 +137,7 @@ const ProgramAlertForm = () => {
                   <FormControl>
                     <div className="relative">
                       <Input placeholder="Votre nom" {...field} className="pl-9 h-10" />
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-getigne-500">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-500">
                         <BookOpen className="h-4 w-4" />
                       </div>
                     </div>
@@ -157,7 +157,7 @@ const ProgramAlertForm = () => {
                 <FormControl>
                   <div className="relative">
                     <Input placeholder="votre@email.com" type="email" {...field} className="pl-9 h-10" />
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-getigne-500">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-500">
                       <Mail className="h-4 w-4" />
                     </div>
                   </div>
@@ -182,7 +182,7 @@ const ProgramAlertForm = () => {
                   <FormLabel className="text-sm">
                     Je souhaite m'inscrire à la newsletter
                   </FormLabel>
-                  <p className="text-xs text-getigne-600">
+                  <p className="text-xs text-brand-600">
                     Recevez nos actualités et événements
                   </p>
                 </div>
@@ -190,14 +190,14 @@ const ProgramAlertForm = () => {
             )}
           />
           
-          <Button type="submit" disabled={isSubmitting} className="w-full bg-getigne-accent hover:bg-getigne-accent/90 transition-colors h-10">
+          <Button type="submit" disabled={isSubmitting} className="w-full bg-brand hover:bg-brand/90 transition-colors h-10">
             {isSubmitting ? "Inscription en cours..." : "M'inscrire"}
           </Button>
         </form>
       </Form>
 
-      <div className="mt-4 pt-4 border-t border-getigne-100 text-center">
-        <p className="text-xs text-getigne-600">
+      <div className="mt-4 pt-4 border-t border-brand-100 text-center">
+        <p className="text-xs text-brand-600">
           Vos données personnelles sont utilisées uniquement pour vous informer de la sortie du programme et vous inscrire à la newsletter si vous avez coché la case.
           Elles ne seront pas partagées avec des tiers.
         </p>

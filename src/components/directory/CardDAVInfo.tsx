@@ -31,10 +31,10 @@ const CardDAVInfo = () => {
   };
   
   return (
-    <Card className="border-getigne-200">
+    <Card className="border-brand-200">
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Link2 className="h-5 w-5 text-getigne-600" />
+          <Link2 className="h-5 w-5 text-brand-600" />
           <CardTitle>Synchronisation CardDAV</CardTitle>
         </div>
         <CardDescription>
@@ -73,11 +73,11 @@ const CardDAVInfo = () => {
           </div>
         </div>
         
-        <div className="rounded-lg bg-getigne-50 p-4 space-y-2">
-          <h4 className="text-sm font-semibold text-getigne-900">
+        <div className="rounded-lg bg-brand-50 p-4 space-y-2">
+          <h4 className="text-sm font-semibold text-brand-900">
             Compatibilité future
           </h4>
-          <ul className="text-sm text-getigne-700 space-y-1 list-disc list-inside">
+          <ul className="text-sm text-brand-700 space-y-1 list-disc list-inside">
             <li>Apple Contacts (macOS, iOS)</li>
             <li>Thunderbird</li>
             <li>Evolution</li>

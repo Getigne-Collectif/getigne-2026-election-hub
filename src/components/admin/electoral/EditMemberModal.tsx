@@ -620,7 +620,7 @@ const EditMemberModal = ({
                     <Upload className="mx-auto h-12 w-12 text-gray-400" />
                     <div className="mt-4">
                       <Label htmlFor="image-upload" className="cursor-pointer">
-                        <span className="text-getigne-accent hover:text-getigne-accent/80">
+                        <span className="text-brand hover:text-brand/80">
                           Télécharger une image
                         </span>
                         <Input
@@ -639,7 +639,7 @@ const EditMemberModal = ({
                 )}
                 {uploading && (
                   <div className="mt-4 flex items-center justify-center">
-                    <Loader2 className="h-5 w-5 animate-spin text-getigne-accent mr-2" />
+                    <Loader2 className="h-5 w-5 animate-spin text-brand mr-2" />
                     <span className="text-sm">Téléchargement en cours...</span>
                   </div>
                 )}
@@ -663,7 +663,7 @@ const EditMemberModal = ({
                     key={role.id}
                     className={`p-4 rounded-lg border-2 transition-colors cursor-pointer ${
                       isSelected
-                        ? 'border-getigne-accent bg-getigne-50'
+                        ? 'border-brand bg-brand-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                     onClick={() => toggleRole(role.id)}

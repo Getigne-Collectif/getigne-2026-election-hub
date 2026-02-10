@@ -149,7 +149,7 @@ const ExternalGroupsAdminSection = ({ showHeader = true }: ExternalGroupsAdminSe
 
       {loading ? (
         <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand" />
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

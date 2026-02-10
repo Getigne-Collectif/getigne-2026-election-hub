@@ -447,7 +447,7 @@ const AdminDashboardPage = () => {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center">
-                        <Users className="h-5 w-5 mr-2 text-getigne-accent" />
+                        <Users className="h-5 w-5 mr-2 text-brand" />
                         Derniers utilisateurs
                       </CardTitle>
                       <Button variant="outline" size="sm" asChild>
@@ -494,7 +494,7 @@ const AdminDashboardPage = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <MessageSquare className="h-5 w-5 mr-2 text-getigne-accent" />
+                      <MessageSquare className="h-5 w-5 mr-2 text-brand" />
                       Derniers commentaires
                     </CardTitle>
                     <CardDescription>
@@ -595,7 +595,7 @@ const AdminDashboardPage = () => {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center">
-                        <Calendar className="h-5 w-5 mr-2 text-getigne-accent" />
+                        <Calendar className="h-5 w-5 mr-2 text-brand" />
                         Prochains événements
                       </CardTitle>
                       <div className="flex gap-2">
@@ -663,7 +663,7 @@ const AdminDashboardPage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center">
-                          <TrendingUp className="h-5 w-5 mr-2 text-getigne-accent" />
+                          <TrendingUp className="h-5 w-5 mr-2 text-brand" />
                           Activité du site
                         </CardTitle>
                         <CardDescription className="mt-1">

@@ -28,7 +28,7 @@ export default function CommentCountBadge({
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      {showIcon && <MessageSquare className="w-4 h-4 text-getigne-accent" />}
+      {showIcon && <MessageSquare className="w-4 h-4 text-brand" />}
       <span className="text-sm text-gray-500">
         {totalCount} {totalCount === 1 ? 'message' : 'messages'}
       </span>

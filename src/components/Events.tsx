@@ -9,8 +9,8 @@ import NeighborhoodEventsMap from '@/components/maps/NeighborhoodEventsMap';
 // Map committee names to colors
 const committeeColors = {
   "Environnement": "border-primary",
-  "Mobilité": "border-getigne-accent",
-  "Solidarité": "border-getigne-700",
+  "Mobilité": "border-brand",
+  "Solidarité": "border-brand-700",
   "Culture": "border-[#9b87f5]",
   "Économie": "border-[#0EA5E9]",
   "Éducation": "border-[#F97316]",
@@ -67,7 +67,7 @@ const EventCard = ({ event, index }) => {
             .single();
             
           if (!error && data) {
-            const color = committeeColors[data.title] || "border-getigne-100";
+            const color = committeeColors[data.title] || "border-brand-100";
             setCommitteeColor(color);
             setCommitteeData(data);
             
@@ -99,7 +99,7 @@ const EventCard = ({ event, index }) => {
     });
   };
 
-  const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-getigne-100";
+  const borderClass = committeeColor ? `border-2 ${committeeColor}` : "border border-brand-100";
 
   const IconComponent = committeeIcon || Users;
   
@@ -127,34 +127,34 @@ const EventCard = ({ event, index }) => {
         <div className="p-6">
           <div className="flex flex-wrap gap-3 mb-3">
             {committeeData && (
-              <div className={`flex items-center text-sm px-3 py-1 rounded-full ${committeeColor ? committeeColor.replace('border', 'bg').replace('getigne', 'getigne') : 'bg-getigne-50'} text-getigne-700`}>
+              <div className={`flex items-center text-sm px-3 py-1 rounded-full ${committeeColor ? committeeColor.replace('border', 'bg') : 'bg-brand-50'} text-brand-700`}>
                 <IconComponent size={14} className="mr-1" />
                 <span>Commission {committeeData.title}</span>
               </div>
             )}
-            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+            <div className="flex items-center text-brand-500 text-sm bg-brand-50 px-3 py-1 rounded-full">
               <Calendar size={14} className="mr-1" />
               <time>{formatDate(event.date)}</time>
             </div>
-            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+            <div className="flex items-center text-brand-500 text-sm bg-brand-50 px-3 py-1 rounded-full">
               <Clock size={14} className="mr-1" />
               <span>{formatTime(event.date)}</span>
             </div>
-            <div className="flex items-center text-getigne-500 text-sm bg-getigne-50 px-3 py-1 rounded-full">
+            <div className="flex items-center text-brand-500 text-sm bg-brand-50 px-3 py-1 rounded-full">
               <MapPin size={14} className="mr-1" />
               <span>{event.location}</span>
             </div>
             {event.is_members_only && (
-              <div className="flex items-center text-white text-sm bg-getigne-700 px-3 py-1 rounded-full">
+              <div className="flex items-center text-white text-sm bg-brand-700 px-3 py-1 rounded-full">
                 <Users size={14} className="mr-1" />
                 <span>Adhérents</span>
               </div>
             )}
           </div>
           <h3 className="font-medium text-xl mb-2">{event.title}</h3>
-          <p className="text-getigne-700 mb-4">{event.description}</p>
+          <p className="text-brand-700 mb-4">{event.description}</p>
           <div 
-            className="text-getigne-accent flex items-center text-sm font-medium group"
+            className="text-brand flex items-center text-sm font-medium group"
           >
             En savoir plus
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
@@ -236,11 +236,11 @@ const Events = () => {
     <section id="evenements" className="py-24 px-4">
       <div className="container mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+          <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
             Agenda
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Nos prochains événements</h2>
-          <p className="text-getigne-700 text-lg">
+          <p className="text-brand-700 text-lg">
             Participez à nos réunions, ateliers et moments d'échanges pour contribuer à notre projet collectif.
           </p>
         </div>
@@ -249,10 +249,10 @@ const Events = () => {
           {/* Événements réguliers */}
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-getigne-900">Événements</h3>
+              <h3 className="text-2xl font-semibold text-brand-900">Événements</h3>
               <Link 
                 to={Routes.AGENDA}
-                className="text-getigne-accent hover:text-getigne-accent/80 transition-colors text-sm font-medium inline-flex items-center"
+                className="text-brand hover:text-brand/80 transition-colors text-sm font-medium inline-flex items-center"
               >
                 Voir tout
                 <ArrowUpRight className="ml-1 h-4 w-4" />
@@ -265,9 +265,9 @@ const Events = () => {
                   <EventCard key={event.id} event={event} index={index} />
                 ))
               ) : (
-                <div className="text-center py-8 bg-getigne-50 rounded-lg">
-                  <Calendar className="mx-auto h-12 w-12 text-getigne-300 mb-4" />
-                  <p className="text-getigne-600">Aucun événement à venir</p>
+                <div className="text-center py-8 bg-brand-50 rounded-lg">
+                  <Calendar className="mx-auto h-12 w-12 text-brand-300 mb-4" />
+                  <p className="text-brand-600">Aucun événement à venir</p>
                 </div>
               )}
             </div>
@@ -276,16 +276,16 @@ const Events = () => {
           {/* Cafés de quartier */}
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-getigne-900 flex items-center">
-                <Coffee className="mr-2 h-6 w-6 text-getigne-accent" />
+              <h3 className="text-2xl font-semibold text-brand-900 flex items-center">
+                <Coffee className="mr-2 h-6 w-6 text-brand" />
                 Cafés de quartier
               </h3>
             </div>
             
             <div className="space-y-6">
               {loading ? (
-                <div className="bg-getigne-50 rounded-lg h-80 flex items-center justify-center">
-                  <p className="text-getigne-600">Chargement de la carte...</p>
+                <div className="bg-brand-50 rounded-lg h-80 flex items-center justify-center">
+                  <p className="text-brand-600">Chargement de la carte...</p>
                 </div>
               ) : neighborhoodEvents.length > 0 ? (
                 <>
@@ -313,8 +313,8 @@ const Events = () => {
                     <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                       <Coffee className="w-8 h-8 text-amber-600" />
                     </div>
-                    <h4 className="text-lg font-semibold text-getigne-900 mb-2">Aucun Café de quartier programmé</h4>
-                    <p className="text-getigne-600 mb-4">Soyez le premier à organiser une rencontre conviviale !</p>
+                    <h4 className="text-lg font-semibold text-brand-900 mb-2">Aucun Café de quartier programmé</h4>
+                    <p className="text-brand-600 mb-4">Soyez le premier à organiser une rencontre conviviale !</p>
                     <Link 
                       to="/contact?type=organizer&subject=Je%20souhaite%20organiser%20un%20caf%C3%A9%20de%20quartier%20chez%20moi"
                       className="inline-flex items-center bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"

@@ -14,16 +14,16 @@ const ContactPage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 bg-gradient-to-br from-getigne-50 to-getigne-100">
+      <section className="pt-32 pb-16 px-4 bg-gradient-to-br from-brand-50 to-brand-100">
         <div className="container mx-auto text-center">
           <Badge variant="secondary" className="mb-4 px-4 py-2 text-sm">
             <MessageCircle className="w-4 h-4 mr-2" />
             Contact & Support
           </Badge>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-getigne-900">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-brand-900">
             Contactez-nous
           </h1>
-          <p className="text-lg md:text-xl text-getigne-700 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-brand-700 max-w-3xl mx-auto leading-relaxed">
             <span className="hidden md:inline">Vous avez des questions, des suggestions ou souhaitez rejoindre notre collectif ? Nous sommes là pour vous écouter et vous accompagner.</span>
             <span className="md:hidden">Questions, suggestions ou envie de nous rejoindre ? Nous sommes là pour vous.</span>
           </p>
@@ -37,9 +37,9 @@ const ContactPage = () => {
             
             {/* Informations de contact */}
             <div className="lg:col-span-1 space-y-6 hidden lg:block">
-              <Card className="border-getigne-200 shadow-sm">
+              <Card className="border-brand-200 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center text-getigne-900">
+                  <CardTitle className="flex items-center text-brand-900">
                     <Users className="w-5 h-5 mr-2 text-primary" />
                     Qui sommes-nous ?
                   </CardTitle>
@@ -53,12 +53,12 @@ const ContactPage = () => {
                       <Heart className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-getigne-900">Gétigné Collectif</h4>
-                      <p className="text-sm text-getigne-600">Association citoyenne engagée</p>
+                      <h4 className="font-medium text-brand-900">Gétigné Collectif</h4>
+                      <p className="text-sm text-brand-600">Association citoyenne engagée</p>
                     </div>
                   </div>
                   <Separator />
-                  <p className="text-sm text-getigne-700">
+                  <p className="text-sm text-brand-700">
                     Notre équipe de bénévoles est disponible pour répondre à vos questions 
                     et vous accompagner dans vos projets citoyens.
                   </p>
@@ -72,13 +72,13 @@ const ContactPage = () => {
             <div className="lg:col-span-2 lg:col-start-2">
 
             <div className="flex flex-col items-center justify-center mb-8">
-              <h2 className="text-center text-xl md:text-2xl text-getigne-900 font-bold">Envoyez-nous un message</h2>
+              <h2 className="text-center text-xl md:text-2xl text-brand-900 font-bold">Envoyez-nous un message</h2>
               <div className="text-sm md:text-base">
                 <span className="hidden md:inline">Remplissez le formulaire ci-dessous et nous vous répondrons rapidement</span>
                 <span className="md:hidden">Remplissez le formulaire et nous vous répondrons rapidement</span>
               </div>
             </div>
-              <Card className="border-getigne-200 shadow-sm">
+              <Card className="border-brand-200 shadow-sm">
                 <CardHeader className="text-center p-4 md:p-6">
                   <CardTitle >
                     

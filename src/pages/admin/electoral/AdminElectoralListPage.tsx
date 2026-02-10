@@ -908,7 +908,7 @@ const AdminElectoralListPage = () => {
 
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+              <Loader2 className="h-8 w-8 animate-spin text-brand" />
             </div>
           ) : (
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
@@ -950,7 +950,7 @@ const AdminElectoralListPage = () => {
 
                   <DragOverlay>
                     {activeId && (
-                      <div className="bg-white border-2 border-getigne-accent rounded-lg p-4 shadow-lg">
+                      <div className="bg-white border-2 border-brand rounded-lg p-4 shadow-lg">
                         <div className="text-sm font-medium">Déplacement...</div>
                       </div>
                     )}

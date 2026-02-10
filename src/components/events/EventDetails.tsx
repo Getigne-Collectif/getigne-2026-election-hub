@@ -55,33 +55,33 @@ const EventDetails: React.FC<EventDetailsProps> = ({
         <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
         
         <div className="space-y-3 mb-6">
-          <div className="flex items-center text-getigne-700">
-            <Calendar className="mr-3 h-5 w-5 text-getigne-accent" />
+          <div className="flex items-center text-brand-700">
+            <Calendar className="mr-3 h-5 w-5 text-brand" />
             <span>{formattedDate}</span>
           </div>
-          <div className="flex items-center text-getigne-700">
-            <Clock className="mr-3 h-5 w-5 text-getigne-accent" />
+          <div className="flex items-center text-brand-700">
+            <Clock className="mr-3 h-5 w-5 text-brand" />
             <span>{formattedTime}</span>
           </div>
-          <div className="flex items-center text-getigne-700">
-            <MapPin className="mr-3 h-5 w-5 text-getigne-accent" />
+          <div className="flex items-center text-brand-700">
+            <MapPin className="mr-3 h-5 w-5 text-brand" />
             <span>{event.location}</span>
           </div>
           {event.committee && (
-            <div className="flex items-center text-getigne-700">
-              <Users className="mr-3 h-5 w-5 text-getigne-accent" />
+            <div className="flex items-center text-brand-700">
+              <Users className="mr-3 h-5 w-5 text-brand" />
               <span>{event.committee}</span>
             </div>
           )}
           {event.max_participants && (
-            <div className="flex items-center text-getigne-700">
-              <Users className="mr-3 h-5 w-5 text-getigne-accent" />
+            <div className="flex items-center text-brand-700">
+              <Users className="mr-3 h-5 w-5 text-brand" />
               <span>Maximum {event.max_participants} participants</span>
             </div>
           )}
           {event.organizer_name && (
-            <div className="flex items-center text-getigne-700">
-              <Users className="mr-3 h-5 w-5 text-getigne-accent" />
+            <div className="flex items-center text-brand-700">
+              <Users className="mr-3 h-5 w-5 text-brand" />
               <span>Organisé par {event.organizer_name}</span>
             </div>
           )}
@@ -90,7 +90,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
         {/* Event type badge for neighborhood events */}
         {event.event_type === 'neighborhood' && (
           <div className="mb-6">
-            <div className="inline-flex items-center bg-getigne-accent/10 text-getigne-accent px-4 py-2 rounded-full text-sm font-medium">
+            <div className="inline-flex items-center bg-brand/10 text-brand px-4 py-2 rounded-full text-sm font-medium">
               <Coffee className="mr-2 h-4 w-4" />
               Café de quartier
             </div>

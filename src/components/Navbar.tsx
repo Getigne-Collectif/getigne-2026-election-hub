@@ -85,8 +85,8 @@ const Navbar = () => {
 
   const isActive = (path: string) => {
     return location.pathname === path
-      ? 'text-getigne-accent'
-      : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200';
+      ? 'text-brand'
+      : 'text-brand-700 hover:text-brand transition-colors duration-200';
   };
 
   useEffect(() => {
@@ -117,8 +117,8 @@ const Navbar = () => {
             to={Routes.PROGRAM}
             className={
               isActive(Routes.PROGRAM)
-                ? 'text-getigne-accent'
-                : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
+                ? 'text-brand'
+                : 'text-brand-700 group-hover:text-brand transition-colors duration-200'
             }
           >
             Le programme
@@ -139,8 +139,8 @@ const Navbar = () => {
               <button 
                 className={`flex items-center ${
                   location.pathname === Routes.AGENDA || location.pathname === Routes.NEIGHBORHOOD_EVENTS 
-                    ? 'text-getigne-accent' 
-                    : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200'
+                    ? 'text-brand' 
+                    : 'text-brand-700 hover:text-brand transition-colors duration-200'
                 }`}
               >
                 Agenda
@@ -272,11 +272,11 @@ const Navbar = () => {
   };
 
   const SupportButton = ({ className = "" }: { className?: string }) => (
-    <Button asChild className={`bg-getigne-accent hover:bg-getigne-accent/90 text-white shadow-sm transition-all hover:scale-105 active:scale-95 relative ${className}`}>
+    <Button asChild className={`bg-brand hover:bg-brand/90 text-brand-fg shadow-sm transition-all hover:scale-105 active:scale-95 relative ${className}`}>
       <Link to={Routes.JOIN} className="flex items-center gap-2">
         <span>Je soutiens</span>
         {settings.modules.supportCommittee && supportersCount !== null && supportersCount > 0 && (
-          <Badge variant="secondary" className="ml-1 bg-white text-getigne-accent hover:bg-white px-1.5 py-0 min-w-[1.2rem] h-5 flex items-center justify-center rounded-full text-[10px] font-bold border-none">
+          <Badge variant="secondary" className="ml-1 bg-white text-brand hover:bg-white px-1.5 py-0 min-w-[1.2rem] h-5 flex items-center justify-center rounded-full text-[10px] font-bold border-none">
             {supportersCount}
           </Badge>
         )}

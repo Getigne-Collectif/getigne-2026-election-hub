@@ -399,16 +399,16 @@ const NewsPage = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <div className="pt-24 pb-10 bg-getigne-50">
+      <div className="pt-24 pb-10 bg-brand-50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-8">
             <h1 className="text-4xl font-bold mb-4">Actualités</h1>
-            <p className="text-lg text-getigne-700">
+            <p className="text-lg text-brand-700">
               Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-getigne-100">
+          <div className="flex flex-wrap gap-4 items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-brand-100">
             <form onSubmit={handleSearch} className="flex-1 min-w-[280px]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
@@ -448,7 +448,7 @@ const NewsPage = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-1">
-              <div className="bg-getigne-50 p-6 rounded-lg sticky top-24 text-center">
+              <div className="bg-brand-50 p-6 rounded-lg sticky top-24 text-center">
                 <h2 className="font-bold text-lg mb-4">Catégories</h2>
                 <Tabs
                   value={selectedCategory}
@@ -459,7 +459,7 @@ const NewsPage = () => {
                   <TabsList className="flex flex-col h-auto w-full bg-transparent space-y-1">
                     <TabsTrigger
                       value="all"
-                      className="justify-start data-[state=active]:bg-getigne-accent data-[state=active]:text-white"
+                      className="justify-start data-[state=active]:bg-brand data-[state=active]:text-brand-fg"
                     >
                       Toutes les catégories
                     </TabsTrigger>
@@ -467,7 +467,7 @@ const NewsPage = () => {
                       <TabsTrigger
                         key={category.id}
                         value={category.id}
-                        className="justify-start data-[state=active]:bg-getigne-accent data-[state=active]:text-white"
+                        className="justify-start data-[state=active]:bg-brand data-[state=active]:text-brand-fg"
                       >
                         {category.name}
                       </TabsTrigger>
@@ -501,7 +501,7 @@ const NewsPage = () => {
               ) : newsArticles.length === 0 ? (
                 <div className="text-center py-12">
                   <h3 className="text-xl font-medium mb-2">Aucun résultat trouvé</h3>
-                  <p className="text-getigne-700 mb-4">
+                  <p className="text-brand-700 mb-4">
                     Aucun article ne correspond à vos critères de recherche.
                   </p>
                   <Button variant="outline" onClick={handleClearFilters}>

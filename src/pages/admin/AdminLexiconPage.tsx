@@ -155,7 +155,7 @@ const AdminLexiconPage = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="w-8 h-8 animate-spin text-getigne-accent" />
+          <Loader2 className="w-8 h-8 animate-spin text-brand" />
         </div>
       </AdminLayout>
     );
@@ -203,7 +203,7 @@ const AdminLexiconPage = () => {
 
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-getigne-accent" />
+                <Loader2 className="w-8 h-8 animate-spin text-brand" />
               </div>
             ) : filteredEntries.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
@@ -251,7 +251,7 @@ const AdminLexiconPage = () => {
                               href={entry.external_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-getigne-accent hover:underline"
+                              className="inline-flex items-center gap-1 text-brand hover:underline"
                             >
                               <ExternalLink size={14} />
                             </a>

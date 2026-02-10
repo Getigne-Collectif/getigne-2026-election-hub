@@ -263,10 +263,10 @@ const CommitteeWorkModal = ({
                     {files.map((file, index) => (
                       <div 
                         key={file.id || index} 
-                        className="flex items-center justify-between p-3 border border-getigne-200 rounded-lg"
+                        className="flex items-center justify-between p-3 border border-brand-200 rounded-lg"
                       >
                         <div className="flex items-center gap-2">
-                          <File className="h-4 w-4 text-getigne-500" />
+                          <File className="h-4 w-4 text-brand-500" />
                           <span>{file.name}</span>
                         </div>
                         <Button 
@@ -292,7 +292,7 @@ const CommitteeWorkModal = ({
                   />
                   <label 
                     htmlFor="file-upload" 
-                    className={`cursor-pointer flex items-center px-4 py-2 border border-dashed border-getigne-300 rounded-md ${isUploading ? 'opacity-50' : 'hover:bg-getigne-50'}`}
+                    className={`cursor-pointer flex items-center px-4 py-2 border border-dashed border-brand-300 rounded-md ${isUploading ? 'opacity-50' : 'hover:bg-brand-50'}`}
                   >
                     {isUploading ? (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -371,7 +371,7 @@ const CommitteeWorkModal = ({
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl">{work.title}</DialogTitle>
-            <DialogDescription className="flex items-center mt-2 text-getigne-500">
+            <DialogDescription className="flex items-center mt-2 text-brand-500">
               <Calendar size={16} className="mr-1" />
               <time>{formatDate(work.date)}</time>
             </DialogDescription>
@@ -409,13 +409,13 @@ const CommitteeWorkModal = ({
                       href={file.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center p-3 border border-getigne-100 rounded-lg hover:bg-getigne-50 transition-colors"
+                      className="flex items-center p-3 border border-brand-100 rounded-lg hover:bg-brand-50 transition-colors"
                     >
-                      <File className="h-5 w-5 mr-2 text-getigne-500" />
-                      <div className="text-getigne-700">
+                      <File className="h-5 w-5 mr-2 text-brand-500" />
+                      <div className="text-brand-700">
                         <div className="font-medium">{file.name}</div>
                         {file.size && (
-                          <div className="text-sm text-getigne-500">
+                          <div className="text-sm text-brand-500">
                             {Math.round(file.size / 1024)} Ko
                           </div>
                         )}

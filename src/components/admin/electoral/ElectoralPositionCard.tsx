@@ -90,7 +90,7 @@ const ElectoralPositionCard = ({
       <div ref={setDroppableRef} className="h-full min-h-[480px]">
         <Card
           className={`h-full flex items-center justify-center transition-colors ${
-            isOver ? 'border-getigne-accent border-2 bg-green-100' : 'border-dashed'
+            isOver ? 'border-brand border-2 bg-green-100' : 'border-dashed'
           }`}
         >
           <CardContent className="p-4 flex flex-col items-center justify-center text-center">
@@ -196,7 +196,7 @@ const ElectoralPositionCard = ({
           <div className="relative">
             <div className="absolute top-2 left-2 z-10">
               <Badge className={`text-lg font-bold px-3 py-1 ${
-                isPreviewMode ? 'bg-blue-500 text-white' : 'bg-getigne-accent text-white'
+                isPreviewMode ? 'bg-blue-500 text-white' : 'bg-brand text-brand-fg'
               }`}>
                 {position.position}
               </Badge>

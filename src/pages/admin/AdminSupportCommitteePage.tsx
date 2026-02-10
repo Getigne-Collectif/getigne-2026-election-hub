@@ -87,7 +87,7 @@ const AdminSupportCommitteePage = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <User className="h-5 w-5 text-getigne-accent" />
+              <User className="h-5 w-5 text-brand" />
               {supporters.length} {supporters.length > 1 ? 'signataires' : 'signataire'}
             </h2>
           </div>

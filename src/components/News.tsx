@@ -51,7 +51,7 @@ const NewsCard = ({ article, index }) => {
     <Link to={articleUrl} className="block h-full">
       <article 
         ref={ref}
-        className={`bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift h-full ${
+        className={`bg-white rounded-xl overflow-hidden shadow-sm border border-brand-100 hover-lift h-full ${
           isVisible 
             ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out' 
             : 'opacity-0 translate-y-10'
@@ -66,12 +66,12 @@ const NewsCard = ({ article, index }) => {
           />
         </div>
         <div className="p-6">
-          <div className="flex items-center text-getigne-500 text-sm mb-3">
+          <div className="flex items-center text-brand-500 text-sm mb-3">
             <Calendar size={14} className="mr-1" />
             <time>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
           </div>
           <h3 className="font-medium text-xl mb-2">{article.title}</h3>
-          <div className="text-getigne-accent flex items-center text-sm font-medium group">
+          <div className="text-brand flex items-center text-sm font-medium group">
             Lire la suite
             <ChevronRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
           </div>
@@ -149,7 +149,7 @@ const News = ({ limit, showPagination = false }) => {
 
   if (loading) {
     return (
-      <section id="actualites" className="py-12 px-4 bg-getigne-50">
+      <section id="actualites" className="py-12 px-4 bg-brand-50">
         <div className="container mx-auto">
           <div className="text-center">Chargement des actualités...</div>
         </div>
@@ -159,14 +159,14 @@ const News = ({ limit, showPagination = false }) => {
 
   if (error) {
     return (
-      <section id="actualites" className="py-12 px-4 bg-getigne-50">
+      <section id="actualites" className="py-12 px-4 bg-brand-50">
         <div className="container mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+            <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
               Actualités
             </span>
             <h2 className="text-4xl font-bold mt-4 mb-6">Dernières nouvelles du collectif</h2>
-            <p className="text-getigne-700 text-lg">
+            <p className="text-brand-700 text-lg">
               Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
             </p>
           </div>
@@ -174,7 +174,7 @@ const News = ({ limit, showPagination = false }) => {
             <p className="text-red-500 mb-4">Nous n'avons pas pu charger les dernières actualités.</p>
             <Button 
               onClick={() => window.location.reload()}
-              className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+              className="bg-brand text-brand-fg rounded-md hover:bg-brand/90"
             >
               Réessayer
             </Button>
@@ -186,14 +186,14 @@ const News = ({ limit, showPagination = false }) => {
 
   if (newsArticles.length === 0) {
     return (
-      <section id="actualites" className="py-24 px-4 bg-getigne-50">
+      <section id="actualites" className="py-24 px-4 bg-brand-50">
         <div className="container mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+            <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
               Actualités
             </span>
             <h2 className="text-4xl font-bold mt-4 mb-6">Dernières nouvelles du collectif</h2>
-            <p className="text-getigne-700 text-lg">
+            <p className="text-brand-700 text-lg">
               Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
             </p>
           </div>
@@ -201,7 +201,7 @@ const News = ({ limit, showPagination = false }) => {
             <p className="mb-4">Aucune actualité disponible pour le moment.</p>
             <Button 
               asChild
-              className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+              className="bg-brand text-brand-fg rounded-md hover:bg-brand/90"
             >
               <Link to={Routes.NEWS}>
                 Voir toutes nos actualités
@@ -304,14 +304,14 @@ const News = ({ limit, showPagination = false }) => {
   }
 
   return (
-    <section id="actualites" className="py-24 px-4 bg-getigne-50">
+    <section id="actualites" className="py-24 px-4 bg-brand-50">
       <div className="container mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+          <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
             Actualités
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Dernières nouvelles du collectif</h2>
-          <p className="text-getigne-700 text-lg">
+          <p className="text-brand-700 text-lg">
             Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
           </p>
         </div>
@@ -335,7 +335,7 @@ const News = ({ limit, showPagination = false }) => {
         <div className="mt-12 text-center">
           <Button 
             asChild
-            className="bg-getigne-accent text-white rounded-md hover:bg-getigne-accent/90"
+            className="bg-brand text-brand-fg rounded-md hover:bg-brand/90"
           >
             <Link to={Routes.NEWS}>
               Toutes nos actualités

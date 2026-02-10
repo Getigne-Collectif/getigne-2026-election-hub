@@ -72,11 +72,11 @@ const CommentModeration: React.FC<CommentModerationProps> = ({ comments, onModer
               <TableRow key={comment.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8 bg-getigne-100">
+                    <Avatar className="h-8 w-8 bg-brand-100">
                       {comment.profiles?.avatar_url ? (
                         <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
                       ) : null}
-                      <AvatarFallback className="text-getigne-700">
+                      <AvatarFallback className="text-brand-700">
                         {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
                       </AvatarFallback>
                     </Avatar>
@@ -150,7 +150,7 @@ const CommentModeration: React.FC<CommentModerationProps> = ({ comments, onModer
           })
         ) : (
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-4 text-getigne-500">
+            <TableCell colSpan={5} className="text-center py-4 text-brand-500">
               Aucun commentaire à modérer
             </TableCell>
           </TableRow>

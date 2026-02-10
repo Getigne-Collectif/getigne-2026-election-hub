@@ -583,14 +583,14 @@ export default function FlagshipProjectForm({
                 {filePreview && (
                   <div className="p-4 border rounded-lg bg-gray-50 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <FileDown className="h-5 w-5 text-getigne-accent" />
+                      <FileDown className="h-5 w-5 text-brand" />
                       <div>
                         <p className="font-medium">{form.getValues('fileLabel') || 'Fichier téléchargé'}</p>
                         <a
                           href={filePreview}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-getigne-accent hover:underline"
+                          className="text-sm text-brand hover:underline"
                         >
                           Voir le fichier
                         </a>

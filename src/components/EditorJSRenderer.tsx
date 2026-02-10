@@ -270,7 +270,7 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
 
       case 'quote':
         return (
-          <blockquote key={index} className="border-l-4 border-getigne-accent pl-4 py-2 mb-4 italic bg-gray-50">
+          <blockquote key={index} className="border-l-4 border-brand pl-4 py-2 mb-4 italic bg-gray-50">
             <p className="text-gray-700 mb-2">
               {parseAcronyms(block.data.text)}
             </p>
@@ -378,7 +378,7 @@ const EditorJSRenderer: React.FC<EditorJSRendererProps> = ({ data, className = '
                 />
               )}
               <div>
-                <h4 className="font-bold text-getigne-accent hover:underline">
+                <h4 className="font-bold text-brand hover:underline">
                   {parseAcronyms(block.data.meta?.title || block.data.link)}
                 </h4>
                 {block.data.meta?.description && (
@@ -591,7 +591,7 @@ const ProgramLinkCard: React.FC<ProgramLinkCardProps> = ({ targetType, targetId,
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-getigne-accent/10 to-cyan-500/10 border-2 border-getigne-accent/20 rounded-xl mb-4">
+      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-brand/10 to-brand-gradient-end/10 border-2 border-brand/20 rounded-xl mb-4">
         <div className="w-16 h-16 bg-gray-200 rounded-lg animate-pulse flex-shrink-0"></div>
         <div className="flex-1">
           <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse mb-2"></div>
@@ -607,10 +607,10 @@ const ProgramLinkCard: React.FC<ProgramLinkCardProps> = ({ targetType, targetId,
   return (
     <div 
       onClick={handleNavigate}
-      className="flex items-center gap-4 p-4 bg-gradient-to-r from-getigne-accent/10 via-cyan-500/10 to-getigne-accent/10 border-2 border-getigne-accent/30 rounded-xl mb-4 hover:border-getigne-accent/50 hover:shadow-lg transition-all group cursor-pointer"
+      className="flex items-center gap-4 p-4 bg-gradient-to-r from-brand/10 via-brand-darker/10 to-brand/10 border-2 border-brand/30 rounded-xl mb-4 hover:border-brand/50 hover:shadow-lg transition-all group cursor-pointer"
     >
       {/* Image ou icône */}
-      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-getigne-accent to-cyan-500 flex items-center justify-center shadow-md">
+      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-brand to-brand-gradient-end flex items-center justify-center shadow-md">
         {(targetType === 'flagship' || targetType === 'event' || targetType === 'article') && imageUrl ? (
           <img 
             src={imageUrl} 
@@ -634,10 +634,10 @@ const ProgramLinkCard: React.FC<ProgramLinkCardProps> = ({ targetType, targetId,
 
       {/* Contenu */}
       <div className="flex-1 min-w-0">
-        <div className="text-xs font-semibold text-getigne-accent uppercase mb-1 tracking-wide">
+        <div className="text-xs font-semibold text-brand uppercase mb-1 tracking-wide">
           Voir aussi
         </div>
-        <div className="font-bold text-gray-900 text-base leading-tight group-hover:text-getigne-accent transition-colors">
+        <div className="font-bold text-gray-900 text-base leading-tight group-hover:text-brand transition-colors">
           {title || 'Point de programme'}
         </div>
       </div>
@@ -649,7 +649,7 @@ const ProgramLinkCard: React.FC<ProgramLinkCardProps> = ({ targetType, targetId,
           e.stopPropagation();
           handleNavigate();
         }}
-        className="flex-shrink-0 bg-gradient-to-r from-getigne-accent to-cyan-500 text-white hover:from-getigne-accent/90 hover:to-cyan-500/90 shadow-md hover:shadow-lg transition-all whitespace-nowrap"
+        className="flex-shrink-0 bg-gradient-to-r from-brand to-brand-gradient-end text-white hover:from-brand/90 hover:to-brand-gradient-end/90 shadow-md hover:shadow-lg transition-all whitespace-nowrap"
       >
         Voir →
       </Button>

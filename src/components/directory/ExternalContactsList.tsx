@@ -488,7 +488,7 @@ const ExternalContactsList = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand" />
       </div>
     );
   }
@@ -534,7 +534,7 @@ const ExternalContactsList = () => {
                     <Badge
                       key={tag}
                       variant={selectedTags.includes(tag) ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-getigne-100 transition-colors text-xs"
+                      className="cursor-pointer hover:bg-brand-100 transition-colors text-xs"
                       onClick={() => toggleTag(tag)}
                     >
                       {tag}
@@ -566,7 +566,7 @@ const ExternalContactsList = () => {
           onClick={handleExportAll}
           disabled={stats.contactCount === 0}
           size="sm"
-          className="bg-getigne-accent hover:bg-getigne-accent/90 h-9"
+          className="bg-brand hover:bg-brand/90 h-9"
         >
           <Download className="mr-2 h-3 w-3" />
           Exporter
@@ -662,8 +662,8 @@ const ExternalContactsList = () => {
                       "w-8 h-6 text-xs font-medium rounded transition-all",
                       hasEntries
                         ? activeLetter === letter
-                          ? "bg-getigne-accent text-white"
-                          : "hover:bg-getigne-100 text-getigne-600"
+                          ? "bg-brand text-brand-fg"
+                          : "hover:bg-brand-100 text-brand-600"
                         : "text-gray-300 cursor-not-allowed"
                     )}
                   >
@@ -682,7 +682,7 @@ const ExternalContactsList = () => {
                 ref={(el) => (sectionRefs.current[letter] = el)}
                 className="space-y-3"
               >
-                <h3 className="text-2xl font-bold text-getigne-accent sticky top-16 bg-background/95 backdrop-blur-sm py-2 z-10 border-b">
+                <h3 className="text-2xl font-bold text-brand sticky top-16 bg-background/95 backdrop-blur-sm py-2 z-10 border-b">
                   {letter}
                 </h3>
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 items-start">
@@ -692,12 +692,12 @@ const ExternalContactsList = () => {
               return (
                 <Card 
                   key={`contact-${contact.id}`} 
-                  className="overflow-hidden hover:shadow-lg transition-all border-l-4 border-l-getigne-500 hover:border-l-getigne-600 bg-gradient-to-br from-white to-getigne-50/30 cursor-pointer"
+                  className="overflow-hidden hover:shadow-lg transition-all border-l-4 border-l-brand-500 hover:border-l-brand-600 bg-gradient-to-br from-white to-brand-50/30 cursor-pointer"
                   onClick={() => handleContactClick(contact)}
                 >
                   <CardContent className="p-3">
                     <div className="flex gap-3">
-                      <div className="w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-getigne-200 to-getigne-100 border-2 border-getigne-300">
+                      <div className="w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-brand-200 to-brand-100 border-2 border-brand-300">
                         {contact.photo_url ? (
                           <img
                             src={contact.photo_url}
@@ -706,7 +706,7 @@ const ExternalContactsList = () => {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <User className="h-7 w-7 text-getigne-700" />
+                            <User className="h-7 w-7 text-brand-700" />
                           </div>
                         )}
                       </div>
@@ -776,7 +776,7 @@ const ExternalContactsList = () => {
                           {contact.email && (
                             <div className="flex items-center gap-1 text-muted-foreground truncate">
                               <Mail className="h-3 w-3 flex-shrink-0" />
-                              <a href={`mailto:${contact.email}`} className="hover:text-getigne-600 truncate">
+                              <a href={`mailto:${contact.email}`} className="hover:text-brand-600 truncate">
                                 {contact.email}
                               </a>
                             </div>
@@ -784,7 +784,7 @@ const ExternalContactsList = () => {
                           {contact.phone && (
                             <div className="flex items-center gap-1 text-muted-foreground">
                               <Phone className="h-3 w-3 flex-shrink-0" />
-                              <a href={`tel:${contact.phone}`} className="hover:text-getigne-600">
+                              <a href={`tel:${contact.phone}`} className="hover:text-brand-600">
                                 {contact.phone}
                               </a>
                             </div>
@@ -894,7 +894,7 @@ const ExternalContactsList = () => {
                               <Mail className="h-3 w-3 flex-shrink-0" />
                               <a 
                                 href={`mailto:${group.contact_email}`} 
-                                className="hover:text-getigne-600 truncate"
+                                className="hover:text-brand-600 truncate"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {group.contact_email}

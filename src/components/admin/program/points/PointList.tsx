@@ -71,7 +71,7 @@ export default function PointList({ points, onEdit, onDelete, onStatusChange, is
                                     n°{point.number}
                                   </span>
                                 )}
-                                <h4 className="font-medium text-getigne-800">{point.title}</h4>
+                                <h4 className="font-medium text-brand-800">{point.title}</h4>
                               </div>
                               {point.competent_entity && (
                                 <span className="text-xs uppercase tracking-wide text-muted-foreground">

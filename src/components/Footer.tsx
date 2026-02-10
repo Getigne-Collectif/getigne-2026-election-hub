@@ -57,7 +57,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-getigne-900 text-white pt-16 pb-8">
+    <footer className="pt-16 pb-8 bg-[var(--site-footer)] text-[var(--site-footer-fg)]">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* About */}
@@ -69,22 +69,22 @@ const Footer = () => {
                 className="h-14 mb-4"
               />
             </div>
-            <p className="text-getigne-100 mb-6 whitespace-pre-line">
+            <p className="mb-6 whitespace-pre-line opacity-90">
               {settings.content.footerAbout}
             </p>
             <div className="flex space-x-4">
               {FACEBOOK_URL && (
-                <a href={FACEBOOK_URL} aria-label="Facebook" target="_blank" rel="noopener noreferrer" className="text-getigne-100 hover:text-white transition-colors">
+                <a href={FACEBOOK_URL} aria-label="Facebook" target="_blank" rel="noopener noreferrer" className="opacity-90 hover:opacity-100 transition-opacity">
                   <FacebookIcon />
                 </a>
               )}
               {DISCORD_INVITE_URL && (
-                <a href={DISCORD_INVITE_URL} className="text-getigne-100 hover:text-white transition-colors" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+                <a href={DISCORD_INVITE_URL} className="opacity-90 hover:opacity-100 transition-opacity" aria-label="Discord" target="_blank" rel="noopener noreferrer">
                   <DiscordLogoIcon />
                 </a>
               )}
               {INSTAGRAM_URL && (
-                <a href={INSTAGRAM_URL} aria-label="Instagram" target="_blank" rel="noopener noreferrer" className="text-getigne-100 hover:text-white transition-colors">
+                <a href={INSTAGRAM_URL} aria-label="Instagram" target="_blank" rel="noopener noreferrer" className="opacity-90 hover:opacity-100 transition-opacity">
                   <InstagramIcon />
                 </a>
               )}
@@ -96,45 +96,45 @@ const Footer = () => {
             <h3 className="text-xl font-medium mb-4">Navigation</h3>
             <ul className="space-y-2">
               <li>
-                <Link to={Routes.HOME} className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.HOME} className="opacity-90 hover:opacity-100 transition-opacity">
                   Accueil
                 </Link>
               </li>
               {settings.modules.program && (
                 <li>
-                  <Link to={Routes.PROGRAM} className="text-getigne-100 hover:text-white transition-colors">
+                  <Link to={Routes.PROGRAM} className="opacity-90 hover:opacity-100 transition-opacity">
                     Élections 2026
                   </Link>
                 </li>
               )}
               {settings.modules.projects && (
                 <li>
-                  <Link to={Routes.PROJECTS} className="text-getigne-100 hover:text-white transition-colors">
+                  <Link to={Routes.PROJECTS} className="opacity-90 hover:opacity-100 transition-opacity">
                     Nos projets citoyens
                   </Link>
                 </li>
               )}
               {settings.modules.blog && (
                 <li>
-                  <Link to={Routes.NEWS} className="text-getigne-100 hover:text-white transition-colors">
+                  <Link to={Routes.NEWS} className="opacity-90 hover:opacity-100 transition-opacity">
                     Actualités
                   </Link>
                 </li>
               )}
               {settings.modules.agenda && (
                 <li>
-                  <Link to={Routes.AGENDA} className="text-getigne-100 hover:text-white transition-colors">
+                  <Link to={Routes.AGENDA} className="opacity-90 hover:opacity-100 transition-opacity">
                     Événements
                   </Link>
                 </li>
               )}
               <li>
-                <Link to={Routes.CONTACT} className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.CONTACT} className="opacity-90 hover:opacity-100 transition-opacity">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link to={Routes.SITEMAP} className="text-getigne-100 hover:text-white transition-colors">
+                <Link to={Routes.SITEMAP} className="opacity-90 hover:opacity-100 transition-opacity">
                   Plan du site
                 </Link>
               </li>
@@ -146,16 +146,16 @@ const Footer = () => {
             <h3 className="text-xl font-medium mb-4">Contact</h3>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <Mail size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
-                <span className="text-getigne-100">{settings.content.contactEmail}</span>
+                <Mail size={20} className="mr-3 text-brand mt-1 flex-shrink-0" />
+                <span className="opacity-90">{settings.content.contactEmail}</span>
               </li>
               <li className="flex items-start">
-                <Phone size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
-                <span className="text-getigne-100">{settings.content.contactPhone}</span>
+                <Phone size={20} className="mr-3 text-brand mt-1 flex-shrink-0" />
+                <span className="opacity-90">{settings.content.contactPhone}</span>
               </li>
               <li className="flex items-start">
-                <MapPin size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
-                <span className="text-getigne-100">
+                <MapPin size={20} className="mr-3 text-brand mt-1 flex-shrink-0" />
+                <span className="opacity-90">
                   {addressLines.map((line, index) => (
                     <span key={line}>
                       {line}
@@ -170,21 +170,21 @@ const Footer = () => {
           {/* Newsletter */}
           <div>
             <h3 className="text-xl font-medium mb-4">Restez informés</h3>
-            <p className="text-getigne-100 mb-4">
+            <p className="opacity-90 mb-4">
               Inscrivez-vous à notre newsletter pour suivre nos actualités et événements.
             </p>
             <form className="space-y-3" onSubmit={handleNewsletterSubmit}>
               <input
                 type="email"
                 placeholder="Votre email"
-                className="bg-getigne-800 text-white w-full px-4 py-2 rounded-md border border-getigne-700 focus:outline-none focus:ring-2 focus:ring-getigne-accent"
+                className="bg-white/10 text-[var(--site-footer-fg)] w-full px-4 py-2 rounded-md border border-white/20 focus:outline-none focus:ring-2 focus:ring-brand"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <button
                 type="submit"
-                className="bg-getigne-accent hover:bg-getigne-accent/90 text-white font-medium px-4 py-2 rounded-md w-full transition-colors"
+                className="bg-brand hover:bg-brand/90 text-brand-fg font-medium px-4 py-2 rounded-md w-full transition-colors"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Envoi...' : "S'inscrire"}
@@ -193,9 +193,9 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-getigne-800 mt-12 pt-8 text-center text-getigne-400 text-sm">
+        <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm opacity-75">
           <div className="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 mb-2">
-            <Link to={Routes.LEGAL} className="hover:text-white transition-colors">
+            <Link to={Routes.LEGAL} className="hover:opacity-100 transition-opacity">
               Mentions légales
             </Link>
           </div>

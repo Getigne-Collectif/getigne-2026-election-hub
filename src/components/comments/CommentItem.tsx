@@ -161,16 +161,16 @@ const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div 
       ref={commentRef}
-      className={`${depth > 0 ? 'ml-6 mt-3 border-l-2 border-getigne-100 pl-4' : ''}`}
+      className={`${depth > 0 ? 'ml-6 mt-3 border-l-2 border-brand-100 pl-4' : ''}`}
     >
       <div className={`flex gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors ${
         isPending ? 'border border-amber-200 bg-amber-50/50' : ''
       }`}>
-        <Avatar className="h-8 w-8 bg-getigne-100 flex-shrink-0">
+        <Avatar className="h-8 w-8 bg-brand-100 flex-shrink-0">
           {comment.profiles?.avatar_url ? (
             <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
           ) : null}
-          <AvatarFallback className="text-getigne-700 text-xs">
+          <AvatarFallback className="text-brand-700 text-xs">
             {!comment.user_id 
               ? 'US'
               : comment.profiles 

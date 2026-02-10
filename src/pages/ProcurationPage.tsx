@@ -134,15 +134,15 @@ export default function ProcurationPage() {
                 <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-12 h-12 text-white" />
                 </div>
-                <h1 className="text-2xl md:text-3xl font-bold text-getigne-900 mb-4">
+                <h1 className="text-2xl md:text-3xl font-bold text-brand-900 mb-4">
                   Demande enregistrée
                 </h1>
-                <p className="text-getigne-700 mb-6">
+                <p className="text-brand-700 mb-6">
                   {successType === 'requester'
                     ? "Nous avons bien reçu votre demande. Dès que nous aurons trouvé une personne disponible pour voter à votre place, nous vous contacterons par email ou téléphone."
                     : "Merci de vous être proposé(e) pour porter une procuration. Dès qu'une personne correspondante sera identifiée, nous vous contacterons."}
                 </p>
-                <p className="text-sm text-getigne-600">
+                <p className="text-sm text-brand-600">
                   Vous pouvez fermer cette page. Nous vous tiendrons au courant.
                 </p>
               </div>
@@ -198,11 +198,11 @@ export default function ProcurationPage() {
                     Élections municipales 2026
                   </div>
 
-                  <h1 className="text-4xl lg:text-5xl font-bold text-getigne-900 leading-tight">
+                  <h1 className="text-4xl lg:text-5xl font-bold text-brand-900 leading-tight">
                     Espace procuration
                   </h1>
 
-                  <p className="text-lg text-getigne-700 leading-relaxed">
+                  <p className="text-lg text-brand-700 leading-relaxed">
                     Pour les élections municipales 2026, il n'y aura qu'un seul tour à Gétigné le <strong className="text-blue-600">15 mars 2026</strong> et chaque voix sera déterminante. Si vous ne pouvez pas vous rendre à votre bureau de vote ou si vous voulez vous porter volontaire pour voter à la place de quelqu'un, déposez une demande.
                   </p>
 
@@ -217,10 +217,10 @@ export default function ProcurationPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-blue-100">
-                        <p className="text-getigne-900 font-medium mb-2">
+                        <p className="text-brand-900 font-medium mb-2">
                           Nous faisons le lien
                         </p>
-                        <p className="text-getigne-700 text-sm leading-relaxed">
+                        <p className="text-brand-700 text-sm leading-relaxed">
                           Nous mettons en relation les personnes qui cherchent un mandataire et celles qui acceptent de voter à leur place. Dès que le binôme sera formé, vous recevrez un email avec les coordonnées et les instructions pour la démarche sur <a href={MAPROXY_URL} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium inline-flex items-center gap-0.5"><span className="inline-block ml-0.5" aria-hidden>🇫🇷</span> maprocuration.gouv.fr<ExternalLink className="w-3 h-3 shrink-0" /></a>.
                         </p>
                       </div>
@@ -252,7 +252,7 @@ export default function ProcurationPage() {
                     <TabsContent value="requester">
                       <Card className="border-blue-100 shadow-lg">
                         <CardHeader className="border-b border-blue-100/50 bg-gradient-to-r from-blue-50/50 to-transparent pb-4">
-                          <CardTitle className="flex items-center gap-2 text-getigne-900 text-lg">
+                          <CardTitle className="flex items-center gap-2 text-brand-900 text-lg">
                             <Search className="w-5 h-5 text-blue-600" />
                             Demander un mandataire
                           </CardTitle>
@@ -274,7 +274,7 @@ export default function ProcurationPage() {
                     <TabsContent value="volunteer">
                       <Card className="border-blue-100 shadow-lg">
                         <CardHeader className="border-b border-blue-100/50 bg-gradient-to-r from-blue-50/50 to-transparent pb-4">
-                          <CardTitle className="flex items-center gap-2 text-getigne-900 text-lg">
+                          <CardTitle className="flex items-center gap-2 text-brand-900 text-lg">
                             <UserCheck className="w-5 h-5 text-blue-600" />
                             Proposer de porter une procuration
                           </CardTitle>
@@ -304,10 +304,10 @@ export default function ProcurationPage() {
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-getigne-900 mb-4">
+                  <h2 className="text-3xl font-bold text-brand-900 mb-4">
                     Comment ça marche ?
                   </h2>
-                  <p className="text-lg text-getigne-700 max-w-2xl mx-auto">
+                  <p className="text-lg text-brand-700 max-w-2xl mx-auto">
                     Une fois votre demande enregistrée, nous faisons le lien. Dès qu'un binôme est formé, vous recevrez un email avec les coordonnées et les instructions. La procédure officielle se fait ensuite sur <a href={MAPROXY_URL} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium inline-flex items-center gap-1">maprocuration.gouv.fr <span className="inline-block ml-0.5" aria-hidden>🇫🇷</span> <ExternalLink className="w-3 h-3" /></a>.
                   </p>
                 </div>
@@ -318,8 +318,8 @@ export default function ProcurationPage() {
                       <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <FileText className="w-8 h-8 text-blue-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">1. Vous remplissez le formulaire</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">1. Vous remplissez le formulaire</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         Indiquez si vous cherchez un mandataire ou si vous proposez d'en être un.
                       </p>
                     </CardContent>
@@ -329,8 +329,8 @@ export default function ProcurationPage() {
                       <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <UserCheck className="w-8 h-8 text-sky-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">2. Nous formons les binômes</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">2. Nous formons les binômes</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         L'équipe associe les demandes et les propositions. Dès qu'un match est trouvé, nous vous contactons.
                       </p>
                     </CardContent>
@@ -340,8 +340,8 @@ export default function ProcurationPage() {
                       <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Shield className="w-8 h-8 text-indigo-600" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-3 text-getigne-900">3. Démarche sur maprocuration.gouv.fr</h3>
-                      <p className="text-getigne-700 text-sm leading-relaxed">
+                      <h3 className="text-lg font-semibold mb-3 text-brand-900">3. Démarche sur maprocuration.gouv.fr</h3>
+                      <p className="text-brand-700 text-sm leading-relaxed">
                         Vous recevrez par email les infos de l'autre personne pour remplir le formulaire en ligne.
                       </p>
                     </CardContent>

@@ -556,7 +556,7 @@ const ThematicRolesAdminSection = ({ showHeader = true }: ThematicRolesAdminSect
 
       {loading ? (
         <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-getigne-accent" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand" />
         </div>
       ) : viewMode === 'circles' ? (
         <div className="rounded-lg border bg-white p-4">

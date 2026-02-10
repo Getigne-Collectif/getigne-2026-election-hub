@@ -45,7 +45,7 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({
 
   if (visibleComments.length === 0) {
     return (
-      <div className="text-center py-8 text-getigne-500">
+      <div className="text-center py-8 text-brand-500">
         Aucun commentaire pour cet article
       </div>
     );
@@ -59,15 +59,15 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({
           className={`bg-white p-5 rounded-lg shadow-sm border ${
             comment.status === 'pending' ? 'border-amber-200 bg-amber-50' : 
             comment.status === 'rejected' ? 'border-red-200 bg-red-50' : 
-            'border-getigne-100'
+            'border-brand-100'
           }`}
         >
           <div className="flex items-center gap-2 mb-3">
-            <Avatar className="h-10 w-10 bg-getigne-100">
+            <Avatar className="h-10 w-10 bg-brand-100">
               {comment.profiles?.avatar_url ? (
                 <AvatarImage src={comment.profiles.avatar_url} alt="Avatar utilisateur" />
               ) : null}
-              <AvatarFallback className="text-getigne-700">
+              <AvatarFallback className="text-brand-700">
                 {comment.profiles ? getInitials(comment.profiles.first_name, comment.profiles.last_name) : 'UN'}
               </AvatarFallback>
             </Avatar>
@@ -76,9 +76,9 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({
                 {comment.profiles?.first_name && comment.profiles?.last_name 
                   ? `${comment.profiles.first_name} ${comment.profiles.last_name}` 
                   : 'Utilisateur anonyme'}
-                {comment.user_id === user?.id && <span className="ml-2 text-sm text-getigne-500">(Vous)</span>}
+                {comment.user_id === user?.id && <span className="ml-2 text-sm text-brand-500">(Vous)</span>}
               </h4>
-              <time className="text-getigne-500 text-sm">
+              <time className="text-brand-500 text-sm">
                 {new Date(comment.created_at).toLocaleDateString('fr-FR', {
                   day: 'numeric',
                   month: 'long',
@@ -114,7 +114,7 @@ const CommentDisplay: React.FC<CommentDisplayProps> = ({
             )}
           </div>
           
-          <p className="text-getigne-700 whitespace-pre-wrap">{comment.content}</p>
+          <p className="text-brand-700 whitespace-pre-wrap">{comment.content}</p>
           
           {/* Indicateur de statut pour les commentaires de l'utilisateur */}
           {comment.user_id === user?.id && comment.status !== 'approved' && (

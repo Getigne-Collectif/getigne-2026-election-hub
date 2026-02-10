@@ -118,8 +118,8 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
     return (
       <TabsContent value={value} className="min-h-[300px] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-getigne-500" />
-          <p className="text-getigne-600">Chargement des propositions...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
+          <p className="text-brand-600">Chargement des propositions...</p>
         </div>
       </TabsContent>
     );
@@ -144,12 +144,12 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         {/* En-tête avec titre et actions */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-getigne-800 mb-2">{programItem.title}</h2>
+            <h2 className="text-3xl font-bold text-brand-800 mb-2">{programItem.title}</h2>
             <div className="flex items-center gap-4">
               <ProgramLikeButton programId={programItemId} />
               <Button
                 variant="ghost"
-                className="text-getigne-600 flex items-center gap-2"
+                className="text-brand-600 flex items-center gap-2"
                 onClick={() => setShowComments(!showComments)}
               >
                 <MessageSquare className="h-5 w-5" />
@@ -183,23 +183,23 @@ export default function ProgramContentComponent({ programItemId, value }: Progra
         )}
 
         {/* Description avec style amélioré */}
-        <div className="prose max-w-none mb-12 rich-content bg-white rounded-xl p-6 shadow-sm border border-getigne-100" dangerouslySetInnerHTML={{ __html: programItem.description }} />
+        <div className="prose max-w-none mb-12 rich-content bg-white rounded-xl p-6 shadow-sm border border-brand-100" dangerouslySetInnerHTML={{ __html: programItem.description }} />
 
         {/* Section des propositions */}
         <div className="my-12">
           <div className="flex items-center gap-4 mb-8">
-            <div className="h-10 w-10 rounded-full bg-getigne-accent/10 flex items-center justify-center">
-              <ThumbsUp className="h-5 w-5 text-getigne-accent" />
+            <div className="h-10 w-10 rounded-full bg-brand/10 flex items-center justify-center">
+              <ThumbsUp className="h-5 w-5 text-brand" />
             </div>
-            <h3 className="text-2xl font-bold text-getigne-800">Nos propositions concrètes</h3>
+            <h3 className="text-2xl font-bold text-brand-800">Nos propositions concrètes</h3>
           </div>
 
           {programPoints.length === 0 ? (
-            <div className="bg-getigne-50 border border-getigne-100 rounded-lg p-8 text-center">
-              <p className="text-getigne-700 italic mb-2">
+            <div className="bg-brand-50 border border-brand-100 rounded-lg p-8 text-center">
+              <p className="text-brand-700 italic mb-2">
                 Les propositions de cette section sont en cours d'élaboration.
               </p>
-              <p className="text-sm text-getigne-600">
+              <p className="text-sm text-brand-600">
                 Revenez prochainement pour découvrir nos engagements concrets sur cette thématique.
               </p>
             </div>

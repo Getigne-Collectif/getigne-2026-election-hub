@@ -63,7 +63,7 @@ const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => 
   return (
     <div
       ref={ref}
-      className={`bg-white rounded-xl overflow-hidden shadow-sm border border-getigne-100 hover-lift ${
+      className={`bg-white rounded-xl overflow-hidden shadow-sm border border-brand-100 hover-lift ${
         isVisible
           ? 'opacity-100 translate-y-0 transition-all duration-700 ease-out'
           : 'opacity-0 translate-y-10'
@@ -73,7 +73,7 @@ const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => 
       {/* Badge de position */}
       <div className="relative">
         <div className="absolute top-4 left-4 z-10">
-          <div className="bg-getigne-accent text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+          <div className="bg-brand text-brand-fg rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
             <span className="text-2xl font-bold">{position}</span>
           </div>
         </div>
@@ -87,8 +87,8 @@ const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => 
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-getigne-100">
-              <span className="text-4xl text-getigne-400 font-semibold">
+            <div className="w-full h-full flex items-center justify-center bg-brand-100">
+              <span className="text-4xl text-brand-400 font-semibold">
                 {getInitials(member.team_member.name)}
               </span>
             </div>
@@ -99,7 +99,7 @@ const ElectoralMemberCard = ({ position, member }: ElectoralMemberCardProps) => 
       {/* Contenu */}
       <div className="p-6">
         <h3 className="font-bold text-xl mb-2">{member.team_member.name}</h3>
-        <p className="text-getigne-700 text-sm">
+        <p className="text-brand-700 text-sm">
           {metaParts.length > 0 ? metaParts.join(' · ') : 'Âge et profession non renseignés'}
         </p>
       </div>

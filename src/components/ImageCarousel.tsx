@@ -112,7 +112,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, className }) => {
               className={cn(
                 "h-2 rounded-full transition-all",
                 index === selectedIndex
-                  ? "w-8 bg-getigne-accent"
+                  ? "w-8 bg-brand"
                   : "w-2 bg-gray-300 hover:bg-gray-400"
               )}
               onClick={() => emblaApi?.scrollTo(index)}

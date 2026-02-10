@@ -18,23 +18,23 @@ const ProjectCard = ({ project, index, initialLikesCount = 0 }: ProjectCardProps
         <div className={`order-2 md:order-${index % 2 === 0 ? '1' : '2'} p-8 md:p-12 flex flex-col justify-between`}>
           <div>
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-3xl font-bold text-getigne-900">{project.title}</h2>
+              <h2 className="text-3xl font-bold text-brand-900">{project.title}</h2>
               <ProjectLikeButton projectId={project.id} initialLikesCount={initialLikesCount} />
             </div>
-            <p className="text-getigne-700 mb-6">
+            <p className="text-brand-700 mb-6">
               {project.description}
             </p>
           </div>
           <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {project.contact_email && (
-              <div className="flex items-center gap-2 text-getigne-700">
-                <Mail className="h-5 w-5 text-getigne-accent" />
+              <div className="flex items-center gap-2 text-brand-700">
+                <Mail className="h-5 w-5 text-brand" />
                 <span>Contact : {project.contact_email}</span>
               </div>
             )}
             
             {project.url && (
-              <Button className="bg-getigne-accent hover:bg-getigne-accent/90" asChild>
+              <Button className="bg-brand hover:bg-brand/90" asChild>
                 <a href={project.url} target="_blank" rel="noopener noreferrer">
                   En savoir plus
                 </a>
@@ -42,7 +42,7 @@ const ProjectCard = ({ project, index, initialLikesCount = 0 }: ProjectCardProps
             )}
           </div>
         </div>
-        <div className={`order-1 md:order-${index % 2 === 0 ? '2' : '1'} h-64 md:h-auto bg-getigne-100`}>
+        <div className={`order-1 md:order-${index % 2 === 0 ? '2' : '1'} h-64 md:h-auto bg-brand-100`}>
           {project.image ? (
             <img
               src={project.image}
@@ -50,8 +50,8 @@ const ProjectCard = ({ project, index, initialLikesCount = 0 }: ProjectCardProps
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="flex items-center justify-center h-full bg-getigne-100">
-              <span className="text-getigne-400">Image non disponible</span>
+            <div className="flex items-center justify-center h-full bg-brand-100">
+              <span className="text-brand-400">Image non disponible</span>
             </div>
           )}
         </div>

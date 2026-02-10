@@ -125,7 +125,7 @@ const JoinPage = () => {
         <Navbar />
 
         {/* Hero Section */}
-        <div className="pt-24 pb-12 bg-getigne-50 border-b border-getigne-100">
+        <div className="pt-24 pb-12 bg-brand-50 border-b border-brand-100">
           <div className="container mx-auto px-4">
             <Breadcrumb>
               <BreadcrumbList>
@@ -141,18 +141,18 @@ const JoinPage = () => {
               </BreadcrumbList>
             </Breadcrumb>
             <div className="max-w-4xl mx-auto text-center mt-8">
-              <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+              <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
                 Participez à l'aventure
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-6 mb-6">Comment nous aider ?</h1>
-              <p className="text-getigne-700 text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-brand-700 text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed">
                 Il existe plusieurs façons de soutenir Gétigné Collectif, selon vos envies et vos disponibilités. Chaque geste compte pour construire ensemble l'avenir de notre commune.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 {showSupportCommittee && (
                   <Button 
                     size="lg" 
-                    className="bg-getigne-accent hover:bg-getigne-accent/90 text-white px-8"
+                    className="bg-brand hover:bg-brand/90 text-brand-fg px-8"
                     onClick={() => scrollToSection('support-committee')}
                   >
                     <PenLine className="mr-2 h-5 w-5 fill-current" /> Signer le comité de soutien
@@ -162,7 +162,7 @@ const JoinPage = () => {
                   <Button 
                     size="lg" 
                     variant="outline" 
-                    className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5 px-8"
+                    className="border-brand text-brand hover:bg-brand/5 px-8"
                     onClick={() => scrollToSection('membership')}
                   >
                     <Users className="mr-2 h-5 w-5" /> Devenir adhérent
@@ -182,54 +182,54 @@ const JoinPage = () => {
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <div>
                     <h2 className="text-3xl md:text-4xl font-bold mb-6 flex items-center gap-3">
-                      <span className="bg-getigne-accent text-white w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0">1</span>
+                      <span className="bg-brand text-brand-fg w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0">1</span>
                       Affichez votre soutien
                     </h2>
-                    <p className="text-getigne-700 text-lg mb-6 leading-relaxed">
+                    <p className="text-brand-700 text-lg mb-6 leading-relaxed">
                       Vous appréciez notre démarche mais vous manquez de temps pour vous engager activement ? 
                       Rejoignez notre <strong>comité de soutien</strong>.
                     </p>
-                    <p className="text-getigne-700 mb-8">
+                    <p className="text-brand-700 mb-8">
                       C'est un geste simple qui ne coûte rien mais qui nous donne du poids et de la visibilité auprès des habitants et des institutions. En signant, vous affirmez votre adhésion aux valeurs de transparence et de participation citoyenne que nous portons.
                     </p>
                     <div className="space-y-4 mb-8">
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="text-getigne-accent h-6 w-6 shrink-0 mt-0.5" />
-                        <p className="text-getigne-800 font-medium">Rapide : moins de 30 secondes</p>
+                        <CheckCircle2 className="text-brand h-6 w-6 shrink-0 mt-0.5" />
+                        <p className="text-brand-800 font-medium">Rapide : moins de 30 secondes</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="text-getigne-accent h-6 w-6 shrink-0 mt-0.5" />
-                        <p className="text-getigne-800 font-medium">Gratuit et sans engagement de temps</p>
+                        <CheckCircle2 className="text-brand h-6 w-6 shrink-0 mt-0.5" />
+                        <p className="text-brand-800 font-medium">Gratuit et sans engagement de temps</p>
                       </div>
                       <div className="flex items-start gap-3">
-                        <CheckCircle2 className="text-getigne-accent h-6 w-6 shrink-0 mt-0.5" />
-                        <p className="text-getigne-800 font-medium">Affichage de votre nom parmi nos soutiens</p>
+                        <CheckCircle2 className="text-brand h-6 w-6 shrink-0 mt-0.5" />
+                        <p className="text-brand-800 font-medium">Affichage de votre nom parmi nos soutiens</p>
                       </div>
                     </div>
                     <Button 
                       size="lg" 
-                      className="bg-getigne-accent hover:bg-getigne-accent/90 text-white w-full sm:w-auto"
+                      className="bg-brand hover:bg-brand/90 text-brand-fg w-full sm:w-auto"
                       onClick={() => setIsSupportFormOpen(true)}
                     >
                       Je rejoins le comité de soutien
                     </Button>
                   </div>
-                  <div className="bg-white rounded-3xl p-8 md:p-10 border border-getigne-100 shadow-xl shadow-getigne-100/50 overflow-hidden h-full min-h-[450px] flex flex-col relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-getigne-accent/5 rounded-bl-full -mr-10 -mt-10 pointer-events-none"></div>
+                  <div className="bg-white rounded-3xl p-8 md:p-10 border border-brand-100 shadow-xl shadow-brand-100/50 overflow-hidden h-full min-h-[450px] flex flex-col relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-bl-full -mr-10 -mt-10 pointer-events-none"></div>
                     
-                    <h3 className="text-2xl font-bold mb-8 flex items-center justify-between border-b border-getigne-50 pb-6 relative z-10">
+                    <h3 className="text-2xl font-bold mb-8 flex items-center justify-between border-b border-brand-50 pb-6 relative z-10">
                       Ils/elles nous soutiennent
-                      <span className="bg-getigne-accent text-white px-4 py-1.5 rounded-full text-sm font-extrabold shadow-md shadow-getigne-accent/20">
+                      <span className="bg-brand text-brand-fg px-4 py-1.5 rounded-full text-sm font-extrabold shadow-md shadow-brand/20">
                         {supporters.length}
                       </span>
                     </h3>
 
                     <div className="mb-6 relative z-10">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-getigne-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-400" />
                         <Input
                           placeholder="Rechercher un signataire ou une ville..."
-                          className="pl-10 bg-getigne-50/50 border-getigne-100 focus:bg-white transition-all rounded-xl"
+                          className="pl-10 bg-brand-50/50 border-brand-100 focus:bg-white transition-all rounded-xl"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -242,14 +242,14 @@ const JoinPage = () => {
                           {filteredSupporters.map((supporter) => (
                             <div 
                               key={supporter.id} 
-                              className="bg-getigne-50/80 px-5 py-2.5 rounded-2xl border border-getigne-100 flex items-center gap-2 shadow-sm"
+                              className="bg-brand-50/80 px-5 py-2.5 rounded-2xl border border-brand-100 flex items-center gap-2 shadow-sm"
                             >
-                              <p className="text-getigne-900 text-sm md:text-base whitespace-nowrap">
+                              <p className="text-brand-900 text-sm md:text-base whitespace-nowrap">
                                 <span className="font-bold">
                                   {supporter.first_name} {supporter.last_name}
                                 </span>
                                 {supporter.city && (
-                                  <span className="text-getigne-400 ml-1 text-xs md:text-sm">
+                                  <span className="text-brand-400 ml-1 text-xs md:text-sm">
                                     , {supporter.city}
                                   </span>
                                 )}
@@ -259,10 +259,10 @@ const JoinPage = () => {
                         </div>
                       ) : (
                         <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                          <div className="bg-getigne-50 p-6 rounded-full mb-6">
-                            <Users className="h-16 w-12 text-getigne-200" />
+                          <div className="bg-brand-50 p-6 rounded-full mb-6">
+                            <Users className="h-16 w-12 text-brand-200" />
                           </div>
-                          <p className="text-getigne-500 text-lg font-medium">
+                          <p className="text-brand-500 text-lg font-medium">
                             {searchQuery ? "Aucun signataire ne correspond à votre recherche." : "Soyez le premier à signer notre comité de soutien !"}
                           </p>
                         </div>
@@ -277,11 +277,11 @@ const JoinPage = () => {
 
           {/* Transition Divider */}
           {showSupportCommittee && showMembershipForm && (
-            <div className="bg-getigne-50 py-10">
+            <div className="bg-brand-50 py-10">
               <div className="container mx-auto px-4 flex justify-center">
-                <div className="bg-white p-4 rounded-full shadow-sm border border-getigne-100 flex items-center gap-3 animate-bounce">
-                  <p className="text-sm font-medium text-getigne-600">Vous voulez aller plus loin ?</p>
-                  <ArrowRight className="h-4 w-4 text-getigne-accent rotate-90" />
+                <div className="bg-white p-4 rounded-full shadow-sm border border-brand-100 flex items-center gap-3 animate-bounce">
+                  <p className="text-sm font-medium text-brand-600">Vous voulez aller plus loin ?</p>
+                  <ArrowRight className="h-4 w-4 text-brand rotate-90" />
                 </div>
               </div>
             </div>
@@ -289,93 +289,93 @@ const JoinPage = () => {
 
           {/* Section 2: Adhésion (Engagement fort) */}
           {showMembershipForm && (
-          <section id="membership" className="py-20 bg-getigne-50">
+          <section id="membership" className="py-20 bg-brand-50">
             <div className="container mx-auto px-4">
               <div className="max-w-5xl mx-auto">
                 <div className="mb-12 text-center">
                   <h2 className="text-3xl md:text-4xl font-bold mb-6 flex items-center justify-center gap-3">
-                    <span className="bg-getigne-accent text-white w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0">2</span>
+                    <span className="bg-brand text-brand-fg w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0">2</span>
                     Adhérez à l'association
                   </h2>
-                  <p className="text-getigne-700 text-lg max-w-3xl mx-auto leading-relaxed">
+                  <p className="text-brand-700 text-lg max-w-3xl mx-auto leading-relaxed">
                     L'adhésion est l'acte fondateur pour participer pleinement à la vie du collectif. Elle vous permet d'être acteur du projet, de voter lors des assemblées et de contribuer aux décisions.
                   </p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8 mb-12">
                   <div className="md:col-span-2">
-                    <div className="bg-white rounded-2xl shadow-sm p-8 md:p-10 h-full border border-getigne-100">
+                    <div className="bg-white rounded-2xl shadow-sm p-8 md:p-10 h-full border border-brand-100">
                       <div className="grid md:grid-cols-2 gap-10">
                         <div>
-                          <h3 className="text-xl font-bold mb-6 text-getigne-900 border-b border-getigne-100 pb-2">Pourquoi adhérer ?</h3>
+                          <h3 className="text-xl font-bold mb-6 text-brand-900 border-b border-brand-100 pb-2">Pourquoi adhérer ?</h3>
                           <ul className="space-y-6">
                             <li className="flex gap-4">
-                              <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-xl flex-shrink-0 flex items-center justify-center">
-                                <Users className="text-getigne-accent h-5 w-5" />
+                              <div className="mt-1 w-10 h-10 bg-brand/10 rounded-xl flex-shrink-0 flex items-center justify-center">
+                                <Users className="text-brand h-5 w-5" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-getigne-900 leading-tight mb-1">Faire partie du collectif</h4>
-                                <p className="text-sm text-getigne-600">Rejoignez un groupe de citoyens engagés pour le bien commun.</p>
+                                <h4 className="font-bold text-brand-900 leading-tight mb-1">Faire partie du collectif</h4>
+                                <p className="text-sm text-brand-600">Rejoignez un groupe de citoyens engagés pour le bien commun.</p>
                               </div>
                             </li>
                             <li className="flex gap-4">
-                              <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-xl flex-shrink-0 flex items-center justify-center">
-                                <Zap className="text-getigne-accent h-5 w-5" />
+                              <div className="mt-1 w-10 h-10 bg-brand/10 rounded-xl flex-shrink-0 flex items-center justify-center">
+                                <Zap className="text-brand h-5 w-5" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-getigne-900 leading-tight mb-1">Participer aux décisions</h4>
-                                <p className="text-sm text-getigne-600">Votez lors des AG et contribuez aux orientations stratégiques.</p>
+                                <h4 className="font-bold text-brand-900 leading-tight mb-1">Participer aux décisions</h4>
+                                <p className="text-sm text-brand-600">Votez lors des AG et contribuez aux orientations stratégiques.</p>
                               </div>
                             </li>
                             <li className="flex gap-4">
-                              <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-xl flex-shrink-0 flex items-center justify-center">
-                                <LayoutList className="text-getigne-accent h-5 w-5" />
+                              <div className="mt-1 w-10 h-10 bg-brand/10 rounded-xl flex-shrink-0 flex items-center justify-center">
+                                <LayoutList className="text-brand h-5 w-5" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-getigne-900 leading-tight mb-1">Accès privilégié</h4>
-                                <p className="text-sm text-getigne-600">Participez à nos rencontres et ateliers réservés aux membres.</p>
+                                <h4 className="font-bold text-brand-900 leading-tight mb-1">Accès privilégié</h4>
+                                <p className="text-sm text-brand-600">Participez à nos rencontres et ateliers réservés aux membres.</p>
                               </div>
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-6 text-getigne-900 border-b border-getigne-100 pb-2">Notre organisation</h3>
+                          <h3 className="text-xl font-bold mb-6 text-brand-900 border-b border-brand-100 pb-2">Notre organisation</h3>
                           <ul className="space-y-6">
                             <li className="flex gap-4">
-                              <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-xl flex-shrink-0 flex items-center justify-center">
-                                <Landmark className="text-getigne-accent h-5 w-5" />
+                              <div className="mt-1 w-10 h-10 bg-brand/10 rounded-xl flex-shrink-0 flex items-center justify-center">
+                                <Landmark className="text-brand h-5 w-5" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-getigne-900 leading-tight mb-1">Association Loi 1901</h4>
-                                <p className="text-sm text-getigne-600">Structure à but non lucratif, gérée démocratiquement.</p>
+                                <h4 className="font-bold text-brand-900 leading-tight mb-1">Association Loi 1901</h4>
+                                <p className="text-sm text-brand-600">Structure à but non lucratif, gérée démocratiquement.</p>
                               </div>
                             </li>
                             <li className="flex gap-4">
-                              <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-xl flex-shrink-0 flex items-center justify-center">
-                                <PiggyBank className="text-getigne-accent h-5 w-5" />
+                              <div className="mt-1 w-10 h-10 bg-brand/10 rounded-xl flex-shrink-0 flex items-center justify-center">
+                                <PiggyBank className="text-brand h-5 w-5" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-getigne-900 leading-tight mb-1">Transparence totale</h4>
-                                <p className="text-sm text-getigne-600">Financement exclusif par les cotisations et dons.</p>
+                                <h4 className="font-bold text-brand-900 leading-tight mb-1">Transparence totale</h4>
+                                <p className="text-sm text-brand-600">Financement exclusif par les cotisations et dons.</p>
                               </div>
                             </li>
                             <li className="flex gap-4">
-                              <div className="mt-1 w-10 h-10 bg-getigne-accent/10 rounded-xl flex-shrink-0 flex items-center justify-center">
-                                <Heart className="text-getigne-accent h-5 w-5" />
+                              <div className="mt-1 w-10 h-10 bg-brand/10 rounded-xl flex-shrink-0 flex items-center justify-center">
+                                <Heart className="text-brand h-5 w-5" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-getigne-900 leading-tight mb-1">100% Bénévole</h4>
-                                <p className="text-sm text-getigne-600">Engagement par conviction, sans intérêt personnel.</p>
+                                <h4 className="font-bold text-brand-900 leading-tight mb-1">100% Bénévole</h4>
+                                <p className="text-sm text-brand-600">Engagement par conviction, sans intérêt personnel.</p>
                               </div>
                             </li>
                           </ul>
                         </div>
                       </div>
 
-                      <div className="border-t border-getigne-100 pt-10 mt-10">
+                      <div className="border-t border-brand-100 pt-10 mt-10">
                         <div className="text-center mb-8">
-                          <p className="text-getigne-700 bg-getigne-50 p-6 rounded-xl border border-getigne-100 inline-block max-w-2xl">
+                          <p className="text-brand-700 bg-brand-50 p-6 rounded-xl border border-brand-100 inline-block max-w-2xl">
                             {settings.content.membershipText}
                           </p>
                         </div>
@@ -383,7 +383,7 @@ const JoinPage = () => {
                         <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6">
                           <Button
                             size="lg"
-                            className="bg-getigne-accent hover:bg-getigne-accent/90 text-white shadow-md shadow-getigne-accent/20 h-14 px-10 text-lg"
+                            className="bg-brand hover:bg-brand/90 text-brand-fg shadow-md shadow-brand/20 h-14 px-10 text-lg"
                             onClick={handleJoinClick}
                           >
                             Adhérer en ligne sur HelloAsso
@@ -391,7 +391,7 @@ const JoinPage = () => {
                           <Button
                             variant="outline"
                             size="lg"
-                            className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5 h-14 px-10 text-lg"
+                            className="border-brand text-brand hover:bg-brand/5 h-14 px-10 text-lg"
                             onClick={handleDonationClick}
                           >
                             Faire un don libre
@@ -424,19 +424,19 @@ const JoinPage = () => {
           )}
 
           {/* Contact Form Section */}
-          <section id="contact-form" className="py-20 px-4 bg-white border-t border-getigne-100">
+          <section id="contact-form" className="py-20 px-4 bg-white border-t border-brand-100">
             <div className="container mx-auto">
               <div className="max-w-3xl mx-auto text-center mb-12">
-                <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+                <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
                   Des questions ?
                 </span>
                 <h2 className="text-3xl font-bold mt-4 mb-6">Contactez-nous</h2>
-                <p className="text-getigne-700 text-lg">
+                <p className="text-brand-700 text-lg">
                   Vous avez des questions sur l'adhésion, le fonctionnement du collectif ou vous souhaitez simplement nous parler ? Écrivez-nous !
                 </p>
               </div>
 
-              <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-getigne-100 p-8 md:p-12">
+              <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-brand-100 p-8 md:p-12">
                 <ContactForm showParticipation={true} showNewsletter={true} />
               </div>
             </div>

@@ -144,7 +144,7 @@ const CommentLikeButton: React.FC<CommentLikeButtonProps> = ({
       onClick={handleToggleLike}
       disabled={loading || !user}
       className={`flex items-center gap-1.5 ${
-        isLiked ? 'text-getigne-accent hover:text-getigne-accent/80' : 'text-muted-foreground hover:text-foreground'
+        isLiked ? 'text-brand hover:text-brand/80' : 'text-muted-foreground hover:text-foreground'
       }`}
     >
       <ThumbsUp className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />

@@ -24,7 +24,7 @@ const Hero = () => {
           alt={`Visuel ${settings.branding.name}`}
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-getigne-800/60 to-getigne-800/20 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-800/60 to-brand-800/20 backdrop-blur-sm"></div>
       </div>
 
       {/* Semi-transparent shapes */}
@@ -60,7 +60,7 @@ const Hero = () => {
           <div
             className={`flex flex-col mt-8 sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
-            <Button asChild className="bg-primary hover:bg-primary/90 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+            <Button asChild className="bg-primary hover:bg-primary/90 py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <Link to={Routes.PROGRAM}>
                 Découvrez notre projet <span className="hidden md:inline">pour 2026</span>
               </Link>
@@ -70,7 +70,7 @@ const Hero = () => {
       </div>
 
       {/* Decorative pattern */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-getigne-800/70 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-brand-800/70 pointer-events-none" />
     </section>
   );
 };

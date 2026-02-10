@@ -67,7 +67,7 @@ const RelatedArticleCard = ({ article }: RelatedArticleProps) => {
 
   return (
     <Link to={articleUrl} className="block">
-      <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-getigne-100 hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-brand-100 hover:shadow-md transition-shadow">
         <div className="h-40 overflow-hidden">
           <img
             src={article.image}
@@ -77,7 +77,7 @@ const RelatedArticleCard = ({ article }: RelatedArticleProps) => {
         </div>
         <div className="p-4">
           <h3 className="font-medium text-lg mb-2 line-clamp-2">{article.title}</h3>
-          <div className="flex items-center text-getigne-500 text-sm">
+          <div className="flex items-center text-brand-500 text-sm">
             <Calendar size={14} className="mr-1" />
             <time>{new Date(article.date).toLocaleDateString('fr-FR', {
               day: 'numeric',
@@ -451,7 +451,7 @@ const NewsDetailPage = () => {
           </div>
         )}
 
-      <div className="pt-24 pb-4 bg-getigne-50">
+      <div className="pt-24 pb-4 bg-brand-50">
         <div className="container mx-auto px-4">
           <div className="mb-4 flex items-center gap-2">
             <Button
@@ -480,10 +480,10 @@ const NewsDetailPage = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="bg-getigne-accent text-white px-4 py-1 rounded-full text-sm font-medium">
+              <span className="bg-brand text-brand-fg px-4 py-1 rounded-full text-sm font-medium">
                 {categoryName}
               </span>
-              <div className="flex items-center text-getigne-500 text-sm">
+              <div className="flex items-center text-brand-500 text-sm">
                 <Calendar size={16} className="mr-1" />
                 <time>{new Date(article.date).toLocaleDateString('fr-FR', {
                   day: 'numeric',
@@ -492,7 +492,7 @@ const NewsDetailPage = () => {
                 })}</time>
               </div>
               {authorName && (
-                <div className="flex items-center gap-2 text-getigne-500 text-sm">
+                <div className="flex items-center gap-2 text-brand-500 text-sm">
                   <Avatar className="h-6 w-6">
                     {article.author?.avatar_url && (
                       <AvatarImage src={article.author.avatar_url} alt={authorName} />
@@ -521,12 +521,12 @@ const NewsDetailPage = () => {
 
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-8">
-                  <Tag size={16} className="text-getigne-500 mr-2" />
+                  <Tag size={16} className="text-brand-500 mr-2" />
                   {tags.map((tag, index) => (
                     <Link
                       key={index}
                       to={`${Routes.NEWS}?tags=${tag}`}
-                      className="bg-getigne-50 text-getigne-700 px-3 py-1 rounded-full text-sm hover:bg-getigne-100 transition-colors"
+                      className="bg-brand-50 text-brand-700 px-3 py-1 rounded-full text-sm hover:bg-brand-100 transition-colors"
                     >
                       {tag}
                     </Link>
@@ -538,7 +538,7 @@ const NewsDetailPage = () => {
             {commentsEnabled && article.id && <CommentsSection newsId={article.id} />}
 
             {relatedArticles.length > 0 && (
-              <div className="mt-16 border-t border-getigne-100 pt-8">
+              <div className="mt-16 border-t border-brand-100 pt-8">
                 <h2 className="text-2xl font-bold mb-6">Articles similaires</h2>
                 <div className="grid md:grid-cols-3 gap-6">
                   {relatedArticles.map(relatedArticle => (
@@ -554,7 +554,7 @@ const NewsDetailPage = () => {
             <div className="mt-16">
               <Button
                 variant="outline"
-                className="border-getigne-200"
+                className="border-brand-200"
                 onClick={() => navigate(Routes.NEWS)}
               >
                 <ArrowLeft size={16} className="mr-2" />

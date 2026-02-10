@@ -375,7 +375,7 @@ export default function PointForm({
                             href={file.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="truncate text-getigne-accent hover:underline"
+                            className="truncate text-brand hover:underline"
                             title={file.url.split('/').pop()}
                           >
                             {file.url.split('/').pop()}

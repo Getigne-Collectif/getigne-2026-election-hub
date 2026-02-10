@@ -23,11 +23,11 @@ const iconMap = {
 export const getColorTheme = (colorClass: string | null) => {
   // Valeurs par défaut
   const defaultTheme = {
-    bg: 'bg-getigne-50',
-    text: 'text-getigne-accent',
-    border: 'border-getigne-100',
-    hover: 'hover:bg-getigne-100/50',
-    accent: 'bg-getigne-accent/10',
+    bg: 'bg-brand-50',
+    text: 'text-brand',
+    border: 'border-brand-100',
+    hover: 'hover:bg-brand-100/50',
+    accent: 'bg-brand/10',
     defaultCoverImage: 'https://images.unsplash.com/photo-1507878866276-a947ef722fee?auto=format&fit=crop&w=2971&q=80',
     defaultTeamImage: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=2970&q=80'
   };
@@ -196,9 +196,9 @@ const CommitteeItem = ({ committee, index }) => {
           <Icon className={themeColor.text} size={24} />
         </div>
         <h3 className="text-lg font-medium mb-2">{committee.title}</h3>
-        <p className="text-getigne-700 mb-2 line-clamp-2">{committee.description}</p>
+        <p className="text-brand-700 mb-2 line-clamp-2">{committee.description}</p>
 
-        <div className="flex items-center text-getigne-500 text-sm mb-3">
+        <div className="flex items-center text-brand-500 text-sm mb-3">
           <Users size={16} className="mr-1" />
           <span>{memberCount} {memberCount > 1 ? 'membres' : 'membre'}</span>
         </div>

@@ -561,7 +561,7 @@ const AdminEventEditorPage = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <label className={`cursor-pointer border-2 rounded-lg p-4 transition-all ${
                             eventType === 'regular' 
-                              ? 'border-getigne-accent bg-getigne-accent/5' 
+                              ? 'border-brand bg-brand/5' 
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <input
@@ -574,7 +574,7 @@ const AdminEventEditorPage = () => {
                             />
                             <div className="flex items-center gap-3">
                               <Calendar className={`w-5 h-5 ${
-                                eventType === 'regular' ? 'text-getigne-accent' : 'text-gray-400'
+                                eventType === 'regular' ? 'text-brand' : 'text-gray-400'
                               }`} />
                               <div>
                                 <div className="font-medium">Événement régulier</div>
@@ -587,7 +587,7 @@ const AdminEventEditorPage = () => {
 
                           <label className={`cursor-pointer border-2 rounded-lg p-4 transition-all ${
                             eventType === 'neighborhood' 
-                              ? 'border-getigne-accent bg-getigne-accent/5' 
+                              ? 'border-brand bg-brand/5' 
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <input
@@ -600,7 +600,7 @@ const AdminEventEditorPage = () => {
                             />
                             <div className="flex items-center gap-3">
                               <Coffee className={`w-5 h-5 ${
-                                eventType === 'neighborhood' ? 'text-getigne-accent' : 'text-gray-400'
+                                eventType === 'neighborhood' ? 'text-brand' : 'text-gray-400'
                               }`} />
                               <div>
                                 <div className="font-medium">Café de quartier</div>
@@ -662,8 +662,8 @@ const AdminEventEditorPage = () => {
 
                       {/* Champs spécifiques aux événements de voisinage */}
                       {eventType === 'neighborhood' && (
-                        <div className="space-y-4 p-4 bg-getigne-accent/5 rounded-lg border border-getigne-accent/20">
-                          <div className="flex items-center gap-2 text-getigne-accent font-medium">
+                        <div className="space-y-4 p-4 bg-brand/5 rounded-lg border border-brand/20">
+                          <div className="flex items-center gap-2 text-brand font-medium">
                             <Coffee className="w-5 h-5" />
                             Informations Café de quartier
                           </div>
@@ -725,7 +725,7 @@ const AdminEventEditorPage = () => {
                                 onCheckedChange={setKitProvided}
                               />
                               <Label htmlFor="kit-provided" className="flex items-center gap-2">
-                                <Package className="w-4 h-4 text-getigne-accent" />
+                                <Package className="w-4 h-4 text-brand" />
                                 Kit d'organisation fourni
                               </Label>
                             </div>
@@ -737,7 +737,7 @@ const AdminEventEditorPage = () => {
                                 onCheckedChange={setMemberPresent}
                               />
                               <Label htmlFor="member-present" className="flex items-center gap-2">
-                                <UserCheck className="w-4 h-4 text-getigne-accent" />
+                                <UserCheck className="w-4 h-4 text-brand" />
                                 Membre du collectif présent
                               </Label>
                             </div>
@@ -770,7 +770,7 @@ const AdminEventEditorPage = () => {
                       </Button>
                     </div>
 
-                    <div className="bg-getigne-50 p-4 rounded-lg">
+                    <div className="bg-brand-50 p-4 rounded-lg">
                       <h3 className="font-medium mb-4">État de publication</h3>
                       <select
                         value={status}
@@ -834,7 +834,7 @@ const AdminEventEditorPage = () => {
                       </div>
                     </div>
 
-                    <div className="bg-getigne-50 p-4 rounded-lg">
+                    <div className="bg-brand-50 p-4 rounded-lg">
                       <h3 className="font-medium mb-4">Paramètres d'inscription</h3>
                       
                       <div className="space-y-4">
@@ -842,7 +842,7 @@ const AdminEventEditorPage = () => {
                             <div className="flex items-center justify-between">
                               <div>
                                 <Label htmlFor="allow-registration" className="font-medium">Autoriser les inscriptions</Label>
-                                <p className="text-sm text-getigne-500">Activez pour permettre aux utilisateurs de s'inscrire à cet événement</p>
+                                <p className="text-sm text-brand-500">Activez pour permettre aux utilisateurs de s'inscrire à cet événement</p>
                               </div>
                               <Switch 
                                 id="allow-registration" 
@@ -854,7 +854,7 @@ const AdminEventEditorPage = () => {
                             <div className="flex items-center justify-between">
                               <div>
                                 <Label htmlFor="members-only" className="font-medium">Réservé aux adhérents</Label>
-                                <p className="text-sm text-getigne-500">Activez pour limiter les inscriptions aux adhérents uniquement</p>
+                                <p className="text-sm text-brand-500">Activez pour limiter les inscriptions aux adhérents uniquement</p>
                               </div>
                               <Switch 
                                 id="members-only" 
@@ -877,7 +877,7 @@ const AdminEventEditorPage = () => {
                                 placeholder="Illimité"
                                 className="mt-2"
                               />
-                              <p className="text-sm text-getigne-500 mt-1">
+                              <p className="text-sm text-brand-500 mt-1">
                                 Laissez vide pour ne pas limiter le nombre de participants
                               </p>
                             </div>
@@ -886,14 +886,14 @@ const AdminEventEditorPage = () => {
                     </div>
                     
                     {!isEditMode && (
-                      <div className="bg-getigne-50 p-4 rounded-lg">
+                      <div className="bg-brand-50 p-4 rounded-lg">
                         <h3 className="font-medium mb-4">Paramètres Discord</h3>
                         
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
                             <div>
                               <Label htmlFor="create-discord-event" className="font-medium">Créer un événement Discord</Label>
-                              <p className="text-sm text-getigne-500">Ajouter automatiquement l'événement au serveur Discord</p>
+                              <p className="text-sm text-brand-500">Ajouter automatiquement l'événement au serveur Discord</p>
                             </div>
                             <Switch 
                               id="create-discord-event" 
@@ -913,7 +913,7 @@ const AdminEventEditorPage = () => {
                                 value={estimatedDuration}
                                 onChange={(e) => setEstimatedDuration(parseInt(e.target.value))}
                               />
-                              <p className="text-sm text-getigne-500 mt-1">
+                              <p className="text-sm text-brand-500 mt-1">
                                 Durée estimée de l'événement pour le calendrier Discord
                               </p>
                             </div>

@@ -206,7 +206,7 @@ const DynamicPage = () => {
           <div className="flex flex-col justify-center items-center h-64">
             <h1 className="text-2xl font-bold mb-4">Page non trouvée</h1>
             <p className="text-muted-foreground mb-8">La page que vous recherchez n'existe pas ou n'est pas disponible.</p>
-            <Link to="/" className="text-getigne-accent hover:underline">
+            <Link to="/" className="text-brand hover:underline">
               Retour à l'accueil
             </Link>
           </div>
@@ -256,7 +256,7 @@ const DynamicPage = () => {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="prose prose-getigne max-w-none">
+          <div className="prose prose-brand max-w-none">
             <h1 className="text-3xl md:text-4xl font-bold mb-6">{page.title}</h1>
             <Separator className="mb-8" />
             

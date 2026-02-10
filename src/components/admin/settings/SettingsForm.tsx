@@ -198,117 +198,91 @@ export default function SettingsForm() {
               />
             </div>
 
-            <div className="grid md:grid-cols-5 gap-4">
-              <FormField
-                control={form.control}
-                name="branding.colors.dominant"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dominante</FormLabel>
-                    <div className="flex items-center gap-3">
-                      <FormControl>
-                        <Input placeholder="#34b190" {...field} />
-                      </FormControl>
-                      <Input
-                        type="color"
-                        value={field.value}
-                        onChange={(event) => field.onChange(event.target.value)}
-                        className="h-10 w-14 p-1"
-                        aria-label="Choisir la couleur dominante"
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(
+                [
+                  { key: 'dominant' as const, label: 'Dominante', bgPlaceholder: '#34b190', fgPlaceholder: '#ffffff' },
+                  { key: 'accent' as const, label: 'Accentuation', bgPlaceholder: '#34b190', fgPlaceholder: '#ffffff' },
+                  { key: 'proximity' as const, label: 'Proximité', bgPlaceholder: '#f97316', fgPlaceholder: '#ffffff' },
+                  { key: 'trust' as const, label: 'Confiance', bgPlaceholder: '#2563eb', fgPlaceholder: '#ffffff' },
+                  { key: 'danger' as const, label: 'Attention / danger / erreur', bgPlaceholder: '#dc2626', fgPlaceholder: '#ffffff' },
+                  { key: 'footer' as const, label: 'Pied de page', bgPlaceholder: '#1d1d1f', fgPlaceholder: '#ffffff' },
+                ] as const
+              ).map(({ key, label, bgPlaceholder, fgPlaceholder }) => (
+                <Card key={key} className="p-4">
+                  <p className="font-medium text-sm text-muted-foreground mb-3">{label}</p>
+                  <div className="space-y-3">
+                    <FormField
+                      control={form.control}
+                      name={`branding.colors.${key}.bg`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs">Fond</FormLabel>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Input placeholder={bgPlaceholder} {...field} className="font-mono text-sm" />
+                            </FormControl>
+                            <Input
+                              type="color"
+                              value={field.value}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              className="h-9 w-11 p-1 shrink-0"
+                              aria-label={`Couleur de fond ${label}`}
+                            />
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {key === 'dominant' && (
+                      <FormField
+                        control={form.control}
+                        name="branding.gradientEnd"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs">Fin de gradient</FormLabel>
+                            <div className="flex items-center gap-2">
+                              <FormControl>
+                                <Input placeholder="#06b6d4" {...field} className="font-mono text-sm" />
+                              </FormControl>
+                              <Input
+                                type="color"
+                                value={field.value}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                className="h-9 w-11 p-1 shrink-0"
+                                aria-label="Couleur de fin de gradient"
+                              />
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="branding.colors.accent"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Accentuation</FormLabel>
-                    <div className="flex items-center gap-3">
-                      <FormControl>
-                        <Input placeholder="#34b190" {...field} />
-                      </FormControl>
-                      <Input
-                        type="color"
-                        value={field.value}
-                        onChange={(event) => field.onChange(event.target.value)}
-                        className="h-10 w-14 p-1"
-                        aria-label="Choisir la couleur d'accentuation"
-                      />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="branding.colors.proximity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Proximité</FormLabel>
-                    <div className="flex items-center gap-3">
-                      <FormControl>
-                        <Input placeholder="#f97316" {...field} />
-                      </FormControl>
-                      <Input
-                        type="color"
-                        value={field.value}
-                        onChange={(event) => field.onChange(event.target.value)}
-                        className="h-10 w-14 p-1"
-                        aria-label="Choisir la couleur de proximité"
-                      />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="branding.colors.trust"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confiance</FormLabel>
-                    <div className="flex items-center gap-3">
-                      <FormControl>
-                        <Input placeholder="#2563eb" {...field} />
-                      </FormControl>
-                      <Input
-                        type="color"
-                        value={field.value}
-                        onChange={(event) => field.onChange(event.target.value)}
-                        className="h-10 w-14 p-1"
-                        aria-label="Choisir la couleur de confiance"
-                      />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="branding.colors.danger"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Attention / danger</FormLabel>
-                    <div className="flex items-center gap-3">
-                      <FormControl>
-                        <Input placeholder="#dc2626" {...field} />
-                      </FormControl>
-                      <Input
-                        type="color"
-                        value={field.value}
-                        onChange={(event) => field.onChange(event.target.value)}
-                        className="h-10 w-14 p-1"
-                        aria-label="Choisir la couleur d'attention"
-                      />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    )}
+                    <FormField
+                      control={form.control}
+                      name={`branding.colors.${key}.fg`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs">Texte sur fond</FormLabel>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Input placeholder={fgPlaceholder} {...field} className="font-mono text-sm" />
+                            </FormControl>
+                            <Input
+                              type="color"
+                              value={field.value}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              className="h-9 w-11 p-1 shrink-0"
+                              aria-label={`Couleur du texte sur ${label}`}
+                            />
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </Card>
+              ))}
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">

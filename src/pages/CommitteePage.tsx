@@ -262,11 +262,11 @@ const CommitteePage = () => {
         <div className="container py-8 mt-20 space-y-8">
           
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="bg-getigne-accent/10 text-getigne-accent font-medium px-4 py-1 rounded-full text-sm">
+          <span className="bg-brand/10 text-brand font-medium px-4 py-1 rounded-full text-sm">
             Démocratie participative
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Nos commissions citoyennes</h2>
-          <p className="text-getigne-700 text-lg">
+          <p className="text-brand-700 text-lg">
             Depuis mai 2024, des commissions citoyennes travaillent en lien avec nos élus sur des thématiques essentielles pour l'avenir de notre commune.
           </p>
         </div>
@@ -283,7 +283,7 @@ const CommitteePage = () => {
         <Navbar />
         <div className="container py-8 mt-20">
           <div className="flex items-center justify-center h-64">
-            <p className="text-xl text-getigne-700">Chargement des informations de la commission...</p>
+            <p className="text-xl text-brand-700">Chargement des informations de la commission...</p>
           </div>
         </div>
         <Footer />
@@ -297,7 +297,7 @@ const CommitteePage = () => {
         <Navbar />
         <div className="container py-8 mt-20">
           <div className="flex items-center justify-center h-64">
-            <p className="text-xl text-getigne-700">Commission non trouvée</p>
+            <p className="text-xl text-brand-700">Commission non trouvée</p>
           </div>
         </div>
         <Footer />
@@ -389,7 +389,7 @@ const CommitteePage = () => {
           </h2>
           <div className="flex flex-col md:flex-row md:gap-8">
             <div className="md:flex-1">
-              <p className="text-getigne-700 whitespace-pre-line mb-6">
+              <p className="text-brand-700 whitespace-pre-line mb-6">
                 {committee.description}
               </p>
 
@@ -406,7 +406,7 @@ const CommitteePage = () => {
                   className="w-full h-48 md:h-64 object-cover"
                 />
               </div>
-              <p className="text-center text-sm text-getigne-700 mt-2 italic">
+              <p className="text-center text-sm text-brand-700 mt-2 italic">
                 Les membres de la commission {committee.title} lors d'une réunion de travail
               </p>
             </div>
@@ -421,7 +421,7 @@ const CommitteePage = () => {
                 <FileText className={`${themeColor.text} mr-2`} size={22} />
                 <span>Travaux de la commission</span>
               </h2>
-              <p className="text-getigne-700">
+              <p className="text-brand-700">
                 Retrouvez ci-dessous les comptes-rendus, études et propositions réalisés par la commission {committee.title}.
                 Ces travaux constituent la base de notre réflexion pour élaborer des propositions concrètes pour Gétigné.
               </p>
@@ -439,7 +439,7 @@ const CommitteePage = () => {
             <div className={`p-6 rounded-lg ${themeColor.bg} border ${themeColor.border}`}>
               <div className="flex items-center">
                 <FileText className={`${themeColor.text} mr-3`} size={24} />
-                <p className="text-getigne-700">
+                <p className="text-brand-700">
                   Aucun travail n'a encore été publié par cette commission. Les premières publications arriveront prochainement !
                 </p>
               </div>
@@ -475,7 +475,7 @@ const CommitteePage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 mb-3 text-sm text-getigne-500">
+                  <div className="flex items-center gap-4 mb-3 text-sm text-brand-500">
                     <div className="flex items-center">
                       <Calendar size={14} className="mr-1" />
                       <span>
@@ -488,7 +488,7 @@ const CommitteePage = () => {
                     </div>
                   </div>
 
-                  <p className="mt-2 text-getigne-700 mb-4">
+                  <p className="mt-2 text-brand-700 mb-4">
                     {work.content.length > 160 ? `${work.content.substring(0, 160)}...` : work.content}
                   </p>
 
@@ -545,7 +545,7 @@ const CommitteePage = () => {
                   <span>Commission {prevCommittee.title}</span>
                 </Link>
               ) : (
-                <span className="text-getigne-500 flex items-center">
+                <span className="text-brand-500 flex items-center">
                   <ArrowLeft className="h-4 w-4 mr-2 opacity-50" />
                   <span>Première commission</span>
                 </span>
@@ -562,7 +562,7 @@ const CommitteePage = () => {
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               ) : (
-                <span className="text-getigne-500 flex items-center justify-end">
+                <span className="text-brand-500 flex items-center justify-end">
                   <span>Dernière commission</span>
                   <ArrowRight className="h-4 w-4 ml-2 opacity-50" />
                 </span>

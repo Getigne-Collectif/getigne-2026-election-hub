@@ -303,12 +303,12 @@ const NewsManagement: React.FC<NewsManagementProps> = ({
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {displayTags.slice(0, 3).map((tag, i) => (
-                        <Badge key={i} variant="outline" className="bg-getigne-50">
+                        <Badge key={i} variant="outline" className="bg-brand-50">
                           {tag}
                         </Badge>
                       ))}
                       {displayTags.length > 3 && (
-                        <Badge variant="outline" className="bg-getigne-50">
+                        <Badge variant="outline" className="bg-brand-50">
                           +{displayTags.length - 3}
                         </Badge>
                       )}

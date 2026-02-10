@@ -29,7 +29,7 @@ function TimelineItem({ event, index, isLast }: TimelineItemProps) {
       {/* Ligne verticale et cercle */}
       <div className="relative flex flex-col items-center flex-shrink-0">
         <div
-          className="w-7 h-7 rounded-full flex items-center justify-center border-2 border-gray-300 bg-white text-gray-500 shadow-sm transition-all duration-200 group-hover:border-getigne-accent group-hover:bg-getigne-accent group-hover:text-white z-10"
+          className="w-7 h-7 rounded-full flex items-center justify-center border-2 border-gray-300 bg-white text-gray-500 shadow-sm transition-all duration-200 group-hover:border-brand group-hover:bg-brand group-hover:text-brand-fg z-10"
         >
           {event.icon ? (
             <DynamicIcon name={event.icon} className="w-3.5 h-3.5" />
@@ -39,7 +39,7 @@ function TimelineItem({ event, index, isLast }: TimelineItemProps) {
         </div>
         {!isLast && (
           <div
-            className="absolute top-7 left-1/2 -translate-x-1/2 w-0.5 h-full bg-gray-200 transition-colors duration-200 group-hover:bg-getigne-accent"
+            className="absolute top-7 left-1/2 -translate-x-1/2 w-0.5 h-full bg-gray-200 transition-colors duration-200 group-hover:bg-brand"
             style={{ height: 'calc(100% + 2rem)' }}
           />
         )}
@@ -47,10 +47,10 @@ function TimelineItem({ event, index, isLast }: TimelineItemProps) {
 
       {/* Contenu */}
       <div className="flex-1 pb-6">
-        <div className="inline-block px-2 py-0.5 rounded-full text-xs font-medium mb-1.5 bg-gray-100 text-gray-600 transition-colors duration-200 group-hover:bg-getigne-accent/10 group-hover:text-getigne-accent">
+        <div className="inline-block px-2 py-0.5 rounded-full text-xs font-medium mb-1.5 bg-gray-100 text-gray-600 transition-colors duration-200 group-hover:bg-brand/10 group-hover:text-brand">
           {event.date_text}
         </div>
-        <h4 className="text-sm font-semibold text-getigne-900 leading-snug transition-colors duration-200 group-hover:text-getigne-accent">
+        <h4 className="text-sm font-semibold text-brand-900 leading-snug transition-colors duration-200 group-hover:text-brand">
           {event.name}
         </h4>
       </div>
@@ -121,7 +121,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
         <div className="max-w-6xl mx-auto">
           {/* Badge numéro */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-getigne-accent text-white shadow-lg">
+            <div className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-brand text-brand-fg shadow-lg">
               <span className="text-2xl md:text-3xl font-bold">{String(index + 1).padStart(2, '0')}</span>
             </div>
             <div className="h-px flex-1 bg-gray-300" />
@@ -129,7 +129,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
 
           {/* Titre avec bouton d'édition */}
           <div className="flex items-start justify-between gap-4 mb-6 md:mb-8">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-getigne-900 leading-tight flex-1">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-brand-900 leading-tight flex-1">
               {project.title}
             </h2>
             {isProgramAdmin && onEditProject && (
@@ -159,7 +159,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
                       {project.effects.map((effect) => (
                         <span
                           key={effect.id}
-                          className="inline-flex items-center gap-2 rounded-full bg-white/95 text-getigne-700 border border-white px-3 py-1 text-xs md:text-sm font-semibold shadow"
+                          className="inline-flex items-center gap-2 rounded-full bg-white/95 text-brand-700 border border-white px-3 py-1 text-xs md:text-sm font-semibold shadow"
                         >
                           {effect.icon && (
                             <span
@@ -182,7 +182,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
                     {project.effects.map((effect) => (
                       <span
                         key={effect.id}
-                        className="inline-flex items-center gap-2 rounded-full bg-gray-100 text-getigne-700 border border-gray-200 px-3 py-1 text-xs md:text-sm font-semibold"
+                        className="inline-flex items-center gap-2 rounded-full bg-gray-100 text-brand-700 border border-gray-200 px-3 py-1 text-xs md:text-sm font-semibold"
                       >
                         {effect.icon && (
                           <span
@@ -210,7 +210,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
                 {/* En-tête avec horizon - arrondi en haut, droit en bas */}
                 {project.timeline && project.timeline.length > 0 && (
                   <>
-                    <div className="bg-gradient-to-br from-getigne-accent to-cyan-500 rounded-t-xl md:rounded-t-2xl p-4 text-white">
+                    <div className="bg-gradient-to-br from-brand to-brand-gradient-end rounded-t-xl md:rounded-t-2xl p-4 text-white">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm">
                           <Clock className="w-5 h-5" />
@@ -242,7 +242,7 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
                   <div className="p-4 md:p-6 border-t border-gray-200">
                     <Button
                       variant="default"
-                      className="w-full bg-getigne-accent text-white hover:bg-getigne-accent/90"
+                      className="w-full bg-brand text-brand-fg hover:bg-brand/90"
                       onClick={async () => {
                         try {
                           if (project.file_path) {
@@ -279,8 +279,8 @@ function ProjectSection({ project, index, isProgramAdmin, onEditProject }: Proje
               onClick={() => setShowComments(!showComments)}
             >
               <div className="flex items-center gap-3">
-                <MessageSquare className="w-5 h-5 text-getigne-accent" />
-                <span className="font-semibold text-getigne-900">Commenter</span>
+                <MessageSquare className="w-5 h-5 text-brand" />
+                <span className="font-semibold text-brand-900">Commenter</span>
                 {commentCount > 0 && (
                   <CommentCountBadge
                     totalCount={commentCount}
@@ -347,7 +347,7 @@ export default function FlagshipProjectsShowcase({ projects, isProgramAdmin, onE
           showSticky ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
         }`}
       >
-        <div className="bg-gradient-to-r from-getigne-accent to-cyan-500 border-b border-white/20 shadow-md">
+        <div className="bg-gradient-to-r from-brand to-brand-gradient-end border-b border-white/20 shadow-md">
           <div className="container mx-auto px-4 py-3">
             <div className="max-w-6xl mx-auto flex items-center gap-2 text-white">
               <Sparkles className="w-4 h-4" />
@@ -358,7 +358,7 @@ export default function FlagshipProjectsShowcase({ projects, isProgramAdmin, onE
       </div>
 
       {/* Header section */}
-      <div ref={headerRef} className="bg-gradient-to-r from-getigne-accent to-cyan-500 py-12 md:py-16 lg:py-20">
+      <div ref={headerRef} className="bg-gradient-to-r from-brand to-brand-gradient-end py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full text-white text-xs md:text-sm font-medium mb-4 md:mb-6">
