@@ -41,11 +41,11 @@
     --getigne-accent-light: 159 54% 55%;
     --getigne-accent-darker: 159 54% 35%;
 
-    --site-green: #34b190;
-    --site-yellow: #fbbf24;
-    --site-orange: #f97316;
-    --site-blue: #2563eb;
-    --site-red: #dc2626;
+    --site-dominant: #34b190;
+    --site-accent: #34b190;
+    --site-proximity: #f97316;
+    --site-trust: #2563eb;
+    --site-danger: #dc2626;
   }
 
   .dark {

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Form,
   FormControl,
@@ -33,6 +34,7 @@ type SettingsFormValues = SiteSettings;
 export default function SettingsForm() {
   const { settings, loading, updateSettings } = useAppSettings();
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const moduleFields: { name: Path<SettingsFormValues>; label: string }[] = [
     { name: 'modules.program', label: 'Programme' },
     { name: 'modules.supportCommittee', label: 'Comité de soutien' },
@@ -67,6 +69,32 @@ export default function SettingsForm() {
       toast.error("Impossible d'enregistrer les paramètres du site.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const uploadImage = async (file: File) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${crypto.randomUUID()}.${fileExt}`;
+    const filePath = `site/${fileName}`;
+
+    setIsUploading(true);
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('site-assets')
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('site-assets')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Erreur upload image:', error);
+      toast.error("Impossible d'envoyer l'image.");
+      throw error;
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -128,6 +156,19 @@ export default function SettingsForm() {
                     <FormDescription>
                       Chemin relatif ou URL absolue.
                     </FormDescription>
+                    <div className="mt-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploading}
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) return;
+                          const url = await uploadImage(file);
+                          field.onChange(url);
+                        }}
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -150,10 +191,10 @@ export default function SettingsForm() {
             <div className="grid md:grid-cols-5 gap-4">
               <FormField
                 control={form.control}
-                name="branding.colors.green"
+                name="branding.colors.dominant"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vert</FormLabel>
+                    <FormLabel>Dominante</FormLabel>
                     <FormControl>
                       <Input placeholder="#34b190" {...field} />
                     </FormControl>
@@ -163,12 +204,12 @@ export default function SettingsForm() {
               />
               <FormField
                 control={form.control}
-                name="branding.colors.yellow"
+                name="branding.colors.accent"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Jaune</FormLabel>
+                    <FormLabel>Accentuation</FormLabel>
                     <FormControl>
-                      <Input placeholder="#fbbf24" {...field} />
+                      <Input placeholder="#34b190" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -176,10 +217,10 @@ export default function SettingsForm() {
               />
               <FormField
                 control={form.control}
-                name="branding.colors.orange"
+                name="branding.colors.proximity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Orange</FormLabel>
+                    <FormLabel>Proximité</FormLabel>
                     <FormControl>
                       <Input placeholder="#f97316" {...field} />
                     </FormControl>
@@ -189,10 +230,10 @@ export default function SettingsForm() {
               />
               <FormField
                 control={form.control}
-                name="branding.colors.blue"
+                name="branding.colors.trust"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bleu</FormLabel>
+                    <FormLabel>Confiance</FormLabel>
                     <FormControl>
                       <Input placeholder="#2563eb" {...field} />
                     </FormControl>
@@ -202,10 +243,10 @@ export default function SettingsForm() {
               />
               <FormField
                 control={form.control}
-                name="branding.colors.red"
+                name="branding.colors.danger"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rouge</FormLabel>
+                    <FormLabel>Attention / danger</FormLabel>
                     <FormControl>
                       <Input placeholder="#dc2626" {...field} />
                     </FormControl>
@@ -225,6 +266,19 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="https://..." {...field} />
                     </FormControl>
+                    <div className="mt-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploading}
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) return;
+                          const url = await uploadImage(file);
+                          field.onChange(url);
+                        }}
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -238,6 +292,19 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="/images/..." {...field} />
                     </FormControl>
+                    <div className="mt-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploading}
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) return;
+                          const url = await uploadImage(file);
+                          field.onChange(url);
+                        }}
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -251,6 +318,74 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="/images/..." {...field} />
                     </FormControl>
+                    <div className="mt-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploading}
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) return;
+                          const url = await uploadImage(file);
+                          field.onChange(url);
+                        }}
+                      />
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="branding.images.joinMembershipPrimary"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Photo adhésion 1</FormLabel>
+                    <FormControl>
+                      <Input placeholder="/images/..." {...field} />
+                    </FormControl>
+                    <div className="mt-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploading}
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) return;
+                          const url = await uploadImage(file);
+                          field.onChange(url);
+                        }}
+                      />
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.images.joinMembershipSecondary"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Photo adhésion 2</FormLabel>
+                    <FormControl>
+                      <Input placeholder="/images/..." {...field} />
+                    </FormControl>
+                    <div className="mt-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploading}
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) return;
+                          const url = await uploadImage(file);
+                          field.onChange(url);
+                        }}
+                      />
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -345,6 +480,23 @@ export default function SettingsForm() {
                   <FormControl>
                     <Textarea rows={3} {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="content.membershipText"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Texte adhésion</FormLabel>
+                  <FormControl>
+                    <Textarea rows={3} {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Texte principal du bloc adhésion dans la page « Comment nous aider ».
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -480,7 +632,7 @@ export default function SettingsForm() {
             ))}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSaving}>
+            <Button type="submit" disabled={isSaving || isUploading}>
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

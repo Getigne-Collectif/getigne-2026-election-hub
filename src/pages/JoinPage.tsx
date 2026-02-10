@@ -20,6 +20,7 @@ import SupportCommitteeForm from "@/components/SupportCommitteeForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 interface Supporter {
   id: number;
@@ -31,13 +32,18 @@ interface Supporter {
 const JoinPage = () => {
   const location = useLocation();
   const { capture } = usePostHog();
+  const { settings } = useAppSettings();
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supporters, setSupporters] = useState<Supporter[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const showSupportCommittee = settings.modules.supportCommittee;
+  const showMembershipForm = settings.modules.membershipForm;
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchSupporters();
+    if (showSupportCommittee) {
+      fetchSupporters();
+    }
     
     // Check if URL has #contact hash
     if (location.hash === '#contact') {
@@ -48,9 +54,10 @@ const JoinPage = () => {
         }
       }, 500);
     }
-  }, [location]);
+  }, [location, showSupportCommittee]);
 
   const fetchSupporters = async () => {
+    if (!showSupportCommittee) return;
     const { data, error } = await supabase
       .from('support_committee')
       .select('id, first_name, last_name, city')
@@ -142,21 +149,25 @@ const JoinPage = () => {
                 Il existe plusieurs façons de soutenir Gétigné Collectif, selon vos envies et vos disponibilités. Chaque geste compte pour construire ensemble l'avenir de notre commune.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button 
-                  size="lg" 
-                  className="bg-getigne-accent hover:bg-getigne-accent/90 text-white px-8"
-                  onClick={() => scrollToSection('support-committee')}
-                >
-                  <PenLine className="mr-2 h-5 w-5 fill-current" /> Signer le comité de soutien
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5 px-8"
-                  onClick={() => scrollToSection('membership')}
-                >
-                  <Users className="mr-2 h-5 w-5" /> Devenir adhérent
-                </Button>
+                {showSupportCommittee && (
+                  <Button 
+                    size="lg" 
+                    className="bg-getigne-accent hover:bg-getigne-accent/90 text-white px-8"
+                    onClick={() => scrollToSection('support-committee')}
+                  >
+                    <PenLine className="mr-2 h-5 w-5 fill-current" /> Signer le comité de soutien
+                  </Button>
+                )}
+                {showMembershipForm && (
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-getigne-accent text-getigne-accent hover:bg-getigne-accent/5 px-8"
+                    onClick={() => scrollToSection('membership')}
+                  >
+                    <Users className="mr-2 h-5 w-5" /> Devenir adhérent
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -164,6 +175,7 @@ const JoinPage = () => {
 
         <main className="flex-grow">
           {/* Section 1: Comité de soutien (Engagement léger) */}
+          {showSupportCommittee && (
           <section id="support-committee" className="py-20 bg-white">
             <div className="container mx-auto px-4">
               <div className="max-w-5xl mx-auto">
@@ -261,18 +273,22 @@ const JoinPage = () => {
               </div>
             </div>
           </section>
+          )}
 
           {/* Transition Divider */}
-          <div className="bg-getigne-50 py-10">
-            <div className="container mx-auto px-4 flex justify-center">
-              <div className="bg-white p-4 rounded-full shadow-sm border border-getigne-100 flex items-center gap-3 animate-bounce">
-                <p className="text-sm font-medium text-getigne-600">Vous voulez aller plus loin ?</p>
-                <ArrowRight className="h-4 w-4 text-getigne-accent rotate-90" />
+          {showSupportCommittee && showMembershipForm && (
+            <div className="bg-getigne-50 py-10">
+              <div className="container mx-auto px-4 flex justify-center">
+                <div className="bg-white p-4 rounded-full shadow-sm border border-getigne-100 flex items-center gap-3 animate-bounce">
+                  <p className="text-sm font-medium text-getigne-600">Vous voulez aller plus loin ?</p>
+                  <ArrowRight className="h-4 w-4 text-getigne-accent rotate-90" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Section 2: Adhésion (Engagement fort) */}
+          {showMembershipForm && (
           <section id="membership" className="py-20 bg-getigne-50">
             <div className="container mx-auto px-4">
               <div className="max-w-5xl mx-auto">
@@ -360,7 +376,7 @@ const JoinPage = () => {
                       <div className="border-t border-getigne-100 pt-10 mt-10">
                         <div className="text-center mb-8">
                           <p className="text-getigne-700 bg-getigne-50 p-6 rounded-xl border border-getigne-100 inline-block max-w-2xl">
-                            L'adhésion annuelle est à <strong>prix libre</strong> : chaque personne donne selon ses moyens. Vous pouvez également faire un don libre pour soutenir nos actions.
+                            {settings.content.membershipText}
                           </p>
                         </div>
 
@@ -388,14 +404,14 @@ const JoinPage = () => {
                   <div className="flex flex-col gap-6 h-full justify-between">
                     <div className="rounded-2xl overflow-hidden shadow-md flex-grow">
                       <img
-                        src="/images/reunion.jpg"
+                        src={settings.branding.images.joinMembershipPrimary}
                         alt="Réunion du collectif"
                         className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
                       />
                     </div>
                     <div className="rounded-2xl overflow-hidden shadow-md flex-grow">
                       <img
-                        src="/images/reunion2.jpg"
+                        src={settings.branding.images.joinMembershipSecondary}
                         alt="Réunion du collectif à l'extérieur"
                         className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
                       />
@@ -405,6 +421,7 @@ const JoinPage = () => {
               </div>
             </div>
           </section>
+          )}
 
           {/* Contact Form Section */}
           <section id="contact-form" className="py-20 px-4 bg-white border-t border-getigne-100">
@@ -429,14 +446,16 @@ const JoinPage = () => {
         <Footer />
       </div>
 
-      <SupportCommitteeForm
-        open={isSupportFormOpen}
-        onOpenChange={setIsSupportFormOpen}
-        onSuccess={() => {
-          setIsSupportFormOpen(false);
-          fetchSupporters();
-        }}
-      />
+      {showSupportCommittee && (
+        <SupportCommitteeForm
+          open={isSupportFormOpen}
+          onOpenChange={setIsSupportFormOpen}
+          onSuccess={() => {
+            setIsSupportFormOpen(false);
+            fetchSupporters();
+          }}
+        />
+      )}
     </HelmetProvider>
   );
 };

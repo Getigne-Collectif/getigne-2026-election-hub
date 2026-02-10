@@ -36,6 +36,7 @@ const Navbar = () => {
 
   const showSupportModule =
     settings.modules.supportCommittee || settings.modules.membershipForm;
+  const showProgramLink = settings.modules.program;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,7 +111,7 @@ const Navbar = () => {
           Accueil
         </Link>
       </li>
-      {canAccessProgram && (
+      {showProgramLink && (
         <li>
           <Link
             to={Routes.PROGRAM}
@@ -274,7 +275,7 @@ const Navbar = () => {
     <Button asChild className={`bg-getigne-accent hover:bg-getigne-accent/90 text-white shadow-sm transition-all hover:scale-105 active:scale-95 relative ${className}`}>
       <Link to={Routes.JOIN} className="flex items-center gap-2">
         <span>Je soutiens</span>
-        {supportersCount !== null && supportersCount > 0 && (
+        {settings.modules.supportCommittee && supportersCount !== null && supportersCount > 0 && (
           <Badge variant="secondary" className="ml-1 bg-white text-getigne-accent hover:bg-white px-1.5 py-0 min-w-[1.2rem] h-5 flex items-center justify-center rounded-full text-[10px] font-bold border-none">
             {supportersCount}
           </Badge>

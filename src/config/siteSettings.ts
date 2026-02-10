@@ -20,19 +20,19 @@ export enum ModuleKey {
 }
 
 export enum BrandColorKey {
-  Green = 'green',
-  Yellow = 'yellow',
-  Orange = 'orange',
-  Blue = 'blue',
-  Red = 'red',
+  Dominant = 'dominant',
+  Accent = 'accent',
+  Proximity = 'proximity',
+  Trust = 'trust',
+  Danger = 'danger',
 }
 
 export type BrandColors = {
-  green: string;
-  yellow: string;
-  orange: string;
-  blue: string;
-  red: string;
+  dominant: string;
+  accent: string;
+  proximity: string;
+  trust: string;
+  danger: string;
 };
 
 export type BrandingSettings = {
@@ -45,6 +45,8 @@ export type BrandingSettings = {
     hero: string;
     campaign: string;
     neighborhood: string;
+    joinMembershipPrimary: string;
+    joinMembershipSecondary: string;
   };
 };
 
@@ -58,6 +60,7 @@ export type ContentSettings = {
   contactPhone: string;
   contactAddress: string;
   siteDescription: string;
+  membershipText: string;
 };
 
 export type MapSettings = {
@@ -101,16 +104,18 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     logoUrl: '/images/getigne-collectif-logo.png',
     city: 'Gétigné',
     colors: {
-      green: '#34b190',
-      yellow: '#fbbf24',
-      orange: '#f97316',
-      blue: '#2563eb',
-      red: '#dc2626',
+      dominant: '#34b190',
+      accent: '#34b190',
+      proximity: '#f97316',
+      trust: '#2563eb',
+      danger: '#dc2626',
     },
     images: {
       hero: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80',
       campaign: '/images/GC-group1.jpg',
       neighborhood: '/images/getigne-places.png',
+      joinMembershipPrimary: '/images/reunion.jpg',
+      joinMembershipSecondary: '/images/reunion2.jpg',
     },
   },
   content: {
@@ -126,6 +131,8 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
     contactAddress: '19 le bois de la roche\n44190 Gétigné',
     siteDescription:
       'Collectif citoyen engagé pour les élections municipales depuis 2020 à Gétigné.',
+    membershipText:
+      "L'adhésion annuelle est à prix libre : chaque personne donne selon ses moyens. Vous pouvez également faire un don libre pour soutenir nos actions.",
   },
   map: {
     center: { lat: 47.0847, lng: -1.2614 },
@@ -152,16 +159,18 @@ const brandingSchema = z.object({
   logoUrl: z.string().min(1),
   city: z.string().min(1),
   colors: z.object({
-    green: colorSchema,
-    yellow: colorSchema,
-    orange: colorSchema,
-    blue: colorSchema,
-    red: colorSchema,
+    dominant: colorSchema,
+    accent: colorSchema,
+    proximity: colorSchema,
+    trust: colorSchema,
+    danger: colorSchema,
   }),
   images: z.object({
     hero: z.string().min(1),
     campaign: z.string().min(1),
     neighborhood: z.string().min(1),
+    joinMembershipPrimary: z.string().min(1),
+    joinMembershipSecondary: z.string().min(1),
   }),
 });
 
@@ -175,6 +184,7 @@ const contentSchema = z.object({
   contactPhone: z.string().min(1),
   contactAddress: z.string().min(1),
   siteDescription: z.string().min(1),
+  membershipText: z.string().min(1),
 });
 
 const mapSchema = z.object({
@@ -263,6 +273,15 @@ export function normalizeSiteSettingsValue<K extends SiteSettingsSection>(
   value: unknown,
   defaults: SiteSettingsByKey[K]
 ): SiteSettingsByKey[K] {
+  if (section === SiteSettingsSection.Branding) {
+    const normalized = normalizeBrandingValue(value);
+    return normalized as SiteSettingsByKey[K];
+  }
+  if (section === SiteSettingsSection.Content) {
+    const normalized = normalizeContentValue(value);
+    return normalized as SiteSettingsByKey[K];
+  }
+
   const schema = siteSettingsSectionSchema[section];
   const parsed = schema.safeParse(value);
   if (parsed.success) {
@@ -320,6 +339,53 @@ export function normalizeSiteSettings(
   return mergeSiteSettings(DEFAULT_SITE_SETTINGS, overrides);
 }
 
+function normalizeBrandingValue(value: unknown): BrandingSettings {
+  if (!value || typeof value !== 'object') {
+    return DEFAULT_SITE_SETTINGS.branding;
+  }
+  const raw = value as Partial<BrandingSettings> & {
+    colors?: Partial<BrandingSettings['colors']> & {
+      green?: string;
+      yellow?: string;
+      orange?: string;
+      blue?: string;
+      red?: string;
+    };
+  };
+
+  const legacyColors = raw.colors ?? {};
+  const colors = {
+    dominant: raw.colors?.dominant ?? legacyColors.green ?? DEFAULT_SITE_SETTINGS.branding.colors.dominant,
+    accent: raw.colors?.accent ?? legacyColors.green ?? DEFAULT_SITE_SETTINGS.branding.colors.accent,
+    proximity: raw.colors?.proximity ?? legacyColors.orange ?? DEFAULT_SITE_SETTINGS.branding.colors.proximity,
+    trust: raw.colors?.trust ?? legacyColors.blue ?? DEFAULT_SITE_SETTINGS.branding.colors.trust,
+    danger: raw.colors?.danger ?? legacyColors.red ?? DEFAULT_SITE_SETTINGS.branding.colors.danger,
+  };
+
+  const merged = mergeSiteSettings(DEFAULT_SITE_SETTINGS, {
+    branding: {
+      ...raw,
+      colors,
+      images: {
+        ...raw.images,
+      },
+    },
+  });
+
+  const parsed = brandingSchema.safeParse(merged.branding);
+  return parsed.success ? parsed.data : DEFAULT_SITE_SETTINGS.branding;
+}
+
+function normalizeContentValue(value: unknown): ContentSettings {
+  if (!value || typeof value !== 'object') {
+    return DEFAULT_SITE_SETTINGS.content;
+  }
+  const raw = value as Partial<ContentSettings>;
+  const merged = mergeSiteSettings(DEFAULT_SITE_SETTINGS, { content: raw });
+  const parsed = contentSchema.safeParse(merged.content);
+  return parsed.success ? parsed.data : DEFAULT_SITE_SETTINGS.content;
+}
+
 function hexToHsl(value: string): string | null {
   const hex = value.replace('#', '');
   if (![3, 6].includes(hex.length)) return null;
@@ -364,16 +430,20 @@ export function applySiteTheme(settings: SiteSettings) {
   if (typeof document === 'undefined') return;
 
   const root = document.documentElement;
-  root.style.setProperty('--site-green', settings.branding.colors.green);
-  root.style.setProperty('--site-yellow', settings.branding.colors.yellow);
-  root.style.setProperty('--site-orange', settings.branding.colors.orange);
-  root.style.setProperty('--site-blue', settings.branding.colors.blue);
-  root.style.setProperty('--site-red', settings.branding.colors.red);
+  root.style.setProperty('--site-dominant', settings.branding.colors.dominant);
+  root.style.setProperty('--site-accent', settings.branding.colors.accent);
+  root.style.setProperty('--site-proximity', settings.branding.colors.proximity);
+  root.style.setProperty('--site-trust', settings.branding.colors.trust);
+  root.style.setProperty('--site-danger', settings.branding.colors.danger);
 
-  const accentHsl = hexToHsl(settings.branding.colors.green);
+  const dominantHsl = hexToHsl(settings.branding.colors.dominant);
+  if (dominantHsl) {
+    root.style.setProperty('--primary', dominantHsl);
+    root.style.setProperty('--ring', dominantHsl);
+  }
+
+  const accentHsl = hexToHsl(settings.branding.colors.accent);
   if (accentHsl) {
     root.style.setProperty('--getigne-accent', accentHsl);
-    root.style.setProperty('--primary', accentHsl);
-    root.style.setProperty('--ring', accentHsl);
   }
 }
