@@ -18,6 +18,7 @@ interface NeighborhoodEventsMapProps {
   selectedEvent?: NeighborhoodEvent | null;
   onEventSelect?: (event: NeighborhoodEvent) => void;
   center?: { lat: number; lng: number };
+  zoom?: number;
 }
 
 // Composant Map qui utilise l'API Google Maps
@@ -26,7 +27,8 @@ const Map: React.FC<{
   selectedEvent?: NeighborhoodEvent | null;
   onEventSelect?: (event: NeighborhoodEvent) => void;
   center: { lat: number; lng: number };
-}> = ({ events, selectedEvent, onEventSelect, center }) => {
+  zoom: number;
+}> = ({ events, selectedEvent, onEventSelect, center, zoom }) => {
   const ref = React.useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
@@ -36,7 +38,7 @@ const Map: React.FC<{
     if (ref.current && !map) {
       const newMap = new window.google.maps.Map(ref.current, {
         center,
-        zoom: 13,
+        zoom,
         styles: [
           {
             featureType: "poi",
@@ -50,7 +52,7 @@ const Map: React.FC<{
       const newInfoWindow = new google.maps.InfoWindow();
       setInfoWindow(newInfoWindow);
     }
-  }, [ref, map, center]);
+  }, [ref, map, center, zoom]);
 
   // Gestion des marqueurs
   React.useEffect(() => {
@@ -133,6 +135,12 @@ const Map: React.FC<{
     }
   }, [map, selectedEvent]);
 
+  React.useEffect(() => {
+    if (map && (!selectedEvent || !selectedEvent.latitude || !selectedEvent.longitude)) {
+      map.setZoom(zoom);
+    }
+  }, [map, zoom, selectedEvent]);
+
   return <div ref={ref} style={{ width: '100%', height: '100%' }} />;
 };
 
@@ -180,7 +188,8 @@ const NeighborhoodEventsMap: React.FC<NeighborhoodEventsMapProps> = ({
   events,
   selectedEvent,
   onEventSelect,
-  center = { lat: 47.0847, lng: -1.2614 } // Coordonnées de Gétigné
+  center = { lat: 47.0847, lng: -1.2614 }, // Coordonnées de Gétigné
+  zoom = 13,
 }) => {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_TOKEN;
 
@@ -213,6 +222,7 @@ const NeighborhoodEventsMap: React.FC<NeighborhoodEventsMapProps> = ({
               selectedEvent={selectedEvent}
               onEventSelect={onEventSelect}
               center={center}
+              zoom={zoom}
             />
           </Wrapper>
         </div>

@@ -29,11 +29,13 @@ const Navbar = () => {
   const [hasRefreshedRoles, setHasRefreshedRoles] = useState(false);
   const { settings } = useAppSettings();
 
-  // Détermine si l'utilisateur peut accéder au programme
   const canAccessProgram = 
-    settings.showProgram || 
+    settings.modules.program || 
     userRoles.includes('admin') || 
     userRoles.includes('program_manager');
+
+  const showSupportModule =
+    settings.modules.supportCommittee || settings.modules.membershipForm;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +51,8 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    if (!showSupportModule) return;
+
     const fetchSupportersCount = async () => {
       try {
         const { count, error } = await supabase
@@ -76,7 +80,7 @@ const Navbar = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [showSupportModule]);
 
   const isActive = (path: string) => {
     return location.pathname === path
@@ -106,57 +110,65 @@ const Navbar = () => {
           Accueil
         </Link>
       </li>
-      <li>
-        <Link
-          to={Routes.PROGRAM}
-          className={
-            isActive(Routes.PROGRAM)
-              ? 'text-getigne-accent'
-              : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
-          }
-        >
-          Le programme
-        </Link>
-      </li>
-      <li>
-        <Link to={Routes.NEWS} className={isActive(Routes.NEWS)}>
-          Actualités
-        </Link>
-      </li>
-      <li className="relative">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button 
-              className={`flex items-center ${
-                location.pathname === Routes.AGENDA || location.pathname === Routes.NEIGHBORHOOD_EVENTS 
-                  ? 'text-getigne-accent' 
-                  : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200'
-              }`}
-            >
-              Agenda
-              <ChevronDown className="ml-1 h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem asChild>
-              <Link to={Routes.AGENDA} className="w-full flex items-center">
-                Tous les événements
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={Routes.NEIGHBORHOOD_EVENTS} className="w-full flex items-center">
-                <Coffee className="mr-2 h-4 w-4" />
-                Cafés de quartier
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </li>
-      <li>
-        <Link to={Routes.PROXY} className={isActive(Routes.PROXY)}>
-          Espace procuration
-        </Link>
-      </li>
+      {canAccessProgram && (
+        <li>
+          <Link
+            to={Routes.PROGRAM}
+            className={
+              isActive(Routes.PROGRAM)
+                ? 'text-getigne-accent'
+                : 'text-getigne-700 group-hover:text-getigne-accent transition-colors duration-200'
+            }
+          >
+            Le programme
+          </Link>
+        </li>
+      )}
+      {settings.modules.blog && (
+        <li>
+          <Link to={Routes.NEWS} className={isActive(Routes.NEWS)}>
+            Actualités
+          </Link>
+        </li>
+      )}
+      {settings.modules.agenda && (
+        <li className="relative">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button 
+                className={`flex items-center ${
+                  location.pathname === Routes.AGENDA || location.pathname === Routes.NEIGHBORHOOD_EVENTS 
+                    ? 'text-getigne-accent' 
+                    : 'text-getigne-700 hover:text-getigne-accent transition-colors duration-200'
+                }`}
+              >
+                Agenda
+                <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link to={Routes.AGENDA} className="w-full flex items-center">
+                  Tous les événements
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to={Routes.NEIGHBORHOOD_EVENTS} className="w-full flex items-center">
+                  <Coffee className="mr-2 h-4 w-4" />
+                  Cafés de quartier
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </li>
+      )}
+      {settings.modules.proxy && (
+        <li>
+          <Link to={Routes.PROXY} className={isActive(Routes.PROXY)}>
+            Espace procuration
+          </Link>
+        </li>
+      )}
       <li>
         <Link to={Routes.CONTACT} className={isActive(Routes.CONTACT)}>
           Contact
@@ -281,8 +293,8 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           <Link to={Routes.HOME} className="flex items-center">
             <img
-              src="/images/getigne-collectif-logo.png"
-              alt="Gétigné Collectif"
+              src={settings.branding.logoUrl}
+              alt={settings.branding.name}
               className="h-10"
             />
           </Link>
@@ -294,9 +306,11 @@ const Navbar = () => {
           </nav>
 
           <div className="flex items-center space-x-3 md:space-x-4">
-            <div className="hidden sm:block">
-              <SupportButton />
-            </div>
+            {showSupportModule && (
+              <div className="hidden sm:block">
+                <SupportButton />
+              </div>
+            )}
             
             <div className="hidden lg:block">
               <AuthButton />
@@ -317,9 +331,11 @@ const Navbar = () => {
                 <nav className="mt-8">
                   <ul className="space-y-4 text-lg">
                     <NavLinks />
-                    <li className="pt-4">
-                      <SupportButton className="w-full py-6 text-lg" />
-                    </li>
+                    {showSupportModule && (
+                      <li className="pt-4">
+                        <SupportButton className="w-full py-6 text-lg" />
+                      </li>
+                    )}
                     <UserMenuLinks onNavigate={() => setIsOpen(false)} />
                   </ul>
                 </nav>

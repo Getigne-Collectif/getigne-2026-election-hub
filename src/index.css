@@ -40,6 +40,12 @@
     --getigne-accent: 159 54% 45%; /* Changé pour #34b190 */
     --getigne-accent-light: 159 54% 55%;
     --getigne-accent-darker: 159 54% 35%;
+
+    --site-green: #34b190;
+    --site-yellow: #fbbf24;
+    --site-orange: #f97316;
+    --site-blue: #2563eb;
+    --site-red: #dc2626;
   }
 
   .dark {

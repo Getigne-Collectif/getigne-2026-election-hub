@@ -65,7 +65,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				getigne: {
+        getigne: {
 					'50': '#f5f5f7',
 					'100': '#e3e3e8',
 					'200': '#c8c9d6',
@@ -76,7 +76,7 @@ export default {
 					'700': '#4a4a5d',
 					'800': '#40404f',
 					'900': '#1d1d1f',
-					'accent': '#34b190',
+          'accent': 'hsl(var(--getigne-accent))',
 					'green': {
 						'100': '#DCFCE7',
 						'500': '#34b190',

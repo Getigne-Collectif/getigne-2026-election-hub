@@ -1,15 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useAuth } from '@/context/AuthContext.tsx';
 import { useToast } from '@/components/ui/use-toast.ts';
-import Navbar from '@/components/Navbar.tsx';
-import Footer from '@/components/Footer.tsx';
-import SiteSettings from '@/components/admin/SiteSettings.tsx';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb.tsx";
-import { Home } from 'lucide-react';
 import AdminLayout from "@/components/admin/AdminLayout.tsx";
+import SettingsForm from '@/components/admin/settings/SettingsForm.tsx';
 
 const AdminSettingsPage = () => {
   const { user, isAdmin, authChecked, isRefreshingRoles } = useAuth();
@@ -76,7 +72,7 @@ const AdminSettingsPage = () => {
           <div className="py-16">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
-                <SiteSettings />
+                <SettingsForm />
               </div>
             </div>
           </div>

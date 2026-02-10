@@ -1,132 +1,112 @@
-
-import { useState, useEffect, createContext, useContext } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/auth';
-
-export type AppSettings = {
-  showProgram: boolean;
-  showCommitteeWorks: boolean;
-};
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from '../integrations/supabase/client';
+import {
+  applySiteTheme,
+  DEFAULT_SITE_SETTINGS,
+  normalizeSiteSettings,
+  SiteSettings,
+  SiteSettingsByKey,
+  SiteSettingsSection,
+  siteSettingsSections,
+  mergeSiteSettings,
+} from '../config/siteSettings';
 
 type AppSettingsContextType = {
-  settings: AppSettings;
-  updateSetting: (key: keyof AppSettings, value: boolean) => Promise<boolean>;
-  updateSettings: (newSettings: Partial<AppSettings>) => Promise<boolean>;
+  settings: SiteSettings;
   loading: boolean;
-  isLoading: boolean; // alias for loading
   error: Error | null;
+  updateSetting: <K extends SiteSettingsSection>(
+    key: K,
+    value: SiteSettingsByKey[K]
+  ) => Promise<boolean>;
+  updateSettings: (nextSettings: SiteSettings) => Promise<boolean>;
   refresh: () => Promise<void>;
 };
 
-const defaultSettings: AppSettings = {
-  showProgram: true,
-  showCommitteeWorks: true,
-};
-
 const AppSettingsContext = createContext<AppSettingsContextType>({
-  settings: defaultSettings,
+  settings: DEFAULT_SITE_SETTINGS,
+  loading: false,
+  error: null,
   updateSetting: async () => false,
   updateSettings: async () => false,
-  loading: false,
-  isLoading: false,
-  error: null,
   refresh: async () => {},
 });
 
-export function AppSettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+async function fetchAppSettingsRows() {
+  const { data, error } = await supabase
+    .from('app_settings')
+    .select('key, value');
+  if (error) throw error;
+  return data ?? [];
+}
+
+export const AppSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SITE_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const { isAdmin } = useAuth();
 
-  const fetchSettings = async () => {
+  const refresh = async () => {
     try {
       setLoading(true);
       setError(null);
-
-      const { data, error } = await supabase
-        .from('app_settings')
-        .select('key, value');
-
-      if (error) throw error;
-
-      // Convert array to object for easier access
-      const settingsObject = { ...defaultSettings };
-      data.forEach((setting) => {
-        if (setting.key === 'showProgram') {
-          settingsObject.showProgram = setting.value === true || setting.value === 'true';
-        }
-        else if (setting.key === 'showCommitteeWorks') {
-          settingsObject.showCommitteeWorks = setting.value === true || setting.value === 'true';
-        }
-      });
-
-      setSettings(settingsObject);
+      const rows = await fetchAppSettingsRows();
+      const nextSettings = normalizeSiteSettings(rows);
+      setSettings(nextSettings);
     } catch (err) {
-      console.error('Error fetching settings:', err);
-      setError(err as Error);
+      console.error('Erreur lors de la récupération des paramètres:', err);
+      setError(err instanceof Error ? err : new Error('Erreur inconnue'));
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSettings();
+    refresh();
   }, []);
 
-  const updateSetting = async (key: keyof AppSettings, value: boolean) => {
-    if (!isAdmin) {
-      console.error('Only admins can update settings');
-      return false;
-    }
+  useEffect(() => {
+    applySiteTheme(settings);
+  }, [settings]);
 
+  const updateSetting = async <K extends SiteSettingsSection>(
+    key: K,
+    value: SiteSettingsByKey[K]
+  ) => {
     try {
       const { error } = await supabase
         .from('app_settings')
-        .update({ value })
-        .eq('key', key);
-
+        .upsert(
+          { key, value, description: `Configuration ${key}` },
+          { onConflict: 'key' }
+        );
       if (error) throw error;
 
-      // Update local state
-      setSettings((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-
+      const merged = mergeSiteSettings(settings, { [key]: value } as Partial<SiteSettings>);
+      setSettings(merged);
       return true;
     } catch (err) {
-      console.error(`Error updating setting ${key}:`, err);
+      console.error('Erreur lors de la mise à jour du paramètre:', err);
       return false;
     }
   };
-  
-  const updateSettings = async (newSettings: Partial<AppSettings>) => {
-    if (!isAdmin) {
-      console.error('Only admins can update settings');
-      return false;
-    }
-    
+
+  const updateSettings = async (nextSettings: SiteSettings) => {
     try {
-      // Update each setting in the database
-      for (const [key, value] of Object.entries(newSettings)) {
-        const { error } = await supabase
-          .from('app_settings')
-          .update({ value })
-          .eq('key', key);
-          
-        if (error) throw error;
-      }
-      
-      // Update local state
-      setSettings((prev) => ({
-        ...prev,
-        ...newSettings,
+      const updates = siteSettingsSections.map((section) => ({
+        key: section,
+        value: nextSettings[section],
+        description: `Configuration ${section}`,
       }));
-      
+
+      const { error } = await supabase
+        .from('app_settings')
+        .upsert(updates, { onConflict: 'key' });
+
+      if (error) throw error;
+      setSettings(nextSettings);
       return true;
     } catch (err) {
-      console.error('Error updating settings:', err);
+      console.error('Erreur lors de la mise à jour des paramètres:', err);
       return false;
     }
   };
@@ -135,17 +115,16 @@ export function AppSettingsProvider({ children }: { children: React.ReactNode })
     <AppSettingsContext.Provider
       value={{
         settings,
+        loading,
+        error,
         updateSetting,
         updateSettings,
-        loading,
-        isLoading: loading, // alias for backward compatibility
-        error,
-        refresh: fetchSettings,
+        refresh,
       }}
     >
       {children}
     </AppSettingsContext.Provider>
   );
-}
+};
 
 export const useAppSettings = () => useContext(AppSettingsContext);

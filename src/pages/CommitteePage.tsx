@@ -74,7 +74,7 @@ const CommitteePage = () => {
   const [works, setWorks] = useState<Tables<'committee_works'>[]>([]);
   const { settings } = useAppSettings();
   const { userRoles } = useAuth();
-  const canSeeWorks = settings.showCommitteeWorks || isCommitteeMember || userRoles.includes('program_manager');
+  const canSeeWorks = settings.modules.committeeWorksPublic || isCommitteeMember || userRoles.includes('program_manager');
   // Vérifier si l'utilisateur actuel est membre de la commission
   useEffect(() => {
     const checkCommitteeMembership = async () => {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { UserPlusIcon, CalendarCheck, PlusCircle, LayoutList, Component, HandHeart, Calendar } from 'lucide-react';
+import { UserPlusIcon, CalendarCheck, Component, HandHeart, Calendar } from 'lucide-react';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useAuth } from '@/context/auth';
 import { Routes } from '@/routes';
@@ -14,9 +14,12 @@ const Campaign = () => {
   
   // Détermine si l'utilisateur peut accéder au programme
   const canAccessProgram = 
-    settings.showProgram || 
+    settings.modules.program || 
     userRoles.includes('admin') || 
     userRoles.includes('program_manager');
+
+  const showSupportModule =
+    settings.modules.supportCommittee || settings.modules.membershipForm;
 
   const handleHelloAssoClick = () => {
     // Track HelloAsso click in PostHog
@@ -35,8 +38,8 @@ const Campaign = () => {
             Élections municipales 2026
           </span>
           <h2 className="text-4xl font-bold mt-4 mb-6">Objectif 2026</h2>
-          <p className="text-getigne-700 text-lg">
-            Tous engagés pour construire l'avenir de Gétigné !<br/>rejoignez notre campagne pour les élections municipales de 2026.
+            <p className="text-getigne-700 text-lg">
+            Tous engagés pour construire l'avenir de {settings.branding.city} !<br/>rejoignez notre campagne pour les élections municipales de 2026.
           </p>
         </div>
 
@@ -77,16 +80,18 @@ const Campaign = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-8">
-                <Button asChild>
-                  <Link to={Routes.PROGRAM}> Découvrez notre projet pour 2026</Link>
-                </Button>
-              </div>
+              {canAccessProgram && (
+                <div className="mt-8">
+                  <Button asChild>
+                    <Link to={Routes.PROGRAM}> Découvrez notre projet pour 2026</Link>
+                  </Button>
+                </div>
+              )}
             </div>
             <div className="relative h-64 md:h-96 rounded-xl overflow-hidden">
               <img 
-                src="/images/GC-group1.jpg" 
-                alt="Quelques membres du collectif" 
+                src={settings.branding.images.campaign} 
+                alt={`Quelques membres de ${settings.branding.name}`} 
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-getigne-900/50 to-transparent pointer-events-none"></div>
@@ -102,39 +107,45 @@ const Campaign = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
-            <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
-              <HandHeart size={18} className="text-getigne-accent" /> Soutenez le collectif
-            </h3>
-            <p className="text-getigne-700 mb-4">
-              Signez le comité de soutien, adhérez ou faites un don.
-            </p>
-            <Button asChild variant="outline" className="w-full">
-              <Link to={Routes.JOIN}>Nous rejoindre</Link>
-            </Button>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
-            <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
-              <Component size={18} className="text-getigne-accent" /> Rejoignez une commission
-            </h3>
-            <p className="text-getigne-700 mb-4">
-              Intégrez l'une de nos commissions de travail selon vos centres d'intérêt et compétences.
-            </p>
-            <Button asChild variant="outline" className="w-full">
-              <Link to={Routes.COMMITTEES}>Découvrir</Link>
-            </Button>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
-            <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
-              <CalendarCheck size={18} className="text-getigne-accent" /> Participez à nos événements
-            </h3>
-            <p className="text-getigne-700 mb-4">
-              Consultez l'agenda de nos prochaines rencontres et événements à Gétigné.
-            </p>
-            <Button asChild variant="outline" className="w-full">
-              <Link to={Routes.AGENDA}>Agenda</Link>
-            </Button>
-          </div>
+          {showSupportModule && (
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
+              <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
+                <HandHeart size={18} className="text-getigne-accent" /> Soutenez le collectif
+              </h3>
+              <p className="text-getigne-700 mb-4">
+                Signez le comité de soutien, adhérez ou faites un don.
+              </p>
+              <Button asChild variant="outline" className="w-full">
+                <Link to={Routes.JOIN}>Nous rejoindre</Link>
+              </Button>
+            </div>
+          )}
+          {settings.modules.committees && (
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
+              <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
+                <Component size={18} className="text-getigne-accent" /> Rejoignez une commission
+              </h3>
+              <p className="text-getigne-700 mb-4">
+                Intégrez l'une de nos commissions de travail selon vos centres d'intérêt et compétences.
+              </p>
+              <Button asChild variant="outline" className="w-full">
+                <Link to={Routes.COMMITTEES}>Découvrir</Link>
+              </Button>
+            </div>
+          )}
+          {settings.modules.agenda && (
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-getigne-100 hover-lift">
+              <h3 className="text-xl font-semibold mb-3 text-center flex items-center justify-center gap-2">
+                <CalendarCheck size={18} className="text-getigne-accent" /> Participez à nos événements
+              </h3>
+              <p className="text-getigne-700 mb-4">
+                Consultez l'agenda de nos prochaines rencontres et événements à {settings.branding.city}.
+              </p>
+              <Button asChild variant="outline" className="w-full">
+                <Link to={Routes.AGENDA}>Agenda</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </section>

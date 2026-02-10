@@ -9,15 +9,18 @@ import FacebookIcon from '@/components/icons/facebook.svg?react';
 import InstagramIcon from '@/components/icons/instagram.svg?react';
 import { Routes } from '@/routes';
 import { usePostHog } from '@/hooks/usePostHog';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { capture } = usePostHog();
+  const { settings } = useAppSettings();
   const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL as string;
   const FACEBOOK_URL = import.meta.env.VITE_FACEBOOK_URL as string;
   const INSTAGRAM_URL = import.meta.env.VITE_INSTAGRAM_URL as string;
+  const addressLines = settings.content.contactAddress.split('\n');
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,14 +64,13 @@ const Footer = () => {
           <div>
             <div className="mb-4">
               <img
-                src="/images/getigne-collectif-logo.png"
-                alt="Gétigné Collectif"
+                src={settings.branding.logoUrl}
+                alt={settings.branding.name}
                 className="h-14 mb-4"
               />
             </div>
-            <p className="text-getigne-100 mb-6">
-              Collectif citoyen engagé pour les élections municipales depuis 2020 à Gétigné.
-              Ensemble, construisons une commune plus dynamique, engagée et démocratique.
+            <p className="text-getigne-100 mb-6 whitespace-pre-line">
+              {settings.content.footerAbout}
             </p>
             <div className="flex space-x-4">
               {FACEBOOK_URL && (
@@ -98,26 +100,34 @@ const Footer = () => {
                   Accueil
                 </Link>
               </li>
-              <li>
-                <Link to={Routes.PROGRAM} className="text-getigne-100 hover:text-white transition-colors">
-                  Élections 2026
-                </Link>
-              </li>
-              <li>
-                <Link to={Routes.PROJECTS} className="text-getigne-100 hover:text-white transition-colors">
-                  Nos projets citoyens
-                </Link>
-              </li>
-              <li>
-                <Link to={Routes.NEWS} className="text-getigne-100 hover:text-white transition-colors">
-                  Actualités
-                </Link>
-              </li>
-              <li>
-                <Link to={Routes.AGENDA} className="text-getigne-100 hover:text-white transition-colors">
-                  Événements
-                </Link>
-              </li>
+              {settings.modules.program && (
+                <li>
+                  <Link to={Routes.PROGRAM} className="text-getigne-100 hover:text-white transition-colors">
+                    Élections 2026
+                  </Link>
+                </li>
+              )}
+              {settings.modules.projects && (
+                <li>
+                  <Link to={Routes.PROJECTS} className="text-getigne-100 hover:text-white transition-colors">
+                    Nos projets citoyens
+                  </Link>
+                </li>
+              )}
+              {settings.modules.blog && (
+                <li>
+                  <Link to={Routes.NEWS} className="text-getigne-100 hover:text-white transition-colors">
+                    Actualités
+                  </Link>
+                </li>
+              )}
+              {settings.modules.agenda && (
+                <li>
+                  <Link to={Routes.AGENDA} className="text-getigne-100 hover:text-white transition-colors">
+                    Événements
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link to={Routes.CONTACT} className="text-getigne-100 hover:text-white transition-colors">
                   Contact
@@ -137,17 +147,21 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start">
                 <Mail size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
-                <span className="text-getigne-100">contact@getigne-collectif.fr</span>
+                <span className="text-getigne-100">{settings.content.contactEmail}</span>
               </li>
               <li className="flex items-start">
                 <Phone size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
-                <span className="text-getigne-100">06 66 77 75 20</span>
+                <span className="text-getigne-100">{settings.content.contactPhone}</span>
               </li>
               <li className="flex items-start">
                 <MapPin size={20} className="mr-3 text-getigne-accent mt-1 flex-shrink-0" />
                 <span className="text-getigne-100">
-                  19 le bois de la roche<br />
-                  44190 Gétigné
+                  {addressLines.map((line, index) => (
+                    <span key={line}>
+                      {line}
+                      {index < addressLines.length - 1 && <br />}
+                    </span>
+                  ))}
                 </span>
               </li>
             </ul>
@@ -185,7 +199,7 @@ const Footer = () => {
               Mentions légales
             </Link>
           </div>
-          <p>© {currentYear} Gétigné Collectif. Tous droits réservés.</p>
+          <p>© {currentYear} {settings.branding.name}. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

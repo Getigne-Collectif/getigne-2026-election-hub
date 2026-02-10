@@ -17,8 +17,7 @@ import { useAppSettings } from '@/hooks/useAppSettings';
 import { DynamicIcon } from '@/components/ui/dynamic-icon';
 import { downloadFileFromUrl, downloadFromSupabasePath } from '@/lib/utils';
 import CtaBanner from '@/components/ui/cta-banner';
-import type { Tables } from '@/integrations/supabase/types';
-import type { ProgramPoint, ProgramCompetentEntity, ProgramFlagshipProject } from '@/types/program.types';
+import type { ProgramPoint, ProgramCompetentEntity, ProgramFlagshipProject, ProgramItem } from '@/types/program.types';
 import ProgramAlertForm from '@/components/program/ProgramAlertForm';
 import ProgramTimeline from '@/components/program/ProgramTimeline';
 import FAQDisplay from '@/components/faq/FAQDisplay';
@@ -41,11 +40,11 @@ import {
 } from '@/components/ui/dialog';
 import ProgramItemForm, { ProgramItemFormValues } from '@/components/admin/program/ProgramItemForm';
 
-type ProgramPointRow = Tables<'program_points'> & {
+type ProgramPointRow = ProgramPoint & {
   competent_entity?: ProgramCompetentEntity | null;
 };
 
-type ProgramItemWithPoints = Tables<'program_items'> & {
+type ProgramItemWithPoints = ProgramItem & {
   program_points: ProgramPointRow[];
 };
 
@@ -136,7 +135,7 @@ const ProgramPage = () => {
   const [isSubmittingSection, setIsSubmittingSection] = useState(false);
   const [hasShareAccess, setHasShareAccess] = useState(false);
   const [shareLink, setShareLink] = useState('');
-  const { settings, isLoading: isLoadingSettings } = useAppSettings();
+  const { settings, loading: isLoadingSettings } = useAppSettings();
   
   // Refs pour le sticky header de la section mesures
   const measuresSectionRef = React.useRef<HTMLDivElement>(null);
@@ -195,7 +194,7 @@ const ProgramPage = () => {
   }, []);
 
   const canAccessProgram = 
-    settings.showProgram || 
+    settings.modules.program || 
     userRoles.includes('admin') || 
     userRoles.includes('program_manager') ||
     hasShareAccess;
@@ -295,7 +294,7 @@ const ProgramPage = () => {
 
       return (data || []).map((item) => {
         const rawPoints =
-          (item as unknown as { program_points?: Tables<'program_points'>[] | null }).program_points || [];
+          (item as unknown as { program_points?: ProgramPoint[] | null }).program_points || [];
 
         const normalizedPoints = rawPoints
           .map((point) => {
@@ -1376,7 +1375,7 @@ const ProgramPage = () => {
                                     Points du programme
                                   </h3>
                                 </div>
-                                {pointsToDisplay.map((point: Tables<'program_points'>) => {
+                                {pointsToDisplay.map((point: ProgramPoint) => {
                                   const normalizedPoint: ProgramPoint = {
                                     id: point.id,
                                     number: (point as unknown as { number?: number }).number,

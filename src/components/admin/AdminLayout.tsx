@@ -30,6 +30,7 @@ import {
   Contact,
   UserCheck
 } from 'lucide-react';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -56,6 +57,7 @@ interface MenuSection {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description, breadcrumb, backLink, noContainer = false }) => {
   const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { settings } = useAppSettings();
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     contenu: true,
     personnes: true,
@@ -219,8 +221,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
           {!isSidebarCollapsed && (
             <div className="mt-4 flex items-center gap-3">
               <img 
-                src="/images/getigne-collectif-logo.png" 
-                alt="Gétigné Collectif" 
+                src={settings.branding.logoUrl} 
+                alt={settings.branding.name} 
                 className="h-10 w-auto"
               />
               <h2 className="text-xl font-bold text-gray-900">Administration</h2>
@@ -230,8 +232,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description,
           {isSidebarCollapsed && (
             <div className="mt-4 flex justify-center">
               <img 
-                src="/images/getigne-collectif-logo.png" 
-                alt="Gétigné Collectif" 
+                src={settings.branding.logoUrl} 
+                alt={settings.branding.name} 
                 className="h-8 w-8 object-contain"
               />
             </div>

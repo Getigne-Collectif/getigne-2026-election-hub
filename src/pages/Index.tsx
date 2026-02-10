@@ -17,10 +17,10 @@ const Index = () => {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>Gétigné Collectif | Ensemble pour une commune écologique, solidaire et démocratique</title>
+        <title>{settings.branding.name} | {settings.content.siteDescription}</title>
         <meta
           name="description"
-          content="Gétigné Collectif rassemble des citoyens et citoyennes engagés pour une commune plus écologique, solidaire et démocratique."
+          content={settings.content.siteDescription}
         />
       </Helmet>
 
@@ -29,8 +29,8 @@ const Index = () => {
         <Hero />
         <Values />
         <Campaign />
-        <Events />
-        <News limit={3} />
+        {settings.modules.agenda && <Events />}
+        {settings.modules.blog && <News limit={3} />}
         <Footer />
         <FloatingMenu />
       </div>

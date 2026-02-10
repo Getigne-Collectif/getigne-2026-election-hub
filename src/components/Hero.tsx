@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Routes } from '@/routes';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { settings } = useAppSettings();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,8 +20,8 @@ const Hero = () => {
       {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80"
-          alt="Champ de fleurs oranges dans la campagne par une journée ensoleillée"
+          src={settings.branding.images.hero}
+          alt={`Visuel ${settings.branding.name}`}
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-getigne-800/60 to-getigne-800/20 backdrop-blur-sm"></div>
@@ -42,17 +44,17 @@ const Hero = () => {
           <h1
             className={`text-4xl md:text-7xl font-bold mb-6 tracking-tight transform transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'} text-white`}
           >
-            Vivre dans une commune<br/>
+            {settings.content.heroTitle}<br/>
             <span className="bg-clip-text text-transparent bg-gradient-to-br from-white to-yellow-300 block">
-            dynamique, engagée et démocratique
+            {settings.content.heroTitleEmphasis}
             </span>
-            ça vous tente ?
+            {settings.content.heroTitleSuffix}
           </h1>
 
           <p
             className={`hidden md:inline text-lg font-bold md:text-xl text-white mb-12 max-w-3xl mx-auto transform transition-all duration-700 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
-            Déployons la force du collectif pour faire de Gétigné <br/>une commune plus engagée, au service de toutes et tous.
+            {settings.content.heroSubtitle}
           </p>
 
           <div

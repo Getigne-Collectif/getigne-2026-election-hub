@@ -26,6 +26,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import NeighborhoodEventsMap from '@/components/maps/NeighborhoodEventsMap';
 import { generateRoutes } from '@/routes';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface NeighborhoodEvent {
   id: string;
@@ -48,6 +49,7 @@ interface NeighborhoodEvent {
 }
 
 const NeighborhoodEventsPage = () => {
+  const { settings } = useAppSettings();
   const [events, setEvents] = useState<NeighborhoodEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -193,8 +195,8 @@ const NeighborhoodEventsPage = () => {
     </Card>
   );
 
-  // Configuration pour Google Maps (coordonnées de Gétigné)
-  const GETIGNE_CENTER = { lat: 47.0847, lng: -1.2614 };
+  const mapCenter = settings.map.center;
+  const mapZoom = settings.map.zoom;
 
   return (
     <HelmetProvider>
@@ -282,8 +284,8 @@ const NeighborhoodEventsPage = () => {
                 <div className="relative">
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                     <img 
-                      src="/images/getigne-places.png"
-                      alt="Places de Gétigné" 
+                      src={settings.branding.images.neighborhood}
+                      alt={`Places de ${settings.branding.city}`} 
                       className="w-full h-80 object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
@@ -410,7 +412,8 @@ const NeighborhoodEventsPage = () => {
                       events={mapEvents}
                       selectedEvent={selectedEvent}
                       onEventSelect={(event) => setSelectedEvent(event as NeighborhoodEvent)}
-                      center={GETIGNE_CENTER}
+                      center={mapCenter}
+                      zoom={mapZoom}
                     />
                   </div>
                   

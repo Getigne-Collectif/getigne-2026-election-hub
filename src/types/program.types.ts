@@ -31,6 +31,7 @@ export interface ProgramItem {
   title: string;
   description: string;
   icon: string;
+  slug: string;
   image?: string;
   content?: string;
   position: number;

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/context/auth";
+import { AppSettingsProvider, useAppSettings } from "@/hooks/useAppSettings";
 import { CookieConsentProvider } from "@/context/CookieConsentContext";
 import CookieBanner from "@/components/CookieBanner";
 import { Routes as AppRoutes } from "./routes";
@@ -91,6 +92,136 @@ function AdminProtectedOutlet() {
   );
 }
 
+function AppRouter() {
+  const { settings, loading } = useAppSettings();
+  const showJoin = settings.modules.supportCommittee || settings.modules.membershipForm;
+
+  const guardedElement = (enabled: boolean, element: React.ReactNode) =>
+    enabled ? element : <NotFound />;
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <Routes>
+      <Route path={AppRoutes.HOME} element={<Index />} />
+      <Route path={AppRoutes.NEWS} element={guardedElement(settings.modules.blog, <NewsPage />)} />
+      <Route path={AppRoutes.NEWS_DETAIL} element={guardedElement(settings.modules.blog, <NewsDetailPage />)} />
+      <Route path={AppRoutes.AGENDA} element={guardedElement(settings.modules.agenda, <AgendaPage />)} />
+      <Route path={AppRoutes.EVENT_DETAIL} element={guardedElement(settings.modules.agenda, <EventDetailPage />)} />
+      <Route path={AppRoutes.NEIGHBORHOOD_EVENTS} element={guardedElement(settings.modules.agenda, <NeighborhoodEventsPage />)} />
+      <Route path={AppRoutes.NEIGHBORHOOD_KIT} element={guardedElement(settings.modules.agenda, <NeighborhoodKitPage />)} />
+      <Route path={AppRoutes.TEAM} element={<TeamPage />} />
+      <Route path={AppRoutes.COMMITTEES} element={guardedElement(settings.modules.committees, <CommitteePage />)} />
+      <Route path={AppRoutes.COMMITTEE_DETAIL} element={guardedElement(settings.modules.committees, <CommitteePage />)} />
+      <Route path={AppRoutes.PROGRAM} element={guardedElement(settings.modules.program, <ProgramPage />)} />
+      <Route path={AppRoutes.PROJECTS} element={guardedElement(settings.modules.projects, <ProjectsPage />)} />
+      <Route path={AppRoutes.SUPPORT_COMMITTEE} element={guardedElement(showJoin, <JoinPage />)} />
+      <Route path={AppRoutes.JOIN} element={guardedElement(showJoin, <JoinPage />)} />
+      <Route path={AppRoutes.CONTACT} element={<ContactPage />} />
+      <Route path={AppRoutes.LEGAL} element={<LegalPage />} />
+      <Route path={AppRoutes.SITEMAP} element={<SiteMapPage />} />
+      <Route path={AppRoutes.AUTH} element={<AuthPage />} />
+      <Route path={AppRoutes.AUTH_CALLBACK} element={<AuthCallbackPage />} />
+      <Route path={AppRoutes.AUTH_RESET_PASSWORD} element={<ResetPasswordPage />} />
+      <Route path={AppRoutes.PROFILE} element={
+        <AuthenticatedRoute>
+          <ProfilePage />
+        </AuthenticatedRoute>
+      } />
+      <Route path={AppRoutes.LIFT} element={<LiftPage />} />
+      <Route path={AppRoutes.PROXY} element={guardedElement(settings.modules.proxy, <ProcurationPage />)} />
+      
+      {/* Admin Routes - All protected by AdminRoute via nested routes */}
+      <Route element={<AdminProtectedOutlet />}>
+        {/* Directory */}
+        <Route path={AppRoutes.DIRECTORY} element={<DirectoryPage />} />
+        <Route path={AppRoutes.DIRECTORY_INTERNAL} element={<DirectoryPage />} />
+        <Route path={AppRoutes.DIRECTORY_EXTERNAL} element={<DirectoryPage />} />
+        <Route path={AppRoutes.ADMIN} element={<AdminDashboardPage />} />
+        
+        {/* News */}
+        <Route path={AppRoutes.ADMIN_NEWS} element={<AdminNewsPage />} />
+        <Route path={AppRoutes.ADMIN_NEWS_NEW} element={<AdminNewsEditorPage />} />
+        <Route path={AppRoutes.ADMIN_NEWS_EDIT} element={<AdminNewsEditorPage />} />
+        <Route path={AppRoutes.ADMIN_NEWS_PREVIEW} element={<AdminNewsPreviewPage />} />
+        
+        {/* Events */}
+        <Route path={AppRoutes.ADMIN_EVENTS} element={<AdminEventsPage />} />
+        <Route path={AppRoutes.ADMIN_EVENTS_NEW} element={<AdminEventEditorPage />} />
+        <Route path={AppRoutes.ADMIN_EVENTS_EDIT} element={<AdminEventEditorPage />} />
+        
+        {/* Users */}
+        <Route path={AppRoutes.ADMIN_USERS} element={<AdminUsersPage />} />
+        
+        {/* Pages */}
+        <Route path={AppRoutes.ADMIN_PAGES} element={<AdminPagesPage />} />
+        <Route path={AppRoutes.ADMIN_PAGES_NEW} element={<AdminPageEditorPage />} />
+        <Route path={AppRoutes.ADMIN_PAGES_EDIT} element={<AdminPageEditorPage />} />
+        
+        {/* Committees */}
+        <Route path={AppRoutes.ADMIN_COMMITTEES} element={<AdminCommitteesPage />} />
+        <Route path={AppRoutes.ADMIN_COMMITTEES_NEW} element={<AdminCommitteeEditorPage />} />
+        <Route path={AppRoutes.ADMIN_COMMITTEES_EDIT} element={<AdminCommitteeEditorPage />} />
+        
+        {/* Menu */}
+        <Route path={AppRoutes.ADMIN_MENU} element={<AdminMenuPage />} />
+        
+        {/* Galaxy */}
+        <Route path={AppRoutes.ADMIN_GALAXY} element={<AdminGalaxyPage />} />
+        <Route path={AppRoutes.ADMIN_GALAXY_NEW} element={<AdminGalaxyEditorPage />} />
+        <Route path={AppRoutes.ADMIN_GALAXY_EDIT} element={<AdminGalaxyEditorPage />} />
+        
+        {/* Program */}
+        <Route path={AppRoutes.ADMIN_PROGRAM} element={<AdminProgramPage />} />
+        <Route path={AppRoutes.ADMIN_PROGRAM_EDIT} element={<AdminProgramEditorPage />} />
+        
+        {/* Projects */}
+        <Route path={AppRoutes.ADMIN_PROJECTS} element={<AdminProjectsPage />} />
+        <Route path={AppRoutes.ADMIN_PROJECTS_NEW} element={<AdminProjectEditorPage />} />
+        <Route path={AppRoutes.ADMIN_PROJECTS_EDIT} element={<AdminProjectEditorPage />} />
+        
+        {/* Lexicon */}
+        <Route path={AppRoutes.ADMIN_LEXICON} element={<AdminLexiconPage />} />
+        <Route path={AppRoutes.ADMIN_LEXICON_NEW} element={<AdminLexiconEditorPage />} />
+        <Route path={AppRoutes.ADMIN_LEXICON_EDIT} element={<AdminLexiconEditorPage />} />
+        
+        {/* Support Committee */}
+        <Route path={AppRoutes.ADMIN_SUPPORT_COMMITTEE} element={<AdminSupportCommitteePage />} />
+        
+        {/* Team Members */}
+        <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_NEW} element={<AdminTeamMemberNewPage />} />
+        <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_EDIT} element={<AdminTeamMemberEditPage />} />
+        
+        {/* Team */}
+        <Route path={AppRoutes.ADMIN_TEAM} element={<AdminElectoralListPage />} />
+        
+        {/* FAQ */}
+        <Route path={AppRoutes.ADMIN_FAQ} element={<AdminFAQPage />} />
+        <Route path={AppRoutes.ADMIN_FAQ_EDIT} element={<AdminFAQEditorPage />} />
+        
+        {/* Procuration */}
+        <Route path={AppRoutes.ADMIN_PROXY} element={<AdminProcurationPage />} />
+        
+        {/* External Directory */}
+        <Route path={AppRoutes.ADMIN_EXTERNAL_DIRECTORY} element={<AdminExternalDirectoryPage />} />
+        <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_NEW} element={<AdminExternalContactFormPage />} />
+        <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_EDIT} element={<AdminExternalContactFormPage />} />
+        <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_NEW} element={<AdminExternalGroupFormPage />} />
+        <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_EDIT} element={<AdminExternalGroupFormPage />} />
+        
+        {/* Settings */}
+        <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />
+      </Route>
+
+      {/* Dynamic pages - this should be last */}
+      <Route path={AppRoutes.DYNAMIC_PAGE} element={<DynamicPage />} />
+      <Route path={AppRoutes.NOT_FOUND} element={<NotFound />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -98,130 +229,18 @@ function App() {
         <TooltipProvider>
           <CookieConsentProvider>
             <AuthProvider>
-              <SpeedInsights />
-              <Analytics />
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
-                    <Route path={AppRoutes.HOME} element={<Index />} />
-                    <Route path={AppRoutes.NEWS} element={<NewsPage />} />
-                    <Route path={AppRoutes.NEWS_DETAIL} element={<NewsDetailPage />} />
-                    <Route path={AppRoutes.AGENDA} element={<AgendaPage />} />
-                    <Route path={AppRoutes.EVENT_DETAIL} element={<EventDetailPage />} />
-                    <Route path={AppRoutes.NEIGHBORHOOD_EVENTS} element={<NeighborhoodEventsPage />} />
-                    <Route path={AppRoutes.NEIGHBORHOOD_KIT} element={<NeighborhoodKitPage />} />
-                    <Route path={AppRoutes.TEAM} element={<TeamPage />} />
-                    <Route path={AppRoutes.COMMITTEES} element={<CommitteePage />} />
-                    <Route path={AppRoutes.COMMITTEE_DETAIL} element={<CommitteePage />} />
-                    <Route path={AppRoutes.PROGRAM} element={<ProgramPage />} />
-                    <Route path={AppRoutes.PROJECTS} element={<ProjectsPage />} />
-                    <Route path={AppRoutes.SUPPORT_COMMITTEE} element={<JoinPage />} />
-                    <Route path={AppRoutes.JOIN} element={<JoinPage />} />
-                    <Route path={AppRoutes.CONTACT} element={<ContactPage />} />
-                    <Route path={AppRoutes.LEGAL} element={<LegalPage />} />
-                    <Route path={AppRoutes.SITEMAP} element={<SiteMapPage />} />
-                    <Route path={AppRoutes.AUTH} element={<AuthPage />} />
-                    <Route path={AppRoutes.AUTH_CALLBACK} element={<AuthCallbackPage />} />
-                    <Route path={AppRoutes.AUTH_RESET_PASSWORD} element={<ResetPasswordPage />} />
-                    <Route path={AppRoutes.PROFILE} element={
-                      <AuthenticatedRoute>
-                        <ProfilePage />
-                      </AuthenticatedRoute>
-                    } />
-                    <Route path={AppRoutes.LIFT} element={<LiftPage />} />
-                    <Route path={AppRoutes.PROXY} element={<ProcurationPage />} />
-                    
-                    {/* Admin Routes - All protected by AdminRoute via nested routes */}
-                    <Route element={<AdminProtectedOutlet />}>
-                      {/* Directory */}
-                      <Route path={AppRoutes.DIRECTORY} element={<DirectoryPage />} />
-                      <Route path={AppRoutes.DIRECTORY_INTERNAL} element={<DirectoryPage />} />
-                      <Route path={AppRoutes.DIRECTORY_EXTERNAL} element={<DirectoryPage />} />
-                      <Route path={AppRoutes.ADMIN} element={<AdminDashboardPage />} />
-                      
-                      {/* News */}
-                      <Route path={AppRoutes.ADMIN_NEWS} element={<AdminNewsPage />} />
-                      <Route path={AppRoutes.ADMIN_NEWS_NEW} element={<AdminNewsEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_NEWS_EDIT} element={<AdminNewsEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_NEWS_PREVIEW} element={<AdminNewsPreviewPage />} />
-                      
-                      {/* Events */}
-                      <Route path={AppRoutes.ADMIN_EVENTS} element={<AdminEventsPage />} />
-                      <Route path={AppRoutes.ADMIN_EVENTS_NEW} element={<AdminEventEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_EVENTS_EDIT} element={<AdminEventEditorPage />} />
-                      
-                      {/* Users */}
-                      <Route path={AppRoutes.ADMIN_USERS} element={<AdminUsersPage />} />
-                      
-                      {/* Pages */}
-                      <Route path={AppRoutes.ADMIN_PAGES} element={<AdminPagesPage />} />
-                      <Route path={AppRoutes.ADMIN_PAGES_NEW} element={<AdminPageEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_PAGES_EDIT} element={<AdminPageEditorPage />} />
-                      
-                      {/* Committees */}
-                      <Route path={AppRoutes.ADMIN_COMMITTEES} element={<AdminCommitteesPage />} />
-                      <Route path={AppRoutes.ADMIN_COMMITTEES_NEW} element={<AdminCommitteeEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_COMMITTEES_EDIT} element={<AdminCommitteeEditorPage />} />
-                      
-                      {/* Menu */}
-                      <Route path={AppRoutes.ADMIN_MENU} element={<AdminMenuPage />} />
-                      
-                      {/* Galaxy */}
-                      <Route path={AppRoutes.ADMIN_GALAXY} element={<AdminGalaxyPage />} />
-                      <Route path={AppRoutes.ADMIN_GALAXY_NEW} element={<AdminGalaxyEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_GALAXY_EDIT} element={<AdminGalaxyEditorPage />} />
-                      
-                      {/* Program */}
-                      <Route path={AppRoutes.ADMIN_PROGRAM} element={<AdminProgramPage />} />
-                      <Route path={AppRoutes.ADMIN_PROGRAM_EDIT} element={<AdminProgramEditorPage />} />
-                      
-                      {/* Projects */}
-                      <Route path={AppRoutes.ADMIN_PROJECTS} element={<AdminProjectsPage />} />
-                      <Route path={AppRoutes.ADMIN_PROJECTS_NEW} element={<AdminProjectEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_PROJECTS_EDIT} element={<AdminProjectEditorPage />} />
-                      
-                      {/* Lexicon */}
-                      <Route path={AppRoutes.ADMIN_LEXICON} element={<AdminLexiconPage />} />
-                      <Route path={AppRoutes.ADMIN_LEXICON_NEW} element={<AdminLexiconEditorPage />} />
-                      <Route path={AppRoutes.ADMIN_LEXICON_EDIT} element={<AdminLexiconEditorPage />} />
-                      
-                      {/* Support Committee */}
-                      <Route path={AppRoutes.ADMIN_SUPPORT_COMMITTEE} element={<AdminSupportCommitteePage />} />
-                      
-                      {/* Team Members */}
-                      <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_NEW} element={<AdminTeamMemberNewPage />} />
-                      <Route path={AppRoutes.ADMIN_TEAM_MEMBERS_EDIT} element={<AdminTeamMemberEditPage />} />
-                      
-                      {/* Team */}
-                      <Route path={AppRoutes.ADMIN_TEAM} element={<AdminElectoralListPage />} />
-                      
-                      {/* FAQ */}
-                      <Route path={AppRoutes.ADMIN_FAQ} element={<AdminFAQPage />} />
-                      <Route path={AppRoutes.ADMIN_FAQ_EDIT} element={<AdminFAQEditorPage />} />
-                      
-                      {/* Procuration */}
-                      <Route path={AppRoutes.ADMIN_PROXY} element={<AdminProcurationPage />} />
-                      
-                      {/* External Directory */}
-                      <Route path={AppRoutes.ADMIN_EXTERNAL_DIRECTORY} element={<AdminExternalDirectoryPage />} />
-                      <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_NEW} element={<AdminExternalContactFormPage />} />
-                      <Route path={AppRoutes.ADMIN_EXTERNAL_CONTACTS_EDIT} element={<AdminExternalContactFormPage />} />
-                      <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_NEW} element={<AdminExternalGroupFormPage />} />
-                      <Route path={AppRoutes.ADMIN_EXTERNAL_GROUPS_EDIT} element={<AdminExternalGroupFormPage />} />
-                      
-                      {/* Settings */}
-                      <Route path={AppRoutes.ADMIN_SETTINGS} element={<AdminSettingsPage />} />
-                    </Route>
-
-                    {/* Dynamic pages - this should be last */}
-                    <Route path={AppRoutes.DYNAMIC_PAGE} element={<DynamicPage />} />
-                    <Route path={AppRoutes.NOT_FOUND} element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </BrowserRouter>
-              <CookieBanner />
+              <AppSettingsProvider>
+                <SpeedInsights />
+                <Analytics />
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Suspense fallback={<LoadingSpinner />}>
+                  <AppRouter />
+                  </Suspense>
+                </BrowserRouter>
+                <CookieBanner />
+              </AppSettingsProvider>
             </AuthProvider>
           </CookieConsentProvider>
         </TooltipProvider>

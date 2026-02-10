@@ -1,15 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Loader2 } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -27,117 +25,42 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { SiteSettings, siteSettingsSchema } from '@/config/siteSettings';
 
-const formSchema = z.object({
-  site_name: z.string().min(2, {
-    message: 'Le nom du site doit comporter au moins 2 caractères.',
-  }),
-  site_description: z.string().min(10, {
-    message: 'La description du site doit comporter au moins 10 caractères.',
-  }),
-  contact_email: z.string().email({
-    message: 'Veuillez entrer une adresse email valide.',
-  }),
-  maintenance_mode: z.boolean().default(false),
-  maintenance_message: z.string().optional(),
-  social_facebook: z.string().url({
-    message: 'Veuillez entrer une URL valide.',
-  }).optional().or(z.literal('')),
-  social_twitter: z.string().url({
-    message: 'Veuillez entrer une URL valide.',
-  }).optional().or(z.literal('')),
-  social_instagram: z.string().url({
-    message: 'Veuillez entrer une URL valide.',
-  }).optional().or(z.literal('')),
-  social_linkedin: z.string().url({
-    message: 'Veuillez entrer une URL valide.',
-  }).optional().or(z.literal('')),
-  social_youtube: z.string().url({
-    message: 'Veuillez entrer une URL valide.',
-  }).optional().or(z.literal('')),
-});
-
-type SettingsFormValues = z.infer<typeof formSchema>;
+type SettingsFormValues = SiteSettings;
 
 export default function SettingsForm() {
-  const [isLoading, setIsLoading] = useState(true);
+  const { settings, loading, updateSettings } = useAppSettings();
   const [isSaving, setIsSaving] = useState(false);
+  const moduleFields: { name: Path<SettingsFormValues>; label: string }[] = [
+    { name: 'modules.program', label: 'Programme' },
+    { name: 'modules.supportCommittee', label: 'Comité de soutien' },
+    { name: 'modules.membershipForm', label: "Formulaire d'adhésion" },
+    { name: 'modules.agenda', label: 'Agenda' },
+    { name: 'modules.blog', label: 'Blog / Actualités' },
+    { name: 'modules.proxy', label: 'Espace procuration' },
+    { name: 'modules.committees', label: 'Comités citoyens' },
+    { name: 'modules.projects', label: 'Projets citoyens' },
+    { name: 'modules.committeeWorksPublic', label: 'Travaux des commissions (public)' },
+  ];
 
   const form = useForm<SettingsFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      site_name: '',
-      site_description: '',
-      contact_email: '',
-      maintenance_mode: false,
-      maintenance_message: '',
-      social_facebook: '',
-      social_twitter: '',
-      social_instagram: '',
-      social_linkedin: '',
-      social_youtube: '',
-    },
+    resolver: zodResolver(siteSettingsSchema),
+    defaultValues: settings,
   });
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('app_settings')
-          .select('*');
-
-        if (error) throw error;
-
-        // Convertir les données en format attendu par le formulaire
-        const settingsMap: Record<string, any> = {};
-        data?.forEach(setting => {
-          settingsMap[setting.key] = setting.value;
-        });
-
-        if (data && data.length > 0) {
-          form.reset({
-            site_name: settingsMap.site_name || '',
-            site_description: settingsMap.site_description || '',
-            contact_email: settingsMap.contact_email || '',
-            maintenance_mode: settingsMap.maintenance_mode || false,
-            maintenance_message: settingsMap.maintenance_message || '',
-            social_facebook: settingsMap.social_facebook || '',
-            social_twitter: settingsMap.social_twitter || '',
-            social_instagram: settingsMap.social_instagram || '',
-            social_linkedin: settingsMap.social_linkedin || '',
-            social_youtube: settingsMap.social_youtube || '',
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching settings:', error);
-        toast.error("Impossible de charger les paramètres du site.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSettings();
-  }, [form]);
+    if (!loading) {
+      form.reset(settings);
+    }
+  }, [form, loading, settings]);
 
   const onSubmit = async (values: SettingsFormValues) => {
     setIsSaving(true);
     try {
-      // Convertir les valeurs en format app_settings
-      const updates = Object.entries(values).map(([key, value]) => ({
-        key,
-        value,
-        description: getDescriptionForKey(key)
-      }));
-
-      // Mettre à jour ou insérer chaque paramètre
-      for (const update of updates) {
-        const { error } = await supabase
-          .from('app_settings')
-          .upsert(update, { onConflict: 'key' });
-
-        if (error) throw error;
-      }
-
+      const ok = await updateSettings(values);
+      if (!ok) throw new Error('Update failed');
       toast.success("Les paramètres du site ont été mis à jour avec succès.");
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -147,23 +70,7 @@ export default function SettingsForm() {
     }
   };
 
-  const getDescriptionForKey = (key: string): string => {
-    const descriptions: Record<string, string> = {
-      site_name: 'Nom du site',
-      site_description: 'Description du site',
-      contact_email: 'Email de contact',
-      maintenance_mode: 'Mode maintenance',
-      maintenance_message: 'Message de maintenance',
-      social_facebook: 'URL Facebook',
-      social_twitter: 'URL Twitter',
-      social_instagram: 'URL Instagram',
-      social_linkedin: 'URL LinkedIn',
-      social_youtube: 'URL YouTube'
-    };
-    return descriptions[key] || key;
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -176,137 +83,253 @@ export default function SettingsForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <Card>
           <CardHeader>
-            <CardTitle>Paramètres généraux</CardTitle>
+            <CardTitle>Personnalisation</CardTitle>
             <CardDescription>
-              Configurez les informations de base du site.
+              Identité visuelle et informations de base du site.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="site_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom du site</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Gétigné Collectif" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Ce nom apparaît dans le titre des pages et dans l'en-tête du site.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="site_description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description du site</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Une description concise du site..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Cette description est utilisée pour le référencement et les partages sur les réseaux sociaux.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="contact_email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email de contact</FormLabel>
-                  <FormControl>
-                    <Input placeholder="contact@getigne-collectif.fr" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Adresse email principale pour les contacts via le site.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Mode maintenance</CardTitle>
-            <CardDescription>
-              Activez le mode maintenance pour afficher un message temporaire aux visiteurs.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="maintenance_mode"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Activer le mode maintenance
-                    </FormLabel>
+            <div className="grid md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="branding.name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom du collectif</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Gétigné Collectif" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.slogan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Slogan</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Élections municipales 2026" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.logoUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Logo (URL)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="/images/logo.png" {...field} />
+                    </FormControl>
                     <FormDescription>
-                      Lorsqu'il est activé, les visiteurs verront un message de maintenance au lieu du contenu normal.
+                      Chemin relatif ou URL absolue.
                     </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ville</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Gétigné" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <FormField
-              control={form.control}
-              name="maintenance_message"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Message de maintenance</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Notre site est actuellement en maintenance. Nous serons de retour très bientôt !"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Ce message sera affiché aux visiteurs lorsque le mode maintenance est activé.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid md:grid-cols-5 gap-4">
+              <FormField
+                control={form.control}
+                name="branding.colors.green"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vert</FormLabel>
+                    <FormControl>
+                      <Input placeholder="#34b190" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.colors.yellow"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Jaune</FormLabel>
+                    <FormControl>
+                      <Input placeholder="#fbbf24" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.colors.orange"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Orange</FormLabel>
+                    <FormControl>
+                      <Input placeholder="#f97316" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.colors.blue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bleu</FormLabel>
+                    <FormControl>
+                      <Input placeholder="#2563eb" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.colors.red"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rouge</FormLabel>
+                    <FormControl>
+                      <Input placeholder="#dc2626" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="branding.images.hero"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Photo hero</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.images.campaign"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Photo campagne</FormLabel>
+                    <FormControl>
+                      <Input placeholder="/images/..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branding.images.neighborhood"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Photo cafés de quartier</FormLabel>
+                    <FormControl>
+                      <Input placeholder="/images/..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Réseaux sociaux</CardTitle>
+            <CardTitle>Configuration</CardTitle>
             <CardDescription>
-              Configurez les liens vers vos profils de réseaux sociaux.
+              Textes, contact et carte.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="grid md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="content.heroTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Titre hero (ligne 1)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Vivre dans une commune" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content.heroTitleEmphasis"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Titre hero (mise en avant)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="dynamique, engagée et démocratique" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content.heroTitleSuffix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Titre hero (ligne 3)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ça vous tente ?" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content.siteDescription"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description du site</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Description courte pour le SEO" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="social_facebook"
+              name="content.heroSubtitle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Facebook</FormLabel>
+                  <FormLabel>Sous-titre hero</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://facebook.com/..." {...field} />
+                    <Textarea rows={3} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -315,59 +338,146 @@ export default function SettingsForm() {
 
             <FormField
               control={form.control}
-              name="social_twitter"
+              name="content.footerAbout"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Twitter</FormLabel>
+                  <FormLabel>Texte footer</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://twitter.com/..." {...field} />
+                    <Textarea rows={3} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="social_instagram"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instagram</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://instagram.com/..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="content.contactEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email de contact</FormLabel>
+                    <FormControl>
+                      <Input placeholder="contact@..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content.contactPhone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Téléphone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="06 00 00 00 00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content.contactAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Adresse</FormLabel>
+                    <FormControl>
+                      <Textarea rows={2} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <FormField
-              control={form.control}
-              name="social_linkedin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>LinkedIn</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://linkedin.com/in/..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="map.center.lat"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Latitude</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.0001"
+                        value={field.value}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="map.center.lng"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longitude</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.0001"
+                        value={field.value}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="map.zoom"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Zoom</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={20}
+                        value={field.value}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-            <FormField
-              control={form.control}
-              name="social_youtube"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>YouTube</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://youtube.com/..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <Card>
+          <CardHeader>
+            <CardTitle>Modules</CardTitle>
+            <CardDescription>
+              Activez ou désactivez les modules publics.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {moduleFields.map((item) => (
+              <FormField
+                key={item.name}
+                control={form.control}
+                name={item.name}
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                    <FormLabel className="text-base">{item.label}</FormLabel>
+                    <FormControl>
+                      <Switch
+                        checked={Boolean(field.value)}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            ))}
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isSaving}>
@@ -377,7 +487,7 @@ export default function SettingsForm() {
                   Enregistrement...
                 </>
               ) : (
-                "Enregistrer les paramètres"
+                'Enregistrer les paramètres'
               )}
             </Button>
           </CardFooter>
