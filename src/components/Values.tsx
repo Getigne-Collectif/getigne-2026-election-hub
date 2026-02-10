@@ -2,9 +2,11 @@ import { LightbulbIcon, UsersIcon, HeartIcon, VoteIcon, Zap, LayoutList, Landmar
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { usePostHog } from '@/hooks/usePostHog';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 const Values = () => {
   const { capture } = usePostHog();
+  const { settings } = useAppSettings();
   const HELLOASSO_JOIN_URL = import.meta.env.VITE_HELLOASSO_JOIN_URL as string;
 
   const handleHelloAssoClick = () => {
@@ -136,8 +138,8 @@ const Values = () => {
           <div className="space-y-6">
             <div className="rounded-xl overflow-hidden shadow-sm">
               <img
-                src="/images/getigne-places.png"
-                alt="Collage de photos de Gétigné"
+                src={settings.branding.images.neighborhood}
+                alt={`Collage de photos de ${settings.branding.city}`}
                 className="w-full h-full object-cover"
               />
             </div>
