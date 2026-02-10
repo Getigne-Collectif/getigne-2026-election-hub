@@ -156,6 +156,16 @@ export default function SettingsForm() {
                     <FormDescription>
                       Chemin relatif ou URL absolue.
                     </FormDescription>
+                  {field.value && (
+                    <div className="mt-3">
+                      <img
+                        src={field.value}
+                        alt="Prévisualisation du logo"
+                        className="h-16 w-auto rounded-md border border-muted bg-white object-contain"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
                     <div className="mt-2">
                       <Input
                         type="file"
@@ -266,6 +276,16 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="https://..." {...field} />
                     </FormControl>
+                    {field.value && (
+                      <div className="mt-3">
+                        <img
+                          src={field.value}
+                          alt="Prévisualisation de la photo hero"
+                          className="h-32 w-full rounded-md border border-muted object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <div className="mt-2">
                       <Input
                         type="file"
@@ -292,6 +312,16 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="/images/..." {...field} />
                     </FormControl>
+                    {field.value && (
+                      <div className="mt-3">
+                        <img
+                          src={field.value}
+                          alt="Prévisualisation de la photo campagne"
+                          className="h-32 w-full rounded-md border border-muted object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <div className="mt-2">
                       <Input
                         type="file"
@@ -318,6 +348,16 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="/images/..." {...field} />
                     </FormControl>
+                    {field.value && (
+                      <div className="mt-3">
+                        <img
+                          src={field.value}
+                          alt="Prévisualisation de la photo cafés de quartier"
+                          className="h-32 w-full rounded-md border border-muted object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <div className="mt-2">
                       <Input
                         type="file"
@@ -347,6 +387,16 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="/images/..." {...field} />
                     </FormControl>
+                    {field.value && (
+                      <div className="mt-3">
+                        <img
+                          src={field.value}
+                          alt="Prévisualisation photo adhésion 1"
+                          className="h-32 w-full rounded-md border border-muted object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <div className="mt-2">
                       <Input
                         type="file"
@@ -373,6 +423,16 @@ export default function SettingsForm() {
                     <FormControl>
                       <Input placeholder="/images/..." {...field} />
                     </FormControl>
+                    {field.value && (
+                      <div className="mt-3">
+                        <img
+                          src={field.value}
+                          alt="Prévisualisation photo adhésion 2"
+                          className="h-32 w-full rounded-md border border-muted object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <div className="mt-2">
                       <Input
                         type="file"
