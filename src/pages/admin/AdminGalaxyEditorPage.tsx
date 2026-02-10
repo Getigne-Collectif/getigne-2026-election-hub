@@ -255,7 +255,7 @@ const AdminGalaxyEditorPage = () => {
             </Button>
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Star className="w-6 h-6 text-getigne-green-500" />
+                <Star className="w-6 h-6 text-primary" />
                 {isEditing ? 'Modifier' : 'Créer'} un élément Galaxy
               </h1>
             </div>
@@ -443,7 +443,7 @@ const AdminGalaxyEditorPage = () => {
                   <Button
                     type="submit"
                     disabled={saving}
-                    className="bg-getigne-green-500 hover:bg-getigne-green-600"
+                    className="bg-primary hover:bg-primary/90"
                   >
                     {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     {isEditing ? 'Modifier' : 'Créer'}

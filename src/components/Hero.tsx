@@ -28,15 +28,15 @@ const Hero = () => {
       </div>
 
       {/* Semi-transparent shapes */}
-      <div className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-getigne-green-500/20 blur-3xl opacity-70 animate-pulse" />
-      <div className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-getigne-green-100/20 blur-3xl opacity-70" />
+      <div className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-primary/20 blur-3xl opacity-70 animate-pulse" />
+      <div className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-primary/10 blur-3xl opacity-70" />
 
       <div className="container mx-auto relative z-10">
         <div
           className={` mx-auto text-center transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           <div className={`mb-4 inline-block transform transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            <span className="text-white bg-getigne-green-500/30 px-5 py-2 rounded-full text-base font-medium">
+            <span className="text-white bg-primary/30 px-5 py-2 rounded-full text-base font-medium">
               Élections municipales 2026
             </span>
           </div>
@@ -60,7 +60,7 @@ const Hero = () => {
           <div
             className={`flex flex-col mt-8 sm:flex-row gap-4 justify-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}
           >
-            <Button asChild className="bg-getigne-green-600 hover:bg-getigne-green-700 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+            <Button asChild className="bg-primary hover:bg-primary/90 text-white py-6 px-8 rounded-md text-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <Link to={Routes.PROGRAM}>
                 Découvrez notre projet <span className="hidden md:inline">pour 2026</span>
               </Link>

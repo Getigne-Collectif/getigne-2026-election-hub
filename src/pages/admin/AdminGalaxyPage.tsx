@@ -199,14 +199,14 @@ const AdminGalaxyPage = () => {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Star className="w-6 h-6 text-getigne-green-500" />
+                <Star className="w-6 h-6 text-primary" />
                 Galaxy Items
               </h1>
               <p className="text-gray-600">Gérez les éléments du menu flottant</p>
             </div>
             <Button 
               onClick={() => navigate('/admin/galaxy/new')} 
-              className="bg-getigne-green-500 hover:bg-getigne-green-600"
+              className="bg-primary hover:bg-primary/90"
             >
               <Plus className="w-4 h-4 mr-2" />
               Nouvel élément
@@ -221,7 +221,7 @@ const AdminGalaxyPage = () => {
                     <CardTitle className="flex items-center gap-3">
                       <div 
                         className={`p-2 rounded-lg text-white ${
-                          item.color || 'bg-getigne-green-500'
+                          item.color || 'bg-primary'
                         }`}
                         style={item.color ? { backgroundColor: item.color } : {}}
                       >
@@ -304,7 +304,7 @@ const AdminGalaxyPage = () => {
                   </p>
                   <Button 
                     onClick={() => navigate('/admin/galaxy/new')}
-                    className="bg-getigne-green-500 hover:bg-getigne-green-600"
+                    className="bg-primary hover:bg-primary/90"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Créer un élément

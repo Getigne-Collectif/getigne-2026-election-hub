@@ -40,7 +40,7 @@ const ContactPage = () => {
               <Card className="border-getigne-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center text-getigne-900">
-                    <Users className="w-5 h-5 mr-2 text-getigne-green-600" />
+                    <Users className="w-5 h-5 mr-2 text-primary" />
                     Qui sommes-nous ?
                   </CardTitle>
                   <CardDescription>
@@ -49,8 +49,8 @@ const ContactPage = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <div className="w-10 h-10 bg-getigne-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Heart className="w-5 h-5 text-getigne-green-600" />
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <h4 className="font-medium text-getigne-900">Gétigné Collectif</h4>

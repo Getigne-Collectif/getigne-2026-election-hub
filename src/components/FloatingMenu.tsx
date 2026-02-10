@@ -227,7 +227,7 @@ const FloatingMenu = () => {
       {/* Bouton principal */}
       <div 
         className={`
-          w-14 h-14 bg-getigne-green-500 hover:bg-getigne-green-600 
+          w-14 h-14 bg-primary hover:bg-primary/90
           rounded-full flex items-center justify-center shadow-lg cursor-pointer
           transition-all duration-300 ease-out
           ${isExpanded ? 'scale-110 shadow-xl' : 'scale-100'}

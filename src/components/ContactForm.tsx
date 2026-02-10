@@ -245,8 +245,8 @@ ${formData.message}${participationInfo}${newsletterInfo}
       <div className={`space-y-6 ${className}`}>
         {/* Message de succès */}
         <div className="text-center py-8">
-          <div className="w-20 h-20 bg-getigne-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-12 h-12 text-getigne-green-600" />
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-12 h-12 text-primary" />
           </div>
           <h3 className="text-2xl font-bold text-getigne-900 mb-2">
             Message envoyé avec succès ! 🎉
@@ -259,7 +259,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
           <Button
             onClick={() => setIsSubmitted(false)}
             variant="outline"
-            className="border-getigne-green-300 text-getigne-green-700 hover:bg-getigne-green-50"
+            className="border-primary/30 text-primary hover:bg-primary/10"
           >
             <ArrowLeftIcon className="w-4 h-4" />
             Retour au formulaire
@@ -270,8 +270,8 @@ ${formData.message}${participationInfo}${newsletterInfo}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Bannière Discord - affichée seulement si participation souhaitée */}
           {showParticipation && participationData.wantsToParticipate && (
-            <div className="relative overflow-hidden bg-gradient-to-r from-getigne-green-500 to-purple-600 rounded-xl border border-getigne-green-200/20 shadow-lg">
-              <div className="absolute inset-0 bg-gradient-to-r from-getigne-green-500/90 to-purple-600/90"></div>
+            <div className="relative overflow-hidden bg-gradient-to-r from-primary to-purple-600 rounded-xl border border-primary/20 shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-purple-600/90"></div>
               <div className="relative p-4 text-white">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0">
@@ -347,7 +347,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
             id="firstName"
             value={formData.firstName}
             onChange={handleChange}
-            className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+            className="border-getigne-200 focus:border-primary focus:ring-primary"
             placeholder="Votre prénom"
             required
           />
@@ -362,7 +362,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
             id="lastName"
             value={formData.lastName}
             onChange={handleChange}
-            className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+            className="border-getigne-200 focus:border-primary focus:ring-primary"
             placeholder="Votre nom"
             required
           />
@@ -378,7 +378,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
           id="email"
           value={formData.email}
           onChange={handleChange}
-          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+          className="border-getigne-200 focus:border-primary focus:ring-primary"
           placeholder="votre.email@exemple.com"
           required
         />
@@ -393,7 +393,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
           id="subject"
           value={formData.subject}
           onChange={handleChange}
-          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+          className="border-getigne-200 focus:border-primary focus:ring-primary"
           placeholder="Objet de votre message"
         />
       </div>
@@ -407,7 +407,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
           rows={6}
           value={formData.message}
           onChange={handleChange}
-          className="border-getigne-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+          className="border-getigne-200 focus:border-primary focus:ring-primary"
           placeholder="Décrivez votre demande, question ou suggestion..."
           required
         />
@@ -421,7 +421,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
               id="wantsToParticipate"
               checked={participationData.wantsToParticipate}
               onCheckedChange={handleParticipationChange}
-              className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500"
+              className="h-6 w-6 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <Label htmlFor="wantsToParticipate" className="text-getigne-900 font-semibold text-base cursor-pointer">
               Je souhaite participer au collectif
@@ -446,7 +446,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
                       id={`participation-${option}`}
                       checked={participationData.participationTypes.includes(option)}
                       onCheckedChange={(checked) => handleParticipationTypeChange(option, checked as boolean)}
-                      className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500 mt-0.5"
+                      className="h-6 w-6 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-0.5"
                     />
                     <Label htmlFor={`participation-${option}`} className="text-sm text-getigne-700 cursor-pointer leading-relaxed">
                       {option}
@@ -455,13 +455,13 @@ ${formData.message}${participationInfo}${newsletterInfo}
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-getigne-green-200/50">
+              <div className="pt-3 border-t border-primary/20">
                 <div className="flex items-start space-x-3">
                   <Checkbox
                     id="participation-other"
                     checked={participationData.participationTypes.includes('Autre')}
                     onCheckedChange={(checked) => handleParticipationTypeChange('Autre', checked as boolean)}
-                    className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500 mt-0.5"
+                    className="h-6 w-6 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-0.5"
                   />
                   <div className="flex-1">
                     <Label htmlFor="participation-other" className="text-sm text-getigne-700 cursor-pointer">
@@ -474,7 +474,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
                           type="text"
                           value={participationData.otherParticipation}
                           onChange={handleOtherParticipationChange}
-                          className="w-full border-getigne-green-200 focus:border-getigne-green-500 focus:ring-getigne-green-500"
+                          className="w-full border-getigne-200 focus:border-primary focus:ring-primary"
                           placeholder="Précisez votre souhait de participation..."
                         />
                       </div>
@@ -496,7 +496,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
             id="newsletter"
             checked={newsletterSubscription}
             onCheckedChange={handleNewsletterChange}
-            className="h-6 w-6 border-getigne-green-300 data-[state=checked]:bg-getigne-green-500 data-[state=checked]:border-getigne-green-500"
+            className="h-6 w-6 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
           />
           <Label htmlFor="newsletter" className="text-getigne-800 cursor-pointer">
             Je souhaite m'abonner à la newsletter pour recevoir les actualités du collectif
@@ -506,7 +506,7 @@ ${formData.message}${participationInfo}${newsletterInfo}
 
       <Button 
         type="submit" 
-        className="w-full bg-getigne-green-500 hover:bg-getigne-green-600 text-white py-3 text-base font-medium transition-all duration-200 transform hover:scale-[1.02]"
+        className="w-full bg-primary hover:bg-primary/90 text-white py-3 text-base font-medium transition-all duration-200 transform hover:scale-[1.02]"
         disabled={isSubmitting}
       >
         <Send className="mr-2 h-4 w-4" /> 

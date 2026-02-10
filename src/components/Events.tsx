@@ -8,7 +8,7 @@ import NeighborhoodEventsMap from '@/components/maps/NeighborhoodEventsMap';
 
 // Map committee names to colors
 const committeeColors = {
-  "Environnement": "border-getigne-green-500",
+  "Environnement": "border-primary",
   "Mobilité": "border-getigne-accent",
   "Solidarité": "border-getigne-700",
   "Culture": "border-[#9b87f5]",

@@ -441,7 +441,7 @@ const NeighborhoodKitPage = () => {
           <Navbar />
           <div className="flex-grow flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-getigne-green-500 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-getigne-700">Chargement de l'événement...</p>
             </div>
           </div>
@@ -463,7 +463,7 @@ const NeighborhoodKitPage = () => {
           <div className="flex-grow flex items-center justify-center">
             <div className="text-center">
               <p className="text-red-600 mb-4">Événement non trouvé</p>
-              <Link to="/cafes-de-quartier" className="text-getigne-green-600 hover:underline">
+              <Link to="/cafes-de-quartier" className="text-primary hover:underline">
                 Retour aux cafés de quartier
               </Link>
             </div>
@@ -1025,8 +1025,8 @@ Au plaisir de vous y retrouver ! 😊
                     </Button>
                   </CardContent>
                 </Card>
-                <div className="relative mt-8 overflow-hidden bg-gradient-to-r from-getigne-green-500 to-purple-600 rounded-xl border border-getigne-green-200/20 shadow-lg">
-                    <div className="absolute inset-0 bg-gradient-to-r from-getigne-green-500/90 to-purple-600/90"></div>
+                <div className="relative mt-8 overflow-hidden bg-gradient-to-r from-primary to-purple-600 rounded-xl border border-primary/20 shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-purple-600/90"></div>
                         <div className="relative p-4 text-white">
                             <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0">

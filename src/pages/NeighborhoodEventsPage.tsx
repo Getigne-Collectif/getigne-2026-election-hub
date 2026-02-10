@@ -170,7 +170,7 @@ const NeighborhoodEventsPage = () => {
                 </span>
               )}
               {event.member_present && (
-                <span className="bg-getigne-green-500/10 text-getigne-green-700 px-2 py-1 rounded-full text-xs flex items-center">
+                <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center">
                   <UserCheck className="w-3 h-3 mr-1" />
                   Membre présent
                 </span>
