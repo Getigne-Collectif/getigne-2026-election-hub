@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, ChevronDown, Settings, FileText, Car, Coffee, HandHeart, PenLineIcon, BookUser, UserCog, LogOut } from 'lucide-react';
+import { Menu, ChevronDown, ChevronRight, Settings, FileText, Car, HandHeart, PenLineIcon, BookUser, UserCog, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import AuthButton from './AuthButton';
 import UserAvatar, { getUserNames } from '@/components/UserAvatar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/context/auth';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { Routes } from '@/routes';
@@ -104,74 +105,140 @@ const Navbar = () => {
     }
   }, [user]);
 
-  const NavLinks = () => (
+  const isActualitesActive =
+    location.pathname === Routes.NEWS ||
+    location.pathname === Routes.AGENDA ||
+    location.pathname === Routes.NEIGHBORHOOD_EVENTS ||
+    location.pathname.startsWith('/agenda/');
+
+  const showActualitesSection = settings.modules.blog || settings.modules.agenda;
+
+  const NavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
     <>
       <li>
-        <Link to={Routes.HOME} className={isActive(Routes.HOME)}>
+        <Link to={Routes.HOME} className={isActive(Routes.HOME)} onClick={onNavigate}>
           Accueil
         </Link>
       </li>
       {showProgramLink && (
         <li>
-          <Link to={Routes.PROGRAM} className={isActive(Routes.PROGRAM)}>
+          <Link to={Routes.PROGRAM} className={isActive(Routes.PROGRAM)} onClick={onNavigate}>
             Le programme
           </Link>
         </li>
       )}
       {settings.modules.team && (
         <li>
-          <Link to={Routes.TEAM} className={isActive(Routes.TEAM)}>
+          <Link to={Routes.TEAM} className={isActive(Routes.TEAM)} onClick={onNavigate}>
             L'équipe
           </Link>
         </li>
       )}
-      {settings.modules.blog && (
-        <li>
-          <Link to={Routes.NEWS} className={isActive(Routes.NEWS)}>
-            Actualités
-          </Link>
-        </li>
-      )}
-      {settings.modules.agenda && (
-        <li className="relative">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button 
-                className={`flex items-center ${
-                  location.pathname === Routes.AGENDA || location.pathname === Routes.NEIGHBORHOOD_EVENTS 
-                    ? 'text-brand' 
+      {showActualitesSection && (
+        <>
+          {/* Desktop : menu déroulant Actualités */}
+          <li className="relative hidden lg:list-item">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={`flex items-center ${
+                    isActualitesActive
+                      ? 'text-brand'
+                      : 'text-brand-700 hover:text-brand transition-colors duration-200'
+                  }`}
+                >
+                  Actualités
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {settings.modules.blog && (
+                  <DropdownMenuItem asChild>
+                    <Link to={Routes.NEWS} className="w-full">
+                      Blog
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {settings.modules.agenda && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to={Routes.AGENDA} className="w-full">
+                        Agenda
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to={Routes.NEIGHBORHOOD_EVENTS} className="w-full">
+                        Cafés de quartier
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </li>
+          {/* Mobile : section dépliable Actualités */}
+          <li className="lg:hidden list-none">
+            <Collapsible>
+              <CollapsibleTrigger
+                className={`flex w-full items-center justify-between py-2 text-lg ${
+                  isActualitesActive
+                    ? 'text-brand font-medium'
                     : 'text-brand-700 hover:text-brand transition-colors duration-200'
                 }`}
               >
-                Agenda
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link to={Routes.AGENDA} className="w-full flex items-center">
-                  Tous les événements
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to={Routes.NEIGHBORHOOD_EVENTS} className="w-full flex items-center">
-                  <Coffee className="mr-2 h-4 w-4" />
-                  Cafés de quartier
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </li>
+                Actualités
+                <ChevronRight className="h-5 w-5 shrink-0 transition-transform duration-200 [[data-state=open]_&]:rotate-90" />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <ul className="space-y-2 pl-3 mt-2 border-l-2 border-brand-200">
+                  {settings.modules.blog && (
+                    <li>
+                      <Link
+                        to={Routes.NEWS}
+                        className={`block py-2 ${isActive(Routes.NEWS)}`}
+                        onClick={onNavigate}
+                      >
+                        Blog
+                      </Link>
+                    </li>
+                  )}
+                  {settings.modules.agenda && (
+                    <>
+                      <li>
+                        <Link
+                          to={Routes.AGENDA}
+                          className={`block py-2 ${isActive(Routes.AGENDA)}`}
+                          onClick={onNavigate}
+                        >
+                          Agenda
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to={Routes.NEIGHBORHOOD_EVENTS}
+                          className={`block py-2 ${isActive(Routes.NEIGHBORHOOD_EVENTS)}`}
+                          onClick={onNavigate}
+                        >
+                          Cafés de quartier
+                        </Link>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </CollapsibleContent>
+            </Collapsible>
+          </li>
+        </>
       )}
       {settings.modules.proxy && (
         <li>
-          <Link to={Routes.PROXY} className={isActive(Routes.PROXY)}>
+          <Link to={Routes.PROXY} className={isActive(Routes.PROXY)} onClick={onNavigate}>
             Espace procuration
           </Link>
         </li>
       )}
       <li>
-        <Link to={Routes.CONTACT} className={isActive(Routes.CONTACT)}>
+        <Link to={Routes.CONTACT} className={isActive(Routes.CONTACT)} onClick={onNavigate}>
           Contact
         </Link>
       </li>
@@ -331,7 +398,7 @@ const Navbar = () => {
               <SheetContent side="right">
                 <nav className="mt-8">
                   <ul className="space-y-4 text-lg">
-                    <NavLinks />
+                    <NavLinks onNavigate={() => setIsOpen(false)} />
                     {showSupportModule && (
                       <li className="pt-4">
                         <SupportButton className="w-full py-6 text-lg" />

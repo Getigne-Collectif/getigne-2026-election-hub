@@ -204,7 +204,7 @@ const News = ({ limit, showPagination = false }) => {
               className="bg-brand text-brand-fg rounded-md hover:bg-brand/90"
             >
               <Link to={Routes.NEWS}>
-                Voir toutes nos actualités
+                Voir le blog
               </Link>
             </Button>
           </div>
@@ -338,7 +338,7 @@ const News = ({ limit, showPagination = false }) => {
             className="bg-brand text-brand-fg rounded-md hover:bg-brand/90"
           >
             <Link to={Routes.NEWS}>
-              Toutes nos actualités
+              Voir le blog
             </Link>
           </Button>
         </div>

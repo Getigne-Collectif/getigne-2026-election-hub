@@ -61,12 +61,17 @@ const SiteMapPage = () => {
                   </li>
                   <li>
                     <Link to={Routes.NEWS} className="text-brand hover:underline">
-                      Actualités
+                      Blog
                     </Link>
                   </li>
                   <li>
                     <Link to={Routes.AGENDA} className="text-brand hover:underline">
                       Agenda
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={Routes.NEIGHBORHOOD_EVENTS} className="text-brand hover:underline">
+                      Cafés de quartier
                     </Link>
                   </li>
                   <li>
@@ -83,16 +88,21 @@ const SiteMapPage = () => {
               </div>
 
               <div>
-                <h2 className="text-xl font-semibold mb-4 border-b pb-2">Actualités et Agenda</h2>
+                <h2 className="text-xl font-semibold mb-4 border-b pb-2">Actualités</h2>
                 <ul className="space-y-3">
                   <li>
                     <Link to={Routes.NEWS} className="text-brand hover:underline">
-                      Toutes les actualités
+                      Blog
                     </Link>
                   </li>
                   <li>
                     <Link to={Routes.AGENDA} className="text-brand hover:underline">
-                      Tous les événements
+                      Agenda
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={Routes.NEIGHBORHOOD_EVENTS} className="text-brand hover:underline">
+                      Cafés de quartier
                     </Link>
                   </li>
                 </ul>

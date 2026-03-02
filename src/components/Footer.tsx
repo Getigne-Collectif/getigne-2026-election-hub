@@ -117,16 +117,23 @@ const Footer = () => {
               {settings.modules.blog && (
                 <li>
                   <Link to={Routes.NEWS} className="opacity-90 hover:opacity-100 transition-opacity">
-                    Actualités
+                    Blog
                   </Link>
                 </li>
               )}
               {settings.modules.agenda && (
-                <li>
-                  <Link to={Routes.AGENDA} className="opacity-90 hover:opacity-100 transition-opacity">
-                    Événements
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link to={Routes.AGENDA} className="opacity-90 hover:opacity-100 transition-opacity">
+                      Agenda
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={Routes.NEIGHBORHOOD_EVENTS} className="opacity-90 hover:opacity-100 transition-opacity">
+                      Cafés de quartier
+                    </Link>
+                  </li>
+                </>
               )}
               <li>
                 <Link to={Routes.CONTACT} className="opacity-90 hover:opacity-100 transition-opacity">

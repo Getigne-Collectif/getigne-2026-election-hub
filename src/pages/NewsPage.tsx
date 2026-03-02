@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -396,13 +397,21 @@ const NewsPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <HelmetProvider>
+      <Helmet>
+        <title>Blog | Gétigné Collectif</title>
+        <meta
+          name="description"
+          content="Suivez l'actualité du collectif, nos rencontres et nos réflexions pour construire ensemble l'avenir de Gétigné."
+        />
+      </Helmet>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
 
-      <div className="pt-24 pb-10 bg-brand-50">
+        <div className="pt-24 pb-10 bg-brand-50">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-8">
-            <h1 className="text-4xl font-bold mb-4">Actualités</h1>
+            <h1 className="text-4xl font-bold mb-4">Blog</h1>
             <p className="text-lg text-brand-700">
               Suivez l'actualité de notre collectif, nos rencontres, et nos réflexions pour construire ensemble l'avenir de Gétigné.
             </p>
@@ -442,9 +451,9 @@ const NewsPage = () => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
 
-      <main className="flex-grow py-12 bg-white">
+        <main className="flex-grow py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-1">
@@ -529,11 +538,12 @@ const NewsPage = () => {
               )}
             </div>
           </div>
-        </div>
-      </main>
+          </div>
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </HelmetProvider>
   );
 };
 
