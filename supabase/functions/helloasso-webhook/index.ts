@@ -30,8 +30,8 @@ interface HelloAssoOrder {
     lastName: string;
   };
   items: Array<{
-    name: string;
-    type: string;
+    name?: string;
+    type?: string;
   }>;
   createdAt: string;
 }
@@ -342,13 +342,17 @@ serve(async (req) => {
     const order = webhookData.data;
     const { email, firstName, lastName } = order.payer;
 
-    // Vérifier que c'est bien une adhésion (pas un don)
-    const isMembership = order.items.some(item => 
-      item.type === 'Membership' || item.name.toLowerCase().includes('adhésion')
+    // Vérifier que c'est bien une adhésion (pas un don). Les dons peuvent avoir des lignes sans `name`.
+    const items = Array.isArray(order.items) ? order.items : [];
+    const isMembership = items.some(
+      (item) =>
+        item.type === "Membership" ||
+        (typeof item.name === "string" &&
+          item.name.toLowerCase().includes("adhésion")),
     );
 
     if (!isMembership) {
-      console.log("Commande ignorée (pas une adhésion):", order.items);
+      console.log("Commande ignorée (pas une adhésion):", items);
       return new Response(
         JSON.stringify({ message: "Not a membership order" }),
         {
