@@ -162,9 +162,9 @@ dash.calc('comparaison', {
 
 dash.calc('position', {
   title: 'Rang de Gétigné parmi les communes publiées de Loire-Atlantique',
-  description: 'Pour l’indicateur choisi et l’année affichée : nombre de communes publiées, rang de Gétigné par taux croissant et médiane des taux publiés.',
-  inputs: ['communes_tous'],
-  fn: (communes) => {
+  description: 'Pour l’indicateur choisi et l’année affichée : nombre de communes publiées, rang de Gétigné par taux croissant et taux de la Loire-Atlantique comme repère.',
+  inputs: ['communes_tous', 'reperes_tous'],
+  fn: (communes, reperes) => {
     const p = dash.params();
     const annee = Number(p.annee);
     const tous = p.indicateur === gtTous;
@@ -172,8 +172,10 @@ dash.calc('position', {
     const publiees = lignes.filter((r) => r.publie === 'oui').sort((a, b) => a.taux - b.taux);
     const i = publiees.findIndex((r) => r.code === '44063');
     const n = publiees.length;
-    const mediane = n ? (n % 2 ? publiees[(n - 1) / 2].taux : (publiees[n / 2 - 1].taux + publiees[n / 2].taux) / 2) : null;
-    return [{indicateur: p.indicateur, annee, communes: lignes.length, publiees: n, statut: i < 0 ? 'non publié' : tous ? 'total' : 'publié', sans_population: lignes.length - n, rang: i < 0 ? null : publiees.filter((r) => r.taux < publiees[i].taux).length + 1, autres_non_publiees: i < 0 ? lignes.length - n - 1 : null, mediane: mediane == null ? null : Math.round(mediane * 100) / 100}];
+    // Repère : le taux du département (tous ses faits rapportés à toute sa population), plutôt qu'une
+    // médiane des seules communes publiées, tirée vers le haut.
+    const dep = reperes.find((r) => r.territoire === 'Loire-Atlantique' && r.indicateur === p.indicateur && r.annee === annee);
+    return [{indicateur: p.indicateur, annee, communes: lignes.length, publiees: n, statut: i < 0 ? 'non publié' : tous ? 'total' : 'publié', sans_population: lignes.length - n, rang: i < 0 ? null : publiees.filter((r) => r.taux < publiees[i].taux).length + 1, autres_non_publiees: i < 0 ? lignes.length - n - 1 : null, taux_44: dep && dep.taux != null ? Math.round(dep.taux * 100) / 100 : null}];
   },
 });
 
@@ -380,13 +382,15 @@ dash.draw('evolution', (el) => {
 
 // Répartition des communes publiées
 dash.draw('repartition', (el) => {
-  const C = dash.data('communes_tous');
-  if (C.status !== 'ok') { el.textContent = C.status === 'error' ? 'Échec du chargement' : '—'; return; }
+  const C = dash.data('communes_tous'), R = dash.data('reperes_tous');
+  if (C.status !== 'ok' || R.status !== 'ok') { el.textContent = C.status === 'error' || R.status === 'error' ? 'Échec du chargement' : '—'; return; }
   const p = dash.params(), ind = p.indicateur, annee = Number(p.annee);
   const rows = C.data.filter((r) => r.indicateur === ind && r.annee === annee && r.publie === 'oui');
   if (!rows.length) { el.textContent = 'Aucune commune publiée pour cet indicateur cette année-là.'; return; }
   const W = el.clientWidth || 640, r0 = 3.4, pasY = 2 * r0 + 1, ml = 12, mr = 18;
-  const max = d3.max(rows, (r) => r.taux) || 1;
+  const depR = R.data.find((r) => r.territoire === 'Loire-Atlantique' && r.indicateur === ind && r.annee === annee);
+  const taux44 = depR ? depR.taux : null;
+  const max = Math.max(d3.max(rows, (r) => r.taux) || 1, taux44 || 0);
   const x = d3.scaleSqrt().domain([0, max]).range([ml, W - mr]);
   const pts = rows.map((r) => ({r, x: x(r.taux)})).sort((a, b) => a.x - b.x);
   const places = [];
@@ -400,13 +404,21 @@ dash.draw('repartition', (el) => {
     q.y = yy; places.push(q);
   });
   const ext = d3.max(pts, (q) => Math.abs(q.y)) || 0;
-  const mid = ext + r0 + 10, H = 2 * mid + 26;
+  const haut = 16; // place pour le libellé du repère départemental
+  const mid = haut + ext + r0 + 10, axeY = mid + ext + r0 + 10, H = axeY + 26;
   const dec = max < 2 ? 2 : max < 20 ? 1 : 0;
   const svg = d3.create('svg').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('role', 'img')
     .attr('aria-label', `${ind}, ${annee} : répartition des taux pour 1 000 des communes publiées de Loire-Atlantique`);
   el.replaceChildren(svg.node());
-  const gx = svg.append('g').attr('class', 'gt-axis').attr('transform', `translate(0,${2 * mid})`).call(d3.axisBottom(x).ticks(W < 460 ? 4 : 7).tickSize(4).tickPadding(4).tickFormat((t) => gtFr(t, dec)));
+  const gx = svg.append('g').attr('class', 'gt-axis').attr('transform', `translate(0,${axeY})`).call(d3.axisBottom(x).ticks(W < 460 ? 4 : 7).tickSize(4).tickPadding(4).tickFormat((t) => gtFr(t, dec)));
   gx.select('.domain').style('stroke', 'var(--cds-chart-axis)'); gx.selectAll('line').style('stroke', 'var(--cds-chart-axis)');
+  // repère : taux de la Loire-Atlantique
+  if (taux44 != null) {
+    const xd = x(taux44);
+    svg.append('line').attr('x1', xd).attr('x2', xd).attr('y1', haut - 2).attr('y2', axeY).style('stroke', 'var(--cds-chart-reference)').style('stroke-dasharray', '4 3').style('stroke-width', 1.2);
+    svg.append('text').attr('class', 'gt-axis').attr('x', xd).attr('y', haut - 5).attr('text-anchor', xd > W - 90 ? 'end' : xd < 90 ? 'start' : 'middle')
+      .style('fill', 'var(--cds-text-secondary)').style('font-size', 'var(--cds-font-size-caption)').text(`Loire-Atlantique : ${gtFr(taux44, 2)}`);
+  }
   const special = (code) => { const t = gtTrio.find((s) => s[0] === code); return t ? gtColor(t[1]) : code === p.commune ? dash.colors[3] : null; };
   svg.append('g').selectAll('circle').data(pts.filter((q) => !special(q.r.code))).join('circle').attr('cx', (q) => q.x).attr('cy', (q) => mid + q.y).attr('r', r0).style('fill', 'var(--cds-chart-muted)').style('opacity', 0.55);
   svg.append('g').selectAll('circle').data(pts.filter((q) => special(q.r.code))).join('circle').attr('cx', (q) => q.x).attr('cy', (q) => mid + q.y).attr('r', r0 + 2.2).style('fill', (q) => special(q.r.code)).style('stroke', 'var(--color-bg)').style('stroke-width', 1.5);
