@@ -40,7 +40,7 @@
       <tbody data-draw="t-getigne"></tbody>
     </table>
   </div>
-  <p class="gt-muted">Taux pour 1 000 habitants, sauf les cambriolages : pour 1 000 logements. « Repère si non publié » : moyenne des nombres non publiés dans les communes de Loire-Atlantique, donnée par le ministère comme ordre de grandeur ; ce n’est pas le chiffre de Gétigné. Dans la dernière colonne, une barre pleine est un nombre publié, un trait au sol un zéro publié, un point creux une année non publiée. Les violences intrafamiliales ne figurent que pour Gétigné : le fichier de toutes les communes ne faisait pas partie de l’envoi, d’où l’absence de taux départemental et national.</p>
+  <p class="gt-muted">Taux pour 1 000 habitants, sauf les cambriolages : pour 1 000 logements. « Repère si non publié » : moyenne des nombres non publiés dans les communes de Loire-Atlantique, donnée par le ministère comme ordre de grandeur ; ce n’est pas le chiffre de Gétigné. Dans la dernière colonne, une barre pleine est un nombre publié, un trait au sol un zéro publié, un point creux une année non publiée.</p>
 </section>
 
 <section id="evolution">
@@ -56,7 +56,8 @@
   </div>
   <div class="gt-card">
     <div class="gt-chart" id="graphique-evolution" data-draw="evolution" data-source="communes reperes">—</div>
-    <p class="gt-muted">Cercles vides : années où le nombre de Gétigné n’est pas publié, placés au taux moyen des communes non publiées du département. Une ligne s’interrompt quand le nombre d’une commune n’est pas publié.</p>
+    <p class="gt-muted" data-gt-mode="un">Cercles vides : années où le nombre de Gétigné n’est pas publié, placés au taux moyen des communes non publiées du département. Une ligne s’interrompt quand le nombre d’une commune n’est pas publié.</p>
+    <p class="gt-muted" data-gt-mode="tous" hidden>Tous indicateurs confondus : somme des 14 indicateurs suivis, rapportée à 1 000 habitants (les cambriolages y comptent comme les autres faits). Comme pour les totaux de la Loire-Atlantique, chaque nombre non publié d’une commune est remplacé par la moyenne départementale des communes non publiées : le total d’une commune est une estimation (≈), d’autant plus incertaine qu’elle a peu d’indicateurs publiés. Le détail publié indicateur par indicateur reste dans le premier tableau.</p>
   </div>
   <div class="gt-scroll">
     <table class="gt-table" id="tableau-comparaison" data-source="comparaison" data-row-key="territoire">
@@ -75,9 +76,11 @@
   <h2 class="gt-h2">Où se situe Gétigné parmi les communes de Loire-Atlantique</h2>
   <p class="gt-p" data-gt-si="publié" hidden>En <span data-draw="val" data-source="position" data-field="annee" data-row="0" data-raw="1">—</span>, <span data-draw="val" data-source="position" data-field="publiees" data-row="0">—</span> des <span data-draw="val" data-source="position" data-field="communes" data-row="0">—</span> communes du département ont un nombre publié pour l’indicateur choisi. Gétigné en fait partie : son taux la place au rang <b data-draw="val" data-source="position" data-field="rang" data-row="0">—</b> en partant du plus bas (les ex æquo partagent le même rang), pour une médiane de <span data-draw="val" data-source="position" data-field="mediane" data-row="0" data-dec="2">—</span> pour 1 000 parmi les communes publiées.</p>
   <p class="gt-p" data-gt-si="non publié" hidden>En <span data-draw="val" data-source="position" data-field="annee" data-row="0" data-raw="1">—</span>, <span data-draw="val" data-source="position" data-field="publiees" data-row="0">—</span> des <span data-draw="val" data-source="position" data-field="communes" data-row="0">—</span> communes du département ont un nombre publié pour l’indicateur choisi. Gétigné n’en fait pas partie : son nombre est sous le seuil de publication, comme celui de <span data-draw="val" data-source="position" data-field="autres_non_publiees" data-row="0">—</span> autres communes.</p>
+  <p class="gt-p" data-gt-si="total" hidden>En <span data-draw="val" data-source="position" data-field="annee" data-row="0" data-raw="1">—</span>, tous indicateurs confondus, le total estimé de Gétigné la place au rang <b data-draw="val" data-source="position" data-field="rang" data-row="0">—</b> sur <span data-draw="val" data-source="position" data-field="publiees" data-row="0">—</span> communes du département en partant du plus bas (les ex æquo partagent le même rang), pour une médiane de <span data-draw="val" data-source="position" data-field="mediane" data-row="0" data-dec="2">—</span> faits pour 1 000 habitants.</p>
   <div class="gt-card">
     <div class="gt-strip" id="graphique-repartition" data-draw="repartition" data-source="communes">—</div>
-    <p class="gt-muted">Un point par commune dont le nombre est publié, placé selon son taux pour 1 000 (échelle resserrée vers les valeurs hautes). Gétigné, Gorges, Clisson et la commune choisie gardent leurs couleurs du graphique précédent. Les communes non publiées — celles où l’on enregistre le moins de faits — n’apparaissent pas : la médiane affichée est donc plus haute que celle de l’ensemble des communes.</p>
+    <p class="gt-muted" data-gt-mode="tous" hidden>Un point par commune, placé selon son total estimé pour 1 000 habitants (échelle resserrée vers les valeurs hautes). Gétigné, Gorges, Clisson et la commune choisie gardent leurs couleurs du graphique précédent. Les <span data-draw="val" data-source="position" data-field="sans_population" data-row="0">—</span> communes dont aucun chiffre publié ne permet de déduire la population n’apparaissent pas.</p>
+    <p class="gt-muted" data-gt-mode="un">Un point par commune dont le nombre est publié, placé selon son taux pour 1 000 (échelle resserrée vers les valeurs hautes). Gétigné, Gorges, Clisson et la commune choisie gardent leurs couleurs du graphique précédent. Les communes non publiées — celles où l’on enregistre le moins de faits — n’apparaissent pas : la médiane affichée est donc plus haute que celle de l’ensemble des communes.</p>
   </div>
 </section>
 

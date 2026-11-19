@@ -12419,6 +12419,536 @@ code,commune,indicateur,annee,nombre,taux,publie
 44224,La Grigonnais,Violences physiques hors cadre familial,2023,,,non
 44224,La Grigonnais,Violences physiques hors cadre familial,2024,,,non
 44224,La Grigonnais,Violences physiques hors cadre familial,2025,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2016,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2017,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2018,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2019,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2020,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2021,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2022,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2023,,,non
+44001,Abbaretz,Violences physiques intrafamiliales,2024,5,2.412,oui
+44001,Abbaretz,Violences physiques intrafamiliales,2025,5,2.412,oui
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2016,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2017,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2018,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2019,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2020,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2021,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2022,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2023,,,non
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2024,23,5.534,oui
+44002,Aigrefeuille-sur-Maine,Violences physiques intrafamiliales,2025,18,4.331,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2016,17,1.605,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2017,18,1.666,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2018,21,1.907,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2019,25,2.265,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2020,21,1.895,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2021,24,2.162,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2022,24,2.115,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2023,48,4.138,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2024,49,4.224,oui
+44003,Ancenis-Saint-Géréon,Violences physiques intrafamiliales,2025,45,3.879,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2016,15,2.242,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2017,5,0.74,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2018,7,1.025,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2019,11,1.595,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2020,12,1.702,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2021,18,2.506,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2022,26,3.568,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2023,21,2.823,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2024,20,2.688,oui
+44005,Chaumes-en-Retz,Violences physiques intrafamiliales,2025,14,1.882,oui
+44006,Assérac,Violences physiques intrafamiliales,2016,,,non
+44006,Assérac,Violences physiques intrafamiliales,2017,,,non
+44006,Assérac,Violences physiques intrafamiliales,2018,,,non
+44006,Assérac,Violences physiques intrafamiliales,2019,,,non
+44006,Assérac,Violences physiques intrafamiliales,2020,,,non
+44006,Assérac,Violences physiques intrafamiliales,2021,,,non
+44006,Assérac,Violences physiques intrafamiliales,2022,,,non
+44006,Assérac,Violences physiques intrafamiliales,2023,,,non
+44006,Assérac,Violences physiques intrafamiliales,2024,,,non
+44006,Assérac,Violences physiques intrafamiliales,2025,,,non
+44007,Avessac,Violences physiques intrafamiliales,2016,,,non
+44007,Avessac,Violences physiques intrafamiliales,2017,,,non
+44007,Avessac,Violences physiques intrafamiliales,2018,,,non
+44007,Avessac,Violences physiques intrafamiliales,2019,,,non
+44007,Avessac,Violences physiques intrafamiliales,2020,,,non
+44007,Avessac,Violences physiques intrafamiliales,2021,,,non
+44007,Avessac,Violences physiques intrafamiliales,2022,,,non
+44007,Avessac,Violences physiques intrafamiliales,2023,,,non
+44007,Avessac,Violences physiques intrafamiliales,2024,8,3.263,oui
+44007,Avessac,Violences physiques intrafamiliales,2025,6,2.447,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2016,6,0.677,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2017,8,0.885,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2018,13,1.43,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2019,26,2.846,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2020,33,3.507,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2021,16,1.675,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2022,21,2.184,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2023,28,2.893,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2024,20,2.066,oui
+44009,Basse-Goulaine,Violences physiques intrafamiliales,2025,24,2.48,oui
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2016,,,non
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2017,,,non
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2018,,,non
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2019,,,non
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2020,,,non
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2021,,,non
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2022,10,3.573,oui
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2023,8,2.766,oui
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2024,10,3.458,oui
+44010,Batz-sur-Mer,Violences physiques intrafamiliales,2025,13,4.495,oui
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2016,,,non
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2017,,,non
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2018,,,non
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2019,,,non
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2020,,,non
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2021,6,1.784,oui
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2022,8,2.271,oui
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2023,6,1.697,oui
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2024,9,2.545,oui
+44012,La Bernerie-en-Retz,Violences physiques intrafamiliales,2025,20,5.656,oui
+44013,Besné,Violences physiques intrafamiliales,2016,,,non
+44013,Besné,Violences physiques intrafamiliales,2017,,,non
+44013,Besné,Violences physiques intrafamiliales,2018,,,non
+44013,Besné,Violences physiques intrafamiliales,2019,,,non
+44013,Besné,Violences physiques intrafamiliales,2020,,,non
+44013,Besné,Violences physiques intrafamiliales,2021,,,non
+44013,Besné,Violences physiques intrafamiliales,2022,,,non
+44013,Besné,Violences physiques intrafamiliales,2023,,,non
+44013,Besné,Violences physiques intrafamiliales,2024,22,6.623,oui
+44013,Besné,Violences physiques intrafamiliales,2025,8,2.408,oui
+44014,Le Bignon,Violences physiques intrafamiliales,2016,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2017,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2018,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2019,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2020,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2021,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2022,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2023,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2024,,,non
+44014,Le Bignon,Violences physiques intrafamiliales,2025,,,non
+44015,Blain,Violences physiques intrafamiliales,2016,10,1.032,oui
+44015,Blain,Violences physiques intrafamiliales,2017,15,1.532,oui
+44015,Blain,Violences physiques intrafamiliales,2018,14,1.418,oui
+44015,Blain,Violences physiques intrafamiliales,2019,14,1.406,oui
+44015,Blain,Violences physiques intrafamiliales,2020,27,2.677,oui
+44015,Blain,Violences physiques intrafamiliales,2021,29,2.847,oui
+44015,Blain,Violences physiques intrafamiliales,2022,35,3.381,oui
+44015,Blain,Violences physiques intrafamiliales,2023,28,2.699,oui
+44015,Blain,Violences physiques intrafamiliales,2024,24,2.313,oui
+44015,Blain,Violences physiques intrafamiliales,2025,26,2.506,oui
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2016,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2017,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2018,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2019,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2020,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2021,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2022,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2023,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2024,,,non
+44016,La Boissière-du-Doré,Violences physiques intrafamiliales,2025,,,non
+44018,Bouaye,Violences physiques intrafamiliales,2016,,,non
+44018,Bouaye,Violences physiques intrafamiliales,2017,,,non
+44018,Bouaye,Violences physiques intrafamiliales,2018,,,non
+44018,Bouaye,Violences physiques intrafamiliales,2019,10,1.249,oui
+44018,Bouaye,Violences physiques intrafamiliales,2020,14,1.728,oui
+44018,Bouaye,Violences physiques intrafamiliales,2021,12,1.473,oui
+44018,Bouaye,Violences physiques intrafamiliales,2022,15,1.811,oui
+44018,Bouaye,Violences physiques intrafamiliales,2023,24,2.877,oui
+44018,Bouaye,Violences physiques intrafamiliales,2024,21,2.517,oui
+44018,Bouaye,Violences physiques intrafamiliales,2025,31,3.716,oui
+44019,Bouée,Violences physiques intrafamiliales,2016,,,non
+44019,Bouée,Violences physiques intrafamiliales,2017,,,non
+44019,Bouée,Violences physiques intrafamiliales,2018,,,non
+44019,Bouée,Violences physiques intrafamiliales,2019,,,non
+44019,Bouée,Violences physiques intrafamiliales,2020,,,non
+44019,Bouée,Violences physiques intrafamiliales,2021,,,non
+44019,Bouée,Violences physiques intrafamiliales,2022,,,non
+44019,Bouée,Violences physiques intrafamiliales,2023,,,non
+44019,Bouée,Violences physiques intrafamiliales,2024,,,non
+44019,Bouée,Violences physiques intrafamiliales,2025,,,non
+44020,Bouguenais,Violences physiques intrafamiliales,2016,16,0.84,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2017,44,2.276,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2018,33,1.679,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2019,51,2.562,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2020,34,1.663,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2021,65,3.185,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2022,80,3.885,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2023,59,2.874,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2024,75,3.653,oui
+44020,Bouguenais,Violences physiques intrafamiliales,2025,98,4.774,oui
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2016,,,non
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2017,,,non
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2018,,,non
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2019,10,2.015,oui
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2020,12,2.394,oui
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2021,10,1.999,oui
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2022,13,2.598,oui
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2023,12,2.344,oui
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2024,16,3.125,oui
+44021,Villeneuve-en-Retz,Violences physiques intrafamiliales,2025,17,3.32,oui
+44022,Boussay,Violences physiques intrafamiliales,2016,,,non
+44022,Boussay,Violences physiques intrafamiliales,2017,,,non
+44022,Boussay,Violences physiques intrafamiliales,2018,,,non
+44022,Boussay,Violences physiques intrafamiliales,2019,,,non
+44022,Boussay,Violences physiques intrafamiliales,2020,,,non
+44022,Boussay,Violences physiques intrafamiliales,2021,,,non
+44022,Boussay,Violences physiques intrafamiliales,2022,,,non
+44022,Boussay,Violences physiques intrafamiliales,2023,,,non
+44022,Boussay,Violences physiques intrafamiliales,2024,11,3.814,oui
+44022,Boussay,Violences physiques intrafamiliales,2025,10,3.467,oui
+44023,Bouvron,Violences physiques intrafamiliales,2016,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2017,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2018,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2019,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2020,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2021,6,1.955,oui
+44023,Bouvron,Violences physiques intrafamiliales,2022,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2023,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2024,,,non
+44023,Bouvron,Violences physiques intrafamiliales,2025,,,non
+44024,Brains,Violences physiques intrafamiliales,2016,,,non
+44024,Brains,Violences physiques intrafamiliales,2017,,,non
+44024,Brains,Violences physiques intrafamiliales,2018,,,non
+44024,Brains,Violences physiques intrafamiliales,2019,,,non
+44024,Brains,Violences physiques intrafamiliales,2020,,,non
+44024,Brains,Violences physiques intrafamiliales,2021,,,non
+44024,Brains,Violences physiques intrafamiliales,2022,,,non
+44024,Brains,Violences physiques intrafamiliales,2023,,,non
+44024,Brains,Violences physiques intrafamiliales,2024,,,non
+44024,Brains,Violences physiques intrafamiliales,2025,,,non
+44025,Campbon,Violences physiques intrafamiliales,2016,,,non
+44025,Campbon,Violences physiques intrafamiliales,2017,,,non
+44025,Campbon,Violences physiques intrafamiliales,2018,,,non
+44025,Campbon,Violences physiques intrafamiliales,2019,,,non
+44025,Campbon,Violences physiques intrafamiliales,2020,12,3.039,oui
+44025,Campbon,Violences physiques intrafamiliales,2021,10,2.497,oui
+44025,Campbon,Violences physiques intrafamiliales,2022,,,non
+44025,Campbon,Violences physiques intrafamiliales,2023,,,non
+44025,Campbon,Violences physiques intrafamiliales,2024,,,non
+44025,Campbon,Violences physiques intrafamiliales,2025,,,non
+44026,Carquefou,Violences physiques intrafamiliales,2016,12,0.619,oui
+44026,Carquefou,Violences physiques intrafamiliales,2017,33,1.666,oui
+44026,Carquefou,Violences physiques intrafamiliales,2018,26,1.298,oui
+44026,Carquefou,Violences physiques intrafamiliales,2019,32,1.571,oui
+44026,Carquefou,Violences physiques intrafamiliales,2020,23,1.124,oui
+44026,Carquefou,Violences physiques intrafamiliales,2021,54,2.633,oui
+44026,Carquefou,Violences physiques intrafamiliales,2022,50,2.435,oui
+44026,Carquefou,Violences physiques intrafamiliales,2023,67,3.203,oui
+44026,Carquefou,Violences physiques intrafamiliales,2024,59,2.82,oui
+44026,Carquefou,Violences physiques intrafamiliales,2025,58,2.772,oui
+44027,Casson,Violences physiques intrafamiliales,2016,,,non
+44027,Casson,Violences physiques intrafamiliales,2017,,,non
+44027,Casson,Violences physiques intrafamiliales,2018,,,non
+44027,Casson,Violences physiques intrafamiliales,2019,,,non
+44027,Casson,Violences physiques intrafamiliales,2020,,,non
+44027,Casson,Violences physiques intrafamiliales,2021,,,non
+44027,Casson,Violences physiques intrafamiliales,2022,,,non
+44027,Casson,Violences physiques intrafamiliales,2023,,,non
+44027,Casson,Violences physiques intrafamiliales,2024,,,non
+44027,Casson,Violences physiques intrafamiliales,2025,,,non
+44028,Le Cellier,Violences physiques intrafamiliales,2016,,,non
+44028,Le Cellier,Violences physiques intrafamiliales,2017,,,non
+44028,Le Cellier,Violences physiques intrafamiliales,2018,,,non
+44028,Le Cellier,Violences physiques intrafamiliales,2019,5,1.258,oui
+44028,Le Cellier,Violences physiques intrafamiliales,2020,8,2.008,oui
+44028,Le Cellier,Violences physiques intrafamiliales,2021,,,non
+44028,Le Cellier,Violences physiques intrafamiliales,2022,,,non
+44028,Le Cellier,Violences physiques intrafamiliales,2023,,,non
+44028,Le Cellier,Violences physiques intrafamiliales,2024,11,2.715,oui
+44028,Le Cellier,Violences physiques intrafamiliales,2025,11,2.715,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2016,7,1.043,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2017,8,1.169,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2018,9,1.303,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2019,10,1.434,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2020,11,1.562,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2021,7,0.992,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2022,22,3.073,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2023,11,1.517,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2024,27,3.723,oui
+44029,Divatte-sur-Loire,Violences physiques intrafamiliales,2025,12,1.655,oui
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2016,,,non
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2017,,,non
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2018,,,non
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2019,9,2.075,oui
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2020,8,1.844,oui
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2021,5,1.14,oui
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2022,9,2.034,oui
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2023,14,3.117,oui
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2024,,,non
+44030,La Chapelle-des-Marais,Violences physiques intrafamiliales,2025,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2016,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2017,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2018,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2019,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2020,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2021,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2022,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2023,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2024,,,non
+44031,La Chapelle-Glain,Violences physiques intrafamiliales,2025,,,non
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2016,,,non
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2017,,,non
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2018,,,non
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2019,,,non
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2020,,,non
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2021,,,non
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2022,13,3.776,oui
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2023,18,5.192,oui
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2024,12,3.461,oui
+44032,La Chapelle-Heulin,Violences physiques intrafamiliales,2025,6,1.731,oui
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2016,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2017,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2018,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2019,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2020,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2021,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2022,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2023,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2024,,,non
+44033,La Chapelle-Launay,Violences physiques intrafamiliales,2025,,,non
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2016,38,1.964,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2017,20,1.02,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2018,17,0.871,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2019,31,1.586,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2020,36,1.802,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2021,35,1.722,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2022,44,2.148,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2023,58,2.803,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2024,55,2.658,oui
+44035,La Chapelle-sur-Erdre,Violences physiques intrafamiliales,2025,59,2.852,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2016,18,1.518,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2017,29,2.422,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2018,21,1.748,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2019,31,2.577,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2020,40,3.329,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2021,37,3.036,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2022,41,3.352,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2023,36,2.936,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2024,47,3.834,oui
+44036,Châteaubriant,Violences physiques intrafamiliales,2025,67,5.465,oui
+44037,Château-Thébaud,Violences physiques intrafamiliales,2016,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2017,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2018,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2019,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2020,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2021,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2022,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2023,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2024,,,non
+44037,Château-Thébaud,Violences physiques intrafamiliales,2025,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2016,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2017,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2018,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2019,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2020,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2021,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2022,6,1.977,oui
+44038,Chauvé,Violences physiques intrafamiliales,2023,7,2.28,oui
+44038,Chauvé,Violences physiques intrafamiliales,2024,,,non
+44038,Chauvé,Violences physiques intrafamiliales,2025,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2016,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2017,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2018,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2019,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2020,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2021,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2022,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2023,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2024,,,non
+44039,Cheix-en-Retz,Violences physiques intrafamiliales,2025,,,non
+44041,La Chevrolière,Violences physiques intrafamiliales,2016,7,1.275,oui
+44041,La Chevrolière,Violences physiques intrafamiliales,2017,6,1.074,oui
+44041,La Chevrolière,Violences physiques intrafamiliales,2018,8,1.406,oui
+44041,La Chevrolière,Violences physiques intrafamiliales,2019,,,non
+44041,La Chevrolière,Violences physiques intrafamiliales,2020,,,non
+44041,La Chevrolière,Violences physiques intrafamiliales,2021,,,non
+44041,La Chevrolière,Violences physiques intrafamiliales,2022,,,non
+44041,La Chevrolière,Violences physiques intrafamiliales,2023,22,3.364,oui
+44041,La Chevrolière,Violences physiques intrafamiliales,2024,16,2.447,oui
+44041,La Chevrolière,Violences physiques intrafamiliales,2025,12,1.835,oui
+44043,Clisson,Violences physiques intrafamiliales,2016,10,1.421,oui
+44043,Clisson,Violences physiques intrafamiliales,2017,6,0.835,oui
+44043,Clisson,Violences physiques intrafamiliales,2018,9,1.216,oui
+44043,Clisson,Violences physiques intrafamiliales,2019,,,non
+44043,Clisson,Violences physiques intrafamiliales,2020,,,non
+44043,Clisson,Violences physiques intrafamiliales,2021,,,non
+44043,Clisson,Violences physiques intrafamiliales,2022,21,2.815,oui
+44043,Clisson,Violences physiques intrafamiliales,2023,28,3.757,oui
+44043,Clisson,Violences physiques intrafamiliales,2024,19,2.55,oui
+44043,Clisson,Violences physiques intrafamiliales,2025,12,1.61,oui
+44044,Conquereuil,Violences physiques intrafamiliales,2016,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2017,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2018,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2019,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2020,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2021,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2022,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2023,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2024,,,non
+44044,Conquereuil,Violences physiques intrafamiliales,2025,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2016,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2017,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2018,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2019,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2020,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2021,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2022,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2023,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2024,,,non
+44045,Cordemais,Violences physiques intrafamiliales,2025,,,non
+44046,Corsept,Violences physiques intrafamiliales,2016,,,non
+44046,Corsept,Violences physiques intrafamiliales,2017,,,non
+44046,Corsept,Violences physiques intrafamiliales,2018,,,non
+44046,Corsept,Violences physiques intrafamiliales,2019,,,non
+44046,Corsept,Violences physiques intrafamiliales,2020,,,non
+44046,Corsept,Violences physiques intrafamiliales,2021,,,non
+44046,Corsept,Violences physiques intrafamiliales,2022,,,non
+44046,Corsept,Violences physiques intrafamiliales,2023,,,non
+44046,Corsept,Violences physiques intrafamiliales,2024,,,non
+44046,Corsept,Violences physiques intrafamiliales,2025,,,non
+44047,Couëron,Violences physiques intrafamiliales,2016,28,1.34,oui
+44047,Couëron,Violences physiques intrafamiliales,2017,23,1.076,oui
+44047,Couëron,Violences physiques intrafamiliales,2018,29,1.327,oui
+44047,Couëron,Violences physiques intrafamiliales,2019,25,1.121,oui
+44047,Couëron,Violences physiques intrafamiliales,2020,33,1.455,oui
+44047,Couëron,Violences physiques intrafamiliales,2021,47,2.038,oui
+44047,Couëron,Violences physiques intrafamiliales,2022,76,3.228,oui
+44047,Couëron,Violences physiques intrafamiliales,2023,72,2.987,oui
+44047,Couëron,Violences physiques intrafamiliales,2024,105,4.356,oui
+44047,Couëron,Violences physiques intrafamiliales,2025,88,3.651,oui
+44048,Couffé,Violences physiques intrafamiliales,2016,,,non
+44048,Couffé,Violences physiques intrafamiliales,2017,,,non
+44048,Couffé,Violences physiques intrafamiliales,2018,,,non
+44048,Couffé,Violences physiques intrafamiliales,2019,,,non
+44048,Couffé,Violences physiques intrafamiliales,2020,,,non
+44048,Couffé,Violences physiques intrafamiliales,2021,,,non
+44048,Couffé,Violences physiques intrafamiliales,2022,,,non
+44048,Couffé,Violences physiques intrafamiliales,2023,,,non
+44048,Couffé,Violences physiques intrafamiliales,2024,,,non
+44048,Couffé,Violences physiques intrafamiliales,2025,,,non
+44049,Le Croisic,Violences physiques intrafamiliales,2016,,,non
+44049,Le Croisic,Violences physiques intrafamiliales,2017,,,non
+44049,Le Croisic,Violences physiques intrafamiliales,2018,,,non
+44049,Le Croisic,Violences physiques intrafamiliales,2019,,,non
+44049,Le Croisic,Violences physiques intrafamiliales,2020,,,non
+44049,Le Croisic,Violences physiques intrafamiliales,2021,,,non
+44049,Le Croisic,Violences physiques intrafamiliales,2022,11,2.695,oui
+44049,Le Croisic,Violences physiques intrafamiliales,2023,12,2.959,oui
+44049,Le Croisic,Violences physiques intrafamiliales,2024,19,4.684,oui
+44049,Le Croisic,Violences physiques intrafamiliales,2025,23,5.671,oui
+44050,Crossac,Violences physiques intrafamiliales,2016,,,non
+44050,Crossac,Violences physiques intrafamiliales,2017,,,non
+44050,Crossac,Violences physiques intrafamiliales,2018,,,non
+44050,Crossac,Violences physiques intrafamiliales,2019,,,non
+44050,Crossac,Violences physiques intrafamiliales,2020,,,non
+44050,Crossac,Violences physiques intrafamiliales,2021,,,non
+44050,Crossac,Violences physiques intrafamiliales,2022,,,non
+44050,Crossac,Violences physiques intrafamiliales,2023,,,non
+44050,Crossac,Violences physiques intrafamiliales,2024,,,non
+44050,Crossac,Violences physiques intrafamiliales,2025,,,non
+44051,Derval,Violences physiques intrafamiliales,2016,,,non
+44051,Derval,Violences physiques intrafamiliales,2017,,,non
+44051,Derval,Violences physiques intrafamiliales,2018,,,non
+44051,Derval,Violences physiques intrafamiliales,2019,,,non
+44051,Derval,Violences physiques intrafamiliales,2020,7,1.994,oui
+44051,Derval,Violences physiques intrafamiliales,2021,9,2.531,oui
+44051,Derval,Violences physiques intrafamiliales,2022,10,2.795,oui
+44051,Derval,Violences physiques intrafamiliales,2023,9,2.499,oui
+44051,Derval,Violences physiques intrafamiliales,2024,29,8.053,oui
+44051,Derval,Violences physiques intrafamiliales,2025,10,2.777,oui
+44052,Donges,Violences physiques intrafamiliales,2016,17,2.165,oui
+44052,Donges,Violences physiques intrafamiliales,2017,11,1.382,oui
+44052,Donges,Violences physiques intrafamiliales,2018,18,2.239,oui
+44052,Donges,Violences physiques intrafamiliales,2019,21,2.576,oui
+44052,Donges,Violences physiques intrafamiliales,2020,20,2.466,oui
+44052,Donges,Violences physiques intrafamiliales,2021,31,3.821,oui
+44052,Donges,Violences physiques intrafamiliales,2022,34,4.189,oui
+44052,Donges,Violences physiques intrafamiliales,2023,36,4.38,oui
+44052,Donges,Violences physiques intrafamiliales,2024,34,4.137,oui
+44052,Donges,Violences physiques intrafamiliales,2025,44,5.353,oui
+44053,Drefféac,Violences physiques intrafamiliales,2016,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2017,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2018,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2019,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2020,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2021,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2022,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2023,,,non
+44053,Drefféac,Violences physiques intrafamiliales,2024,8,3.497,oui
+44053,Drefféac,Violences physiques intrafamiliales,2025,6,2.622,oui
+44054,Erbray,Violences physiques intrafamiliales,2016,,,non
+44054,Erbray,Violences physiques intrafamiliales,2017,,,non
+44054,Erbray,Violences physiques intrafamiliales,2018,,,non
+44054,Erbray,Violences physiques intrafamiliales,2019,,,non
+44054,Erbray,Violences physiques intrafamiliales,2020,,,non
+44054,Erbray,Violences physiques intrafamiliales,2021,5,1.635,oui
+44054,Erbray,Violences physiques intrafamiliales,2022,,,non
+44054,Erbray,Violences physiques intrafamiliales,2023,,,non
+44054,Erbray,Violences physiques intrafamiliales,2024,,,non
+44054,Erbray,Violences physiques intrafamiliales,2025,,,non
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2016,14,0.906,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2017,18,1.116,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2018,26,1.613,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2019,40,2.461,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2020,26,1.609,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2021,48,2.915,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2022,43,2.588,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2023,42,2.483,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2024,35,2.07,oui
+44055,La Baule-Escoublac,Violences physiques intrafamiliales,2025,44,2.602,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2016,5,1.389,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2017,7,1.935,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2018,5,1.371,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2019,8,2.176,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2020,10,2.699,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2021,12,3.2,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2022,10,2.596,oui
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2023,,,non
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2024,,,non
+44056,Fay-de-Bretagne,Violences physiques intrafamiliales,2025,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2016,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2017,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2018,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2019,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2020,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2021,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2022,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2023,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2024,,,non
+44057,Fégréac,Violences physiques intrafamiliales,2025,,,non
+44058,Fercé,Violences physiques intrafamiliales,2016,0,0,oui
+44058,Fercé,Violences physiques intrafamiliales,2017,0,0,oui
+44058,Fercé,Violences physiques intrafamiliales,2018,0,0,oui
+44058,Fercé,Violences physiques intrafamiliales,2019,,,non
+44058,Fercé,Violences physiques intrafamiliales,2020,,,non
+44058,Fercé,Violences physiques intrafamiliales,2021,,,non
+44058,Fercé,Violences physiques intrafamiliales,2022,,,non
+44058,Fercé,Violences physiques intrafamiliales,2023,,,non
+44058,Fercé,Violences physiques intrafamiliales,2024,,,non
+44058,Fercé,Violences physiques intrafamiliales,2025,,,non
+44061,Frossay,Violences physiques intrafamiliales,2016,,,non
+44061,Frossay,Violences physiques intrafamiliales,2017,,,non
+44061,Frossay,Violences physiques intrafamiliales,2018,,,non
+44061,Frossay,Violences physiques intrafamiliales,2019,,,non
+44061,Frossay,Violences physiques intrafamiliales,2020,11,3.408,oui
+44061,Frossay,Violences physiques intrafamiliales,2021,6,1.847,oui
+44061,Frossay,Violences physiques intrafamiliales,2022,6,1.824,oui
+44061,Frossay,Violences physiques intrafamiliales,2023,6,1.814,oui
+44061,Frossay,Violences physiques intrafamiliales,2024,9,2.721,oui
+44061,Frossay,Violences physiques intrafamiliales,2025,14,4.233,oui
+44062,Le Gâvre,Violences physiques intrafamiliales,2016,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2017,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2018,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2019,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2020,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2021,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2022,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2023,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2024,,,non
+44062,Le Gâvre,Violences physiques intrafamiliales,2025,,,non
 44063,Gétigné,Violences physiques intrafamiliales,2016,,,non
 44063,Gétigné,Violences physiques intrafamiliales,2017,,,non
 44063,Gétigné,Violences physiques intrafamiliales,2018,,,non
@@ -12429,6 +12959,1536 @@ code,commune,indicateur,annee,nombre,taux,publie
 44063,Gétigné,Violences physiques intrafamiliales,2023,,,non
 44063,Gétigné,Violences physiques intrafamiliales,2024,,,non
 44063,Gétigné,Violences physiques intrafamiliales,2025,,,non
+44064,Gorges,Violences physiques intrafamiliales,2016,,,non
+44064,Gorges,Violences physiques intrafamiliales,2017,,,non
+44064,Gorges,Violences physiques intrafamiliales,2018,,,non
+44064,Gorges,Violences physiques intrafamiliales,2019,,,non
+44064,Gorges,Violences physiques intrafamiliales,2020,,,non
+44064,Gorges,Violences physiques intrafamiliales,2021,,,non
+44064,Gorges,Violences physiques intrafamiliales,2022,,,non
+44064,Gorges,Violences physiques intrafamiliales,2023,,,non
+44064,Gorges,Violences physiques intrafamiliales,2024,8,1.538,oui
+44064,Gorges,Violences physiques intrafamiliales,2025,7,1.345,oui
+44065,Grand-Auverné,Violences physiques intrafamiliales,2016,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2017,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2018,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2019,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2020,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2021,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2022,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2023,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2024,,,non
+44065,Grand-Auverné,Violences physiques intrafamiliales,2025,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2016,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2017,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2018,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2019,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2020,9,1.362,oui
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2021,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2022,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2023,,,non
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2024,12,1.699,oui
+44066,Grandchamp-des-Fontaines,Violences physiques intrafamiliales,2025,6,0.85,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2016,5,0.959,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2017,6,1.154,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2018,11,2.113,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2019,18,3.44,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2020,16,3.054,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2021,11,2.099,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2022,17,3.243,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2023,20,3.815,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2024,18,3.433,oui
+44067,Guémené-Penfao,Violences physiques intrafamiliales,2025,19,3.624,oui
+44068,Guenrouet,Violences physiques intrafamiliales,2016,,,non
+44068,Guenrouet,Violences physiques intrafamiliales,2017,,,non
+44068,Guenrouet,Violences physiques intrafamiliales,2018,,,non
+44068,Guenrouet,Violences physiques intrafamiliales,2019,,,non
+44068,Guenrouet,Violences physiques intrafamiliales,2020,10,2.96,oui
+44068,Guenrouet,Violences physiques intrafamiliales,2021,,,non
+44068,Guenrouet,Violences physiques intrafamiliales,2022,,,non
+44068,Guenrouet,Violences physiques intrafamiliales,2023,,,non
+44068,Guenrouet,Violences physiques intrafamiliales,2024,16,4.356,oui
+44068,Guenrouet,Violences physiques intrafamiliales,2025,10,2.723,oui
+44069,Guérande,Violences physiques intrafamiliales,2016,13,0.803,oui
+44069,Guérande,Violences physiques intrafamiliales,2017,24,1.512,oui
+44069,Guérande,Violences physiques intrafamiliales,2018,32,1.987,oui
+44069,Guérande,Violences physiques intrafamiliales,2019,32,1.986,oui
+44069,Guérande,Violences physiques intrafamiliales,2020,39,2.431,oui
+44069,Guérande,Violences physiques intrafamiliales,2021,29,1.796,oui
+44069,Guérande,Violences physiques intrafamiliales,2022,31,1.858,oui
+44069,Guérande,Violences physiques intrafamiliales,2023,43,2.559,oui
+44069,Guérande,Violences physiques intrafamiliales,2024,46,2.737,oui
+44069,Guérande,Violences physiques intrafamiliales,2025,41,2.44,oui
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2016,,,non
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2017,,,non
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2018,,,non
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2019,,,non
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2020,,,non
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2021,,,non
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2022,,,non
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2023,6,1.257,oui
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2024,12,2.513,oui
+44070,La Haie-Fouassière,Violences physiques intrafamiliales,2025,6,1.257,oui
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2016,,,non
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2017,,,non
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2018,,,non
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2019,14,2.376,oui
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2020,13,2.183,oui
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2021,8,1.343,oui
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2022,12,2.003,oui
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2023,16,2.625,oui
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2024,12,1.969,oui
+44071,Haute-Goulaine,Violences physiques intrafamiliales,2025,16,2.625,oui
+44072,Herbignac,Violences physiques intrafamiliales,2016,5,0.744,oui
+44072,Herbignac,Violences physiques intrafamiliales,2017,11,1.612,oui
+44072,Herbignac,Violences physiques intrafamiliales,2018,9,1.299,oui
+44072,Herbignac,Violences physiques intrafamiliales,2019,8,1.135,oui
+44072,Herbignac,Violences physiques intrafamiliales,2020,10,1.411,oui
+44072,Herbignac,Violences physiques intrafamiliales,2021,15,2.103,oui
+44072,Herbignac,Violences physiques intrafamiliales,2022,12,1.672,oui
+44072,Herbignac,Violences physiques intrafamiliales,2023,21,2.907,oui
+44072,Herbignac,Violences physiques intrafamiliales,2024,17,2.353,oui
+44072,Herbignac,Violences physiques intrafamiliales,2025,21,2.907,oui
+44073,Héric,Violences physiques intrafamiliales,2016,,,non
+44073,Héric,Violences physiques intrafamiliales,2017,,,non
+44073,Héric,Violences physiques intrafamiliales,2018,,,non
+44073,Héric,Violences physiques intrafamiliales,2019,,,non
+44073,Héric,Violences physiques intrafamiliales,2020,9,1.405,oui
+44073,Héric,Violences physiques intrafamiliales,2021,,,non
+44073,Héric,Violences physiques intrafamiliales,2022,,,non
+44073,Héric,Violences physiques intrafamiliales,2023,,,non
+44073,Héric,Violences physiques intrafamiliales,2024,8,1.215,oui
+44073,Héric,Violences physiques intrafamiliales,2025,14,2.126,oui
+44074,Indre,Violences physiques intrafamiliales,2016,,,non
+44074,Indre,Violences physiques intrafamiliales,2017,,,non
+44074,Indre,Violences physiques intrafamiliales,2018,,,non
+44074,Indre,Violences physiques intrafamiliales,2019,6,1.485,oui
+44074,Indre,Violences physiques intrafamiliales,2020,,,non
+44074,Indre,Violences physiques intrafamiliales,2021,,,non
+44074,Indre,Violences physiques intrafamiliales,2022,,,non
+44074,Indre,Violences physiques intrafamiliales,2023,14,3.365,oui
+44074,Indre,Violences physiques intrafamiliales,2024,16,3.846,oui
+44074,Indre,Violences physiques intrafamiliales,2025,18,4.327,oui
+44075,Issé,Violences physiques intrafamiliales,2016,,,non
+44075,Issé,Violences physiques intrafamiliales,2017,,,non
+44075,Issé,Violences physiques intrafamiliales,2018,,,non
+44075,Issé,Violences physiques intrafamiliales,2019,,,non
+44075,Issé,Violences physiques intrafamiliales,2020,,,non
+44075,Issé,Violences physiques intrafamiliales,2021,,,non
+44075,Issé,Violences physiques intrafamiliales,2022,,,non
+44075,Issé,Violences physiques intrafamiliales,2023,,,non
+44075,Issé,Violences physiques intrafamiliales,2024,,,non
+44075,Issé,Violences physiques intrafamiliales,2025,,,non
+44076,Jans,Violences physiques intrafamiliales,2016,,,non
+44076,Jans,Violences physiques intrafamiliales,2017,,,non
+44076,Jans,Violences physiques intrafamiliales,2018,,,non
+44076,Jans,Violences physiques intrafamiliales,2019,,,non
+44076,Jans,Violences physiques intrafamiliales,2020,,,non
+44076,Jans,Violences physiques intrafamiliales,2021,,,non
+44076,Jans,Violences physiques intrafamiliales,2022,,,non
+44076,Jans,Violences physiques intrafamiliales,2023,,,non
+44076,Jans,Violences physiques intrafamiliales,2024,,,non
+44076,Jans,Violences physiques intrafamiliales,2025,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2016,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2017,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2018,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2019,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2020,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2021,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2022,,,non
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2023,14,5.005,oui
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2024,14,5.005,oui
+44077,Joué-sur-Erdre,Violences physiques intrafamiliales,2025,16,5.72,oui
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2016,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2017,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2018,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2019,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2020,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2021,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2022,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2023,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2024,,,non
+44078,Juigné-des-Moutiers,Violences physiques intrafamiliales,2025,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2016,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2017,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2018,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2019,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2020,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2021,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2022,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2023,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2024,,,non
+44079,Le Landreau,Violences physiques intrafamiliales,2025,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2016,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2017,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2018,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2019,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2020,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2021,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2022,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2023,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2024,,,non
+44080,Lavau-sur-Loire,Violences physiques intrafamiliales,2025,,,non
+44081,Legé,Violences physiques intrafamiliales,2016,,,non
+44081,Legé,Violences physiques intrafamiliales,2017,,,non
+44081,Legé,Violences physiques intrafamiliales,2018,,,non
+44081,Legé,Violences physiques intrafamiliales,2019,6,1.314,oui
+44081,Legé,Violences physiques intrafamiliales,2020,11,2.374,oui
+44081,Legé,Violences physiques intrafamiliales,2021,7,1.489,oui
+44081,Legé,Violences physiques intrafamiliales,2022,11,2.307,oui
+44081,Legé,Violences physiques intrafamiliales,2023,9,1.868,oui
+44081,Legé,Violences physiques intrafamiliales,2024,13,2.699,oui
+44081,Legé,Violences physiques intrafamiliales,2025,14,2.906,oui
+44082,Ligné,Violences physiques intrafamiliales,2016,,,non
+44082,Ligné,Violences physiques intrafamiliales,2017,,,non
+44082,Ligné,Violences physiques intrafamiliales,2018,,,non
+44082,Ligné,Violences physiques intrafamiliales,2019,,,non
+44082,Ligné,Violences physiques intrafamiliales,2020,,,non
+44082,Ligné,Violences physiques intrafamiliales,2021,,,non
+44082,Ligné,Violences physiques intrafamiliales,2022,,,non
+44082,Ligné,Violences physiques intrafamiliales,2023,,,non
+44082,Ligné,Violences physiques intrafamiliales,2024,14,2.459,oui
+44082,Ligné,Violences physiques intrafamiliales,2025,16,2.81,oui
+44083,La Limouzinière,Violences physiques intrafamiliales,2016,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2017,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2018,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2019,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2020,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2021,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2022,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2023,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2024,,,non
+44083,La Limouzinière,Violences physiques intrafamiliales,2025,16,6.507,oui
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2016,,,non
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2017,,,non
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2018,,,non
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2019,,,non
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2020,12,1.409,oui
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2021,12,1.387,oui
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2022,32,3.723,oui
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2023,15,1.754,oui
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2024,26,3.04,oui
+44084,Le Loroux-Bottereau,Violences physiques intrafamiliales,2025,23,2.689,oui
+44085,Louisfert,Violences physiques intrafamiliales,2016,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2017,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2018,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2019,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2020,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2021,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2022,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2023,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2024,,,non
+44085,Louisfert,Violences physiques intrafamiliales,2025,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2016,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2017,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2018,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2019,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2020,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2021,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2022,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2023,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2024,,,non
+44086,Lusanger,Violences physiques intrafamiliales,2025,,,non
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2016,8,1.082,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2017,8,1.071,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2018,9,1.192,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2019,15,1.979,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2020,20,2.623,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2021,24,3.141,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2022,17,2.218,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2023,29,3.772,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2024,32,4.162,oui
+44087,Machecoul-Saint-Même,Violences physiques intrafamiliales,2025,27,3.512,oui
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2016,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2017,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2018,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2019,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2020,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2021,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2022,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2023,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2024,,,non
+44088,Maisdon-sur-Sèvre,Violences physiques intrafamiliales,2025,,,non
+44089,Malville,Violences physiques intrafamiliales,2016,,,non
+44089,Malville,Violences physiques intrafamiliales,2017,,,non
+44089,Malville,Violences physiques intrafamiliales,2018,,,non
+44089,Malville,Violences physiques intrafamiliales,2019,,,non
+44089,Malville,Violences physiques intrafamiliales,2020,,,non
+44089,Malville,Violences physiques intrafamiliales,2021,,,non
+44089,Malville,Violences physiques intrafamiliales,2022,,,non
+44089,Malville,Violences physiques intrafamiliales,2023,8,2.132,oui
+44089,Malville,Violences physiques intrafamiliales,2024,8,2.132,oui
+44089,Malville,Violences physiques intrafamiliales,2025,23,6.13,oui
+44090,La Marne,Violences physiques intrafamiliales,2016,,,non
+44090,La Marne,Violences physiques intrafamiliales,2017,,,non
+44090,La Marne,Violences physiques intrafamiliales,2018,,,non
+44090,La Marne,Violences physiques intrafamiliales,2019,,,non
+44090,La Marne,Violences physiques intrafamiliales,2020,,,non
+44090,La Marne,Violences physiques intrafamiliales,2021,,,non
+44090,La Marne,Violences physiques intrafamiliales,2022,,,non
+44090,La Marne,Violences physiques intrafamiliales,2023,,,non
+44090,La Marne,Violences physiques intrafamiliales,2024,,,non
+44090,La Marne,Violences physiques intrafamiliales,2025,8,5.044,oui
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2016,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2017,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2018,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2019,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2020,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2021,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2022,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2023,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2024,,,non
+44091,Marsac-sur-Don,Violences physiques intrafamiliales,2025,,,non
+44092,Massérac,Violences physiques intrafamiliales,2016,,,non
+44092,Massérac,Violences physiques intrafamiliales,2017,,,non
+44092,Massérac,Violences physiques intrafamiliales,2018,,,non
+44092,Massérac,Violences physiques intrafamiliales,2019,,,non
+44092,Massérac,Violences physiques intrafamiliales,2020,,,non
+44092,Massérac,Violences physiques intrafamiliales,2021,,,non
+44092,Massérac,Violences physiques intrafamiliales,2022,,,non
+44092,Massérac,Violences physiques intrafamiliales,2023,,,non
+44092,Massérac,Violences physiques intrafamiliales,2024,,,non
+44092,Massérac,Violences physiques intrafamiliales,2025,,,non
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2016,,,non
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2017,,,non
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2018,,,non
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2019,,,non
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2020,,,non
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2021,,,non
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2022,9,2.653,oui
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2023,11,3.227,oui
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2024,15,4.4,oui
+44094,Mauves-sur-Loire,Violences physiques intrafamiliales,2025,5,1.467,oui
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2016,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2017,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2018,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2019,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2020,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2021,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2022,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2023,,,non
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2024,6,3.736,oui
+44095,La Meilleraye-de-Bretagne,Violences physiques intrafamiliales,2025,6,3.736,oui
+44096,Mésanger,Violences physiques intrafamiliales,2016,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2017,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2018,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2019,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2020,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2021,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2022,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2023,10,2.117,oui
+44096,Mésanger,Violences physiques intrafamiliales,2024,,,non
+44096,Mésanger,Violences physiques intrafamiliales,2025,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2016,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2017,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2018,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2019,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2020,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2021,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2022,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2023,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2024,,,non
+44097,Mesquer,Violences physiques intrafamiliales,2025,,,non
+44098,Missillac,Violences physiques intrafamiliales,2016,6,1.138,oui
+44098,Missillac,Violences physiques intrafamiliales,2017,7,1.31,oui
+44098,Missillac,Violences physiques intrafamiliales,2018,17,3.168,oui
+44098,Missillac,Violences physiques intrafamiliales,2019,5,0.926,oui
+44098,Missillac,Violences physiques intrafamiliales,2020,11,2.025,oui
+44098,Missillac,Violences physiques intrafamiliales,2021,19,3.436,oui
+44098,Missillac,Violences physiques intrafamiliales,2022,12,2.136,oui
+44098,Missillac,Violences physiques intrafamiliales,2023,16,2.803,oui
+44098,Missillac,Violences physiques intrafamiliales,2024,17,2.978,oui
+44098,Missillac,Violences physiques intrafamiliales,2025,16,2.803,oui
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2016,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2017,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2018,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2019,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2020,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2021,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2022,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2023,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2024,,,non
+44099,Moisdon-la-Rivière,Violences physiques intrafamiliales,2025,,,non
+44100,Monnières,Violences physiques intrafamiliales,2016,,,non
+44100,Monnières,Violences physiques intrafamiliales,2017,,,non
+44100,Monnières,Violences physiques intrafamiliales,2018,,,non
+44100,Monnières,Violences physiques intrafamiliales,2019,,,non
+44100,Monnières,Violences physiques intrafamiliales,2020,,,non
+44100,Monnières,Violences physiques intrafamiliales,2021,6,2.576,oui
+44100,Monnières,Violences physiques intrafamiliales,2022,5,2.136,oui
+44100,Monnières,Violences physiques intrafamiliales,2023,5,2.094,oui
+44100,Monnières,Violences physiques intrafamiliales,2024,8,3.35,oui
+44100,Monnières,Violences physiques intrafamiliales,2025,7,2.931,oui
+44101,La Montagne,Violences physiques intrafamiliales,2016,7,1.126,oui
+44101,La Montagne,Violences physiques intrafamiliales,2017,6,0.963,oui
+44101,La Montagne,Violences physiques intrafamiliales,2018,13,2.076,oui
+44101,La Montagne,Violences physiques intrafamiliales,2019,27,4.293,oui
+44101,La Montagne,Violences physiques intrafamiliales,2020,9,1.412,oui
+44101,La Montagne,Violences physiques intrafamiliales,2021,15,2.312,oui
+44101,La Montagne,Violences physiques intrafamiliales,2022,17,2.606,oui
+44101,La Montagne,Violences physiques intrafamiliales,2023,29,4.458,oui
+44101,La Montagne,Violences physiques intrafamiliales,2024,21,3.228,oui
+44101,La Montagne,Violences physiques intrafamiliales,2025,28,4.304,oui
+44102,Montbert,Violences physiques intrafamiliales,2016,,,non
+44102,Montbert,Violences physiques intrafamiliales,2017,,,non
+44102,Montbert,Violences physiques intrafamiliales,2018,,,non
+44102,Montbert,Violences physiques intrafamiliales,2019,,,non
+44102,Montbert,Violences physiques intrafamiliales,2020,,,non
+44102,Montbert,Violences physiques intrafamiliales,2021,,,non
+44102,Montbert,Violences physiques intrafamiliales,2022,,,non
+44102,Montbert,Violences physiques intrafamiliales,2023,11,3.247,oui
+44102,Montbert,Violences physiques intrafamiliales,2024,7,2.066,oui
+44102,Montbert,Violences physiques intrafamiliales,2025,,,non
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2016,10,1.413,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2017,14,1.975,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2018,13,1.819,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2019,14,1.95,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2020,24,3.326,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2021,36,4.964,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2022,23,3.155,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2023,21,2.884,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2024,43,5.905,oui
+44103,Montoir-de-Bretagne,Violences physiques intrafamiliales,2025,30,4.12,oui
+44104,Montrelais,Violences physiques intrafamiliales,2016,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2017,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2018,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2019,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2020,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2021,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2022,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2023,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2024,,,non
+44104,Montrelais,Violences physiques intrafamiliales,2025,,,non
+44105,Mouais,Violences physiques intrafamiliales,2016,,,non
+44105,Mouais,Violences physiques intrafamiliales,2017,,,non
+44105,Mouais,Violences physiques intrafamiliales,2018,,,non
+44105,Mouais,Violences physiques intrafamiliales,2019,,,non
+44105,Mouais,Violences physiques intrafamiliales,2020,,,non
+44105,Mouais,Violences physiques intrafamiliales,2021,,,non
+44105,Mouais,Violences physiques intrafamiliales,2022,,,non
+44105,Mouais,Violences physiques intrafamiliales,2023,,,non
+44105,Mouais,Violences physiques intrafamiliales,2024,,,non
+44105,Mouais,Violences physiques intrafamiliales,2025,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2016,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2017,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2018,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2019,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2020,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2021,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2022,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2023,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2024,,,non
+44106,Les Moutiers-en-Retz,Violences physiques intrafamiliales,2025,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2016,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2017,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2018,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2019,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2020,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2021,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2022,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2023,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2024,,,non
+44107,Mouzeil,Violences physiques intrafamiliales,2025,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2016,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2017,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2018,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2019,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2020,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2021,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2022,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2023,,,non
+44108,Mouzillon,Violences physiques intrafamiliales,2024,12,4.148,oui
+44108,Mouzillon,Violences physiques intrafamiliales,2025,7,2.42,oui
+44109,Nantes,Violences physiques intrafamiliales,2016,623,2.031,oui
+44109,Nantes,Violences physiques intrafamiliales,2017,623,2.014,oui
+44109,Nantes,Violences physiques intrafamiliales,2018,663,2.111,oui
+44109,Nantes,Violences physiques intrafamiliales,2019,686,2.152,oui
+44109,Nantes,Violences physiques intrafamiliales,2020,728,2.27,oui
+44109,Nantes,Violences physiques intrafamiliales,2021,808,2.5,oui
+44109,Nantes,Violences physiques intrafamiliales,2022,944,2.904,oui
+44109,Nantes,Violences physiques intrafamiliales,2023,969,2.957,oui
+44109,Nantes,Violences physiques intrafamiliales,2024,994,3.033,oui
+44109,Nantes,Violences physiques intrafamiliales,2025,1001,3.054,oui
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2016,,,non
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2017,,,non
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2018,,,non
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2019,,,non
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2020,,,non
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2021,7,0.751,oui
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2022,21,2.223,oui
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2023,21,2.194,oui
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2024,21,2.194,oui
+44110,Nort-sur-Erdre,Violences physiques intrafamiliales,2025,27,2.821,oui
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2016,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2017,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2018,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2019,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2020,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2021,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2022,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2023,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2024,,,non
+44111,Notre-Dame-des-Landes,Violences physiques intrafamiliales,2025,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2016,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2017,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2018,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2019,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2020,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2021,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2022,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2023,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2024,,,non
+44112,Noyal-sur-Brutz,Violences physiques intrafamiliales,2025,,,non
+44113,Nozay,Violences physiques intrafamiliales,2016,,,non
+44113,Nozay,Violences physiques intrafamiliales,2017,,,non
+44113,Nozay,Violences physiques intrafamiliales,2018,,,non
+44113,Nozay,Violences physiques intrafamiliales,2019,,,non
+44113,Nozay,Violences physiques intrafamiliales,2020,,,non
+44113,Nozay,Violences physiques intrafamiliales,2021,11,2.602,oui
+44113,Nozay,Violences physiques intrafamiliales,2022,19,4.439,oui
+44113,Nozay,Violences physiques intrafamiliales,2023,15,3.495,oui
+44113,Nozay,Violences physiques intrafamiliales,2024,7,1.631,oui
+44113,Nozay,Violences physiques intrafamiliales,2025,19,4.427,oui
+44114,Orvault,Violences physiques intrafamiliales,2016,47,1.813,oui
+44114,Orvault,Violences physiques intrafamiliales,2017,33,1.252,oui
+44114,Orvault,Violences physiques intrafamiliales,2018,62,2.303,oui
+44114,Orvault,Violences physiques intrafamiliales,2019,36,1.323,oui
+44114,Orvault,Violences physiques intrafamiliales,2020,38,1.385,oui
+44114,Orvault,Violences physiques intrafamiliales,2021,36,1.292,oui
+44114,Orvault,Violences physiques intrafamiliales,2022,55,1.941,oui
+44114,Orvault,Violences physiques intrafamiliales,2023,69,2.418,oui
+44114,Orvault,Violences physiques intrafamiliales,2024,79,2.769,oui
+44114,Orvault,Violences physiques intrafamiliales,2025,71,2.488,oui
+44115,Oudon,Violences physiques intrafamiliales,2016,,,non
+44115,Oudon,Violences physiques intrafamiliales,2017,,,non
+44115,Oudon,Violences physiques intrafamiliales,2018,,,non
+44115,Oudon,Violences physiques intrafamiliales,2019,,,non
+44115,Oudon,Violences physiques intrafamiliales,2020,,,non
+44115,Oudon,Violences physiques intrafamiliales,2021,,,non
+44115,Oudon,Violences physiques intrafamiliales,2022,,,non
+44115,Oudon,Violences physiques intrafamiliales,2023,,,non
+44115,Oudon,Violences physiques intrafamiliales,2024,5,1.281,oui
+44115,Oudon,Violences physiques intrafamiliales,2025,9,2.305,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2016,7,2.226,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2017,10,3.236,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2018,13,4.254,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2019,8,2.646,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2020,13,4.322,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2021,7,2.322,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2022,28,9.241,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2023,13,4.269,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2024,13,4.269,oui
+44116,Paimbœuf,Violences physiques intrafamiliales,2025,13,4.269,oui
+44117,Le Pallet,Violences physiques intrafamiliales,2016,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2017,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2018,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2019,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2020,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2021,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2022,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2023,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2024,,,non
+44117,Le Pallet,Violences physiques intrafamiliales,2025,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2016,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2017,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2018,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2019,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2020,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2021,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2022,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2023,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2024,,,non
+44118,Pannecé,Violences physiques intrafamiliales,2025,,,non
+44119,Paulx,Violences physiques intrafamiliales,2016,,,non
+44119,Paulx,Violences physiques intrafamiliales,2017,,,non
+44119,Paulx,Violences physiques intrafamiliales,2018,,,non
+44119,Paulx,Violences physiques intrafamiliales,2019,,,non
+44119,Paulx,Violences physiques intrafamiliales,2020,,,non
+44119,Paulx,Violences physiques intrafamiliales,2021,,,non
+44119,Paulx,Violences physiques intrafamiliales,2022,,,non
+44119,Paulx,Violences physiques intrafamiliales,2023,,,non
+44119,Paulx,Violences physiques intrafamiliales,2024,,,non
+44119,Paulx,Violences physiques intrafamiliales,2025,,,non
+44120,Le Pellerin,Violences physiques intrafamiliales,2016,14,2.772,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2017,15,2.941,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2018,6,1.165,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2019,8,1.538,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2020,16,3.047,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2021,6,1.12,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2022,11,2.062,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2023,19,3.572,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2024,10,1.88,oui
+44120,Le Pellerin,Violences physiques intrafamiliales,2025,19,3.572,oui
+44121,Petit-Auverné,Violences physiques intrafamiliales,2016,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2017,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2018,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2019,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2020,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2021,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2022,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2023,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2024,,,non
+44121,Petit-Auverné,Violences physiques intrafamiliales,2025,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2016,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2017,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2018,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2019,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2020,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2021,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2022,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2023,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2024,,,non
+44122,Petit-Mars,Violences physiques intrafamiliales,2025,,,non
+44123,Pierric,Violences physiques intrafamiliales,2016,,,non
+44123,Pierric,Violences physiques intrafamiliales,2017,,,non
+44123,Pierric,Violences physiques intrafamiliales,2018,,,non
+44123,Pierric,Violences physiques intrafamiliales,2019,,,non
+44123,Pierric,Violences physiques intrafamiliales,2020,,,non
+44123,Pierric,Violences physiques intrafamiliales,2021,,,non
+44123,Pierric,Violences physiques intrafamiliales,2022,,,non
+44123,Pierric,Violences physiques intrafamiliales,2023,,,non
+44123,Pierric,Violences physiques intrafamiliales,2024,,,non
+44123,Pierric,Violences physiques intrafamiliales,2025,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2016,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2017,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2018,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2019,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2020,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2021,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2022,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2023,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2024,,,non
+44124,Le Pin,Violences physiques intrafamiliales,2025,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2016,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2017,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2018,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2019,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2020,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2021,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2022,,,non
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2023,13,4.842,oui
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2024,9,3.352,oui
+44125,Piriac-sur-Mer,Violences physiques intrafamiliales,2025,,,non
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2016,,,non
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2017,,,non
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2018,,,non
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2019,,,non
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2020,,,non
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2021,11,2.456,oui
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2022,15,3.249,oui
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2023,12,2.521,oui
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2024,17,3.571,oui
+44126,La Plaine-sur-Mer,Violences physiques intrafamiliales,2025,12,2.521,oui
+44127,La Planche,Violences physiques intrafamiliales,2016,,,non
+44127,La Planche,Violences physiques intrafamiliales,2017,,,non
+44127,La Planche,Violences physiques intrafamiliales,2018,,,non
+44127,La Planche,Violences physiques intrafamiliales,2019,,,non
+44127,La Planche,Violences physiques intrafamiliales,2020,,,non
+44127,La Planche,Violences physiques intrafamiliales,2021,,,non
+44127,La Planche,Violences physiques intrafamiliales,2022,,,non
+44127,La Planche,Violences physiques intrafamiliales,2023,,,non
+44127,La Planche,Violences physiques intrafamiliales,2024,,,non
+44127,La Planche,Violences physiques intrafamiliales,2025,,,non
+44128,Plessé,Violences physiques intrafamiliales,2016,,,non
+44128,Plessé,Violences physiques intrafamiliales,2017,,,non
+44128,Plessé,Violences physiques intrafamiliales,2018,,,non
+44128,Plessé,Violences physiques intrafamiliales,2019,,,non
+44128,Plessé,Violences physiques intrafamiliales,2020,,,non
+44128,Plessé,Violences physiques intrafamiliales,2021,16,3.044,oui
+44128,Plessé,Violences physiques intrafamiliales,2022,18,3.408,oui
+44128,Plessé,Violences physiques intrafamiliales,2023,17,3.187,oui
+44128,Plessé,Violences physiques intrafamiliales,2024,19,3.561,oui
+44128,Plessé,Violences physiques intrafamiliales,2025,17,3.187,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2016,18,1.688,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2017,14,1.31,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2018,20,1.857,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2019,18,1.651,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2020,23,2.085,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2021,24,2.167,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2022,32,2.845,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2023,50,4.358,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2024,30,2.615,oui
+44129,Pontchâteau,Violences physiques intrafamiliales,2025,41,3.573,oui
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2016,,,non
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2017,,,non
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2018,,,non
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2019,,,non
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2020,,,non
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2021,20,2.95,oui
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2022,13,1.873,oui
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2023,18,2.538,oui
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2024,13,1.833,oui
+44130,Pont-Saint-Martin,Violences physiques intrafamiliales,2025,24,3.384,oui
+44131,Pornic,Violences physiques intrafamiliales,2016,24,1.632,oui
+44131,Pornic,Violences physiques intrafamiliales,2017,13,0.866,oui
+44131,Pornic,Violences physiques intrafamiliales,2018,30,1.927,oui
+44131,Pornic,Violences physiques intrafamiliales,2019,23,1.45,oui
+44131,Pornic,Violences physiques intrafamiliales,2020,34,2.014,oui
+44131,Pornic,Violences physiques intrafamiliales,2021,55,3.071,oui
+44131,Pornic,Violences physiques intrafamiliales,2022,31,1.686,oui
+44131,Pornic,Violences physiques intrafamiliales,2023,55,2.934,oui
+44131,Pornic,Violences physiques intrafamiliales,2024,38,2.027,oui
+44131,Pornic,Violences physiques intrafamiliales,2025,54,2.881,oui
+44132,Pornichet,Violences physiques intrafamiliales,2016,13,1.218,oui
+44132,Pornichet,Violences physiques intrafamiliales,2017,13,1.218,oui
+44132,Pornichet,Violences physiques intrafamiliales,2018,18,1.644,oui
+44132,Pornichet,Violences physiques intrafamiliales,2019,18,1.616,oui
+44132,Pornichet,Violences physiques intrafamiliales,2020,24,2.029,oui
+44132,Pornichet,Violences physiques intrafamiliales,2021,16,1.32,oui
+44132,Pornichet,Violences physiques intrafamiliales,2022,36,2.873,oui
+44132,Pornichet,Violences physiques intrafamiliales,2023,23,1.797,oui
+44132,Pornichet,Violences physiques intrafamiliales,2024,19,1.484,oui
+44132,Pornichet,Violences physiques intrafamiliales,2025,29,2.266,oui
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2016,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2017,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2018,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2019,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2020,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2021,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2022,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2023,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2024,,,non
+44133,Port-Saint-Père,Violences physiques intrafamiliales,2025,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2016,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2017,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2018,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2019,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2020,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2021,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2022,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2023,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2024,,,non
+44134,Pouillé-les-Côteaux,Violences physiques intrafamiliales,2025,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2016,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2017,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2018,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2019,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2020,6,1.491,oui
+44135,Le Pouliguen,Violences physiques intrafamiliales,2021,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2022,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2023,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2024,,,non
+44135,Le Pouliguen,Violences physiques intrafamiliales,2025,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2016,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2017,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2018,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2019,6,4.85,oui
+44136,Préfailles,Violences physiques intrafamiliales,2020,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2021,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2022,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2023,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2024,,,non
+44136,Préfailles,Violences physiques intrafamiliales,2025,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2016,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2017,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2018,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2019,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2020,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2021,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2022,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2023,,,non
+44137,Prinquiau,Violences physiques intrafamiliales,2024,6,1.671,oui
+44137,Prinquiau,Violences physiques intrafamiliales,2025,,,non
+44138,Puceul,Violences physiques intrafamiliales,2016,,,non
+44138,Puceul,Violences physiques intrafamiliales,2017,,,non
+44138,Puceul,Violences physiques intrafamiliales,2018,,,non
+44138,Puceul,Violences physiques intrafamiliales,2019,,,non
+44138,Puceul,Violences physiques intrafamiliales,2020,,,non
+44138,Puceul,Violences physiques intrafamiliales,2021,,,non
+44138,Puceul,Violences physiques intrafamiliales,2022,,,non
+44138,Puceul,Violences physiques intrafamiliales,2023,,,non
+44138,Puceul,Violences physiques intrafamiliales,2024,,,non
+44138,Puceul,Violences physiques intrafamiliales,2025,,,non
+44139,Quilly,Violences physiques intrafamiliales,2016,,,non
+44139,Quilly,Violences physiques intrafamiliales,2017,,,non
+44139,Quilly,Violences physiques intrafamiliales,2018,,,non
+44139,Quilly,Violences physiques intrafamiliales,2019,,,non
+44139,Quilly,Violences physiques intrafamiliales,2020,,,non
+44139,Quilly,Violences physiques intrafamiliales,2021,,,non
+44139,Quilly,Violences physiques intrafamiliales,2022,,,non
+44139,Quilly,Violences physiques intrafamiliales,2023,,,non
+44139,Quilly,Violences physiques intrafamiliales,2024,,,non
+44139,Quilly,Violences physiques intrafamiliales,2025,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2016,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2017,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2018,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2019,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2020,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2021,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2022,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2023,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2024,,,non
+44140,La Regrippière,Violences physiques intrafamiliales,2025,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2016,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2017,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2018,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2019,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2020,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2021,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2022,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2023,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2024,,,non
+44141,La Remaudière,Violences physiques intrafamiliales,2025,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2016,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2017,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2018,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2019,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2020,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2021,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2022,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2023,,,non
+44142,Remouillé,Violences physiques intrafamiliales,2024,6,3.106,oui
+44142,Remouillé,Violences physiques intrafamiliales,2025,,,non
+44143,Rezé,Violences physiques intrafamiliales,2016,68,1.685,oui
+44143,Rezé,Violences physiques intrafamiliales,2017,63,1.521,oui
+44143,Rezé,Violences physiques intrafamiliales,2018,89,2.101,oui
+44143,Rezé,Violences physiques intrafamiliales,2019,98,2.283,oui
+44143,Rezé,Violences physiques intrafamiliales,2020,108,2.512,oui
+44143,Rezé,Violences physiques intrafamiliales,2021,89,2.07,oui
+44143,Rezé,Violences physiques intrafamiliales,2022,128,2.953,oui
+44143,Rezé,Violences physiques intrafamiliales,2023,127,2.916,oui
+44143,Rezé,Violences physiques intrafamiliales,2024,108,2.48,oui
+44143,Rezé,Violences physiques intrafamiliales,2025,100,2.296,oui
+44144,Riaillé,Violences physiques intrafamiliales,2016,,,non
+44144,Riaillé,Violences physiques intrafamiliales,2017,,,non
+44144,Riaillé,Violences physiques intrafamiliales,2018,,,non
+44144,Riaillé,Violences physiques intrafamiliales,2019,,,non
+44144,Riaillé,Violences physiques intrafamiliales,2020,5,2.12,oui
+44144,Riaillé,Violences physiques intrafamiliales,2021,8,3.393,oui
+44144,Riaillé,Violences physiques intrafamiliales,2022,9,3.817,oui
+44144,Riaillé,Violences physiques intrafamiliales,2023,9,3.805,oui
+44144,Riaillé,Violences physiques intrafamiliales,2024,,,non
+44144,Riaillé,Violences physiques intrafamiliales,2025,,,non
+44145,Rouans,Violences physiques intrafamiliales,2016,,,non
+44145,Rouans,Violences physiques intrafamiliales,2017,,,non
+44145,Rouans,Violences physiques intrafamiliales,2018,,,non
+44145,Rouans,Violences physiques intrafamiliales,2019,,,non
+44145,Rouans,Violences physiques intrafamiliales,2020,,,non
+44145,Rouans,Violences physiques intrafamiliales,2021,,,non
+44145,Rouans,Violences physiques intrafamiliales,2022,6,1.834,oui
+44145,Rouans,Violences physiques intrafamiliales,2023,13,3.938,oui
+44145,Rouans,Violences physiques intrafamiliales,2024,8,2.424,oui
+44145,Rouans,Violences physiques intrafamiliales,2025,8,2.424,oui
+44146,Rougé,Violences physiques intrafamiliales,2016,,,non
+44146,Rougé,Violences physiques intrafamiliales,2017,,,non
+44146,Rougé,Violences physiques intrafamiliales,2018,,,non
+44146,Rougé,Violences physiques intrafamiliales,2019,,,non
+44146,Rougé,Violences physiques intrafamiliales,2020,,,non
+44146,Rougé,Violences physiques intrafamiliales,2021,,,non
+44146,Rougé,Violences physiques intrafamiliales,2022,7,3.253,oui
+44146,Rougé,Violences physiques intrafamiliales,2023,14,6.524,oui
+44146,Rougé,Violences physiques intrafamiliales,2024,,,non
+44146,Rougé,Violences physiques intrafamiliales,2025,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2016,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2017,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2018,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2019,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2020,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2021,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2022,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2023,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2024,,,non
+44148,Ruffigné,Violences physiques intrafamiliales,2025,,,non
+44149,Saffré,Violences physiques intrafamiliales,2016,,,non
+44149,Saffré,Violences physiques intrafamiliales,2017,,,non
+44149,Saffré,Violences physiques intrafamiliales,2018,,,non
+44149,Saffré,Violences physiques intrafamiliales,2019,,,non
+44149,Saffré,Violences physiques intrafamiliales,2020,,,non
+44149,Saffré,Violences physiques intrafamiliales,2021,8,1.982,oui
+44149,Saffré,Violences physiques intrafamiliales,2022,7,1.718,oui
+44149,Saffré,Violences physiques intrafamiliales,2023,,,non
+44149,Saffré,Violences physiques intrafamiliales,2024,,,non
+44149,Saffré,Violences physiques intrafamiliales,2025,,,non
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2016,,,non
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2017,,,non
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2018,,,non
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2019,,,non
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2020,,,non
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2021,7,1.756,oui
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2022,11,2.756,oui
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2023,5,1.251,oui
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2024,10,2.503,oui
+44150,Saint-Aignan-Grandlieu,Violences physiques intrafamiliales,2025,12,3.003,oui
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2016,,,non
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2017,,,non
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2018,,,non
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2019,9,1.335,oui
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2020,,,non
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2021,,,non
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2022,,,non
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2023,15,2.139,oui
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2024,13,1.854,oui
+44151,Saint-André-des-Eaux,Violences physiques intrafamiliales,2025,15,2.139,oui
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2016,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2017,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2018,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2019,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2020,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2021,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2022,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2023,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2024,,,non
+44152,Sainte-Anne-sur-Brivet,Violences physiques intrafamiliales,2025,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2016,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2017,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2018,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2019,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2020,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2021,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2022,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2023,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2024,,,non
+44153,Saint-Aubin-des-Châteaux,Violences physiques intrafamiliales,2025,,,non
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2016,11,0.798,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2017,20,1.449,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2018,18,1.275,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2019,21,1.47,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2020,22,1.52,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2021,24,1.665,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2022,29,1.98,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2023,49,3.37,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2024,39,2.682,oui
+44154,Saint-Brevin-les-Pins,Violences physiques intrafamiliales,2025,40,2.751,oui
+44155,Saint-Colomban,Violences physiques intrafamiliales,2016,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2017,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2018,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2019,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2020,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2021,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2022,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2023,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2024,,,non
+44155,Saint-Colomban,Violences physiques intrafamiliales,2025,8,2.286,oui
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2016,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2017,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2018,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2019,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2020,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2021,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2022,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2023,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2024,,,non
+44156,Corcoué-sur-Logne,Violences physiques intrafamiliales,2025,10,3.063,oui
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2016,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2017,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2018,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2019,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2020,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2021,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2022,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2023,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2024,,,non
+44157,Saint-Étienne-de-Mer-Morte,Violences physiques intrafamiliales,2025,7,3.928,oui
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2016,,,non
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2017,,,non
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2018,,,non
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2019,7,0.931,oui
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2020,11,1.452,oui
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2021,12,1.567,oui
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2022,9,1.163,oui
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2023,8,1.028,oui
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2024,22,2.828,oui
+44158,Saint-Étienne-de-Montluc,Violences physiques intrafamiliales,2025,17,2.185,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2016,0,0,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2017,0,0,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2018,0,0,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2019,0,0,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2020,0,0,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2021,0,0,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2022,0,0,oui
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2023,,,non
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2024,,,non
+44159,Saint-Fiacre-sur-Maine,Violences physiques intrafamiliales,2025,,,non
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2016,5,1.324,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2017,6,1.59,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2018,7,1.856,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2019,9,2.388,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2020,10,2.659,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2021,7,1.852,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2022,13,3.43,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2023,23,5.959,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2024,20,5.181,oui
+44161,Saint-Gildas-des-Bois,Violences physiques intrafamiliales,2025,15,3.886,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2016,98,2.103,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2017,123,2.658,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2018,94,2.028,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2019,133,2.805,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2020,136,2.772,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2021,166,3.351,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2022,163,3.224,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2023,156,3.06,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2024,152,2.982,oui
+44162,Saint-Herblain,Violences physiques intrafamiliales,2025,157,3.08,oui
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2016,,,non
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2017,,,non
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2018,,,non
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2019,,,non
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2020,,,non
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2021,,,non
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2022,,,non
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2023,11,2.225,oui
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2024,10,2.023,oui
+44163,Vair-sur-Loire,Violences physiques intrafamiliales,2025,10,2.023,oui
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2016,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2017,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2018,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2019,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2020,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2021,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2022,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2023,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2024,,,non
+44164,Saint-Hilaire-de-Chaléons,Violences physiques intrafamiliales,2025,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2016,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2017,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2018,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2019,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2020,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2021,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2022,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2023,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2024,,,non
+44165,Saint-Hilaire-de-Clisson,Violences physiques intrafamiliales,2025,,,non
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2016,,,non
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2017,,,non
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2018,,,non
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2019,6,1.002,oui
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2020,13,2.178,oui
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2021,11,1.839,oui
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2022,20,3.32,oui
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2023,20,3.297,oui
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2024,18,2.967,oui
+44166,Saint-Jean-de-Boiseau,Violences physiques intrafamiliales,2025,31,5.11,oui
+44168,Saint-Joachim,Violences physiques intrafamiliales,2016,,,non
+44168,Saint-Joachim,Violences physiques intrafamiliales,2017,,,non
+44168,Saint-Joachim,Violences physiques intrafamiliales,2018,,,non
+44168,Saint-Joachim,Violences physiques intrafamiliales,2019,,,non
+44168,Saint-Joachim,Violences physiques intrafamiliales,2020,,,non
+44168,Saint-Joachim,Violences physiques intrafamiliales,2021,14,3.382,oui
+44168,Saint-Joachim,Violences physiques intrafamiliales,2022,15,3.636,oui
+44168,Saint-Joachim,Violences physiques intrafamiliales,2023,16,3.891,oui
+44168,Saint-Joachim,Violences physiques intrafamiliales,2024,9,2.189,oui
+44168,Saint-Joachim,Violences physiques intrafamiliales,2025,18,4.377,oui
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2016,,,non
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2017,,,non
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2018,,,non
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2019,,,non
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2020,,,non
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2021,12,1.568,oui
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2022,12,1.545,oui
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2023,10,1.269,oui
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2024,15,1.903,oui
+44169,Saint-Julien-de-Concelles,Violences physiques intrafamiliales,2025,14,1.776,oui
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2016,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2017,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2018,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2019,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2020,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2021,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2022,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2023,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2024,,,non
+44170,Saint-Julien-de-Vouvantes,Violences physiques intrafamiliales,2025,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2016,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2017,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2018,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2019,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2020,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2021,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2022,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2023,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2024,,,non
+44171,Saint-Léger-les-Vignes,Violences physiques intrafamiliales,2025,,,non
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2016,15,0.984,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2017,22,1.432,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2018,34,2.231,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2019,46,3.003,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2020,32,2.076,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2021,54,3.478,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2022,55,3.389,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2023,60,3.659,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2024,65,3.963,oui
+44172,Sainte-Luce-sur-Loire,Violences physiques intrafamiliales,2025,60,3.659,oui
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2016,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2017,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2018,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2019,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2020,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2021,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2022,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2023,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2024,,,non
+44173,Saint-Lumine-de-Clisson,Violences physiques intrafamiliales,2025,8,3.81,oui
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2016,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2017,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2018,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2019,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2020,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2021,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2022,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2023,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2024,,,non
+44174,Saint-Lumine-de-Coutais,Violences physiques intrafamiliales,2025,9,3.756,oui
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2016,,,non
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2017,,,non
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2018,,,non
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2019,9,1.868,oui
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2020,9,1.814,oui
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2021,11,2.155,oui
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2022,13,2.478,oui
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2023,21,3.959,oui
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2024,21,3.959,oui
+44175,Saint-Lyphard,Violences physiques intrafamiliales,2025,18,3.394,oui
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2016,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2017,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2018,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2019,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2020,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2021,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2022,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2023,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2024,,,non
+44176,Saint-Malo-de-Guersac,Violences physiques intrafamiliales,2025,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2016,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2017,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2018,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2019,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2020,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2021,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2022,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2023,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2024,,,non
+44178,Saint-Mars-de-Coutais,Violences physiques intrafamiliales,2025,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2016,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2017,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2018,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2019,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2020,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2021,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2022,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2023,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2024,,,non
+44179,Saint-Mars-du-Désert,Violences physiques intrafamiliales,2025,,,non
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2016,,,non
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2017,,,non
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2018,,,non
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2019,,,non
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2020,,,non
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2021,17,2.592,oui
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2022,15,2.264,oui
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2023,27,4.035,oui
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2024,26,3.885,oui
+44180,Vallons-de-l'Erdre,Violences physiques intrafamiliales,2025,28,4.184,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2016,8,1.662,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2017,10,2.003,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2018,18,3.48,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2019,14,2.675,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2020,19,3.587,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2021,9,1.69,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2022,7,1.268,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2023,19,3.325,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2024,13,2.275,oui
+44182,Saint-Michel-Chef-Chef,Violences physiques intrafamiliales,2025,16,2.8,oui
+44183,Saint-Molf,Violences physiques intrafamiliales,2016,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2017,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2018,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2019,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2020,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2021,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2022,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2023,,,non
+44183,Saint-Molf,Violences physiques intrafamiliales,2024,10,3.484,oui
+44183,Saint-Molf,Violences physiques intrafamiliales,2025,,,non
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2016,148,2.123,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2017,161,2.3,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2018,181,2.563,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2019,232,3.25,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2020,211,2.935,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2021,238,3.303,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2022,244,3.337,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2023,259,3.473,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2024,264,3.54,oui
+44184,Saint-Nazaire,Violences physiques intrafamiliales,2025,285,3.822,oui
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2016,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2017,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2018,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2019,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2020,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2021,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2022,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2023,,,non
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2024,13,3.926,oui
+44185,Saint-Nicolas-de-Redon,Violences physiques intrafamiliales,2025,7,2.114,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2016,14,2.102,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2017,5,0.738,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2018,16,2.323,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2019,11,1.576,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2020,17,2.391,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2021,13,1.801,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2022,11,1.526,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2023,15,2.083,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2024,24,3.333,oui
+44186,Sainte-Pazanne,Violences physiques intrafamiliales,2025,14,1.944,oui
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2016,6,1.318,oui
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2017,11,2.41,oui
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2018,5,1.094,oui
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2019,,,non
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2020,,,non
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2021,,,non
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2022,17,3.616,oui
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2023,24,4.904,oui
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2024,16,3.269,oui
+44187,Saint-Père-en-Retz,Violences physiques intrafamiliales,2025,24,4.904,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2016,6,0.678,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2017,8,0.897,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2018,14,1.557,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2019,17,1.873,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2020,17,1.845,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2021,21,2.237,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2022,8,0.852,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2023,9,0.957,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2024,24,2.553,oui
+44188,Saint-Philbert-de-Grand-Lieu,Violences physiques intrafamiliales,2025,18,1.915,oui
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2016,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2017,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2018,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2019,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2020,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2021,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2022,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2023,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2024,,,non
+44189,Sainte-Reine-de-Bretagne,Violences physiques intrafamiliales,2025,,,non
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2016,33,1.228,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2017,39,1.453,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2018,41,1.497,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2019,43,1.564,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2020,49,1.753,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2021,55,1.945,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2022,49,1.727,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2023,53,1.853,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2024,63,2.203,oui
+44190,Saint-Sébastien-sur-Loire,Violences physiques intrafamiliales,2025,78,2.728,oui
+44192,Saint-Viaud,Violences physiques intrafamiliales,2016,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2017,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2018,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2019,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2020,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2021,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2022,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2023,,,non
+44192,Saint-Viaud,Violences physiques intrafamiliales,2024,5,1.707,oui
+44192,Saint-Viaud,Violences physiques intrafamiliales,2025,10,3.414,oui
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2016,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2017,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2018,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2019,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2020,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2021,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2022,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2023,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2024,,,non
+44193,Saint-Vincent-des-Landes,Violences physiques intrafamiliales,2025,,,non
+44194,Sautron,Violences physiques intrafamiliales,2016,8,1.011,oui
+44194,Sautron,Violences physiques intrafamiliales,2017,8,0.977,oui
+44194,Sautron,Violences physiques intrafamiliales,2018,5,0.592,oui
+44194,Sautron,Violences physiques intrafamiliales,2019,7,0.826,oui
+44194,Sautron,Violences physiques intrafamiliales,2020,5,0.59,oui
+44194,Sautron,Violences physiques intrafamiliales,2021,15,1.762,oui
+44194,Sautron,Violences physiques intrafamiliales,2022,20,2.344,oui
+44194,Sautron,Violences physiques intrafamiliales,2023,23,2.688,oui
+44194,Sautron,Violences physiques intrafamiliales,2024,28,3.273,oui
+44194,Sautron,Violences physiques intrafamiliales,2025,24,2.805,oui
+44195,Savenay,Violences physiques intrafamiliales,2016,7,0.829,oui
+44195,Savenay,Violences physiques intrafamiliales,2017,7,0.807,oui
+44195,Savenay,Violences physiques intrafamiliales,2018,16,1.803,oui
+44195,Savenay,Violences physiques intrafamiliales,2019,19,2.096,oui
+44195,Savenay,Violences physiques intrafamiliales,2020,22,2.37,oui
+44195,Savenay,Violences physiques intrafamiliales,2021,12,1.283,oui
+44195,Savenay,Violences physiques intrafamiliales,2022,16,1.69,oui
+44195,Savenay,Violences physiques intrafamiliales,2023,28,2.934,oui
+44195,Savenay,Violences physiques intrafamiliales,2024,22,2.305,oui
+44195,Savenay,Violences physiques intrafamiliales,2025,30,3.144,oui
+44196,Sévérac,Violences physiques intrafamiliales,2016,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2017,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2018,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2019,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2020,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2021,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2022,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2023,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2024,,,non
+44196,Sévérac,Violences physiques intrafamiliales,2025,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2016,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2017,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2018,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2019,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2020,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2021,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2022,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2023,,,non
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2024,15,9.047,oui
+44197,Sion-les-Mines,Violences physiques intrafamiliales,2025,5,3.016,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2016,9,1.095,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2017,9,1.054,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2018,13,1.495,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2019,7,0.799,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2020,19,2.135,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2021,11,1.218,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2022,23,2.51,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2023,26,2.803,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2024,30,3.235,oui
+44198,Les Sorinières,Violences physiques intrafamiliales,2025,29,3.127,oui
+44199,Soudan,Violences physiques intrafamiliales,2016,,,non
+44199,Soudan,Violences physiques intrafamiliales,2017,,,non
+44199,Soudan,Violences physiques intrafamiliales,2018,,,non
+44199,Soudan,Violences physiques intrafamiliales,2019,,,non
+44199,Soudan,Violences physiques intrafamiliales,2020,,,non
+44199,Soudan,Violences physiques intrafamiliales,2021,,,non
+44199,Soudan,Violences physiques intrafamiliales,2022,,,non
+44199,Soudan,Violences physiques intrafamiliales,2023,,,non
+44199,Soudan,Violences physiques intrafamiliales,2024,,,non
+44199,Soudan,Violences physiques intrafamiliales,2025,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2016,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2017,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2018,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2019,0,0,oui
+44200,Soulvache,Violences physiques intrafamiliales,2020,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2021,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2022,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2023,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2024,,,non
+44200,Soulvache,Violences physiques intrafamiliales,2025,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2016,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2017,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2018,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2019,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2020,9,1.229,oui
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2021,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2022,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2023,,,non
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2024,9,1.194,oui
+44201,Sucé-sur-Erdre,Violences physiques intrafamiliales,2025,15,1.99,oui
+44202,Teillé,Violences physiques intrafamiliales,2016,,,non
+44202,Teillé,Violences physiques intrafamiliales,2017,,,non
+44202,Teillé,Violences physiques intrafamiliales,2018,,,non
+44202,Teillé,Violences physiques intrafamiliales,2019,,,non
+44202,Teillé,Violences physiques intrafamiliales,2020,,,non
+44202,Teillé,Violences physiques intrafamiliales,2021,,,non
+44202,Teillé,Violences physiques intrafamiliales,2022,,,non
+44202,Teillé,Violences physiques intrafamiliales,2023,,,non
+44202,Teillé,Violences physiques intrafamiliales,2024,,,non
+44202,Teillé,Violences physiques intrafamiliales,2025,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2016,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2017,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2018,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2019,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2020,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2021,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2022,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2023,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2024,,,non
+44203,Le Temple-de-Bretagne,Violences physiques intrafamiliales,2025,,,non
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2016,14,1.432,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2017,15,1.496,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2018,18,1.754,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2019,19,1.813,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2020,19,1.775,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2021,36,3.339,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2022,27,2.464,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2023,34,3.09,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2024,47,4.271,oui
+44204,Thouaré-sur-Loire,Violences physiques intrafamiliales,2025,41,3.726,oui
+44205,Les Touches,Violences physiques intrafamiliales,2016,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2017,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2018,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2019,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2020,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2021,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2022,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2023,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2024,,,non
+44205,Les Touches,Violences physiques intrafamiliales,2025,,,non
+44206,Touvois,Violences physiques intrafamiliales,2016,,,non
+44206,Touvois,Violences physiques intrafamiliales,2017,,,non
+44206,Touvois,Violences physiques intrafamiliales,2018,,,non
+44206,Touvois,Violences physiques intrafamiliales,2019,,,non
+44206,Touvois,Violences physiques intrafamiliales,2020,,,non
+44206,Touvois,Violences physiques intrafamiliales,2021,,,non
+44206,Touvois,Violences physiques intrafamiliales,2022,,,non
+44206,Touvois,Violences physiques intrafamiliales,2023,,,non
+44206,Touvois,Violences physiques intrafamiliales,2024,,,non
+44206,Touvois,Violences physiques intrafamiliales,2025,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2016,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2017,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2018,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2019,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2020,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2021,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2022,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2023,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2024,,,non
+44207,Trans-sur-Erdre,Violences physiques intrafamiliales,2025,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2016,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2017,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2018,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2019,0,0,oui
+44208,Treffieux,Violences physiques intrafamiliales,2020,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2021,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2022,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2023,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2024,,,non
+44208,Treffieux,Violences physiques intrafamiliales,2025,,,non
+44209,Treillières,Violences physiques intrafamiliales,2016,11,1.225,oui
+44209,Treillières,Violences physiques intrafamiliales,2017,6,0.651,oui
+44209,Treillières,Violences physiques intrafamiliales,2018,12,1.269,oui
+44209,Treillières,Violences physiques intrafamiliales,2019,13,1.352,oui
+44209,Treillières,Violences physiques intrafamiliales,2020,13,1.293,oui
+44209,Treillières,Violences physiques intrafamiliales,2021,11,1.075,oui
+44209,Treillières,Violences physiques intrafamiliales,2022,15,1.44,oui
+44209,Treillières,Violences physiques intrafamiliales,2023,24,2.264,oui
+44209,Treillières,Violences physiques intrafamiliales,2024,31,2.925,oui
+44209,Treillières,Violences physiques intrafamiliales,2025,15,1.415,oui
+44210,Trignac,Violences physiques intrafamiliales,2016,21,2.668,oui
+44210,Trignac,Violences physiques intrafamiliales,2017,21,2.669,oui
+44210,Trignac,Violences physiques intrafamiliales,2018,17,2.145,oui
+44210,Trignac,Violences physiques intrafamiliales,2019,39,4.885,oui
+44210,Trignac,Violences physiques intrafamiliales,2020,30,3.703,oui
+44210,Trignac,Violences physiques intrafamiliales,2021,34,4.194,oui
+44210,Trignac,Violences physiques intrafamiliales,2022,33,4.008,oui
+44210,Trignac,Violences physiques intrafamiliales,2023,50,5.955,oui
+44210,Trignac,Violences physiques intrafamiliales,2024,42,5.002,oui
+44210,Trignac,Violences physiques intrafamiliales,2025,37,4.406,oui
+44211,La Turballe,Violences physiques intrafamiliales,2016,,,non
+44211,La Turballe,Violences physiques intrafamiliales,2017,,,non
+44211,La Turballe,Violences physiques intrafamiliales,2018,,,non
+44211,La Turballe,Violences physiques intrafamiliales,2019,,,non
+44211,La Turballe,Violences physiques intrafamiliales,2020,13,2.659,oui
+44211,La Turballe,Violences physiques intrafamiliales,2021,15,3.084,oui
+44211,La Turballe,Violences physiques intrafamiliales,2022,9,1.851,oui
+44211,La Turballe,Violences physiques intrafamiliales,2023,7,1.443,oui
+44211,La Turballe,Violences physiques intrafamiliales,2024,11,2.268,oui
+44211,La Turballe,Violences physiques intrafamiliales,2025,19,3.918,oui
+44212,Vallet,Violences physiques intrafamiliales,2016,7,0.782,oui
+44212,Vallet,Violences physiques intrafamiliales,2017,11,1.22,oui
+44212,Vallet,Violences physiques intrafamiliales,2018,18,1.96,oui
+44212,Vallet,Violences physiques intrafamiliales,2019,16,1.691,oui
+44212,Vallet,Violences physiques intrafamiliales,2020,9,0.956,oui
+44212,Vallet,Violences physiques intrafamiliales,2021,17,1.796,oui
+44212,Vallet,Violences physiques intrafamiliales,2022,32,3.36,oui
+44212,Vallet,Violences physiques intrafamiliales,2023,22,2.317,oui
+44212,Vallet,Violences physiques intrafamiliales,2024,30,3.16,oui
+44212,Vallet,Violences physiques intrafamiliales,2025,20,2.106,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2016,7,0.928,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2017,16,2.127,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2018,18,2.4,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2019,15,2.005,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2020,27,3.584,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2021,24,3.193,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2022,20,2.663,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2023,17,2.241,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2024,31,4.086,oui
+44213,Loireauxence,Violences physiques intrafamiliales,2025,17,2.241,oui
+44214,Vay,Violences physiques intrafamiliales,2016,,,non
+44214,Vay,Violences physiques intrafamiliales,2017,,,non
+44214,Vay,Violences physiques intrafamiliales,2018,,,non
+44214,Vay,Violences physiques intrafamiliales,2019,,,non
+44214,Vay,Violences physiques intrafamiliales,2020,,,non
+44214,Vay,Violences physiques intrafamiliales,2021,,,non
+44214,Vay,Violences physiques intrafamiliales,2022,,,non
+44214,Vay,Violences physiques intrafamiliales,2023,,,non
+44214,Vay,Violences physiques intrafamiliales,2024,,,non
+44214,Vay,Violences physiques intrafamiliales,2025,,,non
+44215,Vertou,Violences physiques intrafamiliales,2016,20,0.848,oui
+44215,Vertou,Violences physiques intrafamiliales,2017,32,1.321,oui
+44215,Vertou,Violences physiques intrafamiliales,2018,31,1.238,oui
+44215,Vertou,Violences physiques intrafamiliales,2019,40,1.566,oui
+44215,Vertou,Violences physiques intrafamiliales,2020,46,1.778,oui
+44215,Vertou,Violences physiques intrafamiliales,2021,40,1.538,oui
+44215,Vertou,Violences physiques intrafamiliales,2022,43,1.651,oui
+44215,Vertou,Violences physiques intrafamiliales,2023,60,2.288,oui
+44215,Vertou,Violences physiques intrafamiliales,2024,54,2.059,oui
+44215,Vertou,Violences physiques intrafamiliales,2025,60,2.288,oui
+44216,Vieillevigne,Violences physiques intrafamiliales,2016,,,non
+44216,Vieillevigne,Violences physiques intrafamiliales,2017,,,non
+44216,Vieillevigne,Violences physiques intrafamiliales,2018,,,non
+44216,Vieillevigne,Violences physiques intrafamiliales,2019,,,non
+44216,Vieillevigne,Violences physiques intrafamiliales,2020,,,non
+44216,Vieillevigne,Violences physiques intrafamiliales,2021,12,2.948,oui
+44216,Vieillevigne,Violences physiques intrafamiliales,2022,7,1.703,oui
+44216,Vieillevigne,Violences physiques intrafamiliales,2023,17,4.096,oui
+44216,Vieillevigne,Violences physiques intrafamiliales,2024,20,4.819,oui
+44216,Vieillevigne,Violences physiques intrafamiliales,2025,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2016,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2017,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2018,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2019,6,0.972,oui
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2020,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2021,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2022,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2023,,,non
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2024,16,2.391,oui
+44217,Vigneux-de-Bretagne,Violences physiques intrafamiliales,2025,12,1.793,oui
+44218,Villepot,Violences physiques intrafamiliales,2016,,,non
+44218,Villepot,Violences physiques intrafamiliales,2017,,,non
+44218,Villepot,Violences physiques intrafamiliales,2018,,,non
+44218,Villepot,Violences physiques intrafamiliales,2019,,,non
+44218,Villepot,Violences physiques intrafamiliales,2020,,,non
+44218,Villepot,Violences physiques intrafamiliales,2021,,,non
+44218,Villepot,Violences physiques intrafamiliales,2022,,,non
+44218,Villepot,Violences physiques intrafamiliales,2023,,,non
+44218,Villepot,Violences physiques intrafamiliales,2024,,,non
+44218,Villepot,Violences physiques intrafamiliales,2025,,,non
+44220,Vue,Violences physiques intrafamiliales,2016,,,non
+44220,Vue,Violences physiques intrafamiliales,2017,,,non
+44220,Vue,Violences physiques intrafamiliales,2018,,,non
+44220,Vue,Violences physiques intrafamiliales,2019,,,non
+44220,Vue,Violences physiques intrafamiliales,2020,,,non
+44220,Vue,Violences physiques intrafamiliales,2021,,,non
+44220,Vue,Violences physiques intrafamiliales,2022,,,non
+44220,Vue,Violences physiques intrafamiliales,2023,,,non
+44220,Vue,Violences physiques intrafamiliales,2024,16,9.127,oui
+44220,Vue,Violences physiques intrafamiliales,2025,6,3.423,oui
+44221,La Chevallerais,Violences physiques intrafamiliales,2016,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2017,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2018,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2019,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2020,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2021,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2022,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2023,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2024,,,non
+44221,La Chevallerais,Violences physiques intrafamiliales,2025,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2016,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2017,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2018,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2019,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2020,0,0,oui
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2021,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2022,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2023,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2024,,,non
+44222,La Roche-Blanche,Violences physiques intrafamiliales,2025,,,non
+44223,Geneston,Violences physiques intrafamiliales,2016,,,non
+44223,Geneston,Violences physiques intrafamiliales,2017,,,non
+44223,Geneston,Violences physiques intrafamiliales,2018,,,non
+44223,Geneston,Violences physiques intrafamiliales,2019,,,non
+44223,Geneston,Violences physiques intrafamiliales,2020,5,1.356,oui
+44223,Geneston,Violences physiques intrafamiliales,2021,7,1.893,oui
+44223,Geneston,Violences physiques intrafamiliales,2022,12,3.251,oui
+44223,Geneston,Violences physiques intrafamiliales,2023,12,3.256,oui
+44223,Geneston,Violences physiques intrafamiliales,2024,,,non
+44223,Geneston,Violences physiques intrafamiliales,2025,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2016,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2017,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2018,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2019,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2020,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2021,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2022,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2023,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2024,,,non
+44224,La Grigonnais,Violences physiques intrafamiliales,2025,,,non
 44001,Abbaretz,Violences sexuelles,2016,,,non
 44001,Abbaretz,Violences sexuelles,2017,,,non
 44001,Abbaretz,Violences sexuelles,2018,,,non

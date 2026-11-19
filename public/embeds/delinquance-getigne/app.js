@@ -9,6 +9,51 @@ window.gtColor = (territoire) => {
   return dash.colors[3];
 };
 window.gtDash = (territoire) => territoire === 'Loire-Atlantique' ? '6 4' : territoire === 'France' ? '1 4' : null;
+window.gtTous = 'Tous indicateurs confondus';
+
+// « Tous indicateurs confondus » : somme des 14 indicateurs suivis dans toutes les communes,
+// rapportée aux habitants.
+// Même méthode que les totaux départementaux : chaque nombre non publié d'une commune est remplacé
+// par la moyenne départementale des communes non publiées ; le total d'une commune est donc estimé.
+dash.calc('reperes_tous', {
+  title: 'Repères, avec le total tous indicateurs',
+  inputs: ['reperes'],
+  fn: (reperes) => {
+    const inclus = new Set(reperes.filter((r) => r.territoire === 'France').map((r) => r.indicateur));
+    const totaux = [];
+    d3.group(reperes.filter((r) => inclus.has(r.indicateur)), (r) => r.territoire, (r) => r.annee).forEach((parAnnee, territoire) => parAnnee.forEach((lignes, annee) => {
+      const nombre = d3.sum(lignes, (r) => r.nombre);
+      const pop = d3.median(lignes.filter((r) => r.unite === 'habitants' && r.taux > 0), (r) => r.nombre / r.taux * 1000);
+      totaux.push({territoire, famille: null, indicateur: gtTous, unite: 'habitants', annee, nombre, taux: pop ? nombre / pop * 1000 : null, moyenne_non_publiees: null, taux_non_publiees: null});
+    }));
+    return reperes.concat(totaux);
+  },
+});
+
+dash.calc('communes_tous', {
+  title: 'Communes, avec le total estimé tous indicateurs',
+  inputs: ['communes', 'reperes'],
+  fn: (communes, reperes) => {
+    const inclus = new Set(reperes.filter((r) => r.territoire === 'France').map((r) => r.indicateur));
+    const hab = new Set(reperes.filter((r) => r.unite === 'habitants').map((r) => r.indicateur));
+    const moy = new Map(reperes.filter((r) => r.territoire === 'Loire-Atlantique').map((r) => [r.indicateur + '|' + r.annee, r.moyenne_non_publiees]));
+    const totaux = [];
+    d3.group(communes.filter((r) => inclus.has(r.indicateur)), (r) => r.code).forEach((lignes, code) => {
+      // population de l'année, déduite des taux publiés ; à défaut, celle de l'année connue la plus proche
+      const pops = d3.rollup(lignes.filter((r) => r.publie === 'oui' && hab.has(r.indicateur) && r.taux > 0), (v) => d3.median(v, (r) => r.nombre / r.taux * 1000), (r) => r.annee);
+      d3.group(lignes, (r) => r.annee).forEach((an, annee) => {
+        const np = an.filter((r) => r.publie !== 'oui');
+        const publies = d3.sum(an, (r) => (r.publie === 'oui' ? r.nombre : 0));
+        const estimes = d3.sum(np, (r) => moy.get(r.indicateur + '|' + annee) || 0);
+        let pop = pops.get(annee);
+        if (pop == null && pops.size) pop = pops.get(d3.least(Array.from(pops.keys()), (a) => Math.abs(a - annee)));
+        const nombre = publies + estimes;
+        totaux.push({code, commune: an[0].commune, indicateur: gtTous, annee, nombre, taux: pop ? nombre / pop * 1000 : null, publie: pop ? 'oui' : 'non', publies, estimes, n_non_publies: np.length});
+      });
+    });
+    return communes.concat(totaux);
+  },
+});
 
 dash.loader('communes', {
   description: 'Lit le fichier CSV ligne à ligne et convertit l’année, le nombre et le taux en nombres ; une cellule vide (nombre non publié) reste vide.',
@@ -74,7 +119,7 @@ dash.calc('tableau_trois', {
   inputs: ['communes'],
   fn: (communes) => {
     const annee = Number(dash.params().annee);
-    const ordre = ['Vols avec armes', 'Vols violents sans arme', 'Violences physiques hors cadre familial', 'Violences sexuelles', 'Cambriolages de logement', 'Vols de véhicule', 'Vols dans les véhicules', 'Vols d\'accessoires sur véhicules', 'Vols sans violence contre des personnes', 'Destructions et dégradations volontaires', 'Usage de stupéfiants', 'Trafic de stupéfiants', 'Escroqueries et fraudes aux moyens de paiement'];
+    const ordre = ['Vols avec armes', 'Vols violents sans arme', 'Violences physiques hors cadre familial', 'Violences physiques intrafamiliales', 'Violences sexuelles', 'Cambriolages de logement', 'Vols de véhicule', 'Vols dans les véhicules', 'Vols d\'accessoires sur véhicules', 'Vols sans violence contre des personnes', 'Destructions et dégradations volontaires', 'Usage de stupéfiants', 'Trafic de stupéfiants', 'Escroqueries et fraudes aux moyens de paiement'];
     const lignes = communes.filter((r) => r.annee === annee && (r.code === '44063' || r.code === '44064' || r.code === '44043'));
     const valeur = (indicateur, code) => {
       const r = lignes.find((x) => x.indicateur === indicateur && x.code === code);
@@ -93,7 +138,7 @@ dash.calc('tableau_trois', {
 dash.calc('comparaison', {
   title: 'Indicateur choisi : communes et repères, année affichée',
   description: 'Nombre et taux de l’indicateur choisi, l’année affichée, pour Gétigné, Gorges, Clisson, la commune ajoutée, la Loire-Atlantique et la France.',
-  inputs: ['communes', 'reperes'],
+  inputs: ['communes_tous', 'reperes_tous'],
   fn: (communes, reperes) => {
     const p = dash.params();
     const annee = Number(p.annee);
@@ -105,7 +150,7 @@ dash.calc('comparaison', {
       const r = lignes.find((x) => x.code === code);
       if (!r) return;
       const publie = r.publie === 'oui';
-      sortie.push({territoire: r.commune, statut: publie ? 'publié' : 'non publié', nombre: publie ? r.nombre : null, taux: publie ? arrondi(r.taux) : null});
+      sortie.push({territoire: r.commune, statut: publie ? 'publié' : 'non publié', nombre: publie ? r.nombre : null, taux: publie ? arrondi(r.taux) : null, estime: r.estimes > 0});
     });
     ['Loire-Atlantique', 'France'].forEach((territoire) => {
       const r = reperes.find((x) => x.territoire === territoire && x.indicateur === p.indicateur && x.annee === annee);
@@ -118,16 +163,17 @@ dash.calc('comparaison', {
 dash.calc('position', {
   title: 'Rang de Gétigné parmi les communes publiées de Loire-Atlantique',
   description: 'Pour l’indicateur choisi et l’année affichée : nombre de communes publiées, rang de Gétigné par taux croissant et médiane des taux publiés.',
-  inputs: ['communes'],
+  inputs: ['communes_tous'],
   fn: (communes) => {
     const p = dash.params();
     const annee = Number(p.annee);
+    const tous = p.indicateur === gtTous;
     const lignes = communes.filter((r) => r.indicateur === p.indicateur && r.annee === annee);
     const publiees = lignes.filter((r) => r.publie === 'oui').sort((a, b) => a.taux - b.taux);
     const i = publiees.findIndex((r) => r.code === '44063');
     const n = publiees.length;
     const mediane = n ? (n % 2 ? publiees[(n - 1) / 2].taux : (publiees[n / 2 - 1].taux + publiees[n / 2].taux) / 2) : null;
-    return [{indicateur: p.indicateur, annee, communes: lignes.length, publiees: n, statut: i < 0 ? 'non publié' : 'publié', rang: i < 0 ? null : publiees.filter((r) => r.taux < publiees[i].taux).length + 1, autres_non_publiees: i < 0 ? lignes.length - n - 1 : null, mediane: mediane == null ? null : Math.round(mediane * 100) / 100}];
+    return [{indicateur: p.indicateur, annee, communes: lignes.length, publiees: n, statut: i < 0 ? 'non publié' : tous ? 'total' : 'publié', sans_population: lignes.length - n, rang: i < 0 ? null : publiees.filter((r) => r.taux < publiees[i].taux).length + 1, autres_non_publiees: i < 0 ? lignes.length - n - 1 : null, mediane: mediane == null ? null : Math.round(mediane * 100) / 100}];
   },
 });
 
@@ -136,6 +182,8 @@ dash.onData(() => {
   const d = dash.data('position');
   const statut = d.status === 'ok' && d.data && d.data[0] ? d.data[0].statut : null;
   document.querySelectorAll('[data-gt-si]').forEach((e) => { e.hidden = e.dataset.gtSi !== statut; });
+  const tous = dash.params().indicateur === gtTous;
+  document.querySelectorAll('[data-gt-mode]').forEach((e) => { e.hidden = (e.dataset.gtMode === 'tous') !== tous; });
 });
 
 // Valeur seule : lit la cellule nommée par ses attributs
@@ -162,7 +210,7 @@ dash.draw('choix-annee', (sel) => {
 dash.draw('choix-indicateur', (sel) => {
   const d = dash.data('reperes');
   const noms = d.status === 'ok' ? Array.from(new Set(d.data.filter((r) => r.territoire === 'France').map((r) => r.indicateur))).sort((a, b) => a.localeCompare(b, 'fr')) : [];
-  sel.replaceChildren(...noms.map((n) => new Option(n, n)));
+  sel.replaceChildren(new Option(gtTous, gtTous), ...noms.map((n) => new Option(n, n)));
   sel.value = dash.params().indicateur;
   sel.onchange = () => dash.setParams({indicateur: sel.value});
 });
@@ -248,7 +296,7 @@ dash.draw('t-comparaison', (tb) => {
     const ds = gtDash(r.territoire); if (ds) sw.style.borderTopStyle = ds === '6 4' ? 'dashed' : 'dotted';
     t.append(sw, document.createTextNode(r.territoire));
     const n = document.createElement('td'); const x = document.createElement('td');
-    if (r.nombre == null) { n.textContent = 'non publié'; n.className = 'gt-np'; } else n.textContent = gtFr(r.nombre);
+    if (r.nombre == null) { n.textContent = 'non publié'; n.className = 'gt-np'; } else n.textContent = (r.estime ? '≈ ' : '') + gtFr(r.nombre);
     x.textContent = r.taux == null ? '—' : gtFr(r.taux, 2);
     tr.append(t, n, x);
     return tr;
@@ -257,7 +305,7 @@ dash.draw('t-comparaison', (tb) => {
 
 // Courbes
 dash.draw('evolution', (el) => {
-  const C = dash.data('communes'), R = dash.data('reperes');
+  const C = dash.data('communes_tous'), R = dash.data('reperes_tous');
   if (C.status !== 'ok' || R.status !== 'ok') { el.textContent = C.status === 'error' || R.status === 'error' ? 'Échec du chargement' : '—'; return; }
   const p = dash.params(), ind = p.indicateur, annee = Number(p.annee);
   const years = Array.from(new Set(R.data.map((r) => r.annee))).sort((a, b) => a - b);
@@ -267,7 +315,7 @@ dash.draw('evolution', (el) => {
     const lignes = parCode.get(code) || [];
     const m = new Map(lignes.map((r) => [r.annee, r]));
     const nom = lignes[0] ? lignes[0].commune : code;
-    return {nom, color: gtColor(nom), w: code === '44063' ? 2.8 : 1.8, pts: years.map((y) => { const r = m.get(y); return {annee: y, v: r && r.publie === 'oui' ? r.taux : null, n: r && r.publie === 'oui' ? r.nombre : null}; })};
+    return {nom, color: gtColor(nom), w: code === '44063' ? 2.8 : 1.8, pts: years.map((y) => { const r = m.get(y); return {annee: y, v: r && r.publie === 'oui' ? r.taux : null, n: r && r.publie === 'oui' ? r.nombre : null, e: r ? r.estimes : null}; })};
   });
   const dep = new Map(R.data.filter((r) => r.territoire === 'Loire-Atlantique' && r.indicateur === ind).map((r) => [r.annee, r]));
   ['Loire-Atlantique', 'France'].forEach((t) => {
@@ -317,7 +365,7 @@ dash.draw('evolution', (el) => {
       const d = s.pts.find((q) => q.annee === an); const div = document.createElement('div');
       const lab = document.createElement('span'); lab.textContent = s.nom + ' : ';
       let txt;
-      if (d.v != null) txt = `${gtFr(d.v, 2)} pour 1 000 (${gtFr(d.n)} faits)`;
+      if (d.v != null) txt = `${gtFr(d.v, 2)} pour 1 000 (${d.e ? '≈ ' : ''}${gtFr(d.n)} faits)`;
       else if (s.nom === 'Gétigné' && dep.get(an) && dep.get(an).taux_non_publiees != null) txt = `non publié (repère ${gtFr(dep.get(an).taux_non_publiees, 2)})`;
       else txt = 'non publié';
       div.append(lab, document.createTextNode(txt)); return div;
@@ -332,7 +380,7 @@ dash.draw('evolution', (el) => {
 
 // Répartition des communes publiées
 dash.draw('repartition', (el) => {
-  const C = dash.data('communes');
+  const C = dash.data('communes_tous');
   if (C.status !== 'ok') { el.textContent = C.status === 'error' ? 'Échec du chargement' : '—'; return; }
   const p = dash.params(), ind = p.indicateur, annee = Number(p.annee);
   const rows = C.data.filter((r) => r.indicateur === ind && r.annee === annee && r.publie === 'oui');
@@ -369,7 +417,7 @@ dash.draw('repartition', (el) => {
     const q = pts.reduce((a, b) => (Math.hypot(b.x - mx, mid + b.y - my) < Math.hypot(a.x - mx, mid + a.y - my) ? b : a));
     halo.attr('cx', q.x).attr('cy', mid + q.y).style('display', null);
     const t = document.createElement('b'); t.textContent = q.r.commune;
-    const d = document.createElement('div'); d.textContent = `${gtFr(q.r.taux, 2)} pour 1 000 · ${gtFr(q.r.nombre)} faits en ${annee}`;
+    const d = document.createElement('div'); d.textContent = `${gtFr(q.r.taux, 2)} pour 1 000 · ${q.r.estimes ? '≈ ' : ''}${gtFr(q.r.nombre)} faits en ${annee}`;
     tip.replaceChildren(t, d); tip.hidden = false;
     const tw = tip.offsetWidth;
     tip.style.left = Math.max(4, Math.min(W - tw - 4, q.x + 12 + tw > W ? q.x - tw - 12 : q.x + 12)) + 'px';
