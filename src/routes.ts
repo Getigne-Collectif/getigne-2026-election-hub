@@ -24,6 +24,7 @@ export enum Routes {
   LEGAL = "/mentions-legales",
   SITEMAP = "/plan-du-site",
   LIFT = "/lift",
+  CRIME_DATA = "/donnees-delinquance-getigne",
 
   // Configuration initiale (premier admin)
   SETUP_WIZARD = "/setup/wizard",

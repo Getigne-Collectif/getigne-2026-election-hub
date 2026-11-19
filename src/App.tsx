@@ -76,6 +76,7 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const DynamicPage = lazy(() => import("./pages/DynamicPage"));
 const LiftPage = lazy(() => import("./pages/LiftPage"));
+const CrimeDataPage = lazy(() => import("./pages/CrimeDataPage"));
 const ProcurationPage = lazy(() => import("./pages/ProcurationPage"));
 const SetupWizardPage = lazy(() => import("./pages/SetupWizardPage"));
 
@@ -140,6 +141,7 @@ function AppRouter() {
         </AuthenticatedRoute>
       } />
       <Route path={AppRoutes.LIFT} element={<LiftPage />} />
+      <Route path={AppRoutes.CRIME_DATA} element={<CrimeDataPage />} />
       <Route path={AppRoutes.PROXY} element={guardedElement(settings.modules.proxy, <ProcurationPage />)} />
 
       {/* Wizard de configuration (après premier admin) : réservé aux admins ou au premier passage */}

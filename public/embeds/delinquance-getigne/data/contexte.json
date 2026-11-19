@@ -1,0 +1,81 @@
+{
+ "rows": [
+  {
+   "cle": "part_arme_feu",
+   "valeur": 62,
+   "unite": "%",
+   "periode": "31 décembre 2024",
+   "source": "La Gazette des communes, d'après le ministère de l'Intérieur"
+  },
+  {
+   "cle": "agents_arme_feu",
+   "valeur": 17855,
+   "unite": "agents",
+   "periode": "31 décembre 2024",
+   "source": "La Gazette des communes, d'après le ministère de l'Intérieur"
+  },
+  {
+   "cle": "effectif_total",
+   "valeur": 28446,
+   "unite": "agents",
+   "periode": "31 décembre 2024",
+   "source": "La Gazette des communes, d'après le ministère de l'Intérieur"
+  },
+  {
+   "cle": "part_arme_feu_2012",
+   "valeur": 38,
+   "unite": "%",
+   "periode": "2012",
+   "source": "Sénat, rapport d'information n° 671 (2024-2025)"
+  },
+  {
+   "cle": "part_services_armes",
+   "valeur": 83.1,
+   "unite": "%",
+   "periode": "2023",
+   "source": "Sénat, rapport d'information n° 671 (2024-2025)"
+  },
+  {
+   "cle": "usages_armes_2023",
+   "valeur": 3228,
+   "unite": "cas",
+   "periode": "2023",
+   "source": "Sénat, rapport d'information n° 671 (2024-2025)"
+  },
+  {
+   "cle": "usages_armes_2022",
+   "valeur": 1492,
+   "unite": "cas",
+   "periode": "2022",
+   "source": "Sénat, rapport d'information n° 671 (2024-2025)"
+  },
+  {
+   "cle": "blesses_2023",
+   "valeur": 1208,
+   "unite": "agents",
+   "periode": "2023",
+   "source": "Sénat, rapport d'information n° 671 (2024-2025)"
+  },
+  {
+   "cle": "agents_pluricommunale",
+   "valeur": 4,
+   "unite": "agents",
+   "periode": "consulté le 18 novembre 2026",
+   "source": "Site de la mairie de Clisson, page Police municipale"
+  },
+  {
+   "cle": "seances_entrainement",
+   "valeur": 2,
+   "unite": "séances par an",
+   "periode": "règle en vigueur",
+   "source": "Arrêté du 3 août 2007 relatif aux formations à l'armement"
+  },
+  {
+   "cle": "cartouches_entrainement",
+   "valeur": 50,
+   "unite": "cartouches par an",
+   "periode": "règle en vigueur",
+   "source": "Arrêté du 3 août 2007 relatif aux formations à l'armement"
+  }
+ ]
+}

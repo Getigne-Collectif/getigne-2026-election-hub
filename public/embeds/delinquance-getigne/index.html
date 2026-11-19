@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Délinquance enregistrée à Gétigné, 2016–2025</title>
+<meta name="description" content="Faits enregistrés à Gétigné, Gorges et Clisson de 2016 à 2025, comparés à la Loire-Atlantique et à la France, et repères sur l’armement des polices municipales.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="gt-page">
+<div class="gt" lang="fr">
+
+<header id="entete">
+  <h1 class="gt-title">Délinquance enregistrée à Gétigné, 2016–2025</h1>
+  <p class="gt-lead">En <b data-draw="val" data-source="synthese" data-field="annee" data-row="0" data-raw="1">—</b>, le ministère de l’Intérieur publie un nombre pour <b data-draw="val" data-source="synthese" data-field="publies" data-row="0">—</b> des <b data-draw="val" data-source="synthese" data-field="indicateurs" data-row="0">—</b> indicateurs suivis à Gétigné, soit <b data-draw="val" data-source="synthese" data-field="faits" data-row="0">—</b> faits enregistrés. Les <b data-draw="val" data-source="synthese" data-field="non_publies" data-row="0">—</b> autres sont sous le seuil de publication.</p>
+  <p class="gt-p">Ces chiffres comptent les crimes et délits enregistrés par la gendarmerie et la police nationales, rattachés à la commune où ils ont été commis. « Non publié » ne veut pas dire zéro : le ministère ne diffuse pas les petits nombres, trop instables d’une année à l’autre et couverts par le secret statistique. Sa notice indique qu’un nombre n’est diffusé que là où plus de 5 faits ont été enregistrés pendant trois années successives, et qu’un zéro ne l’est que s’il se répète trois ans de suite.</p>
+  <div class="gt-bar">
+    <label class="gt-field">Année affichée
+      <select class="dash-select" data-draw="choix-annee" aria-label="Année affichée" data-source="reperes"></select>
+    </label>
+  </div>
+</header>
+
+<section id="getigne">
+  <h2 class="gt-h2">Gétigné, indicateur par indicateur</h2>
+  <p class="gt-p">Pour chaque indicateur : le nombre de faits de l’année choisie quand il est publié, le taux pour 1 000 habitants comparé au département et à la France, et le profil des dix années. Cliquer une ligne affiche son évolution plus bas.</p>
+  <div class="gt-scroll">
+    <table class="gt-table" id="tableau-getigne" data-source="tableau_getigne" data-row-key="indicateur">
+      <thead><tr>
+        <th data-field="indicateur">Indicateur</th>
+        <th data-field="nombre">Faits à Gétigné</th>
+        <th data-field="repere_nombre">Repère si non publié</th>
+        <th data-field="taux">Taux Gétigné</th>
+        <th data-field="taux_44">Taux Loire-Atlantique</th>
+        <th data-field="taux_france">Taux France</th>
+        <th data-field="annees_publiees">Années publiées sur dix</th>
+        <th>Faits par an, 2016–2025</th>
+      </tr></thead>
+      <tbody data-draw="t-getigne"></tbody>
+    </table>
+  </div>
+  <p class="gt-muted">Taux pour 1 000 habitants, sauf les cambriolages : pour 1 000 logements. « Repère si non publié » : moyenne des nombres non publiés dans les communes de Loire-Atlantique, donnée par le ministère comme ordre de grandeur ; ce n’est pas le chiffre de Gétigné. Dans la dernière colonne, une barre pleine est un nombre publié, un trait au sol un zéro publié, un point creux une année non publiée. Les violences intrafamiliales ne figurent que pour Gétigné : le fichier de toutes les communes ne faisait pas partie de l’envoi, d’où l’absence de taux départemental et national.</p>
+</section>
+
+<section id="evolution">
+  <h2 class="gt-h2">Évolution d’un indicateur, comparée aux voisines</h2>
+  <p class="gt-p">Taux pour 1 000 habitants (ou logements) à Gétigné, à Gorges et à Clisson — les trois communes de la police pluricommunale — avec la Loire-Atlantique et la France pour repères.</p>
+  <div class="gt-bar">
+    <label class="gt-field">Indicateur
+      <select class="dash-select" data-draw="choix-indicateur" aria-label="Indicateur" data-source="reperes"></select>
+    </label>
+    <label class="gt-field">Autre commune à comparer
+      <select class="dash-select" data-draw="choix-commune" aria-label="Autre commune de Loire-Atlantique à comparer" data-source="communes"></select>
+    </label>
+  </div>
+  <div class="gt-card">
+    <div class="gt-chart" id="graphique-evolution" data-draw="evolution" data-source="communes reperes">—</div>
+    <p class="gt-muted">Cercles vides : années où le nombre de Gétigné n’est pas publié, placés au taux moyen des communes non publiées du département. Une ligne s’interrompt quand le nombre d’une commune n’est pas publié.</p>
+  </div>
+  <div class="gt-scroll">
+    <table class="gt-table" id="tableau-comparaison" data-source="comparaison" data-row-key="territoire">
+      <thead><tr>
+        <th data-field="territoire">Territoire, année affichée</th>
+        <th data-field="nombre">Faits</th>
+        <th data-field="taux">Taux pour 1 000</th>
+      </tr></thead>
+      <tbody data-draw="t-comparaison"></tbody>
+    </table>
+  </div>
+  <p class="gt-muted">Les totaux de la Loire-Atlantique et de la France sont reconstitués à partir des fichiers communaux (méthode en bas de page) ; ils peuvent différer légèrement des bilans officiels.</p>
+</section>
+
+<section id="departement">
+  <h2 class="gt-h2">Où se situe Gétigné parmi les communes de Loire-Atlantique</h2>
+  <p class="gt-p" data-gt-si="publié" hidden>En <span data-draw="val" data-source="position" data-field="annee" data-row="0" data-raw="1">—</span>, <span data-draw="val" data-source="position" data-field="publiees" data-row="0">—</span> des <span data-draw="val" data-source="position" data-field="communes" data-row="0">—</span> communes du département ont un nombre publié pour l’indicateur choisi. Gétigné en fait partie : son taux la place au rang <b data-draw="val" data-source="position" data-field="rang" data-row="0">—</b> en partant du plus bas (les ex æquo partagent le même rang), pour une médiane de <span data-draw="val" data-source="position" data-field="mediane" data-row="0" data-dec="2">—</span> pour 1 000 parmi les communes publiées.</p>
+  <p class="gt-p" data-gt-si="non publié" hidden>En <span data-draw="val" data-source="position" data-field="annee" data-row="0" data-raw="1">—</span>, <span data-draw="val" data-source="position" data-field="publiees" data-row="0">—</span> des <span data-draw="val" data-source="position" data-field="communes" data-row="0">—</span> communes du département ont un nombre publié pour l’indicateur choisi. Gétigné n’en fait pas partie : son nombre est sous le seuil de publication, comme celui de <span data-draw="val" data-source="position" data-field="autres_non_publiees" data-row="0">—</span> autres communes.</p>
+  <div class="gt-card">
+    <div class="gt-strip" id="graphique-repartition" data-draw="repartition" data-source="communes">—</div>
+    <p class="gt-muted">Un point par commune dont le nombre est publié, placé selon son taux pour 1 000 (échelle resserrée vers les valeurs hautes). Gétigné, Gorges, Clisson et la commune choisie gardent leurs couleurs du graphique précédent. Les communes non publiées — celles où l’on enregistre le moins de faits — n’apparaissent pas : la médiane affichée est donc plus haute que celle de l’ensemble des communes.</p>
+  </div>
+</section>
+
+<section id="trois-communes">
+  <h2 class="gt-h2">Le périmètre de la police pluricommunale : Gétigné, Gorges, Clisson</h2>
+  <p class="gt-p">Nombre de faits enregistrés dans chacune des trois communes couvertes par la convention, pour l’année affichée.</p>
+  <div class="gt-scroll">
+    <table class="gt-table" id="tableau-trois" data-source="tableau_trois" data-row-key="indicateur">
+      <thead><tr>
+        <th data-field="indicateur">Indicateur</th>
+        <th data-field="getigne">Gétigné</th>
+        <th data-field="gorges">Gorges</th>
+        <th data-field="clisson">Clisson</th>
+        <th data-field="total_publie">Total des nombres publiés</th>
+      </tr></thead>
+      <tbody data-draw="t-trois"></tbody>
+    </table>
+  </div>
+  <p class="gt-muted">n. p. : non publié (petit nombre, pas forcément zéro). Le total n’additionne que les nombres publiés : c’est un minimum. À Clisson, les vols sans violence chutent en 2020 et 2021, années sans Hellfest, puis remontent : une bonne part de ces faits tient vraisemblablement au festival plutôt qu’au quotidien de la commune.</p>
+</section>
+
+<section id="armement">
+  <h2 class="gt-h2">L’armement des polices municipales : repères nationaux</h2>
+  <div class="gt-cards">
+    <div class="gt-card" id="carte-arme-feu">
+      <div class="gt-cardlabel">Policiers municipaux dotés d’une arme à feu, fin 2024</div>
+      <div class="gt-big"><span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=part_arme_feu">—</span> %</div>
+      <div class="gt-cardnote"><span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=agents_arme_feu">—</span> agents sur <span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=effectif_total">—</span> ; ils étaient <span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=part_arme_feu_2012">—</span> % en 2012.</div>
+    </div>
+    <div class="gt-card" id="carte-services-armes">
+      <div class="gt-cardlabel">Services de police municipale armés, toutes armes confondues, 2023</div>
+      <div class="gt-big"><span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=part_services_armes" data-dec="1">—</span> %</div>
+      <div class="gt-cardnote">Bâton, lacrymogène, pistolet à impulsion électrique ou arme à feu.</div>
+    </div>
+    <div class="gt-card" id="carte-usages">
+      <div class="gt-cardlabel">Usages d’une arme par des policiers municipaux, France, 2023</div>
+      <div class="gt-big"><span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=usages_armes_2023">—</span></div>
+      <div class="gt-cardnote">Contre <span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=usages_armes_2022">—</span> en 2022, tous types d’armes ; <span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=blesses_2023">—</span> agents blessés en mission en 2023.</div>
+    </div>
+    <div class="gt-card" id="carte-agents">
+      <div class="gt-cardlabel">Agents de la police pluricommunale Clisson – Gorges – Gétigné</div>
+      <div class="gt-big"><span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=agents_pluricommunale">—</span></div>
+      <div class="gt-cardnote">Selon le site de la mairie de Clisson. Un agent armé doit suivre <span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=seances_entrainement">—</span> séances d’entraînement et tirer <span data-draw="val" data-source="contexte" data-field="valeur" data-where="cle=cartouches_entrainement">—</span> cartouches par an.</div>
+    </div>
+  </div>
+
+  <p class="gt-p">Le cadre : l’armement est facultatif. Le maire en fait la demande motivée, le préfet délivre une autorisation nominative à chaque agent, et une convention de coordination avec les forces de l’État doit exister (article L. 511-5 du code de la sécurité intérieure). Pour une police commune à plusieurs communes, la demande est faite conjointement par les maires. Chaque agent suit une formation préalable du CNFPT, à la charge de la commune, puis un entraînement annuel.</p>
+
+  <div class="gt-cols">
+    <div class="gt-card" id="arguments-pour">
+      <h3>Ce qu’avancent les partisans de l’armement</h3>
+      <ul>
+        <li>La protection des agents : selon la mission d’information du Sénat de 2025, ceux qui s’en prennent à l’uniforme ne distinguent plus police municipale et forces nationales.</li>
+        <li>Le temps d’attente : en zone gendarmerie, les agents municipaux peuvent être les premiers sur place face à une personne dangereuse, même si le cas est rare.</li>
+        <li>Le recrutement : le Sénat relève que l’absence d’armement nuit à l’attractivité d’un service ; les agents peuvent préférer une commune voisine armée.</li>
+        <li>L’encadrement : autorisation individuelle du préfet, formation, entraînement obligatoire, retrait possible.</li>
+        <li>La norme : la majorité des policiers municipaux portent désormais une arme à feu.</li>
+      </ul>
+    </div>
+    <div class="gt-card" id="arguments-contre">
+      <h3>Ce qu’avancent ses opposants</h3>
+      <ul>
+        <li>Le besoin local : quand les violences et vols avec arme enregistrés restent sous le seuil de publication, la menace qui justifierait une arme létale n’apparaît pas dans les chiffres.</li>
+        <li>Les missions : une police municipale assure d’abord la proximité et la tranquillité publique ; l’arme peut déplacer sa doctrine vers l’intervention, et la Cour des comptes a constaté que l’État se décharge sur les polices municipales étoffées.</li>
+        <li>Le risque propre à l’arme : accident, usage disproportionné, responsabilité du maire et de l’agent.</li>
+        <li>Le coût et le temps : armes, armurerie sécurisée, formation et entraînement qui retirent les agents du terrain.</li>
+        <li>Les alternatives : équipements intermédiaires, effectifs, horaires, prévention, renfort de la gendarmerie.</li>
+      </ul>
+    </div>
+    <div class="gt-card" id="limites">
+      <h3>Ce que ces chiffres ne disent pas</h3>
+      <ul>
+        <li>Les faits non déclarés : seule une partie des victimes porte plainte, surtout pour les violences.</li>
+        <li>Les incivilités, nuisances et infractions routières, qui font le quotidien d’une police municipale, ne sont pas dans ces indicateurs.</li>
+        <li>Les agressions ou menaces subies par les agents eux-mêmes : seul le service ou la gendarmerie peut les fournir.</li>
+        <li>L’effet d’une arme : la Cour des comptes notait en 2020 que l’armement relève d’un choix politique qui ne dépend pas nécessairement du niveau de délinquance, et aucune évaluation publique n’établit qu’il la fasse baisser.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="gt-h2">Questions utiles en séance</h3>
+  <ul class="gt-list">
+    <li>Sur quel diagnostic local de sécurité de la gendarmerie la convention s’appuie-t-elle, et peut-il être communiqué au conseil ?</li>
+    <li>Combien d’interventions des agents ont comporté une menace ou une agression ces dernières années, et de quelle nature ?</li>
+    <li>Quelles armes précisément, pour quels agents, à quels horaires et pour quelles missions ?</li>
+    <li>Quel coût d’acquisition, de stockage, de formation et d’entraînement, et quelle répartition entre les trois communes ?</li>
+    <li>La convention prévoit-elle une évaluation annuelle et une clause de réexamen ? Le vote porte-t-il sur une possibilité ou sur une décision d’armer ?</li>
+    <li>Qu’en disent les agents eux-mêmes, et quelles alternatives ont été étudiées ?</li>
+  </ul>
+  <p class="gt-muted">Sources : <a href="https://www.senat.fr/rap/r24-671/r24-671-syn.pdf" target="_blank" rel="noopener">Sénat, mission d’information sur les polices municipales, mai 2025</a> · <a href="https://www.lagazettedescommunes.com/1028051/62-des-policiers-municipaux-sont-equipes-dune-arme-a-feu/" target="_blank" rel="noopener">La Gazette des communes, chiffres du ministère au 31 décembre 2024</a> · <a href="https://www.ccomptes.fr/sites/default/files/2023-10/20201020-synthese-polices-municipales_0.pdf" target="_blank" rel="noopener">Cour des comptes, Les polices municipales, octobre 2020</a> · <a href="https://www.senat.fr/questions/base/2022/qSEQ220802223.html" target="_blank" rel="noopener">Ministère de l’Intérieur, réponse sur l’article L. 511-5</a> · <a href="https://www.mairie-clisson.fr/services/les-services-de-la-ville/police-municipale" target="_blank" rel="noopener">Mairie de Clisson, police municipale</a> · <a href="https://www.ouest-france.fr/pays-de-la-loire/clisson-44190/larmement-letal-des-policiers-municipaux-divise-les-elus-2d1ab1a8-df45-11f1-8a68-1e9f9f2c4ff6" target="_blank" rel="noopener">Ouest-France, conseil municipal de Clisson du 12 novembre 2026</a>.</p>
+</section>
+
+<details id="methode">
+  <summary>Méthode et limites des données</summary>
+  <p class="gt-p">Source : base communale de la délinquance enregistrée du service statistique ministériel de la sécurité intérieure (SSMSI), années 2016 à 2025, à partir des classeurs fournis. Les faits sont comptés au lieu de commission. Dans une commune de cette taille, quelques faits de plus ou de moins suffisent à faire varier fortement un taux : mieux vaut lire plusieurs années qu’une seule.</p>
+  <p class="gt-p">Totaux de la Loire-Atlantique et de la France : faits publiés, plus le nombre de communes non publiées multiplié par la moyenne départementale de leurs nombres, que le ministère fournit. Les populations et les logements sont déduits du rapport entre nombre et taux. Les arrondissements de Paris, Lyon et Marseille sont écartés pour ne pas compter ces villes deux fois. Le code du calcul est consultable dans les sources du tableau de bord.</p>
+  <p class="gt-p">Les repères nationaux sur l’armement ont été relevés à la main dans les publications citées.</p>
+</details>
+
+</div>
+</main>
+<script src="vendor/d3.min.js"></script>
+<script src="dash-shim.js"></script>
+<script src="app.js"></script>
+<script>dash.start();</script>
+</body>
+</html>
